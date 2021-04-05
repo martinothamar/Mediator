@@ -20,6 +20,8 @@ namespace {{ MediatorNamespace }}
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
             services.AddSingleton<global::{{ MediatorNamespace }}.IMediator, global::{{ MediatorNamespace }}.MediatorImpl>();
+            // services.AddSingleton<global::Mediator.ISender, global::{{ MediatorNamespace }}.IMediator>();
+            // services.AddSingleton<global::Mediator.IPublisher, global::{{ MediatorNamespace }}.IMediator>();
 
             {{~ for handler in Handlers ~}}
             services.AddSingleton<{{ handler.FullName }}, {{ handler.FullName }}>();
@@ -72,7 +74,7 @@ namespace {{ MediatorNamespace }}
                 _rootHandler = handler;
             }
 
-            public global::System.Threading.Tasks.ValueTask<TResponse> Handle(T{{ handlerType.Name }} {{ string.downcase handlerType.Name }}, System.Threading.CancellationToken cancellationToken)
+            public global::System.Threading.Tasks.ValueTask<TResponse> Handle(T{{ handlerType.Name }} {{ string.downcase handlerType.Name }}, global::System.Threading.CancellationToken cancellationToken)
             {
                 return _rootHandler({{ string.downcase handlerType.Name }}, cancellationToken);
             }
@@ -100,7 +102,7 @@ namespace {{ MediatorNamespace }}
                 _rootHandler = handler;
             }
 
-            public global::System.Threading.Tasks.ValueTask Handle(T{{ handlerType.Name }} {{ string.downcase handlerType.Name }}, System.Threading.CancellationToken cancellationToken)
+            public global::System.Threading.Tasks.ValueTask Handle(T{{ handlerType.Name }} {{ string.downcase handlerType.Name }}, global::System.Threading.CancellationToken cancellationToken)
             {
                 return _rootHandler({{ string.downcase handlerType.Name }}, cancellationToken);
             }
@@ -113,7 +115,7 @@ namespace {{ MediatorNamespace }}
     /// Interface for the mediator pattern implementation.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
-    public interface IMediator
+    public interface IMediator //: global::Mediator.ISender, global::Mediator.IPublisher
     {
         {{~ for handler in Handlers ~}}
         {{~ for handlerInterface in handler.Interfaces ~}}
@@ -123,13 +125,13 @@ namespace {{ MediatorNamespace }}
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ handlerInterface.ReturnType }} {{ handlerInterface.MethodName }}({{ handlerInterface.RequestType.FullName }} message, System.Threading.CancellationToken cancellationToken = default);
+        {{ handlerInterface.ReturnType }} {{ handlerInterface.MethodName }}({{ handlerInterface.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default);
         {{~ end ~}}
         {{~ end ~}}
     }
     
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
-    internal sealed partial class MediatorImpl : IMediator
+    internal sealed partial class MediatorImpl : global::{{ MediatorNamespace }}.IMediator
     {
         private readonly global::System.IServiceProvider _sp;
 
@@ -140,14 +142,63 @@ namespace {{ MediatorNamespace }}
 
         {{~ for handler in Handlers ~}}
         {{~ for handlerInterface in handler.Interfaces ~}}
-        public {{ handlerInterface.ReturnType }} {{ handlerInterface.MethodName }}({{ handlerInterface.RequestType.FullName }} message, System.Threading.CancellationToken cancellationToken = default)
+        public {{ handlerInterface.ReturnType }} {{ handlerInterface.MethodName }}({{ handlerInterface.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default)
         {
             var sp = _sp;
             var handler = sp.GetRequiredService<{{ handlerInterface.FullName }}>();
+            // TODO handle multiple handlers, notification case
 
             return handler.Handle(message, cancellationToken);
         }
         {{~ end ~}}
         {{~ end ~}}
+
+        // public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IRequest<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default);
+
+        // public global::System.Threading.Tasks.ValueTask Send(global::Mediator.IRequest request, global::System.Threading.CancellationToken cancellationToken = default);
+
+        // public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.ICommand<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default);
+
+        // public global::System.Threading.Tasks.ValueTask Send(global::Mediator.ICommand request, global::System.Threading.CancellationToken cancellationToken = default);
+
+        // public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IQuery<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default);
+
+        public global::System.Threading.Tasks.ValueTask Publish<TNotification>(TNotification notification, global::System.Threading.CancellationToken cancellationToken = default)
+            where TNotification : global::Mediator.INotification
+        {
+            var sp = _sp;
+
+            var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
+
+            var count = handlers.Count();
+            if (handlers == null || count == 0)
+                return default;
+            else if (count == 1)
+                return handlers.First().Handle(notification, cancellationToken);
+
+            return Publish(notification, handlers, cancellationToken);
+
+            async global::System.Threading.Tasks.ValueTask Publish(TNotification notification, global::System.Collections.Generic.IEnumerable<global::Mediator.INotificationHandler<TNotification>> handlers, global::System.Threading.CancellationToken cancellationToken)
+            {
+                // We don't allocate the list if no task throws
+                global::System.Collections.Generic.List<global::System.Exception> exceptions = null;
+
+                foreach (var handler in handlers)
+                {
+                    try
+                    {
+                        await handler.Handle(notification, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (global::System.Exception ex)
+                    {
+                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
+                        exceptions.Add(ex);
+                    }
+                }
+
+                if (exceptions != null)
+                    throw new global::System.AggregateException(exceptions);
+            }
+        }
     }
 }

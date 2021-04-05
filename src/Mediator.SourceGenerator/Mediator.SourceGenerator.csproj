@@ -32,6 +32,10 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Mediator\Mediator.csproj" />
+    </ItemGroup>
+
     <PropertyGroup>
         <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
     </PropertyGroup>
