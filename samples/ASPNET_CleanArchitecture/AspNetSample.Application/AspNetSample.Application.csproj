@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="9.5.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
+    <ProjectReference Include="..\AspNetSample.Domain\AspNetSample.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

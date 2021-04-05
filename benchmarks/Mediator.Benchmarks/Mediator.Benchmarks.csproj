@@ -11,6 +11,8 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
+        <PackageReference Include="MediatR" Version="9.0.0" />
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
     </ItemGroup>
 
