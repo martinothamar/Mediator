@@ -20,7 +20,7 @@ Using source generators instead of relying on reflection has multiple benefits
   - [2.1. Message types](#21-message-types)
   - [2.2. Handler types](#22-handler-types)
   - [2.3. Pipeline types](#23-pipeline-types)
-  - [2.4. Simple example](#24-simple-example)
+  - [2.4. Simple end-to-end example](#24-simple-end-to-end-example)
 - [3. Benchmarks](#3-benchmarks)
 
 
@@ -88,12 +88,29 @@ public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMes
 }
 ```
 
-### 2.4. Simple example
+### 2.4. Simple end-to-end example
 
-In `ConfigureServices` or equivalent, call `AddMediator`.
+Add package
+
+```pwsh
+dotnet add package Mediator.SourceGenerator --version notyetpublished
+dotnet add package Mediator --version notyetpublished
+```
+or
+```xml
+<PackageReference Include="Mediator.SourceGenerator" Version="notyetpublished">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+<PackageReference Include="Mediator" Version="notyetpublished" />
+```
+
+In `ConfigureServices` or equivalent, call `AddMediator` (unless `MediatorOptions` is configured, default namespace is `Mediator`).
 This registers your handler below.
 
 ```csharp
+using Mediator;
+
 services.AddMediator();
 ```
 
