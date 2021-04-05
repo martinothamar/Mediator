@@ -1,5 +1,20 @@
 ## Mediator
 
+This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
+The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library.
+
+> **NOTE**
+> This is very new, and API etc might change.
+> Will soon publish pre-release NuGet packages.
+
+
+Using source generators instead of relying on reflection has multiple benefits
+* Better performance
+  * This library does zero allocation on its own (see the benchmarks section)
+* AOT friendly, faster startup
+  * Since the code for the mediator implementation is generated during build, any error in the Mediator implementation should be caught during build.
+
+
 - [Mediator](#mediator)
 - [2. Usage](#2-usage)
   - [2.1. Message types](#21-message-types)
@@ -8,15 +23,6 @@
   - [2.4. Simple example](#24-simple-example)
 - [3. Benchmarks](#3-benchmarks)
 
-
-This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
-The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library.
-
-Using source generators instead of relying on reflection has multiple benefits
-* Better performance
-  * This library does zero allocation on its own (see the benchmarks section)
-* AOT friendly, faster startup
-  * Since the code for the mediator implementation is generated during build, any error in the Mediator implementation should be caught during build.
 
 ## 2. Usage
 
