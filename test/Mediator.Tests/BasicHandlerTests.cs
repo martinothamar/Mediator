@@ -42,6 +42,16 @@ namespace Mediator.Tests
             return default;
         }
     }
+    public sealed class SomeOtherNotificationHandler : INotificationHandler<SomeNotification>
+    {
+        internal Guid Id = default;
+
+        public ValueTask Handle(SomeNotification Notification, CancellationToken cancellationToken)
+        {
+            Id = Notification.Id;
+            return default;
+        }
+    }
 
     public class BasicHandlerTests
     {
@@ -59,7 +69,7 @@ namespace Mediator.Tests
 
             var id = Guid.NewGuid();
 
-            var response = await mediator!.Send(new SomeRequest(id), CancellationToken.None);
+            var response = await mediator!.SendAsync(new SomeRequest(id), CancellationToken.None);
             Assert.NotNull(response);
             Assert.Equal(id, response.Id);
         }
@@ -71,7 +81,7 @@ namespace Mediator.Tests
 
             var id = Guid.NewGuid();
 
-            var response = await mediator!.Send(new SomeQuery(id), CancellationToken.None);
+            var response = await mediator!.SendAsync(new SomeQuery(id), CancellationToken.None);
             Assert.NotNull(response);
             Assert.Equal(id, response.Id);
         }
@@ -84,7 +94,7 @@ namespace Mediator.Tests
             var id = Guid.NewGuid();
 
             var commandHandler = sp.GetRequiredService<SomeCommandHandler>();
-            await mediator.Send(new SomeCommand(id));
+            await mediator.SendAsync(new SomeCommand(id));
             Assert.Equal(id, commandHandler.Id);
         }
 
@@ -96,8 +106,22 @@ namespace Mediator.Tests
             var id = Guid.NewGuid();
 
             var commandHandler = sp.GetRequiredService<SomeNotificationHandler>();
-            await mediator.Publish(new SomeNotification(id));
+            await mediator.PublishAsync(new SomeNotification(id));
             Assert.Equal(id, commandHandler.Id);
+        }
+
+        [Fact]
+        public async Task Test_Multiple_Notification_Handlers()
+        {
+            var (sp, mediator) = Fixture.GetMediator();
+
+            var id = Guid.NewGuid();
+
+            var handler1 = sp.GetRequiredService<SomeNotificationHandler>();
+            var handler2 = sp.GetRequiredService<SomeOtherNotificationHandler>();
+            await mediator.PublishAsync(new SomeNotification(id));
+            Assert.Equal(id, handler1.Id);
+            Assert.Equal(id, handler2.Id);
         }
     }
 }

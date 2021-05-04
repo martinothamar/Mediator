@@ -25,7 +25,7 @@ var mediator = serviceProvider.GetRequiredService<IMediator>();
 var id = Guid.NewGuid();
 var request = new Ping(id);
 
-var response = await mediator.Send(request);
+var response = await mediator.SendAsync(request);
 
 Console.WriteLine("-----------------------------------");
 Console.WriteLine("ID: " + id);

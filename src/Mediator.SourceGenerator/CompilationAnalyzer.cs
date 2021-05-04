@@ -10,11 +10,17 @@ namespace Mediator.SourceGenerator
     internal sealed class CompilationAnalyzer
     {
         private readonly Compilation _compilation;
-        private readonly Dictionary<INamedTypeSymbol, List<INamedTypeSymbol>> _handlerMap;
+        private readonly Dictionary<INamedTypeSymbol, List<INamedTypeSymbol>> _concreteHandlerSymbolMap;
 
-        public IReadOnlyDictionary<INamedTypeSymbol, List<INamedTypeSymbol>> HandlerMap => _handlerMap;
+        public IReadOnlyDictionary<INamedTypeSymbol, List<INamedTypeSymbol>> ConcreteHandlerSymbolMap => _concreteHandlerSymbolMap;
 
-        public IEnumerable<INamedTypeSymbol> HandlerTypes { get; private set; }
+        public IEnumerable<INamedTypeSymbol> BaseHandlerSymbols { get; private set; }
+
+        public IEnumerable<INamedTypeSymbol> ConcreteMessageSymbols { get; private set; }
+
+        public IEnumerable<HandlerType> BaseHandlers { get; private set; }
+
+        public IEnumerable<Handler> ConcreteHandlers { get; private set; }
 
         public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
@@ -22,9 +28,13 @@ namespace Mediator.SourceGenerator
         {
             _compilation = compilation;
 #pragma warning disable RS1024 // Compare symbols correctly
-            _handlerMap = new (SymbolEqualityComparer.Default);
+            _concreteHandlerSymbolMap = new (SymbolEqualityComparer.Default);
 #pragma warning restore RS1024 // Compare symbols correctly
-            HandlerTypes = Array.Empty<INamedTypeSymbol>();
+            BaseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
+            ConcreteMessageSymbols = Array.Empty<INamedTypeSymbol>();
+
+            BaseHandlers = Array.Empty<HandlerType>();
+            ConcreteHandlers = Array.Empty<Handler>();
         }
 
         public void Analyze(CancellationToken cancellationToken)
@@ -43,7 +53,7 @@ namespace Mediator.SourceGenerator
                 TryParseOptions(optionsAttr, cancellationToken);
             }
 
-            var handlerTypes = new INamedTypeSymbol[]
+            var baseHandlerSymbols = new INamedTypeSymbol[]
             {
                 // Handlers
                 compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`1")!.OriginalDefinition,
@@ -53,7 +63,7 @@ namespace Mediator.SourceGenerator
                 compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
                 compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
             };
-            HandlerTypes = handlerTypes;
+            BaseHandlerSymbols = baseHandlerSymbols;
 
             foreach (var reference in compilation.References)
             {
@@ -86,15 +96,39 @@ namespace Mediator.SourceGenerator
                         if (interfaceSymbol.ContainingNamespace.Name != Constants.MediatorLib)
                             continue;
 
-                        if (!handlerTypes.Contains(interfaceSymbol.OriginalDefinition, SymbolEqualityComparer.Default))
+                        if (!baseHandlerSymbols.Contains(interfaceSymbol.OriginalDefinition, SymbolEqualityComparer.Default))
                             continue;
 
-                        handlerSymbolList ??= _handlerMap[typeSymbol.OriginalDefinition] = new();
+                        if (handlerSymbolList is null)
+                        {
+                            handlerSymbolList = new();
+                            _concreteHandlerSymbolMap.Add(typeSymbol.OriginalDefinition, handlerSymbolList);
+                        }
 
                         handlerSymbolList.Add(interfaceSymbol);
                     }
                 }
             }
+
+            ConcreteHandlers = ConcreteHandlerSymbolMap
+                .OrderBy(h => h.Key.Name)
+                .Select(h => new Handler(h.Key, h.Value, compilation))
+                .ToArray();
+
+            ConcreteMessageSymbols = ConcreteHandlerSymbolMap
+                .SelectMany(h => h.Value.Select(s => s.TypeArguments[0]))
+                .Distinct(SymbolEqualityComparer.Default)
+                .Cast<INamedTypeSymbol>()
+                .ToArray();
+
+            BaseHandlers = BaseHandlerSymbols
+                .Select(ht =>
+                {
+                    var messageType = ht.TypeArguments[0].Name.Substring(1);
+                    var hasResponse = ht.MetadataName.EndsWith("2", StringComparison.InvariantCulture);
+                    return new HandlerType(messageType, hasResponse);
+                })
+                .ToArray();
         }
 
         private void TryParseOptions(AttributeData optionsAttr, CancellationToken cancellationToken)

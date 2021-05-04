@@ -64,7 +64,7 @@ namespace Mediator.Tests.Pipeline
 
             var pipelineStep = sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is SomePipeline) as SomePipeline;
             Assert.NotNull(pipelineStep);
-            var response = await mediator.Send(new SomeRequest(id));
+            var response = await mediator.SendAsync(new SomeRequest(id));
             Assert.Equal(id, response.Id);
             Assert.Equal(id, pipelineStep!.Id);
         }
@@ -81,7 +81,7 @@ namespace Mediator.Tests.Pipeline
 
             var pipelineStep = sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is GenericPipeline<SomeRequest, SomeResponse>) as GenericPipeline<SomeRequest, SomeResponse>;
             Assert.NotNull(pipelineStep);
-            var response = await mediator.Send(new SomeRequest(id));
+            var response = await mediator.SendAsync(new SomeRequest(id));
             Assert.Equal(id, response.Id);
             Assert.Equal(id, pipelineStep!.Id);
         }
@@ -97,7 +97,7 @@ namespace Mediator.Tests.Pipeline
 
             var id = Guid.NewGuid();
 
-            var response = await mediator.Send(new SomeRequest(id));
+            var response = await mediator.SendAsync(new SomeRequest(id));
 
             var pipelineSteps = sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Cast<IPipelineTestData>();
 

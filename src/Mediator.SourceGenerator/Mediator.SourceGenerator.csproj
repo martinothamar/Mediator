@@ -18,6 +18,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectCapability Include="RoslynComponent" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
         <!--<None Include="$(PKGScriban)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->

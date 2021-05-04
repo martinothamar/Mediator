@@ -12,7 +12,7 @@ namespace Mediator.SourceGenerator
         {
             var debugOptionExists = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Mediator_AttachDebugger", out _);
 
-            if (debugOptionExists)
+            if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
                 System.Diagnostics.Debugger.Launch();
 
             try
@@ -24,7 +24,7 @@ namespace Mediator.SourceGenerator
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         new DiagnosticDescriptor(
-                            "MEDIATOR00001",
+                            "MG0000",
                             "An exception was thrown by the Mediator source generator",
                             "An exception was thrown by the Mediator source generator: '{0}'",
                             "Mediator",
@@ -49,13 +49,13 @@ namespace Mediator.SourceGenerator
             var compilationAnalyzer = new CompilationAnalyzer(compilation);
             compilationAnalyzer.Analyze(context.CancellationToken);
 
-            var mediatorContext = new MediatorGenerationContext(
-                compilationAnalyzer.HandlerMap,
-                compilationAnalyzer.HandlerTypes,
-                compilationAnalyzer.MediatorNamespace
-            );
+            var analysisReporter = new AnalysisReporter();
+            var hasErrors = analysisReporter.Report(in context, compilationAnalyzer);
+            if (hasErrors)
+                return;
+
             var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-            mediatorImplementationGenerator.Generate(in context, in mediatorContext);
+            mediatorImplementationGenerator.Generate(in context, compilationAnalyzer);
         }
 
         private void GenerateOptionsAttribute(in GeneratorExecutionContext context)

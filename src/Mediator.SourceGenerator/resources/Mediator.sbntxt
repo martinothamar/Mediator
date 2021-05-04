@@ -26,6 +26,10 @@ namespace {{ MediatorNamespace }}
             {{~ for handler in Handlers ~}}
             services.AddSingleton<{{ handler.FullName }}, {{ handler.FullName }}>();
             {{~ for handlerInterface in handler.Interfaces ~}}
+
+            {{ if handlerInterface.IsNotificationType }}
+            services.AddSingleton<{{ handlerInterface.FullName }}>(sp => sp.GetRequiredService<{{ handler.FullName }}>());
+            {{ else }}
             services.AddSingleton<{{ handlerInterface.FullName }}>(sp =>
             {
                 var concreteHandler = sp.GetRequiredService<{{ handler.FullName }}>();
@@ -44,6 +48,8 @@ namespace {{ MediatorNamespace }}
                 {{ end }}
 
             });
+            {{ end }}
+
             {{~ end ~}}
             {{~ end ~}}
 
@@ -79,7 +85,7 @@ namespace {{ MediatorNamespace }}
                 return _rootHandler({{ string.downcase handlerType.Name }}, cancellationToken);
             }
         }
-        {{ else }}
+        {{ else if handlerType.IsNotificationType != true }}
         private sealed class {{ handlerType.Name }}HandlerWrapper<T{{ handlerType.Name }}> : global::Mediator.I{{ handlerType.Name }}Handler<T{{ handlerType.Name }}>
             where T{{ handlerType.Name }} : global::Mediator.I{{ handlerType.Name }}
         {
@@ -117,16 +123,14 @@ namespace {{ MediatorNamespace }}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
     public interface IMediator //: global::Mediator.ISender, global::Mediator.IPublisher
     {
-        {{~ for handler in Handlers ~}}
-        {{~ for handlerInterface in handler.Interfaces ~}}
+        {{~ for messageData in RequestTypes ~}}
         /// <summary>
-        /// Message handler for {{ handlerInterface.RequestType.FullName }}.
+        /// Message handler for {{ messageData.RequestType.FullName }}.
         /// </summary>
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ handlerInterface.ReturnType }} {{ handlerInterface.MethodName }}({{ handlerInterface.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default);
-        {{~ end ~}}
+        {{ messageData.RequestType.AsyncReturnType }} {{ messageData.RequestType.AsyncMethodName }}({{ messageData.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default);
         {{~ end ~}}
     }
     
@@ -139,18 +143,30 @@ namespace {{ MediatorNamespace }}
         {
             _sp = sp;
         }
+    
 
-        {{~ for handler in Handlers ~}}
-        {{~ for handlerInterface in handler.Interfaces ~}}
-        public {{ handlerInterface.ReturnType }} {{ handlerInterface.MethodName }}({{ handlerInterface.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default)
+        /// <summary>
+        /// DI cache for Mediator.
+        /// </summary>
+        private sealed class DICache
         {
-            var sp = _sp;
-            var handler = sp.GetRequiredService<{{ handlerInterface.FullName }}>();
-            // TODO handle multiple handlers, notification case
+            private readonly global::System.IServiceProvider _sp;
 
-            return handler.Handle(message, cancellationToken);
+            public DICache(global::System.IServiceProvider sp)
+            {
+                _sp = sp;
+            }
         }
-        {{~ end ~}}
+        
+        {{~ for messageData in RequestTypes ~}}
+        public {{ messageData.RequestType.AsyncReturnType }} {{ messageData.RequestType.AsyncMethodName }}({{ messageData.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default)
+        {
+            {{ if messageData.IsNotification }}
+            return PublishInternal(message, cancellationToken);
+            {{ else }}
+            return _sp.GetRequiredService<{{ messageData.SingleHandlerInterface.FullName }}>().Handle(message, cancellationToken);
+            {{ end }}
+        }
         {{~ end ~}}
 
         // public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IRequest<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default);
@@ -163,7 +179,7 @@ namespace {{ MediatorNamespace }}
 
         // public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IQuery<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default);
 
-        public global::System.Threading.Tasks.ValueTask Publish<TNotification>(TNotification notification, global::System.Threading.CancellationToken cancellationToken = default)
+        private global::System.Threading.Tasks.ValueTask PublishInternal<TNotification>(TNotification notification, global::System.Threading.CancellationToken cancellationToken = default)
             where TNotification : global::Mediator.INotification
         {
             var sp = _sp;

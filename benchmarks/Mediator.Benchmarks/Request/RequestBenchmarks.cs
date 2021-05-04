@@ -66,7 +66,7 @@ namespace Mediator.Benchmarks.Request
         [Benchmark]
         public ValueTask<SomeResponse> SendRequest_Mediator()
         {
-            return _mediator.Send(_request, CancellationToken.None);
+            return _mediator.SendAsync(_request, CancellationToken.None);
         }
 
         [Benchmark]
