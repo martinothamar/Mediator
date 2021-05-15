@@ -12,8 +12,8 @@ namespace Mediator.SourceGenerator
         {
             var debugOptionExists = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Mediator_AttachDebugger", out _);
 
-            if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
-                System.Diagnostics.Debugger.Launch();
+            //if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
+            //System.Diagnostics.Debugger.Launch();
 
             try
             {

@@ -23,7 +23,7 @@ namespace AspNetSample.Api.Controllers
         [HttpGet]
         public async ValueTask<ActionResult<IEnumerable<TodoItemDto>>> GetItems(CancellationToken cancellationToken)
         {
-            var items = await Mediator.SendAsync(new GetTodoItems(), cancellationToken);
+            var items = await Mediator.Send(new GetTodoItems(), cancellationToken);
 
             if (items is null || !items.Any())
                 return NoContent();
@@ -34,7 +34,7 @@ namespace AspNetSample.Api.Controllers
         [HttpPost]
         public async ValueTask<ActionResult> AddItem([FromBody] AddTodoItem item, CancellationToken cancellationToken)
         {
-            await Mediator.SendAsync(item, cancellationToken);
+            await Mediator.Send(item, cancellationToken);
             return Ok();
         }
     }

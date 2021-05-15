@@ -29,7 +29,9 @@ namespace Mediator.SourceGenerator
 
                 foreach (var handlerInterface in handler.Value)
                 {
-                    var requestSymbol = (INamedTypeSymbol)handlerInterface.TypeArguments[0];
+                    var requestSymbol = handlerInterface.TypeArguments[0] as INamedTypeSymbol;
+                    if (requestSymbol is null)
+                        continue;
 
                     if (DerivedFromNotification(requestSymbol))
                         continue;

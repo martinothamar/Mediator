@@ -7,5 +7,8 @@ namespace Mediator.SourceGenerator
         string AsyncMethodName,
         string SyncReturnType,
         string AsyncReturnType
-    );
+    )
+    {
+        public override string ToString() => $"{{ FullName={FullName}, IMessageType={iMessageType} }}";
+    }
 }
