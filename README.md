@@ -9,11 +9,19 @@ The API and usage is mostly based on the great [MediatR](https://github.com/jbog
 
 
 Using source generators instead of relying on reflection has multiple benefits
+* AOT friendly
+  * Faster startup - build time reflection instead of runtime/startup reflection
+* Build time errors instead of runtime errors
 * Better performance
-  * This library does zero allocation on its own (see the benchmarks section)
-* AOT friendly, faster startup
-  * Since the code for the mediator implementation is generated during build, any error in the Mediator implementation should be caught during build.
+  * Runtime performance can be the same for both runtime reflection and source generator based approaches, but it's easier to optimize. High performance runtime reflection based implementation would rely on emitting IL which is hard to deal with in many ways. The source generator emitted code can be easily inspected and analyzed as any other C# code.
+* More flexibility
+  * Through the use of options (for example `[assembly: MediatorOptions("SimpleConsole.Mediator")]`) we can achieve more flexibility.
 
+In particular, source generators in this library is used to
+* Generate code for DI registration
+  * Includes polymorphic dispatch and constrained generics in pipeline steps and notification handlers.
+* Generate code for `IMediator` interface and implementation
+  * Request/Command/Query `Send` methods are monomorphized (1 method per T), the generic `ISender.Send` methods rely on these
 
 - [Mediator](#mediator)
 - [2. Usage](#2-usage)

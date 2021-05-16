@@ -12,8 +12,10 @@ namespace Mediator.SourceGenerator
         {
             var debugOptionExists = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Mediator_AttachDebugger", out _);
 
-            //if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
-            //System.Diagnostics.Debugger.Launch();
+            if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Launch();
+
+            // System.Diagnostics.Debugger.Launch();
 
             try
             {
@@ -21,20 +23,7 @@ namespace Mediator.SourceGenerator
             }
             catch (Exception exception)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "MG0000",
-                            "An exception was thrown by the Mediator source generator",
-                            "An exception was thrown by the Mediator source generator: '{0}'",
-                            "Mediator",
-                            DiagnosticSeverity.Error,
-                            isEnabledByDefault: true
-                        ),
-                        Location.None,
-                        exception.ToString()
-                    )
-                );
+                context.ReportGenericError(exception);
 
                 throw;
             }
