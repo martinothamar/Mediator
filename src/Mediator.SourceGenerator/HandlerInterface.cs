@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mediator.SourceGenerator
@@ -25,7 +26,7 @@ namespace Mediator.SourceGenerator
 
         public bool IsNotificationType => RequestType.iMessageType == "INotification";
 
-        public HandlerInterface(INamedTypeSymbol baseHandlerSymbol, Compilation compilation)
+        public HandlerInterface(INamedTypeSymbol baseHandlerSymbol, INamedTypeSymbol unitSymbol, Compilation compilation)
         {
             Symbol = baseHandlerSymbol;
 
@@ -33,15 +34,17 @@ namespace Mediator.SourceGenerator
             INamedTypeSymbol? responseTypeSymbol = null;
 
             if (baseHandlerSymbol.TypeArguments.Length > 1)
-            {
                 responseTypeSymbol = (INamedTypeSymbol)baseHandlerSymbol.TypeArguments[1];
-            }
+
+            var baseHandlerSymbolWithResponse = baseHandlerSymbol.OriginalDefinition.AllInterfaces.SingleOrDefault(i => i.ContainingNamespace?.Name == Constants.MediatorLib);
+            if (baseHandlerSymbolWithResponse is not null)
+                responseTypeSymbol = (INamedTypeSymbol)baseHandlerSymbolWithResponse.TypeArguments[1];
 
             FullName = RoslynExtensions.GetTypeSymbolFullName(baseHandlerSymbol);
             MessageType = baseHandlerSymbol.OriginalDefinition.TypeArguments[0].Name.Substring(1);
 
-            RequestType = new MessageType(requestType, baseHandlerSymbol, compilation);
-            ResponseType = responseTypeSymbol is null ? null : new MessageType(responseTypeSymbol, baseHandlerSymbol, compilation);
+            RequestType = new MessageType(requestType, baseHandlerSymbol, unitSymbol, compilation);
+            ResponseType = responseTypeSymbol is null ? null : new MessageType(responseTypeSymbol, baseHandlerSymbol, unitSymbol, compilation);
 
             ReturnType = ResponseType is null ?
                 RoslynExtensions.GetTypeSymbolFullName(compilation.GetTypeByMetadataName(typeof(ValueTask).FullName!)!) :

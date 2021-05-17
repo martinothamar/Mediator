@@ -34,7 +34,6 @@ namespace Mediator.Tests.Pipeline
             {
                 services.AddSingleton<GenericPipelineState>();
                 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
-                services.AddSingleton(typeof(IPipelineBehavior<>), typeof(GenericPipeline<>));
             });
 
             var request = new SomeRequest(Guid.NewGuid());
@@ -76,7 +75,6 @@ namespace Mediator.Tests.Pipeline
             {
                 services.AddSingleton<GenericPipelineState>();
                 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
-                services.AddSingleton(typeof(IPipelineBehavior<>), typeof(GenericPipeline<>));
                 services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
             });
 

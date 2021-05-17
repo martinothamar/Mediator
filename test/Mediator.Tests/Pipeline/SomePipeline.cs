@@ -25,7 +25,7 @@ namespace Mediator.Tests.Pipeline
     }
 
     public sealed class SomeGenericConstrainedPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest // Only requests, not commands or queries
+        where TRequest : IBaseRequest // Only requests, not commands or queries
     {
         public async ValueTask<TResponse> Handle(TRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
         {

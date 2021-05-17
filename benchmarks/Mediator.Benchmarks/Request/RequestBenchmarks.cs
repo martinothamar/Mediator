@@ -14,6 +14,8 @@ namespace Mediator.Benchmarks.Request
 
     public sealed record SomeResponse(Guid Id);
 
+    public sealed record Wat : MediatR.IRequest;
+
     public sealed class SomeClass : IRequestHandler<SomeRequest, SomeResponse>, MediatR.IRequestHandler<SomeRequest, SomeResponse>, IAsyncRequestHandler<SomeRequest, SomeResponse>
     {
         private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
@@ -63,6 +65,7 @@ namespace Mediator.Benchmarks.Request
         [Benchmark(Baseline = true)]
         public Task<SomeResponse> SendRequest_MediatR()
         {
+            _mediatr.Send(new Wat());
             return _mediatr.Send(_request, CancellationToken.None);
         }
 

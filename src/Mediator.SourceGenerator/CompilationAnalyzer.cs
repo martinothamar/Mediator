@@ -10,6 +10,8 @@ namespace Mediator.SourceGenerator
 {
     internal sealed class CompilationAnalyzer
     {
+        private static readonly SymbolEqualityComparer _symbolEquality = SymbolEqualityComparer.Default;
+
         private readonly Compilation _compilation;
         private readonly Dictionary<INamedTypeSymbol, List<INamedTypeSymbol>> _concreteHandlerSymbolMap;
 
@@ -25,13 +27,15 @@ namespace Mediator.SourceGenerator
 
         public IEnumerable<HandlerInterface> InterfaceHandlers { get; private set; }
 
+        public INamedTypeSymbol UnitSymbol { get; private set; }
+
         public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
         public CompilationAnalyzer(Compilation compilation)
         {
             _compilation = compilation;
 #pragma warning disable RS1024 // Compare symbols correctly
-            _concreteHandlerSymbolMap = new (SymbolEqualityComparer.Default);
+            _concreteHandlerSymbolMap = new (_symbolEquality);
 #pragma warning restore RS1024 // Compare symbols correctly
             BaseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
             ConcreteMessageSymbols = Array.Empty<INamedTypeSymbol>();
@@ -39,6 +43,8 @@ namespace Mediator.SourceGenerator
             BaseHandlers = Array.Empty<HandlerType>();
             ConcreteHandlers = Array.Empty<Handler>();
             InterfaceHandlers = Array.Empty<HandlerInterface>();
+
+            UnitSymbol = null!;
         }
 
         public void Analyze(CancellationToken cancellationToken)
@@ -80,7 +86,9 @@ namespace Mediator.SourceGenerator
                 compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,
             };
 
-            var concreteMessageSymbols = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            UnitSymbol = compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.Unit")!.OriginalDefinition;
+
+            var concreteMessageSymbols = new HashSet<INamedTypeSymbol>(_symbolEquality);
 
             foreach (var reference in compilation.References)
             {
@@ -113,7 +121,7 @@ namespace Mediator.SourceGenerator
                         if (interfaceSymbol.ContainingNamespace.Name != Constants.MediatorLib)
                             continue;
 
-                        if (baseHandlerSymbols.Contains(interfaceSymbol.OriginalDefinition, SymbolEqualityComparer.Default))
+                        if (baseHandlerSymbols.Contains(interfaceSymbol.OriginalDefinition, _symbolEquality))
                         {
                             if (handlerSymbolList is null)
                             {
@@ -121,9 +129,17 @@ namespace Mediator.SourceGenerator
                                 _concreteHandlerSymbolMap.Add(typeSymbol.OriginalDefinition, handlerSymbolList);
                             }
 
+                            var shouldSkip = interfaceSymbol.TypeArguments.Length > 1 &&
+                                interfaceSymbol.TypeArguments[1] is INamedTypeSymbol responseTypeSymbol &&
+                                _symbolEquality.Equals(responseTypeSymbol, UnitSymbol) &&
+                                handlerSymbolList.Any(h => h.AllInterfaces.Any(i => _symbolEquality.Equals(i, interfaceSymbol)));
+
+                            if (shouldSkip)
+                                continue;
+
                             handlerSymbolList.Add(interfaceSymbol);
                         }
-                        else if (baseMessageSymbols.Contains(interfaceSymbol.OriginalDefinition, SymbolEqualityComparer.Default))
+                        else if (baseMessageSymbols.Contains(interfaceSymbol.OriginalDefinition, _symbolEquality))
                         {
                             concreteMessageSymbols.Add(typeSymbol);
                         }
@@ -133,7 +149,7 @@ namespace Mediator.SourceGenerator
 
             var concreteHandlerSymbolMap = _concreteHandlerSymbolMap.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            foreach (var symbol in concreteHandlerSymbolMap.SelectMany(kvp => kvp.Value).Distinct(SymbolEqualityComparer.Default))
+            foreach (var symbol in concreteHandlerSymbolMap.SelectMany(kvp => kvp.Value).Distinct(_symbolEquality))
             {
                 if (symbol is not INamedTypeSymbol handlerInterface)
                     continue;
@@ -155,7 +171,7 @@ namespace Mediator.SourceGenerator
                         {
                             foreach (var concreteMessageSymbol in concreteMessageSymbols)
                             {
-                                if (!SymbolEqualityComparer.Default.Equals(concreteMessageSymbol, constraint) && compilation.ClassifyConversion(concreteMessageSymbol, constraint).IsImplicit)
+                                if (!_symbolEquality.Equals(concreteMessageSymbol, constraint) && compilation.ClassifyConversion(concreteMessageSymbol, constraint).IsImplicit)
                                 {
                                     var constructedConcreteHandler = concreteHandler.Construct(concreteMessageSymbol);
                                     var constructedInterfaceHandler = handlerInterface.OriginalDefinition.Construct(concreteMessageSymbol);
@@ -166,7 +182,7 @@ namespace Mediator.SourceGenerator
                         else
                         {
                             var concreteMessageSymbol = handlerInterface.TypeArguments[0];
-                            if (!SymbolEqualityComparer.Default.Equals(concreteMessageSymbol, constraint) && compilation.ClassifyConversion(concreteMessageSymbol, constraint).IsImplicit)
+                            if (!_symbolEquality.Equals(concreteMessageSymbol, constraint) && compilation.ClassifyConversion(concreteMessageSymbol, constraint).IsImplicit)
                             {
                                 var constructedConcreteHandler = concreteHandler.Construct(concreteMessageSymbol);
                                 AddInterfaceHandler(constructedConcreteHandler, handlerInterface);
@@ -187,7 +203,7 @@ namespace Mediator.SourceGenerator
 
             ConcreteHandlers = _concreteHandlerSymbolMap
                 .OrderBy(h => h.Key.Name)
-                .Select(h => new Handler(h.Key, h.Value, compilation))
+                .Select(h => new Handler(h.Key, h.Value, UnitSymbol, compilation))
                 .ToArray();
 
             InterfaceHandlers = ConcreteHandlers
@@ -203,7 +219,7 @@ namespace Mediator.SourceGenerator
             ConcreteMessageSymbols = _concreteHandlerSymbolMap
                 .SelectMany(h => h.Value.Select(s => s.TypeArguments[0]))
                 .Where(s => s is INamedTypeSymbol)
-                .Distinct(SymbolEqualityComparer.Default)
+                .Distinct(_symbolEquality)
                 .Cast<INamedTypeSymbol>()
                 .ToArray();
 
@@ -225,7 +241,7 @@ namespace Mediator.SourceGenerator
             if (!_concreteHandlerSymbolMap.TryGetValue(concrete, out var list))
                 _concreteHandlerSymbolMap[concrete] = list = new();
 
-            if (!list.Contains(@interface, SymbolEqualityComparer.Default))
+            if (!list.Contains(@interface, _symbolEquality))
                 list.Add(@interface);
         }
 

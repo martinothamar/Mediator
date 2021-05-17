@@ -6,39 +6,14 @@ using System.Threading.Tasks;
 
 namespace AspNetSample.Application
 {
-    public class ErrorLoggingBehaviour<TMessage> : IPipelineBehavior<TMessage>
+    public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
         where TMessage : IMessage
     {
-        protected readonly ILogger _logger;
+        private readonly ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> _logger;
 
-        public ErrorLoggingBehaviour(ILogger<ErrorLoggingBehaviour<TMessage>> logger) => _logger = logger;
-        protected ErrorLoggingBehaviour(ILogger logger) => _logger = logger;
-
-        public async ValueTask Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage> next)
-        {
-            try
-            {
-                await next(message, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                LogError(ex, message);
-                throw;
-            }
-        }
-
-        protected void LogError(Exception ex, TMessage message)
-        {
-            _logger.LogError(ex, "Error handling message of type {messageType}", message.GetType().Name);
-        }
-    }
-
-    public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : ErrorLoggingBehaviour<TMessage>, IPipelineBehavior<TMessage, TResponse>
-        where TMessage : IMessage
-    {
         public ErrorLoggingBehaviour(ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> logger)
-            : base(logger)
         {
+            _logger = logger;
         }
 
         public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
@@ -49,7 +24,7 @@ namespace AspNetSample.Application
             }
             catch (Exception ex)
             {
-                LogError(ex, message);
+                _logger.LogError(ex, "Error handling message of type {messageType}", message.GetType().Name);
                 throw;
             }
         }

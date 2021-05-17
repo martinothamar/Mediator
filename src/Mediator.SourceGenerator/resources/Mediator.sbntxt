@@ -37,14 +37,14 @@ namespace {{ MediatorNamespace }}
             services.AddSingleton<{{ handlerInterface.FullName }}>(sp =>
             {
                 var concreteHandler = sp.GetRequiredService<{{ handler.FullName }}>();
-                {{- if handlerInterface.HasResponse }}
+                {{- if handlerInterface.HasResponse && !handlerInterface.ResponseType.IsUnitType }}
                 var pipelineBehaviors = sp.GetServices<global::Mediator.IPipelineBehavior<{{ handlerInterface.RequestType.FullName }}, {{ handlerInterface.ResponseType.FullName }}>>();
                 return new {{ handlerInterface.MessageType }}HandlerWrapper<{{ handlerInterface.RequestType.FullName }}, {{ handlerInterface.ResponseType.FullName }}>(
                     concreteHandler,
                     pipelineBehaviors
                 );
                 {{- else }}
-                var pipelineBehaviors = sp.GetServices<global::Mediator.IPipelineBehavior<{{ handlerInterface.RequestType.FullName }}>>();
+                var pipelineBehaviors = sp.GetServices<global::Mediator.IPipelineBehavior<{{ handlerInterface.RequestType.FullName }}, global::Mediator.Unit>>();
                 return new {{ handlerInterface.MessageType }}HandlerWrapper<{{ handlerInterface.RequestType.FullName }}>(
                     concreteHandler,
                     pipelineBehaviors
@@ -57,6 +57,17 @@ namespace {{ MediatorNamespace }}
             {{~ end ~}}
 
             return services;
+        }
+
+        internal static global::System.Threading.Tasks.ValueTask AsValueTask<T>(this global::System.Threading.Tasks.ValueTask<T> valueTask)
+        {
+            if (valueTask.IsCompletedSuccessfully)
+            {
+                valueTask.GetAwaiter().GetResult();
+                return default;
+            }
+
+            return new global::System.Threading.Tasks.ValueTask(valueTask.AsTask());
         }
         
         {{~ for handlerType in HandlerTypes ~}}
@@ -92,14 +103,14 @@ namespace {{ MediatorNamespace }}
         private sealed class {{ handlerType.Name }}HandlerWrapper<T{{ handlerType.Name }}> : global::Mediator.I{{ handlerType.Name }}Handler<T{{ handlerType.Name }}>
             where T{{ handlerType.Name }} : global::Mediator.I{{ handlerType.Name }}
         {
-            private readonly global::Mediator.MessageHandlerDelegate<T{{ handlerType.Name }}> _rootHandler;
+            private readonly global::Mediator.MessageHandlerDelegate<T{{ handlerType.Name }}, global::Mediator.Unit> _rootHandler;
 
             public {{ handlerType.Name }}HandlerWrapper(
                 global::Mediator.I{{ handlerType.Name }}Handler<T{{ handlerType.Name }}> concreteHandler,
-                global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<T{{ handlerType.Name }}>> pipelineBehaviours
+                global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<T{{ handlerType.Name }}, global::Mediator.Unit>> pipelineBehaviours
             )
             {
-                var handler = (global::Mediator.MessageHandlerDelegate<T{{ handlerType.Name }}>)concreteHandler.Handle;
+                var handler = (global::Mediator.MessageHandlerDelegate<T{{ handlerType.Name }}, global::Mediator.Unit>)concreteHandler.Handle;
 
                 foreach (var pipeline in pipelineBehaviours.Reverse())
                 {
@@ -111,7 +122,7 @@ namespace {{ MediatorNamespace }}
                 _rootHandler = handler;
             }
 
-            public global::System.Threading.Tasks.ValueTask Handle(T{{ handlerType.Name }} {{ string.downcase handlerType.Name }}, global::System.Threading.CancellationToken cancellationToken)
+            public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(T{{ handlerType.Name }} {{ string.downcase handlerType.Name }}, global::System.Threading.CancellationToken cancellationToken)
             {
                 return _rootHandler({{ string.downcase handlerType.Name }}, cancellationToken);
             }
@@ -162,10 +173,10 @@ namespace {{ MediatorNamespace }}
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            {{ if messageData.IsNotification }}
+            {{- if messageData.IsNotification }}
             return Publish<{{ messageData.RequestType.FullName }}>(message, cancellationToken);
-            {{ else }}
-            return _sp.GetRequiredService<{{ messageData.SingleHandlerInterface.FullName }}>().Handle(message, cancellationToken);
+            {{- else }}
+            return _sp.GetRequiredService<{{ messageData.SingleHandlerInterface.FullName }}>().Handle(message, cancellationToken){{- if messageData.ResponseType == null || messageData.ResponseType.IsUnitType; ".AsValueTask()"; end; -}};
             {{ end }}
         }
         {{~ end ~}}

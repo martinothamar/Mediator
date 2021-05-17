@@ -9,9 +9,7 @@ namespace AspNetSample.Application
         {
             return services
                 .AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggingBehaviour<,>))
-                .AddSingleton(typeof(IPipelineBehavior<>), typeof(ErrorLoggingBehaviour<>))
-                .AddSingleton(typeof(IPipelineBehavior<,>), typeof(MessageValidatorBehaviour<,>))
-                .AddSingleton(typeof(IPipelineBehavior<>), typeof(MessageValidatorBehaviour<>));
+                .AddSingleton(typeof(IPipelineBehavior<,>), typeof(MessageValidatorBehaviour<,>));
         }
     }
 }

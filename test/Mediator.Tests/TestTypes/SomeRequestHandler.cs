@@ -13,7 +13,7 @@ namespace Mediator.Tests.TestTypes
     {
         internal Guid Id;
 
-        public ValueTask Handle(SomeRequestWithoutResponse request, CancellationToken cancellationToken)
+        public ValueTask<Unit> Handle(SomeRequestWithoutResponse request, CancellationToken cancellationToken)
         {
             Id = request.Id;
             return default;

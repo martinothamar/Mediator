@@ -9,22 +9,20 @@ namespace Mediator
         ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken);
     }
 
-    public interface IRequestHandler<in TRequest>
-        where TRequest : IRequest
+    public interface IRequestHandler<in TRequest> : IRequestHandler<TRequest, Unit>
+        where TRequest : IRequest<Unit>
     {
-        ValueTask Handle(TRequest request, CancellationToken cancellationToken);
-    }
-
-    public interface ICommandHandler<in TCommand>
-        where TCommand : ICommand
-    {
-        ValueTask Handle(TCommand command, CancellationToken cancellationToken);
     }
 
     public interface ICommandHandler<in TCommand, TResponse>
         where TCommand : ICommand<TResponse>
     {
         ValueTask<TResponse> Handle(TCommand command, CancellationToken cancellationToken);
+    }
+
+    public interface ICommandHandler<in TCommand> : ICommandHandler<TCommand, Unit>
+        where TCommand : ICommand<Unit>
+    {
     }
 
     public interface IQueryHandler<in TQuery, TResponse>

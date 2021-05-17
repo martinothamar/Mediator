@@ -16,12 +16,16 @@ namespace Mediator.SourceGenerator
         public string SyncReturnType { get; }
         public string AsyncReturnType { get; }
 
+        public bool IsUnitType { get; }
+
         public bool IsStruct { get; }
         public bool IsReadOnly { get; }
 
-        public MessageType(INamedTypeSymbol symbol, INamedTypeSymbol baseHandlerSymbol, Compilation compilation)
+        public MessageType(INamedTypeSymbol symbol, INamedTypeSymbol baseHandlerSymbol, INamedTypeSymbol unitSymbol, Compilation compilation)
         {
             Symbol = symbol;
+
+            IsUnitType = SymbolEqualityComparer.Default.Equals(symbol, unitSymbol);
 
             FullName = RoslynExtensions.GetTypeSymbolFullName(symbol);
             string? responseTypeName = null;

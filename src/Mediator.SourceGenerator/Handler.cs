@@ -13,13 +13,13 @@ namespace Mediator.SourceGenerator
 
         public readonly IEnumerable<HandlerInterface> Interfaces;
 
-        public Handler(INamedTypeSymbol handlerType, IEnumerable<INamedTypeSymbol> handlerInterfaces, Compilation compilation)
+        public Handler(INamedTypeSymbol handlerType, IEnumerable<INamedTypeSymbol> handlerInterfaces, INamedTypeSymbol unitSymbol, Compilation compilation)
         {
             Symbol = handlerType;
             FullName = RoslynExtensions.GetTypeSymbolFullName(handlerType);
 
             Interfaces = handlerInterfaces
-                .Select(handler => new HandlerInterface(handler, compilation))
+                .Select(handler => new HandlerInterface(handler, unitSymbol, compilation))
                 .ToArray();
         }
 

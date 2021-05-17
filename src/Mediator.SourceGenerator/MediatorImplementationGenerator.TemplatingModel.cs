@@ -36,13 +36,13 @@ namespace Mediator.SourceGenerator
             public readonly bool HasCommandsWithReponse;
             public readonly bool HasQueriesWithResponse;
 
-            public IEnumerable<MessageData> RequestWithoutResponseTypes => RequestTypes.Where(r => r.IsRequest && r.ResponseType is null);
-            public IEnumerable<MessageData> RequestWithResponseTypes => RequestTypes.Where(r => r.IsRequest && r.ResponseType is not null);
+            public IEnumerable<MessageData> RequestWithoutResponseTypes => RequestTypes.Where(r => r.IsRequest && (r.ResponseType is null || r.ResponseType.IsUnitType));
+            public IEnumerable<MessageData> RequestWithResponseTypes => RequestTypes.Where(r => r.IsRequest && r.ResponseType is not null && !r.ResponseType.IsUnitType);
 
-            public IEnumerable<MessageData> CommandWithoutResponseTypes => RequestTypes.Where(r => r.IsCommand && r.ResponseType is null);
-            public IEnumerable<MessageData> CommandWithResponseTypes => RequestTypes.Where(r => r.IsCommand && r.ResponseType is not null);
+            public IEnumerable<MessageData> CommandWithoutResponseTypes => RequestTypes.Where(r => r.IsCommand && (r.ResponseType is null || r.ResponseType.IsUnitType));
+            public IEnumerable<MessageData> CommandWithResponseTypes => RequestTypes.Where(r => r.IsCommand && r.ResponseType is not null && !r.ResponseType.IsUnitType);
 
-            public IEnumerable<MessageData> QueryWithResponseTypes => RequestTypes.Where(r => r.IsQuery && r.ResponseType is not null);
+            public IEnumerable<MessageData> QueryWithResponseTypes => RequestTypes.Where(r => r.IsQuery && r.ResponseType is not null && !r.ResponseType.IsUnitType);
 
             public TemplatingModel(CompilationAnalyzer compilationAnalyzer)
             {
@@ -58,15 +58,13 @@ namespace Mediator.SourceGenerator
                     .Select(r => new MessageData(r.Types.RequestType, r.Types.ResponseType, r.Handlers))
                     .ToArray();
 
-                // System.Diagnostics.Debugger.Launch();
+                HasRequestsWithoutReponse = RequestTypes.Any(r => r.IsRequest && (r.ResponseType is null || r.ResponseType.IsUnitType));
+                HasRequestsWithReponse = RequestTypes.Any(r => r.IsRequest && r.ResponseType is not null && !r.ResponseType.IsUnitType);
 
-                HasRequestsWithoutReponse = RequestTypes.Any(r => r.IsRequest && r.ResponseType is null);
-                HasRequestsWithReponse = RequestTypes.Any(r => r.IsRequest && r.ResponseType is not null);
+                HasCommandsWithoutReponse = RequestTypes.Any(r => r.IsCommand && (r.ResponseType is null || r.ResponseType.IsUnitType));
+                HasCommandsWithReponse = RequestTypes.Any(r => r.IsCommand && r.ResponseType is not null && !r.ResponseType.IsUnitType);
 
-                HasCommandsWithoutReponse = RequestTypes.Any(r => r.IsCommand && r.ResponseType is null);
-                HasCommandsWithReponse = RequestTypes.Any(r => r.IsCommand && r.ResponseType is not null);
-
-                HasQueriesWithResponse = RequestTypes.Any(r => r.IsQuery && r.ResponseType is not null);
+                HasQueriesWithResponse = RequestTypes.Any(r => r.IsQuery && r.ResponseType is not null && !r.ResponseType.IsUnitType);
             }
         }
     }

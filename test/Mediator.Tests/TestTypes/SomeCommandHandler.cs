@@ -19,7 +19,7 @@ namespace Mediator.Tests.TestTypes
     {
         internal Guid Id;
 
-        public ValueTask Handle(SomeCommandWithoutResponse command, CancellationToken cancellationToken)
+        public ValueTask<Unit> Handle(SomeCommandWithoutResponse command, CancellationToken cancellationToken)
         {
             Id = command.Id;
             return default;
@@ -30,7 +30,7 @@ namespace Mediator.Tests.TestTypes
     {
         internal Guid Id;
 
-        public ValueTask Handle(SomeStructCommand command, CancellationToken cancellationToken)
+        public ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
         {
             Id = command.Id;
             return default;

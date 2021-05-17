@@ -4,15 +4,18 @@ namespace Mediator
 
     public interface IMessage { }
 
-    public interface IRequest : IMessage { }
+    public interface IBaseRequest : IMessage { }
+    public interface IRequest : IRequest<Unit> { }
+    public interface IRequest<out TResponse> : IBaseRequest { }
 
-    public interface IRequest<out TResponse> : IRequest { }
 
-    public interface ICommand : IMessage { }
+    public interface IBaseCommand : IMessage { }
+    public interface ICommand : ICommand<Unit> { }
+    public interface ICommand<out TResponse> : IBaseCommand { }
 
-    public interface ICommand<out TResponse> : ICommand { }
+    public interface IBaseQuery : IMessage { }
+    public interface IQuery<out TResponse> : IBaseQuery { }
 
-    public interface IQuery<out TResponse> : IMessage { }
 
     public interface INotification : IMessage { }
 }
