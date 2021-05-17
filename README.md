@@ -165,15 +165,15 @@ See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request/RequestBenchmarks.
 
 BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
 Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
-.NET Core SDK=5.0.201
-  [Host]     : .NET Core 5.0.4 (CoreCLR 5.0.421.11614, CoreFX 5.0.421.11614), X64 RyuJIT
-  DefaultJob : .NET Core 5.0.4 (CoreCLR 5.0.421.11614, CoreFX 5.0.421.11614), X64 RyuJIT
+.NET Core SDK=5.0.300-preview.21228.15
+  [Host]     : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
+  DefaultJob : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
 
 
 ```
-|               Method |        Mean |    Error |   StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|--------------------- |------------:|---------:|---------:|------:|-------:|------:|------:|----------:|
-|  SendRequest_MediatR | 1,050.77 ns | 8.028 ns | 7.117 ns |  1.00 | 0.4349 |     - |     - |    1368 B |
-| SendRequest_Mediator |    56.59 ns | 0.186 ns | 0.156 ns |  0.05 |      - |     - |     - |         - |
-| SendRequest_Baseline |    12.09 ns | 0.034 ns | 0.032 ns |  0.01 |      - |     - |     - |         - |
-
+|                  Method |        Mean |    Error |   StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------ |------------:|---------:|---------:|------:|-------:|------:|------:|----------:|
+|     SendRequest_MediatR | 1,051.89 ns | 3.154 ns | 2.951 ns |  1.00 | 0.4349 |     - |     - |    1368 B |
+|    SendRequest_Mediator |    86.14 ns | 0.145 ns | 0.121 ns |  0.08 |      - |     - |     - |         - |
+| SendRequest_MessagePipe |    14.21 ns | 0.061 ns | 0.054 ns |  0.01 |      - |     - |     - |         - |
+|    SendRequest_Baseline |    11.67 ns | 0.040 ns | 0.033 ns |  0.01 |      - |     - |     - |         - |
