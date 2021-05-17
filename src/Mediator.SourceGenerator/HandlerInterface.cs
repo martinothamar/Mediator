@@ -29,33 +29,19 @@ namespace Mediator.SourceGenerator
         {
             Symbol = baseHandlerSymbol;
 
-            var requestType = baseHandlerSymbol.TypeArguments[0];
-            var requestTypeName = RoslynExtensions.GetTypeSymbolFullName(requestType);
-            string? responseTypeName = null;
+            INamedTypeSymbol requestType = (INamedTypeSymbol)baseHandlerSymbol.TypeArguments[0];
+            INamedTypeSymbol? responseTypeSymbol = null;
 
-            ITypeSymbol? responseTypeSymbol = null;
             if (baseHandlerSymbol.TypeArguments.Length > 1)
             {
-                responseTypeSymbol = baseHandlerSymbol.TypeArguments[1];
-                responseTypeName = RoslynExtensions.GetTypeSymbolFullName(responseTypeSymbol);
+                responseTypeSymbol = (INamedTypeSymbol)baseHandlerSymbol.TypeArguments[1];
             }
 
             FullName = RoslynExtensions.GetTypeSymbolFullName(baseHandlerSymbol);
             MessageType = baseHandlerSymbol.OriginalDefinition.TypeArguments[0].Name.Substring(1);
 
-            var iMessageType = baseHandlerSymbol.Name.Substring(0, baseHandlerSymbol.Name.IndexOf("Handler"));
-            var (syncMethodName, asyncMethodName) = iMessageType switch
-            {
-                "INotification" => ("Publish", "Publish"),
-                _ => ("Send", "Send"),
-            };
-
-            var (syncReturnType, asyncReturnType) = responseTypeName is null ?
-                ("void", RoslynExtensions.GetTypeSymbolFullName(compilation.GetTypeByMetadataName(typeof(ValueTask).FullName!)!)) :
-                (RoslynExtensions.GetTypeSymbolFullName(responseTypeSymbol!), RoslynExtensions.GetTypeSymbolFullName(compilation.GetTypeByMetadataName(typeof(ValueTask<>).FullName!)!.Construct(responseTypeSymbol!)));
-
-            RequestType = new MessageType(requestTypeName, iMessageType, syncMethodName, asyncMethodName, syncReturnType, asyncReturnType);
-            ResponseType = responseTypeName is null ? null : new MessageType(responseTypeName, iMessageType, syncMethodName, asyncMethodName, syncReturnType, asyncReturnType);
+            RequestType = new MessageType(requestType, baseHandlerSymbol, compilation);
+            ResponseType = responseTypeSymbol is null ? null : new MessageType(responseTypeSymbol, baseHandlerSymbol, compilation);
 
             ReturnType = ResponseType is null ?
                 RoslynExtensions.GetTypeSymbolFullName(compilation.GetTypeByMetadataName(typeof(ValueTask).FullName!)!) :
@@ -86,7 +72,7 @@ namespace Mediator.SourceGenerator
 
         public bool Equals(HandlerInterface? other) => other is not null && SymbolEqualityComparer.Default.Equals(Symbol, other.Symbol);
 
-        public override int GetHashCode() => 1179485718 + SymbolEqualityComparer.Default.GetHashCode(Symbol);
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Symbol);
 
         public static bool operator ==(HandlerInterface? left, HandlerInterface? right) => EqualityComparer<HandlerInterface>.Default.Equals(left!, right!);
 

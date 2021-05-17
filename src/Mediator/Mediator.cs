@@ -21,4 +21,8 @@ namespace Mediator
         ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : INotification;
     }
+
+    public interface IMediator : ISender, IPublisher
+    {
+    }
 }

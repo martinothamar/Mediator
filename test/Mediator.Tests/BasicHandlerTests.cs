@@ -79,6 +79,18 @@ namespace Mediator.Tests
         }
 
         [Fact]
+        public async Task Test_StructCommand_Handler()
+        {
+            var (sp, mediator) = Fixture.GetMediator();
+
+            var id = Guid.NewGuid();
+
+            var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
+            await mediator.Send(new SomeStructCommand(id));
+            Assert.Equal(id, commandHandler.Id);
+        }
+
+        [Fact]
         public async Task Test_Notification_Handler()
         {
             var (sp, mediator) = Fixture.GetMediator();

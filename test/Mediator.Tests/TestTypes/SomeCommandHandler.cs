@@ -25,4 +25,15 @@ namespace Mediator.Tests.TestTypes
             return default;
         }
     }
+
+    public sealed class SomeStructCommandHandler : ICommandHandler<SomeStructCommand>
+    {
+        internal Guid Id;
+
+        public ValueTask Handle(SomeStructCommand command, CancellationToken cancellationToken)
+        {
+            Id = command.Id;
+            return default;
+        }
+    }
 }

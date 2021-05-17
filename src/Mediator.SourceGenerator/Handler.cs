@@ -27,7 +27,7 @@ namespace Mediator.SourceGenerator
 
         public bool Equals(Handler? other) => other is not null && SymbolEqualityComparer.Default.Equals(Symbol, other.Symbol);
 
-        public override int GetHashCode() => 1179485718 + SymbolEqualityComparer.Default.GetHashCode(Symbol);
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Symbol);
 
         public static bool operator ==(Handler? left, Handler? right) => EqualityComparer<Handler>.Default.Equals(left!, right!);
 

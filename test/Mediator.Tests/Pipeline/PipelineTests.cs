@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Mediator.Tests.Pipeline
 {
@@ -31,35 +32,41 @@ namespace Mediator.Tests.Pipeline
         {
             var (sp, mediator) = Fixture.GetMediator(services =>
             {
+                services.AddSingleton<GenericPipelineState>();
                 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
+                services.AddSingleton(typeof(IPipelineBehavior<>), typeof(GenericPipeline<>));
             });
 
-            var requestId = Guid.NewGuid();
-            var commandId = Guid.NewGuid();
-            var queryId = Guid.NewGuid();
+            var request = new SomeRequest(Guid.NewGuid());
+            var requestWithoutResponse = new SomeRequestWithoutResponse(Guid.NewGuid());
+            var command = new SomeCommand(Guid.NewGuid());
+            var commandWithoutResponse = new SomeCommandWithoutResponse(Guid.NewGuid());
+            var query = new SomeQuery(Guid.NewGuid());
 
-            var requestPipelineStep = sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is GenericPipeline<SomeRequest, SomeResponse>) as GenericPipeline<SomeRequest, SomeResponse>;
-            var commandPipelineStep = sp.GetServices<IPipelineBehavior<SomeCommand, SomeResponse>>().Single(s => s is GenericPipeline<SomeCommand, SomeResponse>) as GenericPipeline<SomeCommand, SomeResponse>;
-            var queryPipelineStep = sp.GetServices<IPipelineBehavior<SomeQuery, SomeResponse>>().Single(s => s is GenericPipeline<SomeQuery, SomeResponse>) as GenericPipeline<SomeQuery, SomeResponse>;
+            var pipelineState = sp.GetRequiredService<GenericPipelineState>();
 
-            Assert.NotNull(requestPipelineStep);
-            Assert.NotNull(commandPipelineStep);
-            Assert.NotNull(queryPipelineStep);
+            Assert.Equal(default, pipelineState.Id);
+            Assert.Equal(default, pipelineState.Message);
 
-            for (int i = 0; i < 3; i++)
-            {
-                var response = await mediator.Send(new SomeRequest(requestId));
-                Assert.Equal(requestId, response.Id);
-                Assert.Equal(requestId, requestPipelineStep!.Id);
+            _ = await mediator.Send(request);
+            Assert.Equal(request.Id, pipelineState.Id);
+            Assert.Equal(request, pipelineState.Message);
 
-                response = await mediator.Send(new SomeCommand(commandId));
-                Assert.Equal(commandId, response.Id);
-                Assert.Equal(commandId, commandPipelineStep!.Id);
+            await mediator.Send(requestWithoutResponse);
+            Assert.Equal(requestWithoutResponse.Id, pipelineState.Id);
+            Assert.Equal(requestWithoutResponse, pipelineState.Message);
 
-                response = await mediator.Send(new SomeQuery(queryId));
-                Assert.Equal(queryId, response.Id);
-                Assert.Equal(queryId, queryPipelineStep!.Id);
-            }
+            _ = await mediator.Send(command);
+            Assert.Equal(command.Id, pipelineState.Id);
+            Assert.Equal(command, pipelineState.Message);
+
+            await mediator.Send(commandWithoutResponse);
+            Assert.Equal(commandWithoutResponse.Id, pipelineState.Id);
+            Assert.Equal(commandWithoutResponse, pipelineState.Message);
+
+            _ = await mediator.Send(query);
+            Assert.Equal(query.Id, pipelineState.Id);
+            Assert.Equal(query, pipelineState.Message);
         }
 
         [Fact]
@@ -67,7 +74,9 @@ namespace Mediator.Tests.Pipeline
         {
             var (sp, mediator) = Fixture.GetMediator(services =>
             {
+                services.AddSingleton<GenericPipelineState>();
                 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
+                services.AddSingleton(typeof(IPipelineBehavior<>), typeof(GenericPipeline<>));
                 services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
             });
 

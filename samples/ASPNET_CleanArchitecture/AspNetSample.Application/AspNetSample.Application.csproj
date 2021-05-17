@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.5.4" />
+    <PackageReference Include="OneOf" Version="3.0.178" />
   </ItemGroup>
 
   <ItemGroup>

@@ -13,6 +13,7 @@
         <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" SetTargetFramework="TargetFramework=netstandard2.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
         <ProjectReference Include="..\AspNetSample.Application\AspNetSample.Application.csproj" />
+        <ProjectReference Include="..\AspNetSample.Infrastructure\AspNetSample.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

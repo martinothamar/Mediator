@@ -1,5 +1,6 @@
 using AspNetSample.Application;
-using FluentValidation.AspNetCore;
+using AspNetSample.Infrastructure;
+using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,9 +22,12 @@ namespace AspNetSample.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddControllers()
-                .AddFluentValidation(c => c.RegisterValidatorsFromAssemblyContaining<TodoItemDto>());
+            services.AddControllers();
+
+            services.AddMediator();
+
+            services.AddApplication();
+            services.AddInfrastructure();
 
             services.AddSwaggerGen(c =>
             {

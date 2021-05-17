@@ -1,5 +1,7 @@
 namespace Mediator
 {
+    public readonly struct Unit { }
+
     public interface IMessage { }
 
     public interface IRequest : IMessage { }

@@ -20,9 +20,10 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
-            services.TryAddSingleton<global::{{ MediatorNamespace }}.IMediator, global::{{ MediatorNamespace }}.MediatorImpl>();
-            services.TryAddSingleton<global::Mediator.ISender>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.IMediator>());
-            services.TryAddSingleton<global::Mediator.IPublisher>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.IMediator>());
+            services.TryAddSingleton<global::{{ MediatorNamespace }}.Mediator, global::{{ MediatorNamespace }}.Mediator>();
+            services.TryAddSingleton<global::Mediator.IMediator>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
+            services.TryAddSingleton<global::Mediator.ISender>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
+            services.TryAddSingleton<global::Mediator.IPublisher>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
 
             {{~ for handler in Handlers ~}}
             services.TryAddSingleton<{{ handler.FullName }}, {{ handler.FullName }}>();
@@ -118,34 +119,23 @@ namespace {{ MediatorNamespace }}
         {{ end }}
         {{~ end ~}}
     }
-
+    
     /// <summary>
-    /// Interface for the mediator pattern implementation.
+    /// Generated code for Mediator implementation.
+    /// This type is also registered as a DI service.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
-    public interface IMediator : global::Mediator.ISender, global::Mediator.IPublisher
-    {
-        {{~ for messageData in RequestTypes ~}}
-        /// <summary>
-        /// Message handler for {{ messageData.RequestType.FullName }}.
-        /// </summary>
-        /// <param name="message">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        {{ messageData.RequestType.AsyncReturnType }} {{ messageData.RequestType.AsyncMethodName }}({{ messageData.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default);
-        {{~ end ~}}
-    }
-    
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
-    internal sealed partial class MediatorImpl : global::{{ MediatorNamespace }}.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
+    public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
-
-        public MediatorImpl(global::System.IServiceProvider sp)
+        
+        /// <summary>
+        /// Constructor for DI, should not be used by consumer.
+        /// </summary>
+        public Mediator(global::System.IServiceProvider sp)
         {
             _sp = sp;
         }
-    
 
         /// <summary>
         /// DI cache for Mediator.
@@ -161,7 +151,16 @@ namespace {{ MediatorNamespace }}
         }
         
         {{~ for messageData in RequestTypes ~}}
-        public {{ messageData.RequestType.AsyncReturnType }} {{ messageData.RequestType.AsyncMethodName }}({{ messageData.RequestType.FullName }} message, global::System.Threading.CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Send a message of type {{ messageData.RequestType.FullName }}.
+        /// </summary>
+        /// <param name="message">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public {{ messageData.RequestType.AsyncReturnType }} {{ messageData.RequestType.AsyncMethodName }}(
+            {{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; else; ""; end; -}}{{ messageData.RequestType.FullName }} message,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
         {
             {{ if messageData.IsNotification }}
             return Publish<{{ messageData.RequestType.FullName }}>(message, cancellationToken);
@@ -171,21 +170,17 @@ namespace {{ MediatorNamespace }}
         }
         {{~ end ~}}
 
-        // ValueTask<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
-
-        // ValueTask Send(IRequest request, CancellationToken cancellationToken = default);
-
-        // ValueTask<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default);
-
-        // ValueTask Send(ICommand command, CancellationToken cancellationToken = default);
-
-        // ValueTask<TResponse> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default);
-
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidMessage<TMsg>(TMsg msg) =>
             throw new global::System.ArgumentException("Invalid message type: " + msg.GetType().Name);
 
+        /// <summary>
+        /// Send request generically.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IRequest<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default)
         {
             {{- if HasRequestsWithReponse }}
@@ -194,7 +189,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for messageData in RequestWithResponseTypes ~}}
                 case {{ messageData.RequestType.FullName }} r:
                 {
-                    var task = Send(r, cancellationToken);
+                    var task = Send({{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; else; ""; end; -}}r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ messageData.RequestType.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                 }
                 {{~ end ~}}
@@ -209,7 +204,13 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-
+        
+        /// <summary>
+        /// Send request generically.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Send(global::Mediator.IRequest request, global::System.Threading.CancellationToken cancellationToken = default)
         {
             {{- if HasRequestsWithoutReponse }}
@@ -218,7 +219,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for messageData in RequestWithoutResponseTypes ~}}
                 case {{ messageData.RequestType.FullName }} r:
                 {
-                    return Send(r, cancellationToken);
+                    return Send({{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; else; ""; end; -}}r, cancellationToken);
                 }
                 {{~ end ~}}
                 default:
@@ -232,7 +233,13 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-
+        
+        /// <summary>
+        /// Send command generically.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.ICommand<TResponse> command, global::System.Threading.CancellationToken cancellationToken = default)
         {
             {{- if HasCommandsWithReponse }}
@@ -241,7 +248,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for messageData in CommandWithResponseTypes ~}}
                 case {{ messageData.RequestType.FullName }} r:
                 {
-                    var task = Send(r, cancellationToken);
+                    var task = Send({{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; else; ""; end; -}}r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ messageData.RequestType.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                 }
                 {{~ end ~}}
@@ -256,7 +263,13 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-
+        
+        /// <summary>
+        /// Send command generically.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Send(global::Mediator.ICommand command, global::System.Threading.CancellationToken cancellationToken = default)
         {
             {{- if HasCommandsWithoutReponse }}
@@ -265,7 +278,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for messageData in CommandWithoutResponseTypes ~}}
                 case {{ messageData.RequestType.FullName }} r:
                 {
-                    return Send(r, cancellationToken);
+                    return Send({{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; else; ""; end; -}}r, cancellationToken);
                 }
                 {{~ end ~}}
                 default:
@@ -279,7 +292,13 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-
+        
+        /// <summary>
+        /// Send query generically.
+        /// </summary>
+        /// <param name="query">Incoming query</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IQuery<TResponse> query, global::System.Threading.CancellationToken cancellationToken = default)
         {
             {{- if HasQueriesWithResponse }}
@@ -288,7 +307,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for messageData in QueryWithResponseTypes ~}}
                 case {{ messageData.RequestType.FullName }} r:
                 {
-                    var task = Send(r, cancellationToken);
+                    var task = Send({{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; else; ""; end; -}}r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ messageData.RequestType.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                 }
                 {{~ end ~}}
@@ -303,7 +322,13 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-
+        
+        /// <summary>
+        /// Publish notification.
+        /// </summary>
+        /// <param name="notification">Incoming notification</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Publish<TNotification>(TNotification notification, global::System.Threading.CancellationToken cancellationToken = default)
             where TNotification : global::Mediator.INotification
         {
