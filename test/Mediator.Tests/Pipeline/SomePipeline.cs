@@ -1,4 +1,4 @@
-﻿using Mediator.Tests.TestTypes;
+using Mediator.Tests.TestTypes;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -21,6 +21,19 @@ namespace Mediator.Tests.Pipeline
             Id = message.Id;
 
             return next(message, cancellationToken);
+        }
+    }
+
+    public sealed class SomeGenericConstrainedPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest // Only requests, not commands or queries
+    {
+        public async ValueTask<TResponse> Handle(TRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
+        {
+            var response = await next(message, cancellationToken);
+            if (response is SomeResponse someResponse)
+                return (TResponse)(object)(someResponse with { Id = Guid.NewGuid() });
+            else
+                return response;
         }
     }
 }

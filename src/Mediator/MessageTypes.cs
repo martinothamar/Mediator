@@ -6,11 +6,11 @@ namespace Mediator
 
     public interface IRequest : IMessage { }
 
-    public interface IRequest<out TResponse> : IMessage { }
+    public interface IRequest<out TResponse> : IRequest { }
 
     public interface ICommand : IMessage { }
 
-    public interface ICommand<out TResponse> : IMessage { }
+    public interface ICommand<out TResponse> : ICommand { }
 
     public interface IQuery<out TResponse> : IMessage { }
 

@@ -1,3 +1,4 @@
+using Mediator.Tests.Pipeline;
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -24,6 +25,25 @@ namespace Mediator.Tests
 
             await mediator.Publish(notification2);
             Assert.Equal(notification2.Id, handler2.Id);
+        }
+
+        [Fact]
+        public async Task Test_Constrained_Generic_Argument_Pipeline()
+        {
+            var (sp, mediator) = Fixture.GetMediator(services =>
+            {
+                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(SomeGenericConstrainedPipeline<,>));
+            });
+
+            var request = new SomeRequest(Guid.NewGuid());
+            var command = new SomeCommand(Guid.NewGuid());
+
+            var response = await mediator.Send(command);
+            Assert.Equal(command.Id, response.Id);
+
+            response = await mediator.Send(request);
+            Assert.NotEqual(command.Id, response.Id);
+            Assert.NotEqual(default, response.Id);
         }
     }
 }
