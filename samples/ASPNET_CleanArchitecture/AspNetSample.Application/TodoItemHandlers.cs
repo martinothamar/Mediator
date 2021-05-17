@@ -2,7 +2,6 @@ using AspNetSample.Domain;
 using FluentValidation;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
-using OneOf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,8 +15,6 @@ namespace AspNetSample.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            //IPipelineBehavior<AddTodoItem, OneOf<TodoItemDto, ValidationError>> h = new MessageValidatorBehaviour<AddTodoItem, TodoItemDto>();
-
             return services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(MessageValidatorBehaviour<,>));
         }
     }
@@ -29,7 +26,7 @@ namespace AspNetSample.Application
 
     public sealed record ValidationError(IEnumerable<string> Errors);
 
-    public sealed record AddTodoItem(string Title, string Text) : ICommand<OneOf<TodoItemDto, ValidationError>>, IValidate
+    public sealed record AddTodoItem(string Title, string Text) : ICommand<TodoItemDto>, IValidate
     {
         public bool IsValid([NotNullWhen(false)] out ValidationError? error)
         {
@@ -53,20 +50,26 @@ namespace AspNetSample.Application
         }
     }
 
+    public sealed class ValidationException : Exception
+    {
+        public ValidationException(ValidationError validationError) : base("Validation error") => ValidationError = validationError;
+
+        public ValidationError ValidationError { get; }
+    }
+
     public sealed class MessageValidatorBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
-        where TMessage : IMessage, IValidate
-        where TResponse : IOneOf
+        where TMessage : IValidate
     {
         public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
         {
             if (!message.IsValid(out var validationError))
-                return new ValueTask<TResponse>(default(TResponse)!);
+                throw new ValidationException(validationError);
 
             return next(message, cancellationToken);
         }
     }
 
-    public sealed class TodoItemCommandHandler : ICommandHandler<AddTodoItem, OneOf<TodoItemDto, ValidationError>>
+    public sealed class TodoItemCommandHandler : ICommandHandler<AddTodoItem, TodoItemDto>
     {
         private readonly ITodoItemRepository _repository;
 
@@ -75,7 +78,7 @@ namespace AspNetSample.Application
             _repository = repository;
         }
 
-        public async ValueTask<OneOf<TodoItemDto, ValidationError>> Handle(AddTodoItem command, CancellationToken cancellationToken)
+        public async ValueTask<TodoItemDto> Handle(AddTodoItem command, CancellationToken cancellationToken)
         {
             var item = new TodoItem(Guid.NewGuid(), command.Title, command.Text, false);
 
