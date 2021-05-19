@@ -16,7 +16,7 @@ var sp = services.BuildServiceProvider();
 
 var mediator = sp.GetRequiredService<IMediator>();
 
-var ping = new Ping(Guid.NewGuid(), false);
+var ping = new Ping(Guid.NewGuid());
 var pong = await mediator.Send(ping);
 Debug.Assert(ping.Id == pong.Id);
 Console.WriteLine("Got the right ID: " + (ping, pong));
@@ -41,7 +41,7 @@ Console.WriteLine("Done!");
 
 // Types used below
 
-public sealed record Ping(Guid Id, bool ThrowError) : IRequest<Pong>;
+public sealed record Ping(Guid Id) : IRequest<Pong>;
 
 public sealed record Pong(Guid Id);
 
@@ -49,9 +49,6 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
 {
     public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
     {
-        if (request.ThrowError)
-            throw new Exception("Can't handle ping");
-
         return new ValueTask<Pong>(new Pong(request.Id));
     }
 }
@@ -91,7 +88,7 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error handling message: " + ex);
+            Console.WriteLine("Error handling message: " + ex.Message);
             await _mediator.Publish(new ErrorMessage(ex));
             throw;
         }

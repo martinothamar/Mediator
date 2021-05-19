@@ -5,8 +5,17 @@ Just like SimpleConsole, but with [NativeAOT](https://github.com/dotnet/runtimel
 ### Build and run
 
 ```pwsh
-dotnet publish -r win-x64 -c release -o dist
-.\dist\SimpleConsoleAOT.exe
+PS C:\code\Mediator\samples\SimpleConsoleAOT> dotnet publish -r win-x64 -c release -o dist
+PS C:\code\Mediator\samples\SimpleConsoleAOT> .\dist\SimpleConsoleAOT.exe
+1) Running logger handler
+2) Running ping validator
+3) Valid input!
+4) Returning pong!
+5) No error!
+-----------------------------------
+ID: 03a0053a-5411-43d6-9f79-c8c293b5e5fe
+Ping { Id = 03a0053a-5411-43d6-9f79-c8c293b5e5fe }
+Pong { Id = 03a0053a-5411-43d6-9f79-c8c293b5e5fe }
 ```
 
 ### Comparison

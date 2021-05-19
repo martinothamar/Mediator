@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,9 +15,9 @@ namespace Mediator.SourceGenerator
     {
         private static readonly SymbolEqualityComparer _comparer = SymbolEqualityComparer.Default;
         public readonly INamedTypeSymbol Symbol;
-        protected readonly CompilationAnalyzerV2 Analyzer;
+        protected readonly CompilationAnalyzer Analyzer;
 
-        public SymbolMetadata(INamedTypeSymbol symbol, CompilationAnalyzerV2 analyzer)
+        public SymbolMetadata(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
         {
             Symbol = symbol;
             Analyzer = analyzer;
@@ -48,7 +46,7 @@ namespace Mediator.SourceGenerator
 
         public readonly string MessageType;
 
-        public RequestMessage(INamedTypeSymbol symbol, INamedTypeSymbol responseSymbol, string messageType, CompilationAnalyzerV2 analyzer)
+        public RequestMessage(INamedTypeSymbol symbol, INamedTypeSymbol responseSymbol, string messageType, CompilationAnalyzer analyzer)
             : base(symbol, analyzer)
         {
             ResponseSymbol = responseSymbol;
@@ -86,7 +84,7 @@ namespace Mediator.SourceGenerator
     {
         private readonly HashSet<NotificationMessageHandler> _handlers;
 
-        public NotificationMessage(INamedTypeSymbol symbol, CompilationAnalyzerV2 analyzer)
+        public NotificationMessage(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
             : base(symbol, analyzer)
         {
             _handlers = new ();
@@ -113,7 +111,7 @@ namespace Mediator.SourceGenerator
 
     internal abstract class MessageHandler<T> : SymbolMetadata<MessageHandler<T>>
     {
-        public MessageHandler(INamedTypeSymbol symbol, CompilationAnalyzerV2 analyzer)
+        public MessageHandler(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
             : base(symbol, analyzer)
         {
         }
@@ -143,7 +141,7 @@ namespace Mediator.SourceGenerator
         public readonly string MessageType;
         public readonly RequestMessageHandlerWrapper WrapperType;
 
-        public RequestMessageHandler(INamedTypeSymbol symbol, string messageType, CompilationAnalyzerV2 analyzer)
+        public RequestMessageHandler(INamedTypeSymbol symbol, string messageType, CompilationAnalyzer analyzer)
             : base(symbol, analyzer)
         {
             MessageType = messageType;
@@ -154,9 +152,9 @@ namespace Mediator.SourceGenerator
     internal sealed class RequestMessageHandlerWrapper
     {
         public readonly string MessageType;
-        private readonly CompilationAnalyzerV2 _analyzer;
+        private readonly CompilationAnalyzer _analyzer;
 
-        public RequestMessageHandlerWrapper(string messageType, CompilationAnalyzerV2 analyzer)
+        public RequestMessageHandlerWrapper(string messageType, CompilationAnalyzer analyzer)
         {
             MessageType = messageType;
             _analyzer = analyzer;
@@ -195,7 +193,7 @@ namespace Mediator.SourceGenerator
 
     internal sealed class NotificationMessageHandler : MessageHandler<NotificationMessageHandler>
     {
-        public NotificationMessageHandler(INamedTypeSymbol symbol, CompilationAnalyzerV2 analyzer)
+        public NotificationMessageHandler(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
             : base(symbol, analyzer)
         {
         }
@@ -207,7 +205,7 @@ namespace Mediator.SourceGenerator
             $"services.Add(new SD({OpenGenericTypeOfExpression}, {TypeOfExpression(false)}, {ServiceLifetime}));";
     }
 
-    internal sealed class CompilationAnalyzerV2
+    internal sealed class CompilationAnalyzer
     {
         private static readonly SymbolEqualityComparer _symbolComparer = SymbolEqualityComparer.Default;
         private readonly GeneratorExecutionContext _context;
@@ -260,7 +258,7 @@ namespace Mediator.SourceGenerator
 
         public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
-        public CompilationAnalyzerV2(in GeneratorExecutionContext context)
+        public CompilationAnalyzer(in GeneratorExecutionContext context)
         {
             _context = context;
             _compilation = context.Compilation;
@@ -580,58 +578,6 @@ namespace Mediator.SourceGenerator
                 return false;
             }
         }
-
-        //private void ProcessOpenGenericHandlers()
-        //{
-        //    var requestMessageHandlers = _requestMessageHandlers.ToArray();
-
-        //    for (int i = 0; i < requestMessageHandlers.Length; i++)
-        //    {
-        //        var requestMessageHandler = requestMessageHandlers[i];
-
-        //        if (IsOpenGeneric(requestMessageHandler.Symbol))
-        //        {
-        //            var requestHandlerRequestTypeParameter = (ITypeParameterSymbol)requestMessageHandler.Symbol.TypeArguments[0];
-
-        //            if (requestHandlerRequestTypeParameter.ConstraintTypes.Length == 0)
-        //                throw new Exception("TODO report diag - unconstrained generic handler type");
-
-        //            var constraint = requestHandlerRequestTypeParameter.ConstraintTypes[0];
-        //            // TODO what2do with several constraints?
-
-        //            foreach (var requestMessage in _requestMessages)
-        //            {
-        //                if (_symbolComparer.Equals(requestMessage.Symbol, constraint))
-        //                    continue;
-
-        //                if (!_compilation.ClassifyConversion(requestMessage.Symbol, constraint).IsImplicit)
-        //                    continue;
-
-        //                var constructedRequestMessageHandlerSymbol = requestMessageHandler.Symbol.Construct(requestMessage.Symbol);
-        //                var requestMessageHandlerInterfaceSymbol = GetHandlerInterfaceForRequest(requestMessage.Symbol);
-        //                // var constructedRequestMessageHandlerInterfaceSymbol = 
-        //            }
-        //        }
-        //    }
-
-        //    INamedTypeSymbol GetHandlerInterfaceForRequest(INamedTypeSymbol requestMessageSymbol)
-        //    {
-        //        foreach (var baseRequestMessage in _baseMessageSymbols)
-        //        {
-        //            foreach (var requestMessageInterfaceSymbol in requestMessageSymbol.AllInterfaces)
-        //            {
-        //                if (requestMessageInterfaceSymbol.ContainingNamespace.Name != Constants.MediatorLib)
-        //                    continue;
-
-        //                if (_symbolComparer.Equals(baseRequestMessage, requestMessageInterfaceSymbol))
-        //                    return baseRequestMessage.Construct()
-        //            }
-        //        }
-        //    }
-
-        //    static bool IsOpenGeneric(INamedTypeSymbol symbol) =>
-        //        symbol.TypeArguments.Length > 0 && symbol.TypeArguments[0] is ITypeParameterSymbol;
-        //}
 
         static bool IsOpenGeneric(INamedTypeSymbol symbol) =>
             symbol.TypeArguments.Length > 0 && symbol.TypeArguments[0] is ITypeParameterSymbol;

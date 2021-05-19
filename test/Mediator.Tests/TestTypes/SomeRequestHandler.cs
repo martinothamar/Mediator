@@ -28,10 +28,11 @@ namespace Mediator.Tests.TestTypes
         {
             public Guid Id;
 
-            public ValueTask<SomeResponse> Handle(SomeStaticNestedRequest request, CancellationToken cancellationToken)
+            public async ValueTask<SomeResponse> Handle(SomeStaticNestedRequest request, CancellationToken cancellationToken)
             {
+                await Task.Yield();
                 Id = request.Id;
-                return new ValueTask<SomeResponse>(new SomeResponse(Id));
+                return new SomeResponse(Id);
             }
         }
     }
@@ -44,10 +45,11 @@ namespace Mediator.Tests.TestTypes
         {
             public Guid Id;
 
-            public ValueTask<SomeResponse> Handle(SomeNestedRequest request, CancellationToken cancellationToken)
+            public async ValueTask<SomeResponse> Handle(SomeNestedRequest request, CancellationToken cancellationToken)
             {
+                await Task.Delay(1000, cancellationToken);
                 Id = request.Id;
-                return new ValueTask<SomeResponse>(new SomeResponse(Id));
+                return new SomeResponse(Id);
             }
         }
     }

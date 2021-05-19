@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
 using MediatR;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ namespace Mediator.Benchmarks.Request
     }
 
     [MemoryDiagnoser]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
     public class RequestBenchmarks
     {
         private IServiceProvider _serviceProvider;

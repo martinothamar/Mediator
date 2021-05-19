@@ -1,7 +1,9 @@
 ## Mediator
 
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
-The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library.
+The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, one of the few deviations is in the delegate signature used for pipeline behaviors to allow for less allocations.
+
+The mediator pattern is great for implementing cross cutting concern (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
 
 > **NOTE**
 > This is very new, and API etc might change.
@@ -9,7 +11,6 @@ The API and usage is mostly based on the great [MediatR](https://github.com/jbog
 
 Using source generators instead of relying on reflection has multiple benefits
 * AOT friendly
-  * MediatR will not work in AOT, as it uses parts of reflection API that generates code during runtime
   * Faster startup - build time reflection instead of runtime/startup reflection
 * Build time errors instead of runtime errors
 * Better performance
@@ -20,8 +21,9 @@ Using source generators instead of relying on reflection has multiple benefits
 In particular, source generators in this library is used to
 * Generate code for DI registration
   * Includes polymorphic dispatch and constrained generics in pipeline steps and notification handlers.
-* Generate code for `IMediator` interface and implementation
-  * Request/Command/Query `Send` methods are monomorphized (1 method per T), the generic `ISender.Send` methods rely on these
+* Generate code for `IMediator` implementation
+  * Request/Command/Query `Send` methods are monomorphized (1 method per T), the generic `ISender.Send` methods rely on these.
+  * You can use both `IMediator` and `Mediator`, the latter allows for better performance.
 
 - [Mediator](#mediator)
 - [2. Benchmarks](#2-benchmarks)
@@ -29,7 +31,7 @@ In particular, source generators in this library is used to
   - [3.1. Message types](#31-message-types)
   - [3.2. Handler types](#32-handler-types)
   - [3.3. Pipeline types](#33-pipeline-types)
-  - [3.4. Simple end-to-end example](#34-simple-end-to-end-example)
+  - [3.4. Getting started - simple end-to-end example](#34-getting-started---simple-end-to-end-example)
     - [3.4.1. Add package](#341-add-package)
     - [3.4.2. Add Mediator to DI container](#342-add-mediator-to-di-container)
     - [3.4.3. Add your messages and handlers](#343-add-your-messages-and-handlers)
@@ -42,16 +44,34 @@ In particular, source generators in this library is used to
 ## 2. Benchmarks
 
 This benchmark exposes the perf overhead of the libraries.
-Baseline is a simple method invocation.
 Mediator (this library) and MediatR methods show the overhead of the respective mediator implementations.
+I've also included the [MessagePipe](https://github.com/Cysharp/MessagePipe) library as it also has great performance.
 
-See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request/RequestBenchmarks.cs) for more information.
+See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request/RequestBenchmarks.cs) for more details on the measurement.
+
+``` ini
+
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
+Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=5.0.300-preview.21228.15
+  [Host]     : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
+  DefaultJob : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
+
+
+```
+|                        Method |       Mean |     Error |    StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
+|------------------------------ |-----------:|----------:|----------:|------:|-------:|------:|------:|----------:|
+|          SendRequest_Baseline |   9.619 ns | 0.0163 ns | 0.0144 ns | 0.010 |      - |     - |     - |         - |
+| SendRequest_Mediator_Concrete |  11.782 ns | 0.0439 ns | 0.0411 ns | 0.012 |      - |     - |     - |         - |
+|       SendRequest_MessagePipe |  14.277 ns | 0.0334 ns | 0.0312 ns | 0.014 |      - |     - |     - |         - |
+|          SendRequest_Mediator |  27.782 ns | 0.3022 ns | 0.2678 ns | 0.028 |      - |     - |     - |         - |
+|           SendRequest_MediatR | 993.866 ns | 2.9908 ns | 2.7976 ns | 1.000 | 0.4349 |     - |     - |    1368 B |
 
 ## 3. Usage
 
 There are two NuGet packages needed to use this library
 * Mediator.SourceGenerator
-  * To generate the `IMediator` interface, implementation and dependency injection setup.
+  * To generate the `IMediator` implementation and dependency injection setup.
 * Mediator
   * Message types (`IRequest<,>`, `INotification`), handler types (`IRequestHandler<,>`, `INotificationHandler<>`), pipeline types (`IPipelineBehavior`)
 
@@ -60,7 +80,7 @@ and then use the `Mediator` package wherever you defined message types and handl
 Standard message handlers are automatically picked up and added to the DI container in the generated `AddMediator` method.
 Pipeline behaviors need to be added manually.
 
-For example implementations, see the samples folder.
+For example implementations, see the [/samples](/samples) folder.
 
 ### 3.1. Message types
 
@@ -102,7 +122,12 @@ public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMes
 }
 ```
 
-### 3.4. Simple end-to-end example
+### 3.4. Getting started - simple end-to-end example
+
+In this section we will get started with Mediator and go through a sample
+illustrating the various ways the Mediator pattern can be used in an application.
+
+See the full runnable sample code in the [SimpleEndToEnd sample](/samples/SimpleEndToEnd/).
 
 #### 3.4.1. Add package
 

@@ -33,22 +33,14 @@ namespace Mediator.SourceGenerator
         {
             GenerateOptionsAttribute(in context);
 
-            var compilationAnalyzerV2 = new CompilationAnalyzerV2(in context);
-            compilationAnalyzerV2.Analyze(context.CancellationToken);
+            var compilationAnalyzer = new CompilationAnalyzer(in context);
+            compilationAnalyzer.Analyze(context.CancellationToken);
 
-            if (compilationAnalyzerV2.HasErrors)
+            if (compilationAnalyzer.HasErrors)
                 return;
 
-            //var compilationAnalyzer = new CompilationAnalyzer(compilation);
-            //compilationAnalyzer.Analyze(context.CancellationToken);
-
-            //var analysisReporter = new AnalysisReporter();
-            //var hasErrors = analysisReporter.Report(in context, compilationAnalyzer);
-            //if (hasErrors)
-            //    return;
-
             var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-            mediatorImplementationGenerator.Generate(in context, compilationAnalyzerV2);
+            mediatorImplementationGenerator.Generate(in context, compilationAnalyzer);
         }
 
         private void GenerateOptionsAttribute(in GeneratorExecutionContext context)
