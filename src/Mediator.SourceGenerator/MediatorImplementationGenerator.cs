@@ -13,7 +13,7 @@ namespace Mediator.SourceGenerator
 
             var model = new TemplatingModel(compilationAnalyzer);
 
-            var file = @"resources/Mediator.sbntxt";
+            var file = @"resources/Mediator.sbn-cs";
             var template = Template.Parse(EmbeddedResource.GetContent(file), file);
             var output = template.Render(model, member => member.Name);
 

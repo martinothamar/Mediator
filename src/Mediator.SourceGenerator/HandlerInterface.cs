@@ -26,6 +26,17 @@ namespace Mediator.SourceGenerator
 
         public bool IsNotificationType => RequestType.iMessageType == "INotification";
 
+        // {{ handlerInterface.MessageType }}HandlerWrapper<{{ handlerInterface.RequestType.FullName }}{{- if handlerInterface.HasResponse && !handlerInterface.ResponseType.IsUnitType; ", " + handlerInterface.ResponseType.FullName; end; -}}>
+        public string WrapperHandlerType =>
+            $"{MessageType}{(RequestType.IsStruct ? "Struct" : "Class")}HandlerWrapper<{RequestType.FullName}{(HasResponse && !ResponseType!.IsUnitType ? $", {ResponseType.FullName}" : "")}>";
+
+        public string RequestTypeHandlerPropertyName =>
+            $"{MessageType}Handler_{RequestType.Symbol.GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false).Replace('.', '_')}";
+
+        // global::Mediator.IPipelineBehavior<{{ handlerInterface.RequestType.FullName }}, {{ handlerInterface.ResponseType.FullName }}>
+        public string PipelineHandlerType =>
+            $"global::Mediator.IPipelineBehavior<{RequestType.FullName}, {(HasResponse && !ResponseType!.IsUnitType ? ResponseType.FullName : "global::Mediator.Unit")}>";
+
         public HandlerInterface(INamedTypeSymbol baseHandlerSymbol, INamedTypeSymbol unitSymbol, Compilation compilation)
         {
             Symbol = baseHandlerSymbol;

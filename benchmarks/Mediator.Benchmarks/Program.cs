@@ -1,10 +1,9 @@
 using BenchmarkDotNet.Running;
-using Mediator.Benchmarks.Request;
 
 namespace Mediator.Benchmarks
 {
     class Program
     {
-        static void Main() => BenchmarkRunner.Run<RequestBenchmarks>();
+        static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
     }
 }

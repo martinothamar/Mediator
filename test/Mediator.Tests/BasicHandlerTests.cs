@@ -115,5 +115,33 @@ namespace Mediator.Tests
             Assert.Equal(id, handler1.Id);
             Assert.Equal(id, handler2.Id);
         }
+
+        [Fact]
+        public async Task Test_Static_Nested_Request_Handler()
+        {
+            var (sp, mediator) = Fixture.GetMediator();
+
+            var id = Guid.NewGuid();
+
+            var handler = sp.GetRequiredService<SomeStaticClass.SomeStaticNestedHandler>();
+            var response = await mediator!.Send(new SomeStaticClass.SomeStaticNestedRequest(id), CancellationToken.None);
+            Assert.NotNull(response);
+            Assert.Equal(id, response.Id);
+            Assert.Equal(id, handler.Id);
+        }
+
+        [Fact]
+        public async Task Test_Nested_Request_Handler()
+        {
+            var (sp, mediator) = Fixture.GetMediator();
+
+            var id = Guid.NewGuid();
+
+            var handler = sp.GetRequiredService<SomeOtherClass.SomeNestedHandler>();
+            var response = await mediator!.Send(new SomeOtherClass.SomeNestedRequest(id), CancellationToken.None);
+            Assert.NotNull(response);
+            Assert.Equal(id, response.Id);
+            Assert.Equal(id, handler.Id);
+        }
     }
 }

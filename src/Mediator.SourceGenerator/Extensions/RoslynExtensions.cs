@@ -4,12 +4,12 @@ namespace Mediator.SourceGenerator.Extensions
 {
     public static class RoslynExtensions
     {
-        public static string GetTypeSymbolFullName(this ITypeSymbol symbol)
+        public static string GetTypeSymbolFullName(this ITypeSymbol symbol, bool withGlobalPrefix = true, bool includeTypeParameters = true)
         {
             return symbol.ToDisplayString(new SymbolDisplayFormat(
-                SymbolDisplayGlobalNamespaceStyle.Included,
+                withGlobalPrefix ? SymbolDisplayGlobalNamespaceStyle.Included : SymbolDisplayGlobalNamespaceStyle.Omitted,
                 SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-                SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                includeTypeParameters ? SymbolDisplayGenericsOptions.IncludeTypeParameters : SymbolDisplayGenericsOptions.None,
                 miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
             ));
         }

@@ -7,9 +7,9 @@ The API and usage is mostly based on the great [MediatR](https://github.com/jbog
 > This is very new, and API etc might change.
 > Will soon publish pre-release NuGet packages.
 
-
 Using source generators instead of relying on reflection has multiple benefits
 * AOT friendly
+  * MediatR will not work in AOT, as it uses parts of reflection API that generates code during runtime
   * Faster startup - build time reflection instead of runtime/startup reflection
 * Build time errors instead of runtime errors
 * Better performance
@@ -24,15 +24,29 @@ In particular, source generators in this library is used to
   * Request/Command/Query `Send` methods are monomorphized (1 method per T), the generic `ISender.Send` methods rely on these
 
 - [Mediator](#mediator)
-- [2. Usage](#2-usage)
-  - [2.1. Message types](#21-message-types)
-  - [2.2. Handler types](#22-handler-types)
-  - [2.3. Pipeline types](#23-pipeline-types)
-  - [2.4. Simple end-to-end example](#24-simple-end-to-end-example)
-- [3. Benchmarks](#3-benchmarks)
+- [2. Benchmarks](#2-benchmarks)
+- [3. Usage](#3-usage)
+  - [3.1. Message types](#31-message-types)
+  - [3.2. Handler types](#32-handler-types)
+  - [3.3. Pipeline types](#33-pipeline-types)
+  - [3.4. Simple end-to-end example](#34-simple-end-to-end-example)
+    - [3.4.1. Add package](#341-add-package)
+    - [3.4.2. Add Mediator to DI container](#342-add-mediator-to-di-container)
+    - [3.4.3. Add your messages and handlers](#343-add-your-messages-and-handlers)
+    - [3.4.4. Use pipeline behaviors for middleware](#344-use-pipeline-behaviors-for-middleware)
+    - [3.4.5. Use pipeline behaviors for cross cutting concerns using open generics](#345-use-pipeline-behaviors-for-cross-cutting-concerns-using-open-generics)
+    - [3.4.6. Use notifications](#346-use-notifications)
+    - [3.4.7. Polymorphic dispatch with notification handlers](#347-polymorphic-dispatch-with-notification-handlers)
 
+## 2. Benchmarks
 
-## 2. Usage
+This benchmark exposes the perf overhead of the libraries.
+Baseline is a simple method invocation.
+Mediator (this library) and MediatR methods show the overhead of the respective mediator implementations.
+
+See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request/RequestBenchmarks.cs) for more information.
+
+## 3. Usage
 
 There are two NuGet packages needed to use this library
 * Mediator.SourceGenerator
@@ -47,7 +61,7 @@ Pipeline behaviors need to be added manually.
 
 For example implementations, see the samples folder.
 
-### 2.1. Message types
+### 3.1. Message types
 
 * `IMessage` - marker interface
 * `IRequest` - a request message, no return value (`ValueTask`)
@@ -59,7 +73,7 @@ For example implementations, see the samples folder.
 
 As you can see, you can achieve the exact same thing with requests, commands and queries. But I find the distinction in naming useful if you for example use the CQRS pattern or for some reason have a preference on naming in your application. In the future this could even be configurable as the source generator could generate anything.
 
-### 2.2. Handler types
+### 3.2. Handler types
 
 * `IRequestHandler<in TRequest>`
 * `IRequestHandler<in TRequest, TResponse>`
@@ -70,7 +84,7 @@ As you can see, you can achieve the exact same thing with requests, commands and
 
 These types are used in correlation with the message types above.
 
-### 2.3. Pipeline types
+### 3.3. Pipeline types
 
 * `IPipelineBehavior<TMessage>`
 * `IPipelineBehavior<TMessage, TResponse>`
@@ -96,9 +110,9 @@ public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMes
 }
 ```
 
-### 2.4. Simple end-to-end example
+### 3.4. Simple end-to-end example
 
-Add package
+#### 3.4.1. Add package
 
 ```pwsh
 dotnet add package Mediator.SourceGenerator --version notyetpublished
@@ -113,16 +127,21 @@ or
 <PackageReference Include="Mediator" Version="notyetpublished" />
 ```
 
+#### 3.4.2. Add Mediator to DI container
+
 In `ConfigureServices` or equivalent, call `AddMediator` (unless `MediatorOptions` is configured, default namespace is `Mediator`).
 This registers your handler below.
 
 ```csharp
 using Mediator;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection(); // Most likely IServiceCollection comes from IHostBuilder/Generic host abstraction in Microsoft.Extensions.Hosting
 
 services.AddMediator();
 ```
 
-Then somewhere in your application, define your messages, handlers and pipelines
+#### 3.4.3. Add your messages and handlers
 
 ```csharp
 public sealed record Ping(Guid Id) : IRequest<Pong>;
@@ -138,9 +157,14 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
 }
 ```
 
-Say for instance that you want to validate the ping, then you can add a validator to the pipeline
+#### 3.4.4. Use pipeline behaviors for middleware
+
+The pipeline behavior below validates all incoming `Ping` messages.
 
 ```csharp
+services.AddMediator();
+services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>();
+
 public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
     public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken, MessageHandlerDelegate<Ping, Pong> next)
@@ -153,27 +177,85 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 }
 ```
 
-## 3. Benchmarks
+#### 3.4.5. Use pipeline behaviors for cross cutting concerns using open generics
 
-This benchmark exposes the perf overhead of the libraries.
-Baseline is a simple method invocation.
-Mediator (this library) and MediatR methods show the overhead of the respective mediator implementations.
+Add open generic handler to process all or a subset of messages passing through Mediator.
+This handler will log any error that is thrown from message handlers (`IRequest`, `ICommand`, `IQuery`).
+It also publishes a notification allowing notification handlers to react to errors.
 
-See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request/RequestBenchmarks.cs) for more information.
+```csharp
+services.AddMediator();
+services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggerHandler<,>));
 
-``` ini
+public sealed record ErrorMessage(Exception Exception) : INotification;
+public sealed record SuccessfulMessage() : INotification;
 
-BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
-Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
-.NET Core SDK=5.0.300-preview.21228.15
-  [Host]     : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
-  DefaultJob : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
+public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+    where TMessage : IMessage // Constrained to IMessage, or constrain to IBaseCommand or any custom interface you've implemented
+{
+    private readonly ILogger<ErrorLoggerHandler<TMessage, TResponse>> _logger;
+    private readonly IMediator _mediator;
 
+    public ErrorLoggerHandler(ILogger<ErrorLoggerHandler<TMessage, TResponse>> logger, IMediator mediator) 
+    {
+        _logger = logger;
+        _mediator = mediator;
+    }
 
+    public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    {
+        try
+        {
+            var response = await next(message, cancellationToken);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error handling message");
+            await _mediator.Publish(new ErrorMessage(ex));
+            throw;
+        }
+    }
+}
 ```
-|                  Method |        Mean |    Error |   StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|------------------------ |------------:|---------:|---------:|------:|-------:|------:|------:|----------:|
-|     SendRequest_MediatR | 1,051.89 ns | 3.154 ns | 2.951 ns |  1.00 | 0.4349 |     - |     - |    1368 B |
-|    SendRequest_Mediator |    86.14 ns | 0.145 ns | 0.121 ns |  0.08 |      - |     - |     - |         - |
-| SendRequest_MessagePipe |    14.21 ns | 0.061 ns | 0.054 ns |  0.01 |      - |     - |     - |         - |
-|    SendRequest_Baseline |    11.67 ns | 0.040 ns | 0.033 ns |  0.01 |      - |     - |     - |         - |
+
+#### 3.4.6. Use notifications
+
+We can define a notification handler to catch errors from the above pipeline behavior.
+
+```csharp
+// Notification handlers are automatically added to DI container
+
+public sealed class ErrorNotificationHandler : INotificationHandler<ErrorMessage>
+{
+    public ValueTask Handle(ErrorMessage error, CancellationToken cancellationToken)
+    {
+        // Could log to application insights or something...
+        return default;
+    }
+}
+```
+
+#### 3.4.7. Polymorphic dispatch with notification handlers
+
+We can also define a notification handler that receives all notifications.
+
+```csharp
+
+public sealed class StatsNotificationHandler : INotificationHandler<INotification> // or any other interface deriving from INotification
+{
+    private long _messageCount;
+    private long _messageErrorCount;
+
+    public (long MessageCount, long MessageErrorCount) Stats => (_messageCount, _messageErrorCount);
+
+    public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
+    {
+        if (notification is SuccessfulMessage)
+            Interlocked.Increment(ref _messageCount);
+        if (notification is ErrorMessage)
+            Interlocked.Increment(ref _messageErrorCount);
+        return default;
+    }
+}
+```

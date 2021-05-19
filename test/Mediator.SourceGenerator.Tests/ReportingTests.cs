@@ -33,6 +33,28 @@ namespace MyCode
         }
 
         [Fact]
+        public async Task Test_Deep_Namespace_Program()
+        {
+            var source = await Fixture.SourceFromResourceFile("DeepNamespaceProgram.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(
+                Assertions.NoDiagnostics
+            );
+        }
+
+        [Fact]
+        public async Task Test_Static_Nested_Handler_Program()
+        {
+            var source = await Fixture.SourceFromResourceFile("StaticNestedHandlerProgram.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(
+                Assertions.NoDiagnostics
+            );
+        }
+
+        [Fact]
         public async Task Test_Duplicate_Handlers()
         {
             var source = await Fixture.SourceFromResourceFile("DuplicateHandlersProgram.cs");

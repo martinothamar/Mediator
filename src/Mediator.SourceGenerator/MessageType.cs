@@ -21,6 +21,9 @@ namespace Mediator.SourceGenerator
         public bool IsStruct { get; }
         public bool IsReadOnly { get; }
 
+        // {{- if messageData.RequestType.IsStruct && messageData.RequestType.IsReadOnly; "in "; end; -}}
+        public string ParameterModifier => IsStruct && IsReadOnly ? "in " : string.Empty;
+
         public MessageType(INamedTypeSymbol symbol, INamedTypeSymbol baseHandlerSymbol, INamedTypeSymbol unitSymbol, Compilation compilation)
         {
             Symbol = symbol;
@@ -58,6 +61,17 @@ namespace Mediator.SourceGenerator
         public bool Equals(MessageType? other) => other is not null && SymbolEqualityComparer.Default.Equals(Symbol, other.Symbol);
 
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(Symbol);
+
+        public int GetDeterministicHashCode()
+        {
+            int hash = 23;
+            var source = FullName.AsSpan();
+            foreach (ref readonly char c in source)
+            {
+                hash = hash * 31 + c;
+            }
+            return hash;
+        }
 
         public static bool operator ==(MessageType? left, MessageType? right) => EqualityComparer<MessageType>.Default.Equals(left!, right!);
 

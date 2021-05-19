@@ -15,7 +15,7 @@ namespace Mediator.SourceGenerator
             if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
                 System.Diagnostics.Debugger.Launch();
 
-            //System.Diagnostics.Debugger.Launch();
+            System.Diagnostics.Debugger.Launch();
 
             try
             {

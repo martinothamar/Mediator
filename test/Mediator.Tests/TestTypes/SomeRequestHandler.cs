@@ -19,4 +19,36 @@ namespace Mediator.Tests.TestTypes
             return default;
         }
     }
+
+    public static class SomeStaticClass
+    {
+        public sealed record SomeStaticNestedRequest(Guid Id) : IRequest<SomeResponse>;
+
+        public sealed class SomeStaticNestedHandler : IRequestHandler<SomeStaticNestedRequest, SomeResponse>
+        {
+            public Guid Id;
+
+            public ValueTask<SomeResponse> Handle(SomeStaticNestedRequest request, CancellationToken cancellationToken)
+            {
+                Id = request.Id;
+                return new ValueTask<SomeResponse>(new SomeResponse(Id));
+            }
+        }
+    }
+
+    public sealed class SomeOtherClass
+    {
+        public sealed record SomeNestedRequest(Guid Id) : IRequest<SomeResponse>;
+
+        public sealed class SomeNestedHandler : IRequestHandler<SomeNestedRequest, SomeResponse>
+        {
+            public Guid Id;
+
+            public ValueTask<SomeResponse> Handle(SomeNestedRequest request, CancellationToken cancellationToken)
+            {
+                Id = request.Id;
+                return new ValueTask<SomeResponse>(new SomeResponse(Id));
+            }
+        }
+    }
 }
