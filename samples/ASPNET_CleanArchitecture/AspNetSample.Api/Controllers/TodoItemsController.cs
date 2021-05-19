@@ -34,8 +34,15 @@ namespace AspNetSample.Api.Controllers
         [HttpPost]
         public async ValueTask<ActionResult> AddItem([FromBody] AddTodoItem item, CancellationToken cancellationToken)
         {
-            await Mediator.Send(item, cancellationToken);
-            return Ok();
+            try
+            {
+                var response = await Mediator.Send(item, cancellationToken);
+                return Ok(response);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.ValidationError);
+            }
         }
     }
 }

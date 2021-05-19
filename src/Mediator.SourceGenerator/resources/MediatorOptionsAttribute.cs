@@ -11,14 +11,17 @@ namespace Mediator
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
     public sealed class MediatorOptionsAttribute : global::System.Attribute
     {
-        private readonly string _namespace;
+        /// <summary>
+        /// The namespace in which the Mediator implementation is generated.
+        /// </summary>
+        public string Namespace { get; }
 
         /// <summary>
         /// Provide options for the Mediator source generator.
         /// </summary>
         public MediatorOptionsAttribute(string mediatorNamespace = "Mediator")
         {
-            _namespace = mediatorNamespace;
+            Namespace = mediatorNamespace;
         }
     }
 }

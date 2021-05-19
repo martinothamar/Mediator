@@ -1,55 +1,13 @@
+using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Mediator.Tests.Pipeline
 {
-    public interface IPipelineTestData
-    {
-        Guid Id { get; }
-
-        public long LastMsgTimestamp { get; }
-    }
-
-    public sealed class SomePipeline : IPipelineBehavior<SomeRequest, SomeResponse>, IPipelineTestData
-    {
-        public Guid Id { get; private set; }
-        public long LastMsgTimestamp { get; private set; }
-
-        public ValueTask<SomeResponse> Handle(SomeRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<SomeRequest, SomeResponse> next)
-        {
-            LastMsgTimestamp = Stopwatch.GetTimestamp();
-
-            if (message is null || message.Id == default)
-                throw new ArgumentException("Invalid input");
-
-            Id = message.Id;
-
-            return next(message, cancellationToken);
-        }
-    }
-
-    public sealed class GenericPipeline<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>, IPipelineTestData
-        where TMessage : IMessage
-    {
-        internal TMessage? Message;
-        public Guid Id => (Guid)Message!.GetType()!.GetProperty("Id")!.GetValue(Message)!;
-        public long LastMsgTimestamp { get; private set; }
-
-        public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
-        {
-            LastMsgTimestamp = Stopwatch.GetTimestamp();
-
-            Message = message;
-
-            return next(message, cancellationToken);
-        }
-    }
-
     public sealed class PipelineTests
     {
         [Fact]
@@ -74,16 +32,40 @@ namespace Mediator.Tests.Pipeline
         {
             var (sp, mediator) = Fixture.GetMediator(services =>
             {
+                services.AddSingleton<GenericPipelineState>();
                 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
             });
 
-            var id = Guid.NewGuid();
+            var request = new SomeRequest(Guid.NewGuid());
+            var requestWithoutResponse = new SomeRequestWithoutResponse(Guid.NewGuid());
+            var command = new SomeCommand(Guid.NewGuid());
+            var commandWithoutResponse = new SomeCommandWithoutResponse(Guid.NewGuid());
+            var query = new SomeQuery(Guid.NewGuid());
 
-            var pipelineStep = sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is GenericPipeline<SomeRequest, SomeResponse>) as GenericPipeline<SomeRequest, SomeResponse>;
-            Assert.NotNull(pipelineStep);
-            var response = await mediator.Send(new SomeRequest(id));
-            Assert.Equal(id, response.Id);
-            Assert.Equal(id, pipelineStep!.Id);
+            var pipelineState = sp.GetRequiredService<GenericPipelineState>();
+
+            Assert.Equal(default, pipelineState.Id);
+            Assert.Equal(default, pipelineState.Message);
+
+            _ = await mediator.Send(request);
+            Assert.Equal(request.Id, pipelineState.Id);
+            Assert.Equal(request, pipelineState.Message);
+
+            await mediator.Send(requestWithoutResponse);
+            Assert.Equal(requestWithoutResponse.Id, pipelineState.Id);
+            Assert.Equal(requestWithoutResponse, pipelineState.Message);
+
+            _ = await mediator.Send(command);
+            Assert.Equal(command.Id, pipelineState.Id);
+            Assert.Equal(command, pipelineState.Message);
+
+            await mediator.Send(commandWithoutResponse);
+            Assert.Equal(commandWithoutResponse.Id, pipelineState.Id);
+            Assert.Equal(commandWithoutResponse, pipelineState.Message);
+
+            _ = await mediator.Send(query);
+            Assert.Equal(query.Id, pipelineState.Id);
+            Assert.Equal(query, pipelineState.Message);
         }
 
         [Fact]
@@ -91,6 +73,7 @@ namespace Mediator.Tests.Pipeline
         {
             var (sp, mediator) = Fixture.GetMediator(services =>
             {
+                services.AddSingleton<GenericPipelineState>();
                 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
                 services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
             });

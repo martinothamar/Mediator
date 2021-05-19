@@ -1,5 +1,7 @@
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
 using MediatR;
+using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
@@ -13,28 +15,30 @@ namespace Mediator.Benchmarks.Request
 
     public sealed record SomeResponse(Guid Id);
 
-    public sealed class SomeClass : IRequestHandler<SomeRequest, SomeResponse>, MediatR.IRequestHandler<SomeRequest, SomeResponse>
+    public sealed class SomeHandlerClass : IRequestHandler<SomeRequest, SomeResponse>, MediatR.IRequestHandler<SomeRequest, SomeResponse>, IAsyncRequestHandler<SomeRequest, SomeResponse>
     {
-        private static readonly Task<SomeResponse> _response = Task.FromResult(new SomeResponse(Guid.NewGuid()));
+        private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
-        ValueTask<SomeResponse> IRequestHandler<SomeRequest, SomeResponse>.Handle(SomeRequest request, CancellationToken cancellationToken)
-        {
-            return new ValueTask<SomeResponse>(_response.Result);
-        }
+        private static readonly Task<SomeResponse> _tResponse = Task.FromResult(_response);
+        private static ValueTask<SomeResponse> _vtResponse => new ValueTask<SomeResponse>(_response);
 
-        Task<SomeResponse> MediatR.IRequestHandler<SomeRequest, SomeResponse>.Handle(SomeRequest request, CancellationToken cancellationToken)
-        {
-            return _response;
-        }
+        public ValueTask<SomeResponse> Handle(SomeRequest request, CancellationToken cancellationToken) => _vtResponse;
+
+        Task<SomeResponse> MediatR.IRequestHandler<SomeRequest, SomeResponse>.Handle(SomeRequest request, CancellationToken cancellationToken) => _tResponse;
+
+        public ValueTask<SomeResponse> InvokeAsync(SomeRequest request, CancellationToken cancellationToken) => _vtResponse;
     }
 
     [MemoryDiagnoser]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
     public class RequestBenchmarks
     {
         private IServiceProvider _serviceProvider;
         private IMediator _mediator;
+        private Mediator _concreteMediator;
         private MediatR.IMediator _mediatr;
-        private IRequestHandler<SomeRequest, SomeResponse> _handler;
+        private IAsyncRequestHandler<SomeRequest, SomeResponse> _messagePipeHandler;
+        private SomeHandlerClass _handler;
         private SomeRequest _request;
 
         [GlobalSetup]
@@ -42,12 +46,15 @@ namespace Mediator.Benchmarks.Request
         {
             var services = new ServiceCollection();
             services.AddMediator();
-            services.AddMediatR(typeof(SomeClass).Assembly);
+            services.AddMediatR(typeof(SomeHandlerClass).Assembly);
+            services.AddMessagePipe();
 
             _serviceProvider = services.BuildServiceProvider();
             _mediator = _serviceProvider.GetRequiredService<IMediator>();
+            _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
             _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-            _handler = _serviceProvider.GetRequiredService<SomeClass>();
+            _messagePipeHandler = _serviceProvider.GetRequiredService<IAsyncRequestHandler<SomeRequest, SomeResponse>>();
+            _handler = _serviceProvider.GetRequiredService<SomeHandlerClass>();
             _request = new(Guid.NewGuid());
         }
 
@@ -67,6 +74,18 @@ namespace Mediator.Benchmarks.Request
         public ValueTask<SomeResponse> SendRequest_Mediator()
         {
             return _mediator.Send(_request, CancellationToken.None);
+        }
+
+        [Benchmark]
+        public ValueTask<SomeResponse> SendRequest_Mediator_Concrete()
+        {
+            return _concreteMediator.Send(_request, CancellationToken.None);
+        }
+
+        [Benchmark]
+        public ValueTask<SomeResponse> SendRequest_MessagePipe()
+        {
+            return _messagePipeHandler.InvokeAsync(_request, CancellationToken.None);
         }
 
         [Benchmark]

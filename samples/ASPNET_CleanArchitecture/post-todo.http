@@ -1,0 +1,7 @@
+POST http://localhost:5000/api/TodoItems HTTP/1.1
+content-type: application/json
+
+{
+  "title": "",
+  "text": "This is a todo without a title, we should get an error..."
+}
