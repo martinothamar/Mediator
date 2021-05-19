@@ -2,7 +2,6 @@ using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -85,7 +84,7 @@ namespace Mediator.Tests
             object obj = new { Id = id };
 
             var request = Unsafe.As<object, IRequest>(ref obj);
-            await Assert.ThrowsAsync<ArgumentException>(async () => await sender.Send(request));
+            await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await sender.Send(request));
         }
     }
 }

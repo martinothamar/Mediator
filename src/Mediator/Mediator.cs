@@ -7,11 +7,7 @@ namespace Mediator
     {
         ValueTask<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
 
-        ValueTask Send(IRequest request, CancellationToken cancellationToken = default);
-
         ValueTask<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default);
-
-        ValueTask Send(ICommand command, CancellationToken cancellationToken = default);
 
         ValueTask<TResponse> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default);
     }

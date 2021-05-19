@@ -41,6 +41,22 @@ namespace Mediator.SourceGenerator
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true);
 
+            OpenGenericRequestHandler = new DiagnosticDescriptor(
+                GetNextId(),
+                $"{nameof(MediatorGenerator)} invalid handler",
+                $"{nameof(MediatorGenerator)} found invalid handler type, request/query/command handlers cannot be generic: " + "{0}",
+                nameof(MediatorGenerator),
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+
+            MessageDerivesFromMultipleMessageInterfaces = new DiagnosticDescriptor(
+                GetNextId(),
+                $"{nameof(MediatorGenerator)} invalid message",
+                $"{nameof(MediatorGenerator)} found message that derives from multiple message interfaces: " + "{0}",
+                nameof(MediatorGenerator),
+                DiagnosticSeverity.Error,
+                isEnabledByDefault: true);
+
             static string GetNextId()
             {
                 var count = _counter++;
@@ -52,19 +68,24 @@ namespace Mediator.SourceGenerator
         }
 
         public static readonly DiagnosticDescriptor GenericError;
-
         internal static void ReportGenericError(this GeneratorExecutionContext context, Exception exception) =>
             context.ReportDiagnostic(Diagnostic.Create(GenericError, Location.None, exception));
 
         public static readonly DiagnosticDescriptor MultipleHandlersError;
-
         internal static void ReportMultipleHandlers(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
             context.ReportDiagnostic(Diagnostic.Create(MultipleHandlersError, Location.None, messageType.Name));
 
         public static readonly DiagnosticDescriptor InvalidHandlerTypeError;
-
         internal static void ReportInvalidHandlerType(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
             context.ReportDiagnostic(Diagnostic.Create(InvalidHandlerTypeError, Location.None, handlerType.Name));
+
+        public static readonly DiagnosticDescriptor OpenGenericRequestHandler;
+        internal static void ReportOpenGenericRequestHandler(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
+            context.ReportDiagnostic(Diagnostic.Create(OpenGenericRequestHandler, Location.None, handlerType.Name));
+
+        public static readonly DiagnosticDescriptor MessageDerivesFromMultipleMessageInterfaces;
+        internal static void ReportMessageDerivesFromMultipleMessageInterfaces(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+            context.ReportDiagnostic(Diagnostic.Create(MessageDerivesFromMultipleMessageInterfaces, Location.None, messageType.Name));
     }
 }
 

@@ -15,7 +15,7 @@ namespace Mediator.SourceGenerator
             if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
                 System.Diagnostics.Debugger.Launch();
 
-            System.Diagnostics.Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
 
             try
             {
@@ -33,18 +33,22 @@ namespace Mediator.SourceGenerator
         {
             GenerateOptionsAttribute(in context);
 
-            var compilation = context.Compilation;
+            var compilationAnalyzerV2 = new CompilationAnalyzerV2(in context);
+            compilationAnalyzerV2.Analyze(context.CancellationToken);
 
-            var compilationAnalyzer = new CompilationAnalyzer(compilation);
-            compilationAnalyzer.Analyze(context.CancellationToken);
-
-            var analysisReporter = new AnalysisReporter();
-            var hasErrors = analysisReporter.Report(in context, compilationAnalyzer);
-            if (hasErrors)
+            if (compilationAnalyzerV2.HasErrors)
                 return;
 
+            //var compilationAnalyzer = new CompilationAnalyzer(compilation);
+            //compilationAnalyzer.Analyze(context.CancellationToken);
+
+            //var analysisReporter = new AnalysisReporter();
+            //var hasErrors = analysisReporter.Report(in context, compilationAnalyzer);
+            //if (hasErrors)
+            //    return;
+
             var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-            mediatorImplementationGenerator.Generate(in context, compilationAnalyzer);
+            mediatorImplementationGenerator.Generate(in context, compilationAnalyzerV2);
         }
 
         private void GenerateOptionsAttribute(in GeneratorExecutionContext context)

@@ -205,6 +205,7 @@ namespace Mediator.SourceGenerator
             }
 
         }
+
         static bool IsOpenGeneric(INamedTypeSymbol symbol) =>
             symbol.TypeArguments.Length > 0 && symbol.TypeArguments[0] is ITypeParameterSymbol;
 

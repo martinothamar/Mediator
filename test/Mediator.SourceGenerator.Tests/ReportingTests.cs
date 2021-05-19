@@ -23,7 +23,7 @@ namespace MyCode
 ");
 
             inputCompilation.AssertGen(
-                Assertions.NoDiagnostics,
+                Assertions.CompilesWithoutDiagnostics,
                 result =>
                 {
                     Assert.True(result.OutputCompilation.SyntaxTrees.Count() == 3); // Original + attribute + mediator impl
@@ -39,7 +39,7 @@ namespace MyCode
             var inputCompilation = Fixture.CreateCompilation(source);
 
             inputCompilation.AssertGen(
-                Assertions.NoDiagnostics
+                Assertions.CompilesWithoutDiagnostics
             );
         }
 
@@ -50,7 +50,18 @@ namespace MyCode
             var inputCompilation = Fixture.CreateCompilation(source);
 
             inputCompilation.AssertGen(
-                Assertions.NoDiagnostics
+                Assertions.CompilesWithoutDiagnostics
+            );
+        }
+
+        [Fact]
+        public async Task Test_Abstract_Handler_Program()
+        {
+            var source = await Fixture.SourceFromResourceFile("AbstractHandlerClass.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(
+                Assertions.CompilesWithoutDiagnostics
             );
         }
 

@@ -33,10 +33,11 @@ In particular, source generators in this library is used to
     - [3.4.1. Add package](#341-add-package)
     - [3.4.2. Add Mediator to DI container](#342-add-mediator-to-di-container)
     - [3.4.3. Add your messages and handlers](#343-add-your-messages-and-handlers)
-    - [3.4.4. Use pipeline behaviors for middleware](#344-use-pipeline-behaviors-for-middleware)
-    - [3.4.5. Use pipeline behaviors for cross cutting concerns using open generics](#345-use-pipeline-behaviors-for-cross-cutting-concerns-using-open-generics)
+    - [3.4.4. Use pipeline behaviors](#344-use-pipeline-behaviors)
+    - [3.4.5. Constrain `IPipelineBehavior<,>` message with open generics](#345-constrain-ipipelinebehavior-message-with-open-generics)
     - [3.4.6. Use notifications](#346-use-notifications)
     - [3.4.7. Polymorphic dispatch with notification handlers](#347-polymorphic-dispatch-with-notification-handlers)
+    - [3.4.8. Notification handlers also support open generics](#348-notification-handlers-also-support-open-generics)
 
 ## 2. Benchmarks
 
@@ -64,9 +65,9 @@ For example implementations, see the samples folder.
 ### 3.1. Message types
 
 * `IMessage` - marker interface
-* `IRequest` - a request message, no return value (`ValueTask`)
+* `IRequest` - a request message, no return value (`ValueTask<Unit>`)
 * `IRequest<out TResponse>` - a request message with a response (`ValueTask<TResponse>`)
-* `ICommand` - a command message, no return value (`ValueTask`)
+* `ICommand` - a command message, no return value (`ValueTask<Unit>`)
 * `ICommand<out TResponse>` - a command message with a response (`ValueTask<TResponse>`)
 * `IQuery<out TResponse>` - a query message with a response (`ValueTask<TResponse>`)
 * `INotification` - a notification message, no return value (`ValueTask`)
@@ -86,25 +87,16 @@ These types are used in correlation with the message types above.
 
 ### 3.3. Pipeline types
 
-* `IPipelineBehavior<TMessage>`
 * `IPipelineBehavior<TMessage, TResponse>`
 
-This means that if you want a generic message handler (for all message, with or without responses),
-you need to implement both interfaces. Like so:
 
 ```csharp
-public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMessage>, IPipelineBehavior<TMessage, TResponse>
+public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
     where TMessage : IMessage
 {
-    public ValueTask Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage> next)
-    {
-        ...
-        return next(message, cancellationToken);
-    }
-
     public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
     {
-        ...
+        // ...
         return next(message, cancellationToken);
     }
 }
@@ -157,7 +149,7 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
 }
 ```
 
-#### 3.4.4. Use pipeline behaviors for middleware
+#### 3.4.4. Use pipeline behaviors
 
 The pipeline behavior below validates all incoming `Ping` messages.
 
@@ -177,7 +169,7 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 }
 ```
 
-#### 3.4.5. Use pipeline behaviors for cross cutting concerns using open generics
+#### 3.4.5. Constrain `IPipelineBehavior<,>` message with open generics
 
 Add open generic handler to process all or a subset of messages passing through Mediator.
 This handler will log any error that is thrown from message handlers (`IRequest`, `ICommand`, `IQuery`).
@@ -251,10 +243,22 @@ public sealed class StatsNotificationHandler : INotificationHandler<INotificatio
 
     public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
     {
-        if (notification is SuccessfulMessage)
-            Interlocked.Increment(ref _messageCount);
+        Interlocked.Increment(ref _messageCount);
         if (notification is ErrorMessage)
             Interlocked.Increment(ref _messageErrorCount);
+        return default;
+    }
+}
+```
+
+#### 3.4.8. Notification handlers also support open generics
+
+```csharp
+public sealed class GenericNotificationHandler<TNotification> : INotificationHandler<TNotification>
+    where TNotification : INotification // Generic notification handlers will be registered as open constrained types automatically
+{
+    public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
+    {
         return default;
     }
 }

@@ -62,13 +62,13 @@ namespace Mediator.Benchmarks.Request
         }
 
         [Benchmark]
-        public ValueTask SendResponselessRequest_Mediator()
+        public ValueTask<Unit> SendResponselessRequest_Mediator()
         {
             return _mediator.Send(_request, CancellationToken.None);
         }
 
         [Benchmark]
-        public ValueTask SendResponselessRequest_Mediator_Concrete()
+        public ValueTask<Unit> SendResponselessRequest_Mediator_Concrete()
         {
             return _concreteMediator.Send(_request, CancellationToken.None);
         }

@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Some.Very.Very.Very.Very.Deep.Namespace.ThatIUseToTestTheSourceGenSoThatItCanHandleLotsOfDifferentInput
+namespace Some.Nested.Types
 {
     public static class Program
     {
@@ -23,21 +23,21 @@ namespace Some.Very.Very.Very.Very.Deep.Namespace.ThatIUseToTestTheSourceGenSoTh
 
             _ = await mediator.Send(request);
         }
-    }
 
-    //
-    // Types
-    //
+        //
+        // Types
+        //
 
-    public sealed record Ping(Guid Id) : IRequest<Pong>;
+        public sealed record Ping(Guid Id) : IRequest<Pong>;
 
-    public sealed record Pong(Guid Id);
+        public sealed record Pong(Guid Id);
 
-    public sealed class PingHandler : IRequestHandler<Ping, Pong>
-    {
-        public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
+        public abstract class PingHandler : IRequestHandler<Ping, Pong>
         {
-            return new ValueTask<Pong>(new Pong(request.Id));
+            public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
+            {
+                return new ValueTask<Pong>(new Pong(request.Id));
+            }
         }
     }
 }

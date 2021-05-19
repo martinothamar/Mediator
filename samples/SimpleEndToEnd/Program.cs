@@ -33,8 +33,8 @@ catch (ArgumentException) // The ErrorLoggerHandler should handle the logging fo
 var statsHandler = sp.GetRequiredService<StatsNotificationHandler>();
 var (messageCount, messageErrorCount) = statsHandler.Stats;
 // First Ping succeeded, second failed validation
-Debug.Assert(messageCount == 2);
-Debug.Assert(messageErrorCount == 1);
+Debug.Assert(messageCount == 2,      "We sent 2 pings");
+Debug.Assert(messageErrorCount == 1, "1 of them failed validation");
 
 Console.WriteLine("Done!");
 
@@ -118,10 +118,18 @@ public sealed class StatsNotificationHandler : INotificationHandler<INotificatio
 
     public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
     {
-        if (notification is SuccessfulMessage)
-            Interlocked.Increment(ref _messageCount);
+        Interlocked.Increment(ref _messageCount);
         if (notification is ErrorMessage)
             Interlocked.Increment(ref _messageErrorCount);
+        return default;
+    }
+}
+
+public sealed class GenericNotificationHandler<TNotification> : INotificationHandler<TNotification>
+    where TNotification : INotification // Notification handlers will be registered as open constrained types
+{
+    public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
+    {
         return default;
     }
 }

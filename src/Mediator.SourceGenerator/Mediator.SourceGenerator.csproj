@@ -31,6 +31,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotNetVersion)" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
         <PackageReference Include="Scriban" Version="3.6.0" PrivateAssets="all" GeneratePathProperty="true" />
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />

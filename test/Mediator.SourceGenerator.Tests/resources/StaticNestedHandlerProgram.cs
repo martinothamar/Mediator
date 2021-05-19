@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Some.Nested.Types
 {
-    public sealed static class Program
+    public static class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
             var services = new ServiceCollection();
 
