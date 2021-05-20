@@ -137,16 +137,16 @@ See the full runnable sample code in the [SimpleEndToEnd sample](/samples/Simple
 ### 4.1. Add package
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 0.1.6-preview
-dotnet add package Mediator.Abstractions --version 0.1.6-preview
+dotnet add package Mediator.SourceGenerator --version 0.1.*-*
+dotnet add package Mediator.Abstractions --version 0.1.*-*
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="0.1.6-preview">
+<PackageReference Include="Mediator.SourceGenerator" Version="0.1.*-*">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator.Abstractions" Version="0.1.6-preview" />
+<PackageReference Include="Mediator.Abstractions" Version="0.1.*-*" />
 ```
 
 ### 4.2. Add Mediator to DI container
@@ -307,5 +307,6 @@ List of things to do before I remove preview tag:
 * Dogfooding
 * More samples (for example netfx, Blazor Webassembly)
 * Improve docs
+* Improve diagnostics
 * Result/union types and constrained generic pipeline behaviors based on `Result` type arguments
   * #2 - would then not need exceptions for control flow (I want to avoid reflection APIs)

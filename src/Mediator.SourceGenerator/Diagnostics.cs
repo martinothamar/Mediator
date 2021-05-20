@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 #pragma warning disable RS2008 // Enable analyzer release tracking
@@ -86,8 +87,9 @@ namespace Mediator.SourceGenerator
             if (typeof(T) == typeof(INamedTypeSymbol))
             {
                 ref var symbolArg = ref Unsafe.As<T, INamedTypeSymbol>(ref arg);
+                var location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
                 var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-                diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, symbolName);
+                diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, symbolName);
             }
             else
             {
