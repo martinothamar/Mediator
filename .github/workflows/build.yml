@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+    - uses: dotnet/nbgv@master
+      with:
+        setAllVars: true
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore Build.csproj
+
+    - name: Build
+      run: dotnet build Build.csproj --no-restore -c Release
+
+    - name: Test
+      run: dotnet test Build.csproj --no-build --verbosity normal -c Release
+
+    - name: Pack
+      if: ${{ success() && !github.base_ref }}
+      run: |
+        dotnet pack src/Mediator/Mediator.csproj --no-build --verbosity normal -c Release -o artifacts/ && \
+        dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-build --verbosity normal -c Release -o artifacts/
+
+    - name: Push to NuGet
+      if: ${{ success() && !github.base_ref }}
+      run: |
+        dotnet nuget push artifacts/**.nupkg -s nuget.org --api-key ${{secrets.NUGET_API_KEY}}

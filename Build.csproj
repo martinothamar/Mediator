@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.Build.Traversal/2.0.24">
+  <ItemGroup>
+    <ProjectReference Include="src/Mediator/Mediator.csproj" />
+    <ProjectReference Include="src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj" />
+    <ProjectReference Include="test/Mediator.SourceGenerator.Tests/Mediator.SourceGenerator.Tests.csproj" />
+    <ProjectReference Include="test/Mediator.Tests/Mediator.Tests.csproj" />
+  </ItemGroup>
+</Project>

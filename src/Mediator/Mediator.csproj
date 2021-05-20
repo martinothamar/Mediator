@@ -3,6 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
+    <Description>
+        Abstractions for the Mediator.SourceGenerator package.
+    </Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mediator
@@ -10,15 +10,5 @@ namespace Mediator
         ValueTask<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default);
 
         ValueTask<TResponse> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default);
-    }
-
-    public interface IPublisher
-    {
-        ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
-            where TNotification : INotification;
-    }
-
-    public interface IMediator : ISender, IPublisher
-    {
     }
 }
