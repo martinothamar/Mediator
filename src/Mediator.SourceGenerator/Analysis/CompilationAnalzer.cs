@@ -22,8 +22,6 @@ namespace Mediator.SourceGenerator
 
         private readonly INamedTypeSymbol[] _baseHandlerSymbols;
         private readonly INamedTypeSymbol[] _baseMessageSymbols;
-        private readonly HashSet<INamedTypeSymbol> _baseHandlerSymbolsSet;
-        private readonly HashSet<INamedTypeSymbol> _baseMessageSymbolsSet;
 
         private readonly INamedTypeSymbol _notificationHandlerInterfaceSymbol;
         private readonly INamedTypeSymbol _notificationInterfaceSymbol;
@@ -83,7 +81,6 @@ namespace Mediator.SourceGenerator
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
             };
-            _baseHandlerSymbolsSet = new(_baseHandlerSymbols, _symbolComparer);
 
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
             {
@@ -104,7 +101,6 @@ namespace Mediator.SourceGenerator
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQuery`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,
             };
-            _baseMessageSymbolsSet = new (_baseMessageSymbols, _symbolComparer);
 
             _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
         }
@@ -140,7 +136,9 @@ namespace Mediator.SourceGenerator
 
         private void PopulateMetadata(Queue<INamespaceOrTypeSymbol> queue)
         {
+#pragma warning disable RS1024 // Compare symbols correctly
             var requestMessageHandlerMap = new Dictionary<INamedTypeSymbol, object?>(_symbolComparer);
+#pragma warning restore RS1024 // Compare symbols correctly
 
             while (queue.Count > 0)
             {

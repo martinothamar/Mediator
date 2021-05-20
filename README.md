@@ -1,4 +1,8 @@
-## Mediator
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/martinothamar/Mediator/Build)
+![Abstractions NuGet (with prereleases)](https://img.shields.io/nuget/vpre/Mediator.Abstractions?label=Mediator.Abstractions)
+![SourceGenerator NuGet (with prereleases)](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)
+
+# Mediator
 
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
 The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, one of the few deviations is in the delegate signature used for pipeline behaviors to allow for less allocations.
@@ -6,8 +10,7 @@ The API and usage is mostly based on the great [MediatR](https://github.com/jbog
 The mediator pattern is great for implementing cross cutting concern (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
 
 > **NOTE**
-> This is very new, and API etc might change.
-> Will soon publish pre-release NuGet packages.
+> In preview
 
 Using source generators instead of relying on reflection has multiple benefits
 * AOT friendly
@@ -26,20 +29,21 @@ In particular, source generators in this library is used to
   * You can use both `IMediator` and `Mediator`, the latter allows for better performance.
 
 - [Mediator](#mediator)
-- [2. Benchmarks](#2-benchmarks)
-- [3. Usage](#3-usage)
-  - [3.1. Message types](#31-message-types)
-  - [3.2. Handler types](#32-handler-types)
-  - [3.3. Pipeline types](#33-pipeline-types)
-  - [3.4. Getting started - simple end-to-end example](#34-getting-started---simple-end-to-end-example)
-    - [3.4.1. Add package](#341-add-package)
-    - [3.4.2. Add Mediator to DI container](#342-add-mediator-to-di-container)
-    - [3.4.3. Add your messages and handlers](#343-add-your-messages-and-handlers)
-    - [3.4.4. Use pipeline behaviors](#344-use-pipeline-behaviors)
-    - [3.4.5. Constrain `IPipelineBehavior<,>` message with open generics](#345-constrain-ipipelinebehavior-message-with-open-generics)
-    - [3.4.6. Use notifications](#346-use-notifications)
-    - [3.4.7. Polymorphic dispatch with notification handlers](#347-polymorphic-dispatch-with-notification-handlers)
-    - [3.4.8. Notification handlers also support open generics](#348-notification-handlers-also-support-open-generics)
+  - [2. Benchmarks](#2-benchmarks)
+  - [3. Usage and abstractions](#3-usage-and-abstractions)
+    - [3.1. Message types](#31-message-types)
+    - [3.2. Handler types](#32-handler-types)
+    - [3.3. Pipeline types](#33-pipeline-types)
+  - [4. Getting started](#4-getting-started)
+    - [4.1. Add package](#41-add-package)
+    - [4.2. Add Mediator to DI container](#42-add-mediator-to-di-container)
+    - [4.3. Create `IRequest<>` type](#43-create-irequest-type)
+    - [4.4. Use pipeline behaviors](#44-use-pipeline-behaviors)
+    - [4.5. Constrain `IPipelineBehavior<,>` message with open generics](#45-constrain-ipipelinebehavior-message-with-open-generics)
+    - [4.6. Use notifications](#46-use-notifications)
+    - [4.7. Polymorphic dispatch with notification handlers](#47-polymorphic-dispatch-with-notification-handlers)
+    - [4.8. Notification handlers also support open generics](#48-notification-handlers-also-support-open-generics)
+  - [5. TODO](#5-todo)
 
 ## 2. Benchmarks
 
@@ -67,7 +71,7 @@ Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical co
 |          SendRequest_Mediator |  27.782 ns | 0.3022 ns | 0.2678 ns | 0.028 |      - |     - |     - |         - |
 |           SendRequest_MediatR | 993.866 ns | 2.9908 ns | 2.7976 ns | 1.000 | 0.4349 |     - |     - |    1368 B |
 
-## 3. Usage
+## 3. Usage and abstractions
 
 There are two NuGet packages needed to use this library
 * Mediator.SourceGenerator
@@ -81,6 +85,7 @@ Standard message handlers are automatically picked up and added to the DI contai
 Pipeline behaviors need to be added manually.
 
 For example implementations, see the [/samples](/samples) folder.
+See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real world setup.
 
 ### 3.1. Message types
 
@@ -122,29 +127,29 @@ public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMes
 }
 ```
 
-### 3.4. Getting started - simple end-to-end example
+## 4. Getting started
 
 In this section we will get started with Mediator and go through a sample
 illustrating the various ways the Mediator pattern can be used in an application.
 
 See the full runnable sample code in the [SimpleEndToEnd sample](/samples/SimpleEndToEnd/).
 
-#### 3.4.1. Add package
+### 4.1. Add package
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version notyetpublished
-dotnet add package Mediator --version notyetpublished
+dotnet add package Mediator.SourceGenerator --version 0.1.5-preview
+dotnet add package Mediator --version 0.1.5-preview
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="notyetpublished">
+<PackageReference Include="Mediator.SourceGenerator" Version="0.1.5-preview">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator" Version="notyetpublished" />
+<PackageReference Include="Mediator" Version="0.1.5-preview" />
 ```
 
-#### 3.4.2. Add Mediator to DI container
+### 4.2. Add Mediator to DI container
 
 In `ConfigureServices` or equivalent, call `AddMediator` (unless `MediatorOptions` is configured, default namespace is `Mediator`).
 This registers your handler below.
@@ -158,7 +163,7 @@ var services = new ServiceCollection(); // Most likely IServiceCollection comes 
 services.AddMediator();
 ```
 
-#### 3.4.3. Add your messages and handlers
+### 4.3. Create `IRequest<>` type
 
 ```csharp
 public sealed record Ping(Guid Id) : IRequest<Pong>;
@@ -174,9 +179,14 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
 }
 ```
 
-#### 3.4.4. Use pipeline behaviors
+As soon as you code up message types, the source generator will add DI registrations automatically (inside `AddMediator`).
+P.S - You can inspect the code yourself - open `Mediator.g.cs` in VS from Project -> Dependencies -> Analyzers -> Mediator.SourceGenerator -> Mediator.SourceGenerator.MediatorGenerator,
+or just F12 through the code.
+
+### 4.4. Use pipeline behaviors
 
 The pipeline behavior below validates all incoming `Ping` messages.
+Pipeline behaviors currently must be added manually.
 
 ```csharp
 services.AddMediator();
@@ -194,7 +204,7 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 }
 ```
 
-#### 3.4.5. Constrain `IPipelineBehavior<,>` message with open generics
+### 4.5. Constrain `IPipelineBehavior<,>` message with open generics
 
 Add open generic handler to process all or a subset of messages passing through Mediator.
 This handler will log any error that is thrown from message handlers (`IRequest`, `ICommand`, `IQuery`).
@@ -213,7 +223,7 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
     private readonly ILogger<ErrorLoggerHandler<TMessage, TResponse>> _logger;
     private readonly IMediator _mediator;
 
-    public ErrorLoggerHandler(ILogger<ErrorLoggerHandler<TMessage, TResponse>> logger, IMediator mediator) 
+    public ErrorLoggerHandler(ILogger<ErrorLoggerHandler<TMessage, TResponse>> logger, IMediator mediator)
     {
         _logger = logger;
         _mediator = mediator;
@@ -236,7 +246,7 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
 }
 ```
 
-#### 3.4.6. Use notifications
+### 4.6. Use notifications
 
 We can define a notification handler to catch errors from the above pipeline behavior.
 
@@ -253,7 +263,7 @@ public sealed class ErrorNotificationHandler : INotificationHandler<ErrorMessage
 }
 ```
 
-#### 3.4.7. Polymorphic dispatch with notification handlers
+### 4.7. Polymorphic dispatch with notification handlers
 
 We can also define a notification handler that receives all notifications.
 
@@ -276,7 +286,7 @@ public sealed class StatsNotificationHandler : INotificationHandler<INotificatio
 }
 ```
 
-#### 3.4.8. Notification handlers also support open generics
+### 4.8. Notification handlers also support open generics
 
 ```csharp
 public sealed class GenericNotificationHandler<TNotification> : INotificationHandler<TNotification>
@@ -288,3 +298,14 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
     }
 }
 ```
+
+## 5. TODO
+
+List of things to do before I remove preview tag:
+
+* More tests
+* Dogfooding
+* More samples (for example netfx, Blazor Webassembly)
+* Improve docs
+* Result/union types and constrained generic pipeline behaviors based on `Result` type arguments
+  * #2 - would then not need exceptions for control flow (I want to avoid reflection APIs)
