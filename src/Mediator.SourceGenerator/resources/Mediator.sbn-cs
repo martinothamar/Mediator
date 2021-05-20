@@ -28,7 +28,7 @@ namespace {{ MediatorNamespace }}
             services.TryAddSingleton<global::Mediator.IMediator>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
             services.TryAddSingleton<global::Mediator.ISender>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
             services.TryAddSingleton<global::Mediator.IPublisher>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
-            
+
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistrationBlock }}
             services.Add(new SD(
@@ -62,7 +62,7 @@ namespace {{ MediatorNamespace }}
             return services;
         }
     }
-  
+
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
     internal sealed class {{ wrapperType.ClassHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : class, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
@@ -115,7 +115,7 @@ namespace {{ MediatorNamespace }}
             _rootHandler(request, cancellationToken);
     }
     {{~ end ~}}
-    
+
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -127,7 +127,7 @@ namespace {{ MediatorNamespace }}
         private readonly global::System.IServiceProvider _sp;
         private readonly global::System.Lazy<DICache> _diCacheLazy;
         private DICache _diCache => _diCacheLazy.Value;
-        
+
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
@@ -140,7 +140,7 @@ namespace {{ MediatorNamespace }}
         private sealed class DICache
         {
             private readonly global::System.IServiceProvider _sp;
-            
+
             {{~ for message in RequestMessages ~}}
             public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
             {{~ end ~}}
@@ -148,13 +148,13 @@ namespace {{ MediatorNamespace }}
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
-                
+
                 {{~ for message in RequestMessages ~}}
                 {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
                 {{~ end ~}}
             }
         }
-        
+
         {{~ for message in RequestMessages ~}}
         /// <summary>
         /// Send a message of type {{ message.RequestFullName }}.
@@ -172,7 +172,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        // [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidMessage<TMsg>(TMsg msg) where TMsg : global::Mediator.IMessage =>
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
@@ -206,7 +206,7 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        
+
         /// <summary>
         /// Send command.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
@@ -237,7 +237,7 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        
+
         /// <summary>
         /// Send query.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
@@ -268,7 +268,7 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        
+
         /// <summary>
         /// Publish notification.
         /// </summary>

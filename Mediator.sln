@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		version.json = version.json
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPFApp", "samples\WPFApp\WPFApp.csproj", "{634FAAC1-D0BE-4743-B28A-AB95783C9587}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +209,18 @@ Global
 		{B9E8DA69-C6FA-446F-B949-EF48856551D8}.Release|x64.Build.0 = Release|Any CPU
 		{B9E8DA69-C6FA-446F-B949-EF48856551D8}.Release|x86.ActiveCfg = Release|Any CPU
 		{B9E8DA69-C6FA-446F-B949-EF48856551D8}.Release|x86.Build.0 = Release|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Debug|x64.Build.0 = Debug|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Debug|x86.Build.0 = Debug|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Release|Any CPU.Build.0 = Release|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Release|x64.ActiveCfg = Release|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Release|x64.Build.0 = Release|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Release|x86.ActiveCfg = Release|Any CPU
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -225,6 +239,7 @@ Global
 		{45FC79C1-76EB-4B30-B54F-DD1762BA15EE} = {D3569CDD-7E19-429E-B9AD-75CC05F6C4AA}
 		{CE5A582D-3CC6-44D7-AF3F-CD741BA53833} = {B0120C11-5024-491A-B3AD-821E1D2CD8F2}
 		{B9E8DA69-C6FA-446F-B949-EF48856551D8} = {D3569CDD-7E19-429E-B9AD-75CC05F6C4AA}
+		{634FAAC1-D0BE-4743-B28A-AB95783C9587} = {D3569CDD-7E19-429E-B9AD-75CC05F6C4AA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D45B5457-4190-49B6-BF89-7FA5F4C8ABE2}

@@ -7,6 +7,9 @@
         A high performance .NET Mediator pattern implemenation using source generation.
     </Description>
 
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
 
@@ -22,8 +25,7 @@
     <PackageReference Include="Scriban" Version="3.7.0" IncludeAssets="Build" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
