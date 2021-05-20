@@ -11,6 +11,22 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+# Xml project files
+[*.{csproj,fsproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
+indent_size = 2
+
+[*.{csproj,fsproj,vbproj,proj,nativeproj,locproj}]
+charset = utf-8
+
+# Xml config files
+[*.{props,targets,config,nuspec}]
+indent_size = 2
+
+# Shell scripts
+[*.sh]
+end_of_line = lf
+[*.{cmd,bat}]
+end_of_line = crlf
 
 #### .NET Coding Conventions ####
 
