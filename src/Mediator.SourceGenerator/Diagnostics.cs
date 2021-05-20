@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 #pragma warning disable RS2008 // Enable analyzer release tracking
 
@@ -57,6 +58,14 @@ namespace Mediator.SourceGenerator
                 DiagnosticSeverity.Error,
                 isEnabledByDefault: true);
 
+            MessageWithoutHandler = new DiagnosticDescriptor(
+                GetNextId(),
+                $"{nameof(MediatorGenerator)} message warning",
+                $"{nameof(MediatorGenerator)} found message without any registered handler: " + "{0}",
+                nameof(MediatorGenerator),
+                DiagnosticSeverity.Warning,
+                isEnabledByDefault: true);
+
             static string GetNextId()
             {
                 var count = _counter++;
@@ -67,25 +76,50 @@ namespace Mediator.SourceGenerator
             }
         }
 
+        private static Diagnostic Report<T>(
+            this GeneratorExecutionContext context,
+            DiagnosticDescriptor diagnosticDescriptor,
+            T arg
+        )
+        {
+            Diagnostic diagnostic;
+            if (typeof(T) == typeof(INamedTypeSymbol))
+            {
+                ref var symbolArg = ref Unsafe.As<T, INamedTypeSymbol>(ref arg);
+                var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+                diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, symbolName);
+            }
+            else
+            {
+                diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, arg);
+            }
+            context.ReportDiagnostic(diagnostic);
+            return diagnostic;
+        }
+
         public static readonly DiagnosticDescriptor GenericError;
-        internal static void ReportGenericError(this GeneratorExecutionContext context, Exception exception) =>
-            context.ReportDiagnostic(Diagnostic.Create(GenericError, Location.None, exception));
+        internal static Diagnostic ReportGenericError(this GeneratorExecutionContext context, Exception exception) =>
+            context.Report(GenericError, exception);
 
         public static readonly DiagnosticDescriptor MultipleHandlersError;
-        internal static void ReportMultipleHandlers(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
-            context.ReportDiagnostic(Diagnostic.Create(MultipleHandlersError, Location.None, messageType.Name));
+        internal static Diagnostic ReportMultipleHandlers(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+            context.Report(MultipleHandlersError, messageType);
 
         public static readonly DiagnosticDescriptor InvalidHandlerTypeError;
-        internal static void ReportInvalidHandlerType(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
-            context.ReportDiagnostic(Diagnostic.Create(InvalidHandlerTypeError, Location.None, handlerType.Name));
+        internal static Diagnostic ReportInvalidHandlerType(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
+            context.Report(InvalidHandlerTypeError, handlerType);
 
         public static readonly DiagnosticDescriptor OpenGenericRequestHandler;
-        internal static void ReportOpenGenericRequestHandler(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
-            context.ReportDiagnostic(Diagnostic.Create(OpenGenericRequestHandler, Location.None, handlerType.Name));
+        internal static Diagnostic ReportOpenGenericRequestHandler(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
+            context.Report(OpenGenericRequestHandler, handlerType);
 
         public static readonly DiagnosticDescriptor MessageDerivesFromMultipleMessageInterfaces;
-        internal static void ReportMessageDerivesFromMultipleMessageInterfaces(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
-            context.ReportDiagnostic(Diagnostic.Create(MessageDerivesFromMultipleMessageInterfaces, Location.None, messageType.Name));
+        internal static Diagnostic ReportMessageDerivesFromMultipleMessageInterfaces(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+            context.Report(MessageDerivesFromMultipleMessageInterfaces, messageType);
+
+        public static readonly DiagnosticDescriptor MessageWithoutHandler;
+        internal static Diagnostic ReportMessageWithoutHandler(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+            context.Report(MessageWithoutHandler, messageType);
     }
 }
 

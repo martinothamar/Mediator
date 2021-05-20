@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+using System.Linq;
 using Xunit;
 
 namespace Mediator.SourceGenerator.Tests
@@ -16,6 +18,15 @@ namespace Mediator.SourceGenerator.Tests
 
             var outputCompilationDiagnostics = result.OutputCompilation.GetDiagnostics();
             Assert.True(outputCompilationDiagnostics.IsEmpty);
+        }
+
+        public static void CompilesWithoutErrorDiagnostics(GeneratorResult result)
+        {
+            Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+            Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+
+            var outputCompilationDiagnostics = result.OutputCompilation.GetDiagnostics();
+            Assert.Empty(outputCompilationDiagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
         }
     }
 }

@@ -57,11 +57,18 @@ namespace MyCode
         [Fact]
         public async Task Test_Abstract_Handler_Program()
         {
-            var source = await Fixture.SourceFromResourceFile("AbstractHandlerClass.cs");
+            var source = await Fixture.SourceFromResourceFile("AbstractHandlerProgram.cs");
             var inputCompilation = Fixture.CreateCompilation(source);
 
             inputCompilation.AssertGen(
-                Assertions.CompilesWithoutDiagnostics
+                Assertions.CompilesWithoutErrorDiagnostics,
+                result =>
+                {
+                    Assert.Contains(
+                        result.Diagnostics,
+                        d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
+                    );
+                }
             );
         }
 
@@ -107,6 +114,42 @@ namespace MyCode
                 {
                     Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
                     Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Test_Request_Without_Handler_Warning()
+        {
+            var source = await Fixture.SourceFromResourceFile("RequestWithoutHandlerProgram.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(
+                Assertions.CompilesWithoutErrorDiagnostics,
+                result =>
+                {
+                    Assert.Contains(
+                        result.Diagnostics,
+                        d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
+                    );
+                }
+            );
+        }
+
+        [Fact]
+        public async Task Test_Notification_Without_Any_Handlers()
+        {
+            var source = await Fixture.SourceFromResourceFile("NotificationWithoutHandlerProgram.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(
+                Assertions.CompilesWithoutErrorDiagnostics,
+                result =>
+                {
+                    Assert.Contains(
+                        result.Diagnostics,
+                        d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
+                    );
                 }
             );
         }

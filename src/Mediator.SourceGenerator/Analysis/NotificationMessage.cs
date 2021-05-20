@@ -1,4 +1,4 @@
-﻿using Mediator.SourceGenerator.Extensions;
+using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 
@@ -15,6 +15,8 @@ namespace Mediator.SourceGenerator
         }
 
         internal void AddHandlers(NotificationMessageHandler handler) => _handlers.Add(handler);
+
+        public int HandlerCount => _handlers.Count;
 
         public string ServiceLifetime => "global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton";
 

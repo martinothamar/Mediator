@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="resources\AbstractHandlerClass.cs" />
+    <Compile Remove="resources\AbstractHandlerProgram.cs" />
     <Compile Remove="resources\DeepNamespaceProgram.cs" />
     <Compile Remove="resources\DuplicateHandlersProgram.cs" />
     <Compile Remove="resources\MultipleErrorsProgram.cs" />
+    <Compile Remove="resources\NotificationWithoutHandlerProgram.cs" />
+    <Compile Remove="resources\RequestWithoutHandlerProgram.cs" />
     <Compile Remove="resources\StaticNestedHandlerProgram.cs" />
     <Compile Remove="resources\StructHandlerProgram.cs" />
   </ItemGroup>

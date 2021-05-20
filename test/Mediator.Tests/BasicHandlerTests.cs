@@ -143,18 +143,5 @@ namespace Mediator.Tests
             Assert.Equal(id, response.Id);
             Assert.Equal(id, handler.Id);
         }
-
-        [Fact]
-        public async Task Test_Request_Without_Handler()
-        {
-            var (sp, mediator) = Fixture.GetMediator();
-
-            var request = new SomeRequestWithoutHandler();
-
-            var handler = sp.GetService<SomeAbstractRequestHandler>();
-            Assert.Null(handler);
-
-            await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(request));
-        }
     }
 }

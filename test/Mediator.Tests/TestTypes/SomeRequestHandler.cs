@@ -53,14 +53,4 @@ namespace Mediator.Tests.TestTypes
             }
         }
     }
-
-    public sealed record SomeRequestWithoutHandler : IRequest<SomeResponse>;
-
-    public abstract class SomeAbstractRequestHandler : IRequestHandler<SomeRequestWithoutHandler, SomeResponse>
-    {
-        public ValueTask<SomeResponse> Handle(SomeRequestWithoutHandler request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }

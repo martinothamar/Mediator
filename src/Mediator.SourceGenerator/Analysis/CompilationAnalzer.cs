@@ -114,8 +114,6 @@ namespace Mediator.SourceGenerator
             FindGlobalNamespaces(queue);
 
             PopulateMetadata(queue);
-
-            //ProcessOpenGenericHandlers();
         }
 
         private void FindGlobalNamespaces(Queue<INamespaceOrTypeSymbol> queue)
@@ -151,6 +149,14 @@ namespace Mediator.SourceGenerator
                     ProcessMember(queue, (INamedTypeSymbol)nsOrTypeSymbol, requestMessageHandlerMap);
             }
 
+            foreach (var kvp in requestMessageHandlerMap)
+            {
+                if (kvp.Value is not RequestMessage message)
+                    continue;
+
+                ReportDiagnostic(message.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
+            }
+
             foreach (var notificationMessage in _notificationMessages)
             {
                 foreach (var notificationMessageHandler in _notificationMessageHandlers)
@@ -174,9 +180,12 @@ namespace Mediator.SourceGenerator
                             notificationMessage.AddHandlers(notificationMessageHandler);
                     }
                 }
-            }
 
-            ;
+                if (notificationMessage.HandlerCount == 0)
+                {
+                    ReportDiagnostic(notificationMessage.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
+                }
+            }
 
             const int NOT_RELEVANT = 0;
             const int IS_REQUEST_HANDLER = 1;
@@ -407,11 +416,11 @@ namespace Mediator.SourceGenerator
             }
         }
 
-        private delegate void ReportDiagnosticDelegate<T>(in GeneratorExecutionContext context, T state);
+        private delegate Diagnostic ReportDiagnosticDelegate<T>(in GeneratorExecutionContext context, T state);
         private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
         {
-            _hasErrors = true;
-            del(in _context, state);
+            var diagnostic = del(in _context, state);
+            _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
         }
     }
 }
