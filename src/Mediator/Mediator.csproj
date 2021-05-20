@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Mediator.Abstractions</PackageId>
     <IsPackable>true</IsPackable>
     <Description>
         Abstractions for the Mediator.SourceGenerator package.
