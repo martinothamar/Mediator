@@ -38,7 +38,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleConsoleAOT", "samples
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Infrastructure", "samples\ASPNET_CleanArchitecture\AspNetSample.Infrastructure\AspNetSample.Infrastructure.csproj", "{CE5A582D-3CC6-44D7-AF3F-CD741BA53833}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleEndToEnd", "samples\SimpleEndToEnd\SimpleEndToEnd.csproj", "{B9E8DA69-C6FA-446F-B949-EF48856551D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleEndToEnd", "samples\SimpleEndToEnd\SimpleEndToEnd.csproj", "{B9E8DA69-C6FA-446F-B949-EF48856551D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{FDAEEFFB-30BC-4BC2-9E76-2F98D801FC34}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		global.json = global.json
+		LICENSE = LICENSE
+		NuGet.config = NuGet.config
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

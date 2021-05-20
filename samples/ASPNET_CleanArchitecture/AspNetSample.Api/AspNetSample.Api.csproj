@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" SetTargetFramework="TargetFramework=netstandard2.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
-        <ProjectReference Include="..\AspNetSample.Application\AspNetSample.Application.csproj" />
-        <ProjectReference Include="..\AspNetSample.Infrastructure\AspNetSample.Infrastructure.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" SetTargetFramework="TargetFramework=netstandard2.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
+    <ProjectReference Include="..\AspNetSample.Application\AspNetSample.Application.csproj" />
+    <ProjectReference Include="..\AspNetSample.Infrastructure\AspNetSample.Infrastructure.csproj" />
+  </ItemGroup>
 
 </Project>

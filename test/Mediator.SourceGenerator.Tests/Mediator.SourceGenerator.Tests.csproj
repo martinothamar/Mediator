@@ -35,7 +35,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\samples\SimpleEndToEnd\Program.cs" Link="resources\SimpleEndToEndProgram.cs">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="resources\*.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
