@@ -10,7 +10,7 @@ using System.Linq;
 
 using SD = global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
-namespace {{ MediatorNamespace }}
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// DI extensions for Mediator.
@@ -58,11 +58,13 @@ namespace {{ MediatorNamespace }}
             {{ handler.OpenGenericServiceRegistrationBlock }}
             {{~ end ~}}
 
-
             return services;
         }
     }
+}
 
+namespace {{ MediatorNamespace }}
+{
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
     internal sealed class {{ wrapperType.ClassHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : class, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>

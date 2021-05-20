@@ -137,16 +137,16 @@ See the full runnable sample code in the [SimpleEndToEnd sample](/samples/Simple
 ### 4.1. Add package
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 0.1.5-preview
-dotnet add package Mediator --version 0.1.5-preview
+dotnet add package Mediator.SourceGenerator --version 0.1.6-preview
+dotnet add package Mediator.Abstractions --version 0.1.6-preview
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="0.1.5-preview">
+<PackageReference Include="Mediator.SourceGenerator" Version="0.1.6-preview">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator" Version="0.1.5-preview" />
+<PackageReference Include="Mediator.Abstractions" Version="0.1.6-preview" />
 ```
 
 ### 4.2. Add Mediator to DI container
