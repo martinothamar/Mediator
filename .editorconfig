@@ -22,6 +22,9 @@ charset = utf-8
 [*.{props,targets,config,nuspec}]
 indent_size = 2
 
+[*.sln]
+end_of_line = crlf
+
 # Shell scripts
 [*.sh]
 end_of_line = lf
