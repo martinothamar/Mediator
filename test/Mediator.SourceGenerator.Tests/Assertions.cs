@@ -17,7 +17,7 @@ namespace Mediator.SourceGenerator.Tests
             Assert.True(result.RunResult.Diagnostics.IsEmpty);
 
             var outputCompilationDiagnostics = result.OutputCompilation.GetDiagnostics();
-            Assert.True(outputCompilationDiagnostics.IsEmpty);
+            Assert.Empty(outputCompilationDiagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
         }
 
         public static void CompilesWithoutErrorDiagnostics(GeneratorResult result)
