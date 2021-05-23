@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// DI extensions for Mediator.
     /// </summary>
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     public static class DependencyInjectionExtensions
     {
         /// <summary>
@@ -66,6 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
 namespace {{ MediatorNamespace }}
 {
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     internal sealed class {{ wrapperType.ClassHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : class, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
@@ -91,6 +92,7 @@ namespace {{ MediatorNamespace }}
         public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
             _rootHandler(request, cancellationToken);
     }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     internal sealed class {{ wrapperType.StructHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : struct, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
@@ -123,7 +125,7 @@ namespace {{ MediatorNamespace }}
     /// This type is also registered as a DI service.
     /// Can be used directly for high performance scenarios.
     /// </summary>
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "1.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;

@@ -33,7 +33,7 @@ namespace Mediator.SourceGenerator
         {
             GenerateOptionsAttribute(in context);
 
-            var compilationAnalyzer = new CompilationAnalyzer(in context);
+            var compilationAnalyzer = new CompilationAnalyzer(in context, typeof(MediatorGenerator));
             compilationAnalyzer.Analyze(context.CancellationToken);
 
             if (compilationAnalyzer.HasErrors)

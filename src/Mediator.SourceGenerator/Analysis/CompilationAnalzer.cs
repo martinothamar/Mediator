@@ -59,7 +59,9 @@ namespace Mediator.SourceGenerator
 
         public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
-        public CompilationAnalyzer(in GeneratorExecutionContext context)
+        public string GeneratorVersion { get; }
+
+        public CompilationAnalyzer(in GeneratorExecutionContext context, Type generatorType)
         {
             _context = context;
             _compilation = context.Compilation;
@@ -103,6 +105,9 @@ namespace Mediator.SourceGenerator
             };
 
             _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
+
+            var generatorAssembly = generatorType.Assembly;
+            GeneratorVersion = generatorAssembly.GetName().Version.ToString();
         }
 
         public void Analyze(CancellationToken cancellationToken)
