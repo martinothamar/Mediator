@@ -1,9 +1,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 
 namespace Mediator.SourceGenerator
@@ -61,7 +63,11 @@ namespace Mediator.SourceGenerator
 
         public string GeneratorVersion { get; }
 
-        public CompilationAnalyzer(in GeneratorExecutionContext context, Type generatorType)
+        public IFieldSymbol ServiceLifetime { get; private set; }
+
+        public bool ServiceLifetimeIsSingleton => ServiceLifetime.Name == "Singleton";
+
+        public CompilationAnalyzer(in GeneratorExecutionContext context, string generatorVersion)
         {
             _context = context;
             _compilation = context.Compilation;
@@ -75,7 +81,7 @@ namespace Mediator.SourceGenerator
 
             _baseHandlerSymbols = new INamedTypeSymbol[]
             {
-                // Handlers
+                // Handler
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`1")!.OriginalDefinition,
@@ -83,6 +89,9 @@ namespace Mediator.SourceGenerator
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
             };
+
+            var serviceLifetimeSymbol = _compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
+            ServiceLifetime = (IFieldSymbol)serviceLifetimeSymbol.GetMembers().Single(m => m.Name == "Singleton");
 
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
             {
@@ -106,8 +115,7 @@ namespace Mediator.SourceGenerator
 
             _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
 
-            var generatorAssembly = generatorType.Assembly;
-            GeneratorVersion = generatorAssembly.GetName().Version.ToString();
+            GeneratorVersion = generatorVersion;
         }
 
         public void Analyze(CancellationToken cancellationToken)
@@ -403,20 +411,41 @@ namespace Mediator.SourceGenerator
 
             var attrs = compilation.Assembly.GetAttributes();
             var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptions");
-            if (optionsAttr is not null)
-            {
-                var syntaxReference = optionsAttr.ApplicationSyntaxReference;
-                if (syntaxReference is not null)
-                {
-                    var semanticModel = compilation.GetSemanticModel(syntaxReference.SyntaxTree);
+            if (optionsAttr is null)
+                return;
 
-                    var optionsAttrSyntax = optionsAttr.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
-                    if (optionsAttrSyntax is not null && optionsAttrSyntax.ArgumentList is not null)
+            var syntaxReference = optionsAttr.ApplicationSyntaxReference;
+            if (syntaxReference is null)
+                return;
+
+            var semanticModel = compilation.GetSemanticModel(syntaxReference.SyntaxTree);
+
+            var optionsAttrSyntax = optionsAttr.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
+            if (optionsAttrSyntax is null || optionsAttrSyntax.ArgumentList is null)
+                return;
+
+            foreach (var attrArg in optionsAttrSyntax.ArgumentList.Arguments)
+            {
+                if (attrArg.NameEquals is not null)
+                {
+                    var attrFieldName = attrArg.NameEquals.Name.ToString();
+                    if (attrFieldName == "DefaultServiceLifetime")
                     {
-                        var namespaceArg = semanticModel.GetConstantValue(optionsAttrSyntax.ArgumentList.Arguments[0].Expression, cancellationToken).Value as string;
+                        var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
+                        ServiceLifetime = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                    }
+                    else if (attrFieldName == "Namespace")
+                    {
+                        var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
                         if (!string.IsNullOrWhiteSpace(namespaceArg))
                             MediatorNamespace = namespaceArg!;
                     }
+                }
+                else
+                {
+                    var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
+                    if (!string.IsNullOrWhiteSpace(namespaceArg))
+                        MediatorNamespace = namespaceArg!;
                 }
             }
         }

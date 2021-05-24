@@ -13,5 +13,10 @@ namespace Mediator.SourceGenerator.Extensions
                 miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
             ));
         }
+
+        public static string GetFieldSymbolFullName(this IFieldSymbol symbol)
+        {
+            return $"global::{symbol.ToDisplayString()}";
+        }
     }
 }

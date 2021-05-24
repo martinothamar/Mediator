@@ -11,7 +11,7 @@ namespace Mediator.Tests.TestTypes
 
     public sealed class SomeRequestWithoutResponseHandler : IRequestHandler<SomeRequestWithoutResponse>
     {
-        internal Guid Id;
+        internal static Guid Id;
 
         public ValueTask<Unit> Handle(SomeRequestWithoutResponse request, CancellationToken cancellationToken)
         {
@@ -26,7 +26,7 @@ namespace Mediator.Tests.TestTypes
 
         public sealed class SomeStaticNestedHandler : IRequestHandler<SomeStaticNestedRequest, SomeResponse>
         {
-            public Guid Id;
+            public static Guid Id;
 
             public async ValueTask<SomeResponse> Handle(SomeStaticNestedRequest request, CancellationToken cancellationToken)
             {
@@ -43,7 +43,7 @@ namespace Mediator.Tests.TestTypes
 
         public sealed class SomeNestedHandler : IRequestHandler<SomeNestedRequest, SomeResponse>
         {
-            public Guid Id;
+            public static Guid Id;
 
             public async ValueTask<SomeResponse> Handle(SomeNestedRequest request, CancellationToken cancellationToken)
             {

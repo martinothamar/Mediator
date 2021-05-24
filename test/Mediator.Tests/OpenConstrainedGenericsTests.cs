@@ -25,11 +25,14 @@ namespace Mediator.Tests
                 .GetServices<INotificationHandler<SomeOtherNotification>>()
                 .Single(h => h is SomeGenericConstrainedNotificationHandler<SomeOtherNotification>);
 
+            Assert.NotNull(handler1);
+            Assert.NotNull(handler2);
+
             await mediator.Publish(notification1);
-            Assert.Equal(notification1.Id, handler1.Id);
+            Assert.Equal(notification1.Id, SomeGenericConstrainedNotificationHandler<SomeNotification>.Id);
 
             await mediator.Publish(notification2);
-            Assert.Equal(notification2.Id, handler2.Id);
+            Assert.Equal(notification2.Id, SomeGenericConstrainedNotificationHandler<SomeOtherNotification>.Id);
         }
 
         [Fact]
@@ -42,7 +45,8 @@ namespace Mediator.Tests
             await mediator.Publish(notification);
 
             var handler = (CatchAllPolymorphicNotificationHandler)sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
-            Assert.Equal(notification.Id, handler.Id);
+            Assert.Equal(notification.Id, CatchAllPolymorphicNotificationHandler.Id);
+            Assert.NotNull(handler);
         }
 
         [Fact]

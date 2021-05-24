@@ -15,20 +15,9 @@ namespace Mediator.Tests.TestTypes
 
     public sealed record SomeNotificationWithoutConcreteHandler(Guid Id) : INotification;
 
-    public sealed class SomePolymorphicNotificationHandler : INotificationHandler<ISomeNotification>
-    {
-        public Guid Id { get; private set; }
-
-        public ValueTask Handle(ISomeNotification notification, CancellationToken cancellationToken)
-        {
-            Id = notification.Id;
-            return default;
-        }
-    }
-
     public sealed class CatchAllPolymorphicNotificationHandler : INotificationHandler<INotification>
     {
-        public Guid Id { get; private set; }
+        public static Guid Id { get; private set; }
 
         public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
         {
@@ -41,7 +30,7 @@ namespace Mediator.Tests.TestTypes
     public sealed class SomeGenericConstrainedNotificationHandler<TNotification> : INotificationHandler<TNotification>
         where TNotification : ISomeNotification
     {
-        public Guid Id { get; private set; }
+        public static Guid Id { get; private set; }
 
         public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
         {

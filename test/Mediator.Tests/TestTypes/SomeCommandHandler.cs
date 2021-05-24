@@ -6,7 +6,7 @@ namespace Mediator.Tests.TestTypes
 {
     public sealed class SomeCommandHandler : ICommandHandler<SomeCommand, SomeResponse>
     {
-        internal Guid Id;
+        internal static Guid Id;
 
         public ValueTask<SomeResponse> Handle(SomeCommand command, CancellationToken cancellationToken)
         {
@@ -17,7 +17,7 @@ namespace Mediator.Tests.TestTypes
 
     public sealed class SomeCommandWithoutResponseHandler : ICommandHandler<SomeCommandWithoutResponse>
     {
-        internal Guid Id;
+        internal static Guid Id;
 
         public ValueTask<Unit> Handle(SomeCommandWithoutResponse command, CancellationToken cancellationToken)
         {
@@ -28,7 +28,7 @@ namespace Mediator.Tests.TestTypes
 
     public sealed class SomeStructCommandHandler : ICommandHandler<SomeStructCommand>
     {
-        internal Guid Id;
+        internal static Guid Id;
 
         public ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
         {

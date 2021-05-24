@@ -59,8 +59,8 @@ namespace Mediator.Tests
             IRequestHandler<CreateRequest, CreateResponse>,
             IRequestHandler<CreateRequestWithN, CreateResponseWithN>
         {
-            internal Guid Id;
-            internal Guid IdForN;
+            internal static Guid Id;
+            internal static Guid IdForN;
 
             public ValueTask<CreateResponse> Handle(CreateRequest request, CancellationToken cancellationToken)
             {
@@ -91,8 +91,9 @@ namespace Mediator.Tests
             Assert.Equal(3, responseWithN.N);
 
             var handler = sp.GetRequiredService<CreateHandler>();
-            Assert.Equal(id, handler.Id);
-            Assert.Equal(idForN, handler.IdForN);
+            Assert.NotNull(handler);
+            Assert.Equal(id, CreateHandler.Id);
+            Assert.Equal(idForN, CreateHandler.IdForN);
         }
     }
 }

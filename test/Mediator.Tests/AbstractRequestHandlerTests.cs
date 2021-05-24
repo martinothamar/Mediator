@@ -17,7 +17,7 @@ namespace Mediator.Tests
 
         public sealed class ConcreteNotificationHandler : AbstractNotificationHandler
         {
-            internal Guid Id;
+            internal static Guid Id;
 
             public override ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken)
             {
@@ -28,7 +28,7 @@ namespace Mediator.Tests
 
         public sealed class ConcreteNotificationHandler2 : AbstractNotificationHandler
         {
-            internal Guid Id;
+            internal static Guid Id;
 
             public override ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken)
             {
@@ -48,8 +48,10 @@ namespace Mediator.Tests
 
             var handler1 = sp.GetRequiredService<ConcreteNotificationHandler>();
             var handler2 = sp.GetRequiredService<ConcreteNotificationHandler2>();
-            Assert.Equal(id, handler1.Id);
-            Assert.Equal(id, handler2.Id);
+            Assert.NotNull(handler1);
+            Assert.NotNull(handler2);
+            Assert.Equal(id, ConcreteNotificationHandler.Id);
+            Assert.Equal(id, ConcreteNotificationHandler2.Id);
         }
     }
 }

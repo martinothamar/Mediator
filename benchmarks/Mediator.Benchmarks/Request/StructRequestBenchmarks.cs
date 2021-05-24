@@ -60,7 +60,7 @@ namespace Mediator.Benchmarks.Request
         {
             var services = new ServiceCollection();
             services.AddMediator();
-            services.AddMediatR(typeof(SomeStructHandler).Assembly);
+            services.AddMediatR(config => config.AsSingleton(), typeof(SomeStructHandler).Assembly);
             services.AddMessagePipe();
 
             _serviceProvider = services.BuildServiceProvider();

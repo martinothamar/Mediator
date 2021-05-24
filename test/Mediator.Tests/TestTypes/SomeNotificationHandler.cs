@@ -6,7 +6,7 @@ namespace Mediator.Tests.TestTypes
 {
     public sealed class SomeNotificationHandler : INotificationHandler<SomeNotification>
     {
-        internal Guid Id = default;
+        internal static Guid Id = default;
 
         public ValueTask Handle(SomeNotification Notification, CancellationToken cancellationToken)
         {
