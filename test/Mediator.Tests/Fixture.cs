@@ -5,6 +5,8 @@ namespace Mediator.Tests
 {
     public static class Fixture
     {
+        public static bool CreateServiceScope;
+
         public static (IServiceProvider sp, IMediator mediator) GetMediator(Action<IServiceCollection>? configureServices = null)
         {
             var services = new ServiceCollection();
@@ -17,7 +19,7 @@ namespace Mediator.Tests
 
             var mediator = sp.GetRequiredService<IMediator>();
 
-            return (sp, mediator!);
+            return (CreateServiceScope ? sp.CreateScope().ServiceProvider : sp, mediator!);
         }
     }
 }
