@@ -7,7 +7,10 @@ namespace Mediator.Tests
     {
         public static bool CreateServiceScope;
 
-        public static (IServiceProvider sp, IMediator mediator) GetMediator(Action<IServiceCollection>? configureServices = null)
+        public static (IServiceProvider sp, IMediator mediator) GetMediator(
+            Action<IServiceCollection>? configureServices = null,
+            bool? createScope = null
+        )
         {
             var services = new ServiceCollection();
 
@@ -19,7 +22,8 @@ namespace Mediator.Tests
 
             var mediator = sp.GetRequiredService<IMediator>();
 
-            return (CreateServiceScope ? sp.CreateScope().ServiceProvider : sp, mediator!);
+            var shouldCreateScope = createScope.HasValue ? (createScope.Value) : CreateServiceScope;
+            return (shouldCreateScope ? sp.CreateScope().ServiceProvider : sp, mediator!);
         }
     }
 }
