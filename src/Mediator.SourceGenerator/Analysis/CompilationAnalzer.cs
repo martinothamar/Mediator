@@ -44,13 +44,19 @@ namespace Mediator.SourceGenerator
         public IEnumerable<NotificationMessageHandler> OpenGenericNotificationMessageHandlers =>
             _notificationMessageHandlers.Where(h => h.IsOpenGeneric);
 
-        public bool HasRequests => _requestMessages.Any(r => r.MessageType == "Request");
-        public bool HasCommands => _requestMessages.Any(r => r.MessageType == "Command");
-        public bool HasQueries => _requestMessages.Any(r => r.MessageType == "Query");
+        public bool HasRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Request");
+        public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
+        public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
+
+        public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
+
+        public bool HasNotifications => _notificationMessages.Any();
 
         public IEnumerable<RequestMessage> IRequestMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
         public IEnumerable<RequestMessage> ICommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
         public IEnumerable<RequestMessage> IQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
+
+        public IEnumerable<RequestMessage> IMessages => _requestMessages.Where(r => r.Handler is not null);
 
         private bool _hasErrors;
 
@@ -203,10 +209,17 @@ namespace Mediator.SourceGenerator
                     }
                 }
 
-                if (notificationMessage.HandlerCount == 0)
-                {
-                    ReportDiagnostic(notificationMessage.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
-                }
+                // This diagnostic is not safe to use here.
+                // A user can define a notification, expecting it to only
+                // show up in an open generic handler.
+                // We don't keep track of bindings between notification and
+                // these open generic handlers, so we can't know what notifications
+                // are and aren't handled just yet.
+                // TODO - include open generic handlers in analysis as well, so that we can report this correctly.
+                //if (notificationMessage.HandlerCount == 0)
+                //{
+                //    ReportDiagnostic(notificationMessage.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
+                //}
             }
 
             const int NOT_RELEVANT = 0;

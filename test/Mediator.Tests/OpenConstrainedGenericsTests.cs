@@ -91,6 +91,20 @@ namespace Mediator.Tests
         }
 
         [Fact]
+        public async Task Test_Notification_Without_Concrete_Handler_As_Objct()
+        {
+            var (sp, mediator) = Fixture.GetMediator();
+
+            var notification = new SomeNotificationWithoutConcreteHandler(Guid.NewGuid());
+
+            await mediator.Publish((object)notification);
+
+            var handler = (CatchAllPolymorphicNotificationHandler)sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
+            Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
+            Assert.NotNull(handler);
+        }
+
+        [Fact]
         public async Task Test_Constrained_Generic_Argument_Pipeline()
         {
             var (sp, mediator) = Fixture.GetMediator(services =>

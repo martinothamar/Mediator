@@ -203,7 +203,6 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        // [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidMessage<TMsg>(TMsg msg) where TMsg : global::Mediator.IMessage =>
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
@@ -296,6 +295,58 @@ namespace {{ MediatorNamespace }}
             }
             {{ else }}
             ThrowInvalidMessage(query);
+            return default;
+            {{ end }}
+        }
+
+        /// <summary>
+        /// Send message.
+        /// </summary>
+        /// <param name="message">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public{{ if HasAnyRequest; " async "; else; " "; end; }}global::System.Threading.Tasks.ValueTask<object> Send(object message, global::System.Threading.CancellationToken cancellationToken = default)
+        {
+            {{- if HasAnyRequest }}
+            switch (message)
+            {
+                {{~ for message in IMessages ~}}
+                case {{ message.RequestFullName }} m: return await Send({{- message.ParameterModifier -}}m, cancellationToken);
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidMessage(message as global::Mediator.IMessage);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(message as global::Mediator.IMessage);
+            return default;
+            {{ end }}
+        }
+
+        /// <summary>
+        /// Publish notification.
+        /// </summary>
+        /// <param name="notification">Incoming notification</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(object notification, global::System.Threading.CancellationToken cancellationToken = default)
+        {
+            {{- if HasNotifications }}
+            switch (notification)
+            {
+                {{~ for message in NotificationMessages ~}}
+                case {{ message.FullName }} n: return Publish<{{ message.FullName }}>(n, cancellationToken);
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidMessage(notification as global::Mediator.IMessage);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(notification as global::Mediator.IMessage);
             return default;
             {{ end }}
         }

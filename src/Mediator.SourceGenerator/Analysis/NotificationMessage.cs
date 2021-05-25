@@ -16,6 +16,8 @@ namespace Mediator.SourceGenerator
 
         internal void AddHandlers(NotificationMessageHandler handler) => _handlers.Add(handler);
 
+        public string FullName => Symbol.GetTypeSymbolFullName();
+
         public int HandlerCount => _handlers.Count;
 
         public string ServiceLifetime => Analyzer.ServiceLifetime;
