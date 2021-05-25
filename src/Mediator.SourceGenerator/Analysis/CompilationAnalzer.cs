@@ -209,10 +209,17 @@ namespace Mediator.SourceGenerator
                     }
                 }
 
-                if (notificationMessage.HandlerCount == 0)
-                {
-                    ReportDiagnostic(notificationMessage.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
-                }
+                // This diagnostic is not safe to use here.
+                // A user can define a notification, expecting it to only
+                // show up in an open generic handler.
+                // We don't keep track of bindings between notification and
+                // these open generic handlers, so we can't know what notifications
+                // are and aren't handled just yet.
+                // TODO - include open generic handlers in analysis as well, so that we can report this correctly.
+                //if (notificationMessage.HandlerCount == 0)
+                //{
+                //    ReportDiagnostic(notificationMessage.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
+                //}
             }
 
             const int NOT_RELEVANT = 0;
