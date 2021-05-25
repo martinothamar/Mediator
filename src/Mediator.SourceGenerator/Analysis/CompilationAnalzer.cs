@@ -44,13 +44,19 @@ namespace Mediator.SourceGenerator
         public IEnumerable<NotificationMessageHandler> OpenGenericNotificationMessageHandlers =>
             _notificationMessageHandlers.Where(h => h.IsOpenGeneric);
 
-        public bool HasRequests => _requestMessages.Any(r => r.MessageType == "Request");
-        public bool HasCommands => _requestMessages.Any(r => r.MessageType == "Command");
-        public bool HasQueries => _requestMessages.Any(r => r.MessageType == "Query");
+        public bool HasRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Request");
+        public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
+        public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
+
+        public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
+
+        public bool HasNotifications => _notificationMessages.Any();
 
         public IEnumerable<RequestMessage> IRequestMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
         public IEnumerable<RequestMessage> ICommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
         public IEnumerable<RequestMessage> IQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
+
+        public IEnumerable<RequestMessage> IMessages => _requestMessages.Where(r => r.Handler is not null);
 
         private bool _hasErrors;
 

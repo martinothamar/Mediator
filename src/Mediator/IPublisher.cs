@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mediator
@@ -7,5 +7,7 @@ namespace Mediator
     {
         ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
             where TNotification : INotification;
+
+        ValueTask Publish(object notification, CancellationToken cancellationToken = default);
     }
 }

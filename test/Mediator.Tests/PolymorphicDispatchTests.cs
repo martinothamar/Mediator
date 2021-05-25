@@ -46,5 +46,23 @@ namespace Mediator.Tests
             await mediator.Publish(notification2);
             Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
         }
+
+        [Fact]
+        public async Task Test_Multiple_Notification_Handlers_With_Object_Notification()
+        {
+            var (sp, mediator) = Fixture.GetMediator();
+
+            var notification1 = new SomeNotification(Guid.NewGuid());
+            var notification2 = new SomeOtherNotification(Guid.NewGuid());
+
+            var handler = sp.GetRequiredService<SomePolymorphicNotificationHandler>();
+            Assert.NotNull(handler);
+
+            await mediator.Publish((object)notification1);
+            Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
+
+            await mediator.Publish((object)notification2);
+            Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
+        }
     }
 }
