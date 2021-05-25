@@ -1,3 +1,4 @@
+using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,9 +64,16 @@ namespace Mediator.SourceGenerator
 
         public string GeneratorVersion { get; }
 
-        public IFieldSymbol ServiceLifetime { get; private set; }
+        public IFieldSymbol ServiceLifetimeSymbol { get; private set; }
+        public IFieldSymbol SingletonServiceLifetimeSymbol { get; }
 
-        public bool ServiceLifetimeIsSingleton => ServiceLifetime.Name == "Singleton";
+        public string ServiceLifetime => ServiceLifetimeSymbol.GetFieldSymbolFullName();
+
+        public string SingletonServiceLifetime => SingletonServiceLifetimeSymbol.GetFieldSymbolFullName();
+
+        public bool ServiceLifetimeIsSingleton => ServiceLifetimeSymbol.Name == "Singleton";
+
+        public bool ServiceLifetimeIsScoped => ServiceLifetimeSymbol.Name == "Scoped";
 
         public CompilationAnalyzer(in GeneratorExecutionContext context, string generatorVersion)
         {
@@ -91,7 +99,8 @@ namespace Mediator.SourceGenerator
             };
 
             var serviceLifetimeSymbol = _compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
-            ServiceLifetime = (IFieldSymbol)serviceLifetimeSymbol.GetMembers().Single(m => m.Name == "Singleton");
+            SingletonServiceLifetimeSymbol = (IFieldSymbol)serviceLifetimeSymbol.GetMembers().Single(m => m.Name == "Singleton");
+            ServiceLifetimeSymbol = SingletonServiceLifetimeSymbol;
 
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
             {
@@ -433,7 +442,7 @@ namespace Mediator.SourceGenerator
                 if (attrFieldName == "DefaultServiceLifetime")
                 {
                     var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
-                    ServiceLifetime = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                    ServiceLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
                 }
                 else if (attrFieldName == "Namespace")
                 {

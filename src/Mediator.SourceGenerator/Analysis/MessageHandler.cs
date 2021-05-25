@@ -26,6 +26,6 @@ namespace Mediator.SourceGenerator
         public string ServiceRegistrationBlock =>
             $"services.TryAdd(new SD({TypeOfExpression()}, {TypeOfExpression()}, {ServiceLifetime}));";
 
-        public string ServiceLifetime => Analyzer.ServiceLifetime.GetFieldSymbolFullName();
+        public string ServiceLifetime => Analyzer.ServiceLifetime;
     }
 }

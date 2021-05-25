@@ -18,11 +18,13 @@ namespace Mediator.Tests
 
             configureServices?.Invoke(services);
 
-            var sp = services.BuildServiceProvider();
+            IServiceProvider sp = services.BuildServiceProvider(validateScopes: true);
+
+            var shouldCreateScope = createScope.HasValue ? createScope.Value : CreateServiceScope;
+            if (shouldCreateScope)
+                sp = sp.CreateScope().ServiceProvider;
 
             var mediator = sp.GetRequiredService<IMediator>();
-
-            var shouldCreateScope = createScope.HasValue ? (createScope.Value) : CreateServiceScope;
             return (shouldCreateScope ? sp.CreateScope().ServiceProvider : sp, mediator!);
         }
     }

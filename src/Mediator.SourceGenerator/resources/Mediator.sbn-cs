@@ -24,10 +24,17 @@ namespace Microsoft.Extensions.DependencyInjection
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
-            services.TryAddSingleton<global::{{ MediatorNamespace }}.Mediator, global::{{ MediatorNamespace }}.Mediator>();
-            services.TryAddSingleton<global::Mediator.IMediator>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
-            services.TryAddSingleton<global::Mediator.ISender>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
-            services.TryAddSingleton<global::Mediator.IPublisher>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
+            {{~ if ServiceLifetimeIsScoped ~}}
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
+            {{ else }}
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
 
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistrationBlock }}
