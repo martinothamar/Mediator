@@ -5,13 +5,13 @@ namespace Mediator.SourceGenerator.Tests
     public sealed class LifetimeOptionTests
     {
         [Fact]
-        public void Test_Transient_Lifetime_With_Namespace_First_Arg()
+        public void Test_No_Args()
         {
             var source = @"
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: MediatorOptions(""Mediator2"", DefaultServiceLifetime = ServiceLifetime.Transient)]
+[assembly: MediatorOptions]
 
 namespace Something
 {

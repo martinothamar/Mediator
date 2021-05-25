@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -59,18 +60,18 @@ namespace Mediator.Tests
             IRequestHandler<CreateRequest, CreateResponse>,
             IRequestHandler<CreateRequestWithN, CreateResponseWithN>
         {
-            internal static Guid Id;
-            internal static Guid IdForN;
+            internal static readonly ConcurrentBag<Guid> Ids = new();
+            internal static readonly ConcurrentBag<Guid> IdsForN = new();
 
             public ValueTask<CreateResponse> Handle(CreateRequest request, CancellationToken cancellationToken)
             {
-                Id = request.Id;
+                Ids.Add(request.Id);
                 return new ValueTask<CreateResponse>(new CreateResponse(request.Id));
             }
 
             public ValueTask<CreateResponseWithN> Handle(CreateRequestWithN request, CancellationToken cancellationToken)
             {
-                IdForN = request.Id;
+                IdsForN.Add(request.Id);
                 return new ValueTask<CreateResponseWithN>(new CreateResponseWithN(request.Id, request.N));
             }
         }
@@ -92,8 +93,8 @@ namespace Mediator.Tests
 
             var handler = sp.GetRequiredService<CreateHandler>();
             Assert.NotNull(handler);
-            Assert.Equal(id, CreateHandler.Id);
-            Assert.Equal(idForN, CreateHandler.IdForN);
+            Assert.Contains(id, CreateHandler.Ids);
+            Assert.Contains(idForN, CreateHandler.IdsForN);
         }
     }
 }

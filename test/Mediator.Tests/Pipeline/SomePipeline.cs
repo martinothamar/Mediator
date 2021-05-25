@@ -23,17 +23,4 @@ namespace Mediator.Tests.Pipeline
             return next(message, cancellationToken);
         }
     }
-
-    public sealed class SomeGenericConstrainedPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IBaseRequest // Only requests, not commands or queries
-    {
-        public async ValueTask<TResponse> Handle(TRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
-        {
-            var response = await next(message, cancellationToken);
-            if (response is SomeResponse someResponse)
-                return (TResponse)(object)(someResponse with { Id = Guid.NewGuid() });
-            else
-                return response;
-        }
-    }
 }

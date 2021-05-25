@@ -3,6 +3,6 @@ using System.Threading.Tasks;
 
 namespace Mediator
 {
-    public delegate ValueTask<TResponse> MessageHandlerDelegate<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken)
-        where TMessage : IMessage;
+    public delegate ValueTask<TResponse> MessageHandlerDelegate<in TMessage, TResponse>(TMessage message, CancellationToken cancellationToken)
+        where TMessage : notnull, IMessage;
 }

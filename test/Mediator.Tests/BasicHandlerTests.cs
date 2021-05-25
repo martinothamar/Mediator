@@ -38,7 +38,7 @@ namespace Mediator.Tests
             var requestHandler = sp.GetRequiredService<SomeRequestWithoutResponseHandler>();
             await mediator!.Send(new SomeRequestWithoutResponse(id), CancellationToken.None);
             Assert.NotNull(requestHandler);
-            Assert.Equal(id, SomeRequestWithoutResponseHandler.Id);
+            Assert.Contains(id, SomeRequestWithoutResponseHandler.Ids);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Mediator.Tests
             var commandHandler = sp.GetRequiredService<SomeCommandHandler>();
             var response = await mediator.Send(new SomeCommand(id));
             Assert.NotNull(commandHandler);
-            Assert.Equal(id, SomeCommandHandler.Id);
+            Assert.Contains(id, SomeCommandHandler.Ids);
             Assert.NotNull(response);
             Assert.Equal(id, response.Id);
         }
@@ -78,7 +78,7 @@ namespace Mediator.Tests
             var commandHandler = sp.GetRequiredService<SomeCommandWithoutResponseHandler>();
             Assert.NotNull(commandHandler);
             await mediator.Send(new SomeCommandWithoutResponse(id));
-            Assert.Equal(id, SomeCommandWithoutResponseHandler.Id);
+            Assert.Contains(id, SomeCommandWithoutResponseHandler.Ids);
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace Mediator.Tests
             var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
             Assert.NotNull(commandHandler);
             await mediator.Send(new SomeStructCommand(id));
-            Assert.Equal(id, SomeStructCommandHandler.Id);
+            Assert.Contains(id, SomeStructCommandHandler.Ids);
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace Mediator.Tests
             var notificationHandler = sp.GetRequiredService<SomeNotificationHandler>();
             Assert.NotNull(notificationHandler);
             await mediator.Publish(new SomeNotification(id));
-            Assert.Equal(id, SomeNotificationHandler.Id);
+            Assert.Contains(id, SomeNotificationHandler.Ids);
         }
 
         [Fact]
@@ -119,8 +119,8 @@ namespace Mediator.Tests
             Assert.NotNull(handler1);
             Assert.NotNull(handler2);
             await mediator.Publish(new SomeNotification(id));
-            Assert.Equal(id, SomeNotificationHandler.Id);
-            Assert.Equal(id, SomeOtherNotificationHandler.Id);
+            Assert.Contains(id, SomeNotificationHandler.Ids);
+            Assert.Contains(id, SomeOtherNotificationHandler.Ids);
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Mediator.Tests
             Assert.NotNull(handler);
             Assert.NotNull(response);
             Assert.Equal(id, response.Id);
-            Assert.Equal(id, SomeStaticClass.SomeStaticNestedHandler.Id);
+            Assert.Contains(id, SomeStaticClass.SomeStaticNestedHandler.Ids);
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace Mediator.Tests
             Assert.NotNull(handler);
             Assert.NotNull(response);
             Assert.Equal(id, response.Id);
-            Assert.Equal(id, SomeOtherClass.SomeNestedHandler.Id);
+            Assert.Contains(id, SomeOtherClass.SomeNestedHandler.Ids);
         }
     }
 }

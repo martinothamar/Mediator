@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-[assembly: MediatorOptions("SimpleConsole.Mediator")]
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator")]
 
 var services = new ServiceCollection();
 

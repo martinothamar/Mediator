@@ -33,7 +33,7 @@ namespace Mediator.Tests
             var handler = sp.GetRequiredService<SomeRequestWithoutResponseHandler>();
             Assert.NotNull(handler);
             await sender.Send(new SomeRequestWithoutResponse(id));
-            Assert.Equal(id, SomeRequestWithoutResponseHandler.Id);
+            Assert.Contains(id, SomeRequestWithoutResponseHandler.Ids);
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace Mediator.Tests
             var handler = sp.GetRequiredService<SomeCommandWithoutResponseHandler>();
             Assert.NotNull(handler);
             await sender.Send(new SomeCommandWithoutResponse(id));
-            Assert.Equal(id, SomeCommandWithoutResponseHandler.Id);
+            Assert.Contains(id, SomeCommandWithoutResponseHandler.Ids);
         }
 
         [Fact]

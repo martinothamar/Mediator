@@ -19,7 +19,7 @@ Using source generators instead of relying on reflection has multiple benefits
 * Better performance
   * Runtime performance can be the same for both runtime reflection and source generator based approaches, but it's easier to optimize. High performance runtime reflection based implementation would rely on emitting IL which is hard to deal with in many ways. The source generator emitted code can be easily inspected and analyzed as any other C# code.
 * More flexibility
-  * Through the use of options (for example `[assembly: MediatorOptions("SimpleConsole.Mediator")]`) we can achieve more flexibility.
+  * Through the use of options (for example `[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator")]`) we can achieve more flexibility.
 
 In particular, source generators in this library is used to
 * Generate code for DI registration
@@ -53,23 +53,7 @@ I've also included the [MessagePipe](https://github.com/Cysharp/MessagePipe) lib
 
 See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request/RequestBenchmarks.cs) for more details on the measurement.
 
-``` ini
-
-BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
-Intel Core i7-7700HQ CPU 2.80GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
-.NET Core SDK=5.0.300-preview.21228.15
-  [Host]     : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
-  DefaultJob : .NET Core 5.0.6 (CoreCLR 5.0.621.22011, CoreFX 5.0.621.22011), X64 RyuJIT
-
-
-```
-|                        Method |       Mean |     Error |    StdDev | Ratio |  Gen 0 | Gen 1 | Gen 2 | Allocated |
-|------------------------------ |-----------:|----------:|----------:|------:|-------:|------:|------:|----------:|
-|          SendRequest_Baseline |   9.619 ns | 0.0163 ns | 0.0144 ns | 0.010 |      - |     - |     - |         - |
-| SendRequest_Mediator_Concrete |  11.782 ns | 0.0439 ns | 0.0411 ns | 0.012 |      - |     - |     - |         - |
-|       SendRequest_MessagePipe |  14.277 ns | 0.0334 ns | 0.0312 ns | 0.014 |      - |     - |     - |         - |
-|          SendRequest_Mediator |  27.782 ns | 0.3022 ns | 0.2678 ns | 0.028 |      - |     - |     - |         - |
-|           SendRequest_MediatR | 993.866 ns | 2.9908 ns | 2.7976 ns | 1.000 | 0.4349 |     - |     - |    1368 B |
+![Requests benchmark](/img/request_benchmark.png "Requests benchmark")
 
 ## 3. Usage and abstractions
 

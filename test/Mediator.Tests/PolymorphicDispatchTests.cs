@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -19,11 +20,11 @@ namespace Mediator.Tests
 
         public sealed class SomePolymorphicNotificationHandler : INotificationHandler<IPolymorphicDispatchNotification>
         {
-            public static Guid Id { get; private set; }
+            internal static readonly ConcurrentBag<Guid> Ids = new();
 
             public ValueTask Handle(IPolymorphicDispatchNotification notification, CancellationToken cancellationToken)
             {
-                Id = notification.Id;
+                Ids.Add(notification.Id);
                 return default;
             }
         }
@@ -38,13 +39,12 @@ namespace Mediator.Tests
 
             var handler = sp.GetRequiredService<SomePolymorphicNotificationHandler>();
             Assert.NotNull(handler);
-            Assert.Equal(default, SomePolymorphicNotificationHandler.Id);
 
             await mediator.Publish(notification1);
-            Assert.Equal(notification1.Id, SomePolymorphicNotificationHandler.Id);
+            Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
 
             await mediator.Publish(notification2);
-            Assert.Equal(notification2.Id, SomePolymorphicNotificationHandler.Id);
+            Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
         }
     }
 }

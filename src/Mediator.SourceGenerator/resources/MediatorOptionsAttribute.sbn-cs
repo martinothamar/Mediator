@@ -23,13 +23,5 @@ namespace Mediator
         /// </summary>
         public global::Microsoft.Extensions.DependencyInjection.ServiceLifetime DefaultServiceLifetime { get; set; } =
             global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
-
-        /// <summary>
-        /// Provide options for the Mediator source generator.
-        /// </summary>
-        public MediatorOptionsAttribute(string mediatorNamespace = "Mediator")
-        {
-            Namespace = mediatorNamespace;
-        }
     }
 }

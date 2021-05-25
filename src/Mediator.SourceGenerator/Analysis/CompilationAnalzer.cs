@@ -426,22 +426,16 @@ namespace Mediator.SourceGenerator
 
             foreach (var attrArg in optionsAttrSyntax.ArgumentList.Arguments)
             {
-                if (attrArg.NameEquals is not null)
+                if (attrArg.NameEquals is null)
+                    throw new Exception("Error parsing MediatorOptions");
+
+                var attrFieldName = attrArg.NameEquals.Name.ToString();
+                if (attrFieldName == "DefaultServiceLifetime")
                 {
-                    var attrFieldName = attrArg.NameEquals.Name.ToString();
-                    if (attrFieldName == "DefaultServiceLifetime")
-                    {
-                        var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
-                        ServiceLifetime = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
-                    }
-                    else if (attrFieldName == "Namespace")
-                    {
-                        var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
-                        if (!string.IsNullOrWhiteSpace(namespaceArg))
-                            MediatorNamespace = namespaceArg!;
-                    }
+                    var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
+                    ServiceLifetime = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
                 }
-                else
+                else if (attrFieldName == "Namespace")
                 {
                     var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
                     if (!string.IsNullOrWhiteSpace(namespaceArg))
