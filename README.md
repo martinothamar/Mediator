@@ -33,6 +33,7 @@ In particular, source generators in this library is used to
     - [3.1. Message types](#31-message-types)
     - [3.2. Handler types](#32-handler-types)
     - [3.3. Pipeline types](#33-pipeline-types)
+    - [3.4. Configuration](#34-configuration)
   - [4. Getting started](#4-getting-started)
     - [4.1. Add package](#41-add-package)
     - [4.2. Add Mediator to DI container](#42-add-mediator-to-di-container)
@@ -117,6 +118,17 @@ public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMes
     }
 }
 ```
+
+### 3.4. Configuration
+
+There is an assembly level attribute for configuration: `MediatorOptionsAttribute`.
+Declare the attribute in the project where the source generator is installed.
+
+* `Namespace` - where the `IMediator` implementation is generated
+* `DefaultServiceLifetime` - the DI service lifetime
+  * `Singleton` - (default value) everything registered as singletone, minimal allocations
+  * `Transient` - handlers registered as transient, `IMediator`/`Mediator`/`ISender`/`IPublisher` still singleton
+  * `Scoped`    - mediator and handlers registrered as singletons
 
 ## 4. Getting started
 
