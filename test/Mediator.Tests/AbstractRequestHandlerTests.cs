@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,22 +19,22 @@ namespace Mediator.Tests
 
         public sealed class ConcreteNotificationHandler : AbstractNotificationHandler
         {
-            internal Guid Id;
+            internal static readonly ConcurrentBag<Guid> Ids = new ();
 
             public override ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken)
             {
-                Id = notification.Id;
+                Ids.Add(notification.Id);
                 return default;
             }
         }
 
         public sealed class ConcreteNotificationHandler2 : AbstractNotificationHandler
         {
-            internal Guid Id;
+            internal static readonly ConcurrentBag<Guid> Ids = new();
 
             public override ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken)
             {
-                Id = notification.Id;
+                Ids.Add(notification.Id);
                 return default;
             }
         }
@@ -48,8 +50,10 @@ namespace Mediator.Tests
 
             var handler1 = sp.GetRequiredService<ConcreteNotificationHandler>();
             var handler2 = sp.GetRequiredService<ConcreteNotificationHandler2>();
-            Assert.Equal(id, handler1.Id);
-            Assert.Equal(id, handler2.Id);
+            Assert.NotNull(handler1);
+            Assert.NotNull(handler2);
+            Assert.Contains(id, ConcreteNotificationHandler.Ids);
+            Assert.Contains(id, ConcreteNotificationHandler2.Ids);
         }
     }
 }

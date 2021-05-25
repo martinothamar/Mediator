@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using Scriban;
 using System;
 using System.Text;
 
@@ -31,9 +32,12 @@ namespace Mediator.SourceGenerator
 
         private void ExecuteInternal(in GeneratorExecutionContext context)
         {
-            GenerateOptionsAttribute(in context);
+            var generatorAssembly = GetType().Assembly;
+            var generatorVersion = generatorAssembly.GetName().Version.ToString();
 
-            var compilationAnalyzer = new CompilationAnalyzer(in context, typeof(MediatorGenerator));
+            GenerateOptionsAttribute(in context, generatorVersion);
+
+            var compilationAnalyzer = new CompilationAnalyzer(in context, generatorVersion);
             compilationAnalyzer.Analyze(context.CancellationToken);
 
             if (compilationAnalyzer.HasErrors)
@@ -43,10 +47,14 @@ namespace Mediator.SourceGenerator
             mediatorImplementationGenerator.Generate(in context, compilationAnalyzer);
         }
 
-        private void GenerateOptionsAttribute(in GeneratorExecutionContext context)
+        private void GenerateOptionsAttribute(in GeneratorExecutionContext context, string generatorVersion)
         {
-            var attributeSource = EmbeddedResource.GetContent(@"resources/MediatorOptionsAttribute.cs");
-            context.AddSource("MediatorOptionsAttribute.g.cs", SourceText.From(attributeSource, Encoding.UTF8));
+            var model = new { GeneratorVersion = generatorVersion };
+
+            var file = @"resources/MediatorOptionsAttribute.sbn-cs";
+            var template = Template.Parse(EmbeddedResource.GetContent(file), file);
+            var output = template.Render(model, member => member.Name);
+            context.AddSource("MediatorOptionsAttribute.g.cs", SourceText.From(output, Encoding.UTF8));
         }
 
         public void Initialize(GeneratorInitializationContext context)

@@ -1,4 +1,4 @@
-﻿using Mediator.SourceGenerator.Extensions;
+using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Mediator.SourceGenerator
@@ -26,7 +26,6 @@ namespace Mediator.SourceGenerator
         public string ServiceRegistrationBlock =>
             $"services.TryAdd(new SD({TypeOfExpression()}, {TypeOfExpression()}, {ServiceLifetime}));";
 
-        public string ServiceLifetime =>
-            "global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton";
+        public string ServiceLifetime => Analyzer.ServiceLifetime;
     }
 }

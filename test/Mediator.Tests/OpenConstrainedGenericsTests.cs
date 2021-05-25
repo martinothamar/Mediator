@@ -2,7 +2,9 @@ using Mediator.Tests.Pipeline;
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,6 +12,45 @@ namespace Mediator.Tests
 {
     public sealed class OpenConstrainedGenericsTests
     {
+        public sealed record SomeNotificationWithoutConcreteHandler(Guid Id) : INotification;
+
+        public sealed class CatchAllPolymorphicNotificationHandler : INotificationHandler<INotification>
+        {
+            internal static readonly ConcurrentBag<Guid> Ids = new();
+
+            public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
+            {
+                if (notification is SomeNotificationWithoutConcreteHandler n)
+                    Ids.Add(n.Id);
+                return default;
+            }
+        }
+
+        public sealed class SomeGenericConstrainedNotificationHandler<TNotification> : INotificationHandler<TNotification>
+            where TNotification : ISomeNotification
+        {
+            internal static readonly ConcurrentBag<Guid> Ids = new();
+
+            public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
+            {
+                Ids.Add(notification.Id);
+                return default;
+            }
+        }
+
+        public sealed class SomeGenericConstrainedPipeline<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+            where TRequest : IBaseRequest // Only requests, not commands or queries
+        {
+            public async ValueTask<TResponse> Handle(TRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<TRequest, TResponse> next)
+            {
+                var response = await next(message, cancellationToken);
+                if (response is SomeResponse someResponse)
+                    return (TResponse)(object)(someResponse with { Id = Guid.NewGuid() });
+                else
+                    return response;
+            }
+        }
+
         [Fact]
         public async Task Test_Constrained_Generic_Argument_Handler()
         {
@@ -25,11 +66,14 @@ namespace Mediator.Tests
                 .GetServices<INotificationHandler<SomeOtherNotification>>()
                 .Single(h => h is SomeGenericConstrainedNotificationHandler<SomeOtherNotification>);
 
+            Assert.NotNull(handler1);
+            Assert.NotNull(handler2);
+
             await mediator.Publish(notification1);
-            Assert.Equal(notification1.Id, handler1.Id);
+            Assert.Contains(notification1.Id, SomeGenericConstrainedNotificationHandler<SomeNotification>.Ids);
 
             await mediator.Publish(notification2);
-            Assert.Equal(notification2.Id, handler2.Id);
+            Assert.Contains(notification2.Id, SomeGenericConstrainedNotificationHandler<SomeOtherNotification>.Ids);
         }
 
         [Fact]
@@ -42,7 +86,8 @@ namespace Mediator.Tests
             await mediator.Publish(notification);
 
             var handler = (CatchAllPolymorphicNotificationHandler)sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
-            Assert.Equal(notification.Id, handler.Id);
+            Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
+            Assert.NotNull(handler);
         }
 
         [Fact]

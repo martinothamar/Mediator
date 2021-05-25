@@ -24,10 +24,17 @@ namespace Microsoft.Extensions.DependencyInjection
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
-            services.TryAddSingleton<global::{{ MediatorNamespace }}.Mediator, global::{{ MediatorNamespace }}.Mediator>();
-            services.TryAddSingleton<global::Mediator.IMediator>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
-            services.TryAddSingleton<global::Mediator.ISender>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
-            services.TryAddSingleton<global::Mediator.IPublisher>(sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>());
+            {{~ if ServiceLifetimeIsScoped ~}}
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
+            {{ else }}
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
 
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistrationBlock }}
@@ -129,8 +136,12 @@ namespace {{ MediatorNamespace }}
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
+        {{~ if ServiceLifetimeIsSingleton ~}}
         private readonly global::System.Lazy<DICache> _diCacheLazy;
         private DICache _diCache => _diCacheLazy.Value;
+        {{~ else ~}}
+        private readonly DICache _diCache;
+        {{~ end ~}}
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -138,23 +149,39 @@ namespace {{ MediatorNamespace }}
         public Mediator(global::System.IServiceProvider sp)
         {
             _sp = sp;
+            {{~ if ServiceLifetimeIsSingleton ~}}
             _diCacheLazy = new global::System.Lazy<DICache>(() => new DICache(_sp));
+            {{~ else ~}}
+            _diCache = new DICache(_sp);
+            {{~ end ~}}
         }
 
-        private sealed class DICache
+        private {{ if ServiceLifetimeIsSingleton; "sealed class"; else; "readonly struct"; end; }} DICache
         {
             private readonly global::System.IServiceProvider _sp;
 
+            {{~ if ServiceLifetimeIsSingleton ~}}
             {{~ for message in RequestMessages ~}}
             public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
+            {{~ end ~}}
+            {{~ else ~}}
+            {{~ for message in RequestMessages ~}}
+            public {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }}
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                get => _sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
+            }
+            {{~ end ~}}
             {{~ end ~}}
 
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
+                {{~ if ServiceLifetimeIsSingleton ~}}
                 {{~ for message in RequestMessages ~}}
                 {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
+                {{~ end ~}}
                 {{~ end ~}}
             }
         }

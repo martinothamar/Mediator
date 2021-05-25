@@ -25,4 +25,10 @@
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
 </Project>

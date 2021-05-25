@@ -18,7 +18,7 @@ namespace Mediator.SourceGenerator
 
         public int HandlerCount => _handlers.Count;
 
-        public string ServiceLifetime => "global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton";
+        public string ServiceLifetime => Analyzer.ServiceLifetime;
 
         public string HandlerTypeOfExpression => $"typeof(global::Mediator.INotificationHandler<{Symbol.GetTypeSymbolFullName()}>)";
 

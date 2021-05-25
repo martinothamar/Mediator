@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,11 +12,11 @@ namespace Mediator.Tests.TestTypes
 
     public sealed class SomeRequestWithoutResponseHandler : IRequestHandler<SomeRequestWithoutResponse>
     {
-        internal Guid Id;
+        internal static readonly ConcurrentBag<Guid> Ids = new();
 
         public ValueTask<Unit> Handle(SomeRequestWithoutResponse request, CancellationToken cancellationToken)
         {
-            Id = request.Id;
+            Ids.Add(request.Id);
             return default;
         }
     }
@@ -26,13 +27,13 @@ namespace Mediator.Tests.TestTypes
 
         public sealed class SomeStaticNestedHandler : IRequestHandler<SomeStaticNestedRequest, SomeResponse>
         {
-            public Guid Id;
+            internal static readonly ConcurrentBag<Guid> Ids = new();
 
             public async ValueTask<SomeResponse> Handle(SomeStaticNestedRequest request, CancellationToken cancellationToken)
             {
                 await Task.Yield();
-                Id = request.Id;
-                return new SomeResponse(Id);
+                Ids.Add(request.Id);
+                return new SomeResponse(request.Id);
             }
         }
     }
@@ -43,13 +44,13 @@ namespace Mediator.Tests.TestTypes
 
         public sealed class SomeNestedHandler : IRequestHandler<SomeNestedRequest, SomeResponse>
         {
-            public Guid Id;
+            internal static readonly ConcurrentBag<Guid> Ids = new();
 
             public async ValueTask<SomeResponse> Handle(SomeNestedRequest request, CancellationToken cancellationToken)
             {
                 await Task.Delay(1000, cancellationToken);
-                Id = request.Id;
-                return new SomeResponse(Id);
+                Ids.Add(request.Id);
+                return new SomeResponse(request.Id);
             }
         }
     }

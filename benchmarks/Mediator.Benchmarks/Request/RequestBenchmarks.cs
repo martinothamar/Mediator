@@ -46,7 +46,7 @@ namespace Mediator.Benchmarks.Request
         {
             var services = new ServiceCollection();
             services.AddMediator();
-            services.AddMediatR(typeof(SomeHandlerClass).Assembly);
+            services.AddMediatR(config => config.AsSingleton(), typeof(SomeHandlerClass).Assembly);
             services.AddMessagePipe();
 
             _serviceProvider = services.BuildServiceProvider();
@@ -64,20 +64,20 @@ namespace Mediator.Benchmarks.Request
             (_serviceProvider as IDisposable)?.Dispose();
         }
 
-        [Benchmark(Baseline = true)]
+        [Benchmark]
         public Task<SomeResponse> SendRequest_MediatR()
         {
             return _mediatr.Send(_request, CancellationToken.None);
         }
 
         [Benchmark]
-        public ValueTask<SomeResponse> SendRequest_Mediator()
+        public ValueTask<SomeResponse> SendRequest_IMediator()
         {
             return _mediator.Send(_request, CancellationToken.None);
         }
 
         [Benchmark]
-        public ValueTask<SomeResponse> SendRequest_Mediator_Concrete()
+        public ValueTask<SomeResponse> SendRequest_Mediator()
         {
             return _concreteMediator.Send(_request, CancellationToken.None);
         }
@@ -88,7 +88,7 @@ namespace Mediator.Benchmarks.Request
             return _messagePipeHandler.InvokeAsync(_request, CancellationToken.None);
         }
 
-        [Benchmark]
+        [Benchmark(Baseline = true)]
         public ValueTask<SomeResponse> SendRequest_Baseline()
         {
             return _handler.Handle(_request, CancellationToken.None);
