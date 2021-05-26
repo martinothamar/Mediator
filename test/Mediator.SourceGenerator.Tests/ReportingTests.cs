@@ -68,6 +68,7 @@ namespace MyCode
                         result.Diagnostics,
                         d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
                     );
+                    Assert.Single(result.Diagnostics);
                 }
             );
         }
@@ -79,10 +80,10 @@ namespace MyCode
             var inputCompilation = Fixture.CreateCompilation(source);
 
             inputCompilation.AssertGen(
-                Assertions.NoMediatorImplGenerated,
                 result =>
                 {
                     Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
+                    Assert.Single(result.Diagnostics);
                 }
             );
         }
@@ -94,10 +95,14 @@ namespace MyCode
             var inputCompilation = Fixture.CreateCompilation(source);
 
             inputCompilation.AssertGen(
-                Assertions.NoMediatorImplGenerated,
                 result =>
                 {
                     Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
+                    Assert.Contains(
+                        result.Diagnostics,
+                        d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
+                    );
+                    Assert.True(result.Diagnostics.Length == 2);
                 }
             );
         }
@@ -109,11 +114,11 @@ namespace MyCode
             var inputCompilation = Fixture.CreateCompilation(source);
 
             inputCompilation.AssertGen(
-                Assertions.NoMediatorImplGenerated,
                 result =>
                 {
                     Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
                     Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
+                    Assert.True(result.Diagnostics.Length == 2);
                 }
             );
         }

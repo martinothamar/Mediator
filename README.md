@@ -10,7 +10,8 @@ The API and usage is mostly based on the great [MediatR](https://github.com/jbog
 The mediator pattern is great for implementing cross cutting concern (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
 
 > **NOTE**
-> In preview
+> In preview currently
+> Library has been tested on .NET Framework 4.7.2, .NET Core 3.1, .NET 5 and .NET 6
 
 Goals for this library
 * High performance
@@ -43,7 +44,9 @@ In particular, source generators in this library is used to
     - [4.6. Use notifications](#46-use-notifications)
     - [4.7. Polymorphic dispatch with notification handlers](#47-polymorphic-dispatch-with-notification-handlers)
     - [4.8. Notification handlers also support open generics](#48-notification-handlers-also-support-open-generics)
-  - [5. TODO](#5-todo)
+  - [5. Diagnostics](#5-diagnostics)
+  - [6. Differences from MediatR](#6-differences-from-mediatr)
+  - [7. TODO](#7-todo)
 
 ## 2. Benchmarks
 
@@ -302,7 +305,31 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
 }
 ```
 
-## 5. TODO
+## 5. Diagnostics
+
+Since this is a source generator, diagnostics are also included. Examples below
+
+* Missing request handler
+
+![Missing request handler](/img/missing_request_handler.png "Missing request handler")
+
+* Multiple request handlers found
+
+![Multiple request handlers found](/img/multiple_request_handlers.png "Multiple request handlers found")
+
+
+## 6. Differences from [MediatR](https://github.com/jbogard/MediatR)
+
+This is a work in progress list on the differences between this library and MediatR.
+
+* `RequestHandlerDelegate<TResponse>()` -> `MessageHandlerDelegate<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken)`
+  * This is to avoid excessive closure allocations. I thin it's worthwhile when the cost is simply passing along the message and the cancellationtoken.
+* No `ServiceFactory`
+  * This library relies on the `Microsoft.Extensions.DependencyInjection`, so it only works with DI containers that integrate with those abstractions.
+* Singleton service lifetime by default
+  * MediatR in combination with `MediatR.Extensions.Microsoft.DependencyInjection` does transient service registration by default, which leads to a lot of allocations. Even if it is configured for singleton lifetime, `IMediator` and `ServiceFactory` services are registered as transient (not configurable).
+
+## 7. TODO
 
 List of things to do before I remove preview tag:
 

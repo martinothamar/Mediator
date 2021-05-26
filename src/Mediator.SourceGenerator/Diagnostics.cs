@@ -32,7 +32,7 @@ namespace Mediator.SourceGenerator
                 $"{nameof(MediatorGenerator)} multiple handlers",
                 $"{nameof(MediatorGenerator)} found multiple handlers " + "of message type {0}",
                 nameof(MediatorGenerator),
-                DiagnosticSeverity.Error,
+                DiagnosticSeverity.Warning,
                 isEnabledByDefault: true);
 
             InvalidHandlerTypeError = new DiagnosticDescriptor(
@@ -40,7 +40,7 @@ namespace Mediator.SourceGenerator
                 $"{nameof(MediatorGenerator)} invalid handler",
                 $"{nameof(MediatorGenerator)} found invalid handler type " + "{0}",
                 nameof(MediatorGenerator),
-                DiagnosticSeverity.Error,
+                DiagnosticSeverity.Warning,
                 isEnabledByDefault: true);
 
             OpenGenericRequestHandler = new DiagnosticDescriptor(
@@ -48,7 +48,7 @@ namespace Mediator.SourceGenerator
                 $"{nameof(MediatorGenerator)} invalid handler",
                 $"{nameof(MediatorGenerator)} found invalid handler type, request/query/command handlers cannot be generic: " + "{0}",
                 nameof(MediatorGenerator),
-                DiagnosticSeverity.Error,
+                DiagnosticSeverity.Warning,
                 isEnabledByDefault: true);
 
             MessageDerivesFromMultipleMessageInterfaces = new DiagnosticDescriptor(
@@ -56,7 +56,7 @@ namespace Mediator.SourceGenerator
                 $"{nameof(MediatorGenerator)} invalid message",
                 $"{nameof(MediatorGenerator)} found message that derives from multiple message interfaces: " + "{0}",
                 nameof(MediatorGenerator),
-                DiagnosticSeverity.Error,
+                DiagnosticSeverity.Warning,
                 isEnabledByDefault: true);
 
             MessageWithoutHandler = new DiagnosticDescriptor(
