@@ -129,9 +129,9 @@ Declare the attribute in the project where the source generator is installed.
 
 * `Namespace` - where the `IMediator` implementation is generated
 * `DefaultServiceLifetime` - the DI service lifetime
-  * `Singleton` - (default value) everything registered as singletone, minimal allocations
+  * `Singleton` - (default value) everything registered as singletons, minimal allocations
   * `Transient` - handlers registered as transient, `IMediator`/`Mediator`/`ISender`/`IPublisher` still singleton
-  * `Scoped`    - mediator and handlers registrered as singletons
+  * `Scoped`    - mediator and handlers registered as scoped
 
 ## 4. Getting started
 
