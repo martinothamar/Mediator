@@ -1,6 +1,8 @@
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/martinothamar/Mediator/Build)
-![Abstractions NuGet (with prereleases)](https://img.shields.io/nuget/vpre/Mediator.Abstractions?label=Mediator.Abstractions)
-![SourceGenerator NuGet (with prereleases)](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)
+![Abstractions NuGet current](https://img.shields.io/nuget/v/Mediator.Abstractions?label=Mediator.Abstractions)
+![SourceGenerator NuGet current](https://img.shields.io/nuget/v/Mediator.SourceGenerator?label=Mediator.SourceGenerator)
+![Abstractions NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.Abstractions?label=Mediator.Abstractions)
+![SourceGenerator NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)
 
 # Mediator
 
@@ -10,7 +12,7 @@ The API and usage is mostly based on the great [MediatR](https://github.com/jbog
 The mediator pattern is great for implementing cross cutting concern (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
 
 > **NOTE**
-> In preview currently
+> This project is in its early stages.
 > Library has been tested on .NET Framework 4.7.2, .NET Core 3.1, .NET 5 and .NET 6
 
 Goals for this library
@@ -143,16 +145,16 @@ See the full runnable sample code in the [SimpleEndToEnd sample](/samples/Simple
 ### 4.1. Add package
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 0.1.*-*
-dotnet add package Mediator.Abstractions --version 0.1.*-*
+dotnet add package Mediator.SourceGenerator --version 0.1.*
+dotnet add package Mediator.Abstractions --version 0.1.*
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="0.1.*-*">
+<PackageReference Include="Mediator.SourceGenerator" Version="0.1.*">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator.Abstractions" Version="0.1.*-*" />
+<PackageReference Include="Mediator.Abstractions" Version="0.1.*" />
 ```
 
 ### 4.2. Add Mediator to DI container
