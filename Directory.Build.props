@@ -12,13 +12,13 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/martinothamar/Mediator</PackageProjectUrl>
     <RepositoryUrl>https://github.com/martinothamar/Mediator</RepositoryUrl>
-    <PackageTags>mediator mediator-pattern source-generation source-gen source-generator sourcegenerator C# .NET .NET5 dotnet dotnet5</PackageTags>
+    <PackageTags>mediator mediator-pattern source-generation source-gen source-generator sourcegenerator C# .NET .NET5 dotnet dotnet5 dotnet6</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Authors>Martin Othamar</Authors>
     <Copyright>Copyright 2021 Martin Othamar</Copyright>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DotNetVersion>5.0.*</DotNetVersion>
+    <DotNetVersion>6.0.*</DotNetVersion>
   </PropertyGroup>
 </Project>
