@@ -1,7 +1,6 @@
-﻿using Mediator.SourceGenerator.Extensions;
+using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Mediator.SourceGenerator
 {
@@ -14,6 +13,8 @@ namespace Mediator.SourceGenerator
         public readonly RequestMessageHandlerWrapper WrapperType;
 
         public readonly string MessageType;
+
+        public bool IsStreaming => MessageType.StartsWith("Stream");
 
         public RequestMessage(INamedTypeSymbol symbol, INamedTypeSymbol responseSymbol, string messageType, CompilationAnalyzer analyzer)
             : base(symbol, analyzer)
@@ -31,21 +32,20 @@ namespace Mediator.SourceGenerator
         public string HandlerWrapperTypeNameWithGenericTypeArguments =>
             WrapperType.HandlerWrapperTypeNameWithGenericTypeArguments(Symbol, ResponseSymbol);
 
-        public string PipelineHandlerType =>
+        public string PipelineHandlerType => IsStreaming ?
+            $"global::Mediator.IStreamPipelineBehavior<{RequestFullName}, {ResponseFullName}>" :
             $"global::Mediator.IPipelineBehavior<{RequestFullName}, {ResponseFullName}>";
 
 
         public string HandlerWrapperPropertyName =>
            $"Wrapper_For_{Symbol.GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false).Replace("global::", "").Replace('.', '_')}";
 
-        public string SyncMethodName => "Send";
-        public string AsyncMethodName => "Send";
+        public string SyncMethodName => IsStreaming ? "CreateStream" : "Send";
+        public string AsyncMethodName => IsStreaming ? "CreateStream" : "Send";
 
         public string SyncReturnType => ResponseSymbol.GetTypeSymbolFullName();
-        public string AsyncReturnType => Analyzer
-            .Compilation
-            .GetTypeByMetadataName(typeof(ValueTask<>).FullName!)!
-            .Construct(ResponseSymbol)
-            .GetTypeSymbolFullName();
+        public string AsyncReturnType => IsStreaming ?
+            $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>" :
+            $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
     }
 }

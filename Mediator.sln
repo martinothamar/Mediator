@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.6.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32127.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{438C928E-FBB5-45B2-9CD2-7ED3341AC75E}"
 EndProject
@@ -55,7 +55,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.TransientLifetime", "test\Mediator.Tests.TransientLifetime\Mediator.Tests.TransientLifetime.csproj", "{4C18FD08-BCE4-4C6A-9D84-9A81C4561586}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.Tests.ScopedLifetime", "test\Mediator.Tests.ScopedLifetime\Mediator.Tests.ScopedLifetime.csproj", "{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.ScopedLifetime", "test\Mediator.Tests.ScopedLifetime\Mediator.Tests.ScopedLifetime.csproj", "{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleStreaming", "samples\SimpleStreaming\SimpleStreaming.csproj", "{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -235,6 +237,18 @@ Global
 		{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943}.Release|x64.Build.0 = Release|Any CPU
 		{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943}.Release|x86.ActiveCfg = Release|Any CPU
 		{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943}.Release|x86.Build.0 = Release|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Debug|x64.Build.0 = Debug|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Debug|x86.Build.0 = Debug|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Release|x64.ActiveCfg = Release|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Release|x64.Build.0 = Release|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Release|x86.ActiveCfg = Release|Any CPU
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -255,6 +269,7 @@ Global
 		{B9E8DA69-C6FA-446F-B949-EF48856551D8} = {D3569CDD-7E19-429E-B9AD-75CC05F6C4AA}
 		{4C18FD08-BCE4-4C6A-9D84-9A81C4561586} = {ED1809FC-733B-4D9E-8FEE-70D3BB0BBD84}
 		{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943} = {ED1809FC-733B-4D9E-8FEE-70D3BB0BBD84}
+		{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047} = {D3569CDD-7E19-429E-B9AD-75CC05F6C4AA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D45B5457-4190-49B6-BF89-7FA5F4C8ABE2}

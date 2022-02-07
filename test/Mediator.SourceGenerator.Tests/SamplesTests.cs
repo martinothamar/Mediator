@@ -22,5 +22,14 @@ namespace Mediator.SourceGenerator.Tests
 
             inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
         }
+
+        [Fact(Skip = "Test manually, programs containing top level statements must be executable")]
+        public async Task Test_SimpleStreaming()
+        {
+            var source = await Fixture.SourceFromResourceFile("SimpleStreamingProgram.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        }
     }
 }

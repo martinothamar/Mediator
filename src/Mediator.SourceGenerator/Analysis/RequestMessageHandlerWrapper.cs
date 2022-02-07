@@ -1,4 +1,4 @@
-﻿using Mediator.SourceGenerator.Extensions;
+using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 
 namespace Mediator.SourceGenerator
@@ -43,5 +43,16 @@ namespace Mediator.SourceGenerator
 
         public string StructHandlerWrapperTypeName =>
             HandlerWrapperTypeName(TypeKind.Struct);
+
+        public bool IsStreaming => MessageType.StartsWith("Stream");
+
+        public string MessageHandlerDelegateName => IsStreaming ? $"global::Mediator.StreamHandlerDelegate<TRequest, TResponse>" :
+            $"global::Mediator.MessageHandlerDelegate<TRequest, TResponse>";
+
+        public string PipelineHandlerTypeName => IsStreaming ? "global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>" :
+            "global::Mediator.IPipelineBehavior<TRequest, TResponse>";
+
+        public string ReturnTypeName => IsStreaming ? "global::System.Collections.Generic.IAsyncEnumerable<TResponse>" :
+            "global::System.Threading.Tasks.ValueTask<TResponse>";
     }
 }
