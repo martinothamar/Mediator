@@ -4,5 +4,5 @@ using System.Threading;
 namespace Mediator
 {
     public delegate IAsyncEnumerable<TResponse> StreamHandlerDelegate<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken)
-        where TMessage : notnull, IStreamMessage<TResponse>;
+        where TMessage : notnull, IStreamMessage;
 }
