@@ -1,28 +1,22 @@
 using Mediator;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace AspNetSample.Application
+namespace AspNetSample.Application;
+
+public sealed class TodoItemQueryHandler : IQueryHandler<GetTodoItems, IEnumerable<TodoItemDto>>
 {
+    private readonly ITodoItemRepository _repository;
 
-    public sealed class TodoItemQueryHandler : IQueryHandler<GetTodoItems, IEnumerable<TodoItemDto>>
+    public TodoItemQueryHandler(ITodoItemRepository repository)
     {
-        private readonly ITodoItemRepository _repository;
+        _repository = repository;
+    }
 
-        public TodoItemQueryHandler(ITodoItemRepository repository)
-        {
-            _repository = repository;
-        }
+    public async ValueTask<IEnumerable<TodoItemDto>> Handle(GetTodoItems query, CancellationToken cancellationToken)
+    {
+        var items = await _repository.GetItems(cancellationToken);
 
-        public async ValueTask<IEnumerable<TodoItemDto>> Handle(GetTodoItems query, CancellationToken cancellationToken)
-        {
-            var items = await _repository.GetItems(cancellationToken);
-
-            return items
-                .Select(i => new TodoItemDto(i.Title, i.Text, i.Done))
-                .ToArray();
-        }
+        return items
+            .Select(i => new TodoItemDto(i.Title, i.Text, i.Done))
+            .ToArray();
     }
 }

@@ -1,32 +1,28 @@
 using Mediator;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace AspNetSample.Application
-{
-    public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+namespace AspNetSample.Application;
+
+public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
         where TMessage : IMessage
+{
+    private readonly ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> _logger;
+
+    public ErrorLoggingBehaviour(ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> logger)
     {
-        private readonly ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> _logger;
+        _logger = logger;
+    }
 
-        public ErrorLoggingBehaviour(ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> logger)
+    public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    {
+        try
         {
-            _logger = logger;
+            return await next(message, cancellationToken);
         }
-
-        public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+        catch (Exception ex)
         {
-            try
-            {
-                return await next(message, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error handling message of type {messageType}", message.GetType().Name);
-                throw;
-            }
+            _logger.LogError(ex, "Error handling message of type {messageType}", message.GetType().Name);
+            throw;
         }
     }
 }

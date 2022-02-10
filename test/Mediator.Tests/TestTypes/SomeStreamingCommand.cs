@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Mediator.Tests.TestTypes;
 
 public sealed record SomeStreamingCommand(Guid Id) : IStreamCommand<SomeResponse>;

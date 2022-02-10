@@ -1,18 +1,14 @@
-﻿using Microsoft.CodeAnalysis;
-using System.Linq;
+namespace Mediator.SourceGenerator;
 
-namespace Mediator.SourceGenerator
+internal sealed class RequestMessageHandler : MessageHandler<RequestMessageHandler>
 {
-    internal sealed class RequestMessageHandler : MessageHandler<RequestMessageHandler>
-    {
-        public readonly string MessageType;
-        public readonly RequestMessageHandlerWrapper WrapperType;
+    public readonly string MessageType;
+    public readonly RequestMessageHandlerWrapper WrapperType;
 
-        public RequestMessageHandler(INamedTypeSymbol symbol, string messageType, CompilationAnalyzer analyzer)
-            : base(symbol, analyzer)
-        {
-            MessageType = messageType;
-            WrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);
-        }
+    public RequestMessageHandler(INamedTypeSymbol symbol, string messageType, CompilationAnalyzer analyzer)
+        : base(symbol, analyzer)
+    {
+        MessageType = messageType;
+        WrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);
     }
 }

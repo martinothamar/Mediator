@@ -1,31 +1,29 @@
 using Mediator.SourceGenerator.Extensions;
-using Microsoft.CodeAnalysis;
 
-namespace Mediator.SourceGenerator
+namespace Mediator.SourceGenerator;
+
+internal abstract class MessageHandler<T> : SymbolMetadata<MessageHandler<T>>
 {
-    internal abstract class MessageHandler<T> : SymbolMetadata<MessageHandler<T>>
+    public MessageHandler(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
+        : base(symbol, analyzer)
     {
-        public MessageHandler(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
-            : base(symbol, analyzer)
-        {
-        }
-
-        public bool IsOpenGeneric => Symbol.TypeArguments.Length > 0;
-
-        public string FullName => Symbol.GetTypeSymbolFullName();
-
-        public string TypeOfExpression(bool includeTypeParameters = true)
-        {
-            var typeName = Symbol.GetTypeSymbolFullName(includeTypeParameters: includeTypeParameters);
-            var genericArguments = string.Empty;
-            if (IsOpenGeneric && !includeTypeParameters)
-                genericArguments = $"<{new string(',', Symbol.TypeArguments.Length - 1)}>";
-            return $"typeof({typeName}{genericArguments})";
-        }
-
-        public string ServiceRegistrationBlock =>
-            $"services.TryAdd(new SD({TypeOfExpression()}, {TypeOfExpression()}, {ServiceLifetime}));";
-
-        public string ServiceLifetime => Analyzer.ServiceLifetime;
     }
+
+    public bool IsOpenGeneric => Symbol.TypeArguments.Length > 0;
+
+    public string FullName => Symbol.GetTypeSymbolFullName();
+
+    public string TypeOfExpression(bool includeTypeParameters = true)
+    {
+        var typeName = Symbol.GetTypeSymbolFullName(includeTypeParameters: includeTypeParameters);
+        var genericArguments = string.Empty;
+        if (IsOpenGeneric && !includeTypeParameters)
+            genericArguments = $"<{new string(',', Symbol.TypeArguments.Length - 1)}>";
+        return $"typeof({typeName}{genericArguments})";
+    }
+
+    public string ServiceRegistrationBlock =>
+        $"services.TryAdd(new SD({TypeOfExpression()}, {TypeOfExpression()}, {ServiceLifetime}));";
+
+    public string ServiceLifetime => Analyzer.ServiceLifetime;
 }

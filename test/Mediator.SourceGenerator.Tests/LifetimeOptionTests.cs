@@ -1,13 +1,11 @@
-using Xunit;
+namespace Mediator.SourceGenerator.Tests;
 
-namespace Mediator.SourceGenerator.Tests
+public sealed class LifetimeOptionTests
 {
-    public sealed class LifetimeOptionTests
+    [Fact]
+    public void Test_No_Args()
     {
-        [Fact]
-        public void Test_No_Args()
-        {
-            var source = @"
+        var source = @"
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,17 +21,17 @@ namespace Something
     }
 }
 ";
-            var inputCompilation = Fixture.CreateCompilation(source);
+        var inputCompilation = Fixture.CreateCompilation(source);
 
-            inputCompilation.AssertGen(
-                Assertions.CompilesWithoutDiagnostics
-            );
-        }
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics
+        );
+    }
 
-        [Fact]
-        public void Test_Transient_Lifetime_With_Named_Namespace_Arg()
-        {
-            var source = @"
+    [Fact]
+    public void Test_Transient_Lifetime_With_Named_Namespace_Arg()
+    {
+        var source = @"
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -49,11 +47,10 @@ namespace Something
     }
 }
 ";
-            var inputCompilation = Fixture.CreateCompilation(source);
+        var inputCompilation = Fixture.CreateCompilation(source);
 
-            inputCompilation.AssertGen(
-                Assertions.CompilesWithoutDiagnostics
-            );
-        }
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics
+        );
     }
 }

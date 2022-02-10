@@ -1,6 +1,3 @@
-﻿using System.Collections.Generic;
+namespace AspNetSample.Application;
 
-namespace AspNetSample.Application
-{
-    public sealed record ValidationError(IEnumerable<string> Errors);
-}
+public sealed record ValidationError(IEnumerable<string> Errors);

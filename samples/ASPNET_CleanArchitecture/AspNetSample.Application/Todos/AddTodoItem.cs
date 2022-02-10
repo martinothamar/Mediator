@@ -1,21 +1,19 @@
-﻿using Mediator;
+using Mediator;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
-namespace AspNetSample.Application
+namespace AspNetSample.Application;
+
+public sealed record AddTodoItem(string Title, string Text) : ICommand<TodoItemDto>, IValidate
 {
-    public sealed record AddTodoItem(string Title, string Text) : ICommand<TodoItemDto>, IValidate
+    public bool IsValid([NotNullWhen(false)] out ValidationError? error)
     {
-        public bool IsValid([NotNullWhen(false)] out ValidationError? error)
-        {
-            var validator = new AddTodoItemValidator();
-            var result = validator.Validate(this);
-            if (result.IsValid)
-                error = null;
-            else
-                error = new ValidationError(result.Errors.Select(e => e.ErrorMessage).ToArray());
+        var validator = new AddTodoItemValidator();
+        var result = validator.Validate(this);
+        if (result.IsValid)
+            error = null;
+        else
+            error = new ValidationError(result.Errors.Select(e => e.ErrorMessage).ToArray());
 
-            return result.IsValid;
-        }
+        return result.IsValid;
     }
 }

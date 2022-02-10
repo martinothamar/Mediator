@@ -1,13 +1,12 @@
-﻿using FluentValidation;
+using FluentValidation;
 
-namespace AspNetSample.Application
+namespace AspNetSample.Application;
+
+public class AddTodoItemValidator : AbstractValidator<AddTodoItem>
 {
-    public class AddTodoItemValidator : AbstractValidator<AddTodoItem>
+    public AddTodoItemValidator()
     {
-        public AddTodoItemValidator()
-        {
-            RuleFor(x => x.Title).Length(1, 40);
-            RuleFor(x => x.Text).Length(1, 150);
-        }
+        RuleFor(x => x.Title).Length(1, 40);
+        RuleFor(x => x.Text).Length(1, 150);
     }
 }

@@ -1,7 +1,5 @@
-﻿using Mediator;
-using System.Collections.Generic;
+using Mediator;
 
-namespace AspNetSample.Application
-{
-    public sealed record GetTodoItems() : IQuery<IEnumerable<TodoItemDto>>;
-}
+namespace AspNetSample.Application;
+
+public sealed record GetTodoItems() : IQuery<IEnumerable<TodoItemDto>>;

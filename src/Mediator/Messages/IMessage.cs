@@ -1,6 +1,3 @@
-namespace Mediator
-{
-    public interface IMessage { }
+namespace Mediator;
 
-    public interface IStreamMessage { }
-}
+public interface IMessage { }

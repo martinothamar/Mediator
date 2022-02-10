@@ -1,6 +1,3 @@
-using System;
+namespace AspNetSample.Domain;
 
-namespace AspNetSample.Domain
-{
-    public sealed record TodoItem(Guid Id, string Title, string Text, bool Done);
-}
+public sealed record TodoItem(Guid Id, string Title, string Text, bool Done);

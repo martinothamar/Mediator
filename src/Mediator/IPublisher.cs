@@ -1,13 +1,9 @@
-using System.Threading;
-using System.Threading.Tasks;
+namespace Mediator;
 
-namespace Mediator
+public interface IPublisher
 {
-    public interface IPublisher
-    {
-        ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
-            where TNotification : INotification;
+    ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default)
+        where TNotification : INotification;
 
-        ValueTask Publish(object notification, CancellationToken cancellationToken = default);
-    }
+    ValueTask Publish(object notification, CancellationToken cancellationToken = default);
 }
