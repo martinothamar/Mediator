@@ -13,6 +13,12 @@ Naming convention:
 
 ![Requests benchmark](/img/request_benchmark.png "Requests benchmark")
 
+### Streaming
+
+An `IAsyncEnumerable` doing 10 iterations, being fully consumed.
+
+![Streaming benchmark](/img/stream_benchmark.png "Streaming benchmark")
+
 ### Big struct requests
 
 ![Big struct requests benchmark](/img/struct_request_benchmark.png "Big struct requests benchmark")

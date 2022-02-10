@@ -18,6 +18,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleConsole", "samples\SimpleConsole\SimpleConsole.csproj", "{75548DF7-A07C-41BB-A589-50EF296837EC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{0F5E1C71-66E0-4285-B861-184E5B6C841A}"
+	ProjectSection(SolutionItems) = preProject
+		benchmarks\README.md = benchmarks\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Benchmarks", "benchmarks\Mediator.Benchmarks\Mediator.Benchmarks.csproj", "{A1E16465-9155-4957-BB97-ADCCF1648958}"
 EndProject
