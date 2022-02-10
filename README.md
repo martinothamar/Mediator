@@ -46,6 +46,7 @@ In particular, source generators in this library is used to
     - [4.6. Use notifications](#46-use-notifications)
     - [4.7. Polymorphic dispatch with notification handlers](#47-polymorphic-dispatch-with-notification-handlers)
     - [4.8. Notification handlers also support open generics](#48-notification-handlers-also-support-open-generics)
+    - [4.9. Use streaming messages](#49-use-streaming-messages)
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
   - [7. TODO](#7-todo)
@@ -335,7 +336,7 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
 ```
 
 
-### 4.9. Use streaming messages for `IAsyncEnumerable`
+### 4.9. Use streaming messages
 
 Since version 1.* of this library there is support for streaming using `IAsyncEnumerable`.
 
