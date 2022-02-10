@@ -10,7 +10,10 @@ public sealed record SomeRequest(Guid Id) : IRequest<SomeResponse>, MediatR.IReq
 
 public sealed record SomeResponse(Guid Id);
 
-public sealed class SomeHandlerClass : IRequestHandler<SomeRequest, SomeResponse>, MediatR.IRequestHandler<SomeRequest, SomeResponse>, IAsyncRequestHandler<SomeRequest, SomeResponse>
+public sealed class SomeHandlerClass :
+    IRequestHandler<SomeRequest, SomeResponse>,
+    MediatR.IRequestHandler<SomeRequest, SomeResponse>,
+    IAsyncRequestHandler<SomeRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
