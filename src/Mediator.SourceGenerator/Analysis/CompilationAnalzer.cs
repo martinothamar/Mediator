@@ -50,10 +50,11 @@ namespace Mediator.SourceGenerator
 
         public bool HasStreamRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
         public bool HasStreamQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
+        public bool HasStreamCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
 
         public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
 
-        public bool HasAnyStreamRequest => HasStreamRequests || HasStreamQueries;
+        public bool HasAnyStreamRequest => HasStreamRequests || HasStreamQueries || HasStreamCommands;
 
         public bool HasNotifications => _notificationMessages.Any();
 
@@ -63,6 +64,7 @@ namespace Mediator.SourceGenerator
 
         public IEnumerable<RequestMessage> IStreamRequestMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest");
         public IEnumerable<RequestMessage> IStreamQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery");
+        public IEnumerable<RequestMessage> IStreamCommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand");
 
         public IEnumerable<RequestMessage> IMessages => _requestMessages.Where(r => r.Handler is not null && !r.IsStreaming);
         public IEnumerable<RequestMessage> IStreamMessages => _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
@@ -110,6 +112,7 @@ namespace Mediator.SourceGenerator
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequestHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`2")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommandHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQueryHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
@@ -124,6 +127,7 @@ namespace Mediator.SourceGenerator
                 new RequestMessageHandlerWrapper("Request", this),
                 new RequestMessageHandlerWrapper("StreamRequest", this),
                 new RequestMessageHandlerWrapper("Command", this),
+                new RequestMessageHandlerWrapper("StreamCommand", this),
                 new RequestMessageHandlerWrapper("Query", this),
                 new RequestMessageHandlerWrapper("StreamQuery", this),
             }.ToImmutableArray();
@@ -138,6 +142,7 @@ namespace Mediator.SourceGenerator
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequest`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand`1")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommand`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQuery`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQuery`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,

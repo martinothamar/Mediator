@@ -9,11 +9,7 @@ using System.Threading.Tasks;
 var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Mediator" namespace by default.
-// We override the namespace in the "MediatorOptions" attribute above.
 services.AddMediator();
-
-// Standard handlers are added by default, but we need to add pipeline steps manually.
-// Here are two examples.
 
 var serviceProvider = services.BuildServiceProvider();
 

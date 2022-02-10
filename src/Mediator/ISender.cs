@@ -18,6 +18,8 @@ namespace Mediator
 
         IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default);
 
+        IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamCommand<TResponse> command, CancellationToken cancellationToken = default);
+
         IAsyncEnumerable<object?> CreateStream(object request, CancellationToken cancellationToken = default);
     }
 }

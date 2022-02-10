@@ -246,6 +246,7 @@ namespace {{ MediatorNamespace }}
         
         /// <summary>
         /// Create stream for request.
+        /// Throws <see cref="global::Mediator.MissingStreamMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="request">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -310,6 +311,40 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
+        
+        /// <summary>
+        /// Create stream for command.
+        /// Throws <see cref="global::Mediator.MissingStreamMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="command">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Async enumerable</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+            global::Mediator.IStreamCommand<TResponse> command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasStreamCommands }}
+            switch (command)
+            {
+                {{~ for message in IStreamCommandMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {
+                    var task = CreateStream({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidStreamMessage(command);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidStreamMessage(command);
+            return default;
+            {{ end }}
+        }
 
         /// <summary>
         /// Send query.
@@ -347,6 +382,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Create stream for query.
+        /// Throws <see cref="global::Mediator.MissingStreamMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="query">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -380,6 +416,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Send message.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -409,6 +446,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Create stream.
+        /// Throws <see cref="global::Mediator.MissingStreamMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
