@@ -93,6 +93,7 @@ See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real worl
 * `IBaseCommand` - marker interface for commands
 * `ICommand` - a command message, no return value (`ValueTask<Unit>`)
 * `ICommand<out TResponse>` - a command message with a response (`ValueTask<TResponse>`)
+* `IStreamCommand<out TResponse>` - a command message with a streaming response (`IAsyncEnumerable<TResponse>`)
 * `IBaseQuery` - marker interface for queries
 * `IQuery<out TResponse>` - a query message with a response (`ValueTask<TResponse>`)
 * `IStreamQuery<out TResponse>` - a query message with a streaming response (`IAsyncEnumerable<TResponse>`)
@@ -107,6 +108,7 @@ As you can see, you can achieve the exact same thing with requests, commands and
 * `IStreamRequestHandler<in TRequest, out TResponse>`
 * `ICommandHandler<in TCommand>`
 * `ICommandHandler<in TCommand, TResponse>`
+* `IStreamCommandHandler<in TCommand, out TResponse>`
 * `IQueryHandler<in TQuery, TResponse>`
 * `IStreamQueryHandler<in TQuery, out TResponse>`
 * `INotificationHandler<in TNotification>`
