@@ -1,10 +1,9 @@
-﻿using Mediator;
+using Mediator;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AspNetSample.Application
+namespace AspNetSample.Application;
+
+public interface IValidate : IMessage
 {
-    public interface IValidate : IMessage
-    {
-        bool IsValid([NotNullWhen(false)] out ValidationError? error);
-    }
+    bool IsValid([NotNullWhen(false)] out ValidationError? error);
 }

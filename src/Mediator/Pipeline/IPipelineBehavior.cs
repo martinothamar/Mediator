@@ -1,11 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
+namespace Mediator;
 
-namespace Mediator
+public interface IPipelineBehavior<TMessage, TResponse>
+    where TMessage : notnull, IMessage
 {
-    public interface IPipelineBehavior<TMessage, TResponse>
-        where TMessage : notnull, IMessage
-    {
-        ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next);
-    }
+    ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next);
 }

@@ -1,4 +1,3 @@
-﻿namespace Mediator
-{
-    public interface INotification : IMessage { }
-}
+namespace Mediator;
+
+public interface INotification : IMessage { }

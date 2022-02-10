@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="resources\AbstractHandlerProgram.cs" />
     <Compile Remove="resources\DeepNamespaceProgram.cs" />
     <Compile Remove="resources\DuplicateHandlersProgram.cs" />

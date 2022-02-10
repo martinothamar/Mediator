@@ -40,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleEndToEnd", "samples\SimpleEndToEnd\SimpleEndToEnd.csproj", "{B9E8DA69-C6FA-446F-B949-EF48856551D8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{FDAEEFFB-30BC-4BC2-9E76-2F98D801FC34}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_files", "_files", "{FDAEEFFB-30BC-4BC2-9E76-2F98D801FC34}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
@@ -57,7 +57,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.TransientLif
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.ScopedLifetime", "test\Mediator.Tests.ScopedLifetime\Mediator.Tests.ScopedLifetime.csproj", "{6FC1A2EC-7178-4A3E-93DF-1ABDF09F4943}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleStreaming", "samples\SimpleStreaming\SimpleStreaming.csproj", "{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStreaming", "samples\SimpleStreaming\SimpleStreaming.csproj", "{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

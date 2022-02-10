@@ -1,9 +1,5 @@
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleConsole.Mediator;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 [assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator")]
 

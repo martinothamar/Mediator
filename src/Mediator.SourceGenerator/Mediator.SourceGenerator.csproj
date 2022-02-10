@@ -12,6 +12,11 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Using Include="Microsoft.CodeAnalysis" />
+    <Using Include="Microsoft.CodeAnalysis.CSharp.Syntax" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />

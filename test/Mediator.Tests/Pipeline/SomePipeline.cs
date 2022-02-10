@@ -1,28 +1,22 @@
 using Mediator.Tests.TestTypes;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Mediator.Tests.Pipeline
+namespace Mediator.Tests.Pipeline;
+
+public sealed class SomePipeline : IPipelineBehavior<SomeRequest, SomeResponse>, IPipelineTestData
 {
-    public sealed class SomePipeline : IPipelineBehavior<SomeRequest, SomeResponse>, IPipelineTestData
+    public Guid Id { get; private set; }
+    public long LastMsgTimestamp { get; private set; }
+
+    public ValueTask<SomeResponse> Handle(SomeRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<SomeRequest, SomeResponse> next)
     {
-        public Guid Id { get; private set; }
-        public long LastMsgTimestamp { get; private set; }
+        LastMsgTimestamp = Stopwatch.GetTimestamp();
 
-        public ValueTask<SomeResponse> Handle(SomeRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<SomeRequest, SomeResponse> next)
-        {
-            LastMsgTimestamp = Stopwatch.GetTimestamp();
+        if (message is null || message.Id == default)
+            throw new ArgumentException("Invalid input");
 
-            if (message is null || message.Id == default)
-                throw new ArgumentException("Invalid input");
+        Id = message.Id;
 
-            Id = message.Id;
-
-            return next(message, cancellationToken);
-        }
+        return next(message, cancellationToken);
     }
 }

@@ -1,13 +1,12 @@
 using AspNetSample.Application;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AspNetSample.Infrastructure
+namespace AspNetSample.Infrastructure;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
-        {
-            return services.AddSingleton<ITodoItemRepository, InMemoryTodoItemRepository>();
-        }
+        return services.AddSingleton<ITodoItemRepository, InMemoryTodoItemRepository>();
     }
 }
