@@ -14,6 +14,7 @@
     <Compile Remove="resources\NotificationWithoutHandlerProgram.cs" />
     <Compile Remove="resources\RequestWithoutHandlerProgram.cs" />
     <Compile Remove="resources\StaticNestedHandlerProgram.cs" />
+    <Compile Remove="resources\StreamingProgram.cs" />
     <Compile Remove="resources\StructHandlerProgram.cs" />
   </ItemGroup>
 
@@ -37,6 +38,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\samples\SimpleEndToEnd\Program.cs" Link="resources\SimpleEndToEndProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\samples\SimpleStreaming\Program.cs" Link="resources\SimpleStreamingProgram.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="resources\*.cs">

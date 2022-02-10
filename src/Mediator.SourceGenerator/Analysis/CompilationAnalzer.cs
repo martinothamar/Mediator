@@ -48,7 +48,13 @@ namespace Mediator.SourceGenerator
         public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
         public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
 
+        public bool HasStreamRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
+        public bool HasStreamQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
+        public bool HasStreamCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
+
         public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
+
+        public bool HasAnyStreamRequest => HasStreamRequests || HasStreamQueries || HasStreamCommands;
 
         public bool HasNotifications => _notificationMessages.Any();
 
@@ -56,7 +62,12 @@ namespace Mediator.SourceGenerator
         public IEnumerable<RequestMessage> ICommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
         public IEnumerable<RequestMessage> IQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
 
-        public IEnumerable<RequestMessage> IMessages => _requestMessages.Where(r => r.Handler is not null);
+        public IEnumerable<RequestMessage> IStreamRequestMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest");
+        public IEnumerable<RequestMessage> IStreamQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery");
+        public IEnumerable<RequestMessage> IStreamCommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand");
+
+        public IEnumerable<RequestMessage> IMessages => _requestMessages.Where(r => r.Handler is not null && !r.IsStreaming);
+        public IEnumerable<RequestMessage> IStreamMessages => _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
 
         private bool _hasErrors;
 
@@ -98,9 +109,12 @@ namespace Mediator.SourceGenerator
                 // Handler
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`2")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequestHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`2")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommandHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQueryHandler`2")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
             };
 
@@ -111,8 +125,11 @@ namespace Mediator.SourceGenerator
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
             {
                 new RequestMessageHandlerWrapper("Request", this),
+                new RequestMessageHandlerWrapper("StreamRequest", this),
                 new RequestMessageHandlerWrapper("Command", this),
+                new RequestMessageHandlerWrapper("StreamCommand", this),
                 new RequestMessageHandlerWrapper("Query", this),
+                new RequestMessageHandlerWrapper("StreamQuery", this),
             }.ToImmutableArray();
 
             _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
@@ -122,9 +139,12 @@ namespace Mediator.SourceGenerator
                 // Message types
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest`1")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequest`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand`1")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommand`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQuery`1")!.OriginalDefinition,
+                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQuery`1")!.OriginalDefinition,
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,
             };
 

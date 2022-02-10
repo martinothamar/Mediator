@@ -74,6 +74,15 @@ namespace MyCode
         }
 
         [Fact]
+        public async Task Test_Streaming_Program()
+        {
+            var source = await Fixture.SourceFromResourceFile("StreamingProgram.cs");
+            var inputCompilation = Fixture.CreateCompilation(source);
+
+            inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        }
+
+        [Fact]
         public async Task Test_Duplicate_Handlers()
         {
             var source = await Fixture.SourceFromResourceFile("DuplicateHandlersProgram.cs");

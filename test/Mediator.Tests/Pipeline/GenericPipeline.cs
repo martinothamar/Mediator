@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,16 @@ namespace Mediator.Tests.Pipeline
 
             return next(message, cancellationToken);
         }
+
+        public IAsyncEnumerable<TResponse> Handle<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken, StreamHandlerDelegate<TMessage, TResponse> next)
+            where TMessage : IStreamMessage
+        {
+            LastMsgTimestamp = Stopwatch.GetTimestamp();
+
+            Message = message;
+
+            return next(message, cancellationToken);
+        }
     }
 
     public sealed class GenericPipeline<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>, IPipelineTestData
@@ -34,6 +45,21 @@ namespace Mediator.Tests.Pipeline
         public long LastMsgTimestamp => _state.LastMsgTimestamp;
 
         public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next) =>
+            _state.Handle(message, cancellationToken, next);
+    }
+
+    public sealed class GenericStreamPipeline<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>, IPipelineTestData
+        where TMessage : IStreamMessage
+    {
+        private readonly GenericPipelineState _state;
+
+        public GenericStreamPipeline(GenericPipelineState state) => _state = state;
+
+        public Guid Id => _state.Id;
+
+        public long LastMsgTimestamp => _state.LastMsgTimestamp;
+
+        public IAsyncEnumerable<TResponse> Handle(TMessage message, CancellationToken cancellationToken, StreamHandlerDelegate<TMessage, TResponse> next) =>
             _state.Handle(message, cancellationToken, next);
     }
 }

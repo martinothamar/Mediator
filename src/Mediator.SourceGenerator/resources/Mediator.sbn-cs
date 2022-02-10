@@ -77,14 +77,14 @@ namespace {{ MediatorNamespace }}
     internal sealed class {{ wrapperType.ClassHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : class, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private readonly {{ wrapperType.MessageHandlerDelegateName }} _rootHandler;
 
         public {{ wrapperType.ClassHandlerWrapperTypeName }}(
             global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+            global::System.Collections.Generic.IEnumerable<{{ wrapperType.PipelineHandlerTypeName }}> pipelineBehaviours
         )
         {
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
+            var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
             foreach (var pipeline in pipelineBehaviours.Reverse())
             {
@@ -95,22 +95,22 @@ namespace {{ MediatorNamespace }}
 
             _rootHandler = handler;
         }
-
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
+        
+        public {{ wrapperType.ReturnTypeName }} Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
             _rootHandler(request, cancellationToken);
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     internal sealed class {{ wrapperType.StructHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : struct, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private readonly {{ wrapperType.MessageHandlerDelegateName }} _rootHandler;
 
         public {{ wrapperType.StructHandlerWrapperTypeName }}(
             global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+            global::System.Collections.Generic.IEnumerable<{{ wrapperType.PipelineHandlerTypeName }}> pipelineBehaviours
         )
         {
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
+            var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
             foreach (var pipeline in pipelineBehaviours.Reverse())
             {
@@ -122,7 +122,7 @@ namespace {{ MediatorNamespace }}
             _rootHandler = handler;
         }
 
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(in TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
+        public {{ wrapperType.ReturnTypeName }} Handle(in TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
             _rootHandler(request, cancellationToken);
     }
     {{~ end ~}}
@@ -203,7 +203,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private static void ThrowInvalidMessage<TMsg>(TMsg msg) where TMsg : global::Mediator.IMessage =>
+        private static void ThrowInvalidMessage(object msg) =>
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
         /// <summary>
@@ -213,7 +213,10 @@ namespace {{ MediatorNamespace }}
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IRequest<TResponse> request, global::System.Threading.CancellationToken cancellationToken = default)
+        public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(
+            global::Mediator.IRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
         {
             {{- if HasRequests }}
             switch (request)
@@ -236,6 +239,40 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
+        
+        /// <summary>
+        /// Create stream for request.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="request">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Async enumerable</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+            global::Mediator.IStreamRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasStreamRequests }}
+            switch (request)
+            {
+                {{~ for message in IStreamRequestMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {
+                    var task = CreateStream({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidMessage(request);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(request);
+            return default;
+            {{ end }}
+        }
 
         /// <summary>
         /// Send command.
@@ -244,7 +281,10 @@ namespace {{ MediatorNamespace }}
         /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.ICommand<TResponse> command, global::System.Threading.CancellationToken cancellationToken = default)
+        public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(
+            global::Mediator.ICommand<TResponse> command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
         {
             {{- if HasCommands }}
             switch (command)
@@ -267,6 +307,40 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
+        
+        /// <summary>
+        /// Create stream for command.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="command">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Async enumerable</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+            global::Mediator.IStreamCommand<TResponse> command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasStreamCommands }}
+            switch (command)
+            {
+                {{~ for message in IStreamCommandMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {
+                    var task = CreateStream({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidMessage(command);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(command);
+            return default;
+            {{ end }}
+        }
 
         /// <summary>
         /// Send query.
@@ -275,7 +349,10 @@ namespace {{ MediatorNamespace }}
         /// <param name="query">Incoming query</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(global::Mediator.IQuery<TResponse> query, global::System.Threading.CancellationToken cancellationToken = default)
+        public global::System.Threading.Tasks.ValueTask<TResponse> Send<TResponse>(
+            global::Mediator.IQuery<TResponse> query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
         {
             {{- if HasQueries }}
             switch (query)
@@ -300,12 +377,50 @@ namespace {{ MediatorNamespace }}
         }
 
         /// <summary>
+        /// Create stream for query.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="query">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Async enumerable</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+            global::Mediator.IStreamQuery<TResponse> query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasStreamQueries }}
+            switch (query)
+            {
+                {{~ for message in IStreamQueryMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {
+                    var task = CreateStream({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidMessage(query);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(query);
+            return default;
+            {{ end }}
+        }
+
+        /// <summary>
         /// Send message.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public{{ if HasAnyRequest; " async "; else; " "; end; }}global::System.Threading.Tasks.ValueTask<object> Send(object message, global::System.Threading.CancellationToken cancellationToken = default)
+        public{{ if HasAnyRequest; " async "; else; " "; end; }}global::System.Threading.Tasks.ValueTask<object> Send(
+            object message,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
         {
             {{- if HasAnyRequest }}
             switch (message)
@@ -326,12 +441,45 @@ namespace {{ MediatorNamespace }}
         }
 
         /// <summary>
+        /// Create stream.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="message">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Async enumerable</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<object> CreateStream(
+            object message,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasAnyStreamRequest }}
+            switch (message)
+            {
+                {{~ for message in IStreamMessages ~}}
+                case {{ message.RequestFullName }} m: return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+                {{~ end ~}}
+                default:
+                {
+                    ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
+            return default;
+            {{ end }}
+        }
+
+        /// <summary>
         /// Publish notification.
         /// </summary>
         /// <param name="notification">Incoming notification</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(object notification, global::System.Threading.CancellationToken cancellationToken = default)
+        public global::System.Threading.Tasks.ValueTask Publish(
+            object notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
         {
             {{- if HasNotifications }}
             switch (notification)
@@ -357,7 +505,10 @@ namespace {{ MediatorNamespace }}
         /// <param name="notification">Incoming notification</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish<TNotification>(TNotification notification, global::System.Threading.CancellationToken cancellationToken = default)
+        public global::System.Threading.Tasks.ValueTask Publish<TNotification>(
+            TNotification notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
             where TNotification : global::Mediator.INotification
         {
             var sp = _sp;

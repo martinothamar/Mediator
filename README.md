@@ -46,6 +46,7 @@ In particular, source generators in this library is used to
     - [4.6. Use notifications](#46-use-notifications)
     - [4.7. Polymorphic dispatch with notification handlers](#47-polymorphic-dispatch-with-notification-handlers)
     - [4.8. Notification handlers also support open generics](#48-notification-handlers-also-support-open-generics)
+    - [4.9. Use streaming messages](#49-use-streaming-messages)
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
   - [7. TODO](#7-todo)
@@ -85,14 +86,18 @@ See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real worl
 ### 3.1. Message types
 
 * `IMessage` - marker interface
+* `IStreamMessage` - marker interface
 * `IBaseRequest` - market interface for requests
 * `IRequest` - a request message, no return value (`ValueTask<Unit>`)
 * `IRequest<out TResponse>` - a request message with a response (`ValueTask<TResponse>`)
+* `IStreamRequest<out TResponse>` - a request message with a streaming response (`IAsyncEnumerable<TResponse>`)
 * `IBaseCommand` - marker interface for commands
 * `ICommand` - a command message, no return value (`ValueTask<Unit>`)
 * `ICommand<out TResponse>` - a command message with a response (`ValueTask<TResponse>`)
+* `IStreamCommand<out TResponse>` - a command message with a streaming response (`IAsyncEnumerable<TResponse>`)
 * `IBaseQuery` - marker interface for queries
 * `IQuery<out TResponse>` - a query message with a response (`ValueTask<TResponse>`)
+* `IStreamQuery<out TResponse>` - a query message with a streaming response (`IAsyncEnumerable<TResponse>`)
 * `INotification` - a notification message, no return value (`ValueTask`)
 
 As you can see, you can achieve the exact same thing with requests, commands and queries. But I find the distinction in naming useful if you for example use the CQRS pattern or for some reason have a preference on naming in your application.
@@ -101,9 +106,12 @@ As you can see, you can achieve the exact same thing with requests, commands and
 
 * `IRequestHandler<in TRequest>`
 * `IRequestHandler<in TRequest, TResponse>`
+* `IStreamRequestHandler<in TRequest, out TResponse>`
 * `ICommandHandler<in TCommand>`
 * `ICommandHandler<in TCommand, TResponse>`
+* `IStreamCommandHandler<in TCommand, out TResponse>`
 * `IQueryHandler<in TQuery, TResponse>`
+* `IStreamQueryHandler<in TQuery, out TResponse>`
 * `INotificationHandler<in TNotification>`
 
 These types are used in correlation with the message types above.
@@ -111,12 +119,23 @@ These types are used in correlation with the message types above.
 ### 3.3. Pipeline types
 
 * `IPipelineBehavior<TMessage, TResponse>`
+* `IStreamPipelineBehavior<TMessage, TResponse>`
 
 ```csharp
 public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
     where TMessage : IMessage
 {
     public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    {
+        // ...
+        return next(message, cancellationToken);
+    }
+}
+
+public sealed class GenericStreamHandler<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
+    where TMessage : IStreamMessage
+{
+    public IAsyncEnumerable<TResponse> Handle(TMessage message, CancellationToken cancellationToken, StreamHandlerDelegate<TMessage, TResponse> next)
     {
         // ...
         return next(message, cancellationToken);
@@ -165,15 +184,24 @@ This registers your handler below.
 ```csharp
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 var services = new ServiceCollection(); // Most likely IServiceCollection comes from IHostBuilder/Generic host abstraction in Microsoft.Extensions.Hosting
 
 services.AddMediator();
+var serviceProvider = services.BuildServiceProvider();
 ```
 
 ### 4.3. Create `IRequest<>` type
 
 ```csharp
+var mediator = serviceProvider.GetRequiredService<IMediator>();
+var ping = new Ping(Guid.NewGuid());
+var pong = await mediator.Send(ping);
+Debug.Assert(ping.Id == pong.Id);
+
+// ...
+
 public sealed record Ping(Guid Id) : IRequest<Pong>;
 
 public sealed record Pong(Guid Id);
@@ -303,6 +331,41 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
     public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
     {
         return default;
+    }
+}
+```
+
+
+### 4.9. Use streaming messages
+
+Since version 1.* of this library there is support for streaming using `IAsyncEnumerable`.
+
+```csharp
+var mediator = serviceProvider.GetRequiredService<IMediator>();
+
+var ping = new StreamPing(Guid.NewGuid());
+
+await foreach (var pong in mediator.CreateStream(ping))
+{
+    Debug.Assert(ping.Id == pong.Id);
+    Console.WriteLine("Received pong!"); // Should log 5 times
+}
+
+// ...
+
+public sealed record StreamPing(Guid Id) : IStreamRequest<Pong>;
+
+public sealed record Pong(Guid Id);
+
+public sealed class PingHandler : IStreamRequestHandler<StreamPing, Pong>
+{
+    public async IAsyncEnumerable<Pong> Handle(StreamPing request, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            await Task.Delay(1000, cancellationToken);
+            yield return new Pong(request.Id);
+        }
     }
 }
 ```
