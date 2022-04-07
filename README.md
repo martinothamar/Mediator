@@ -76,7 +76,7 @@ There are two NuGet packages needed to use this library
 You install the source generator package into your edge/outermost project (i.e. ASP.NET Core application, Background worker project),
 and then use the `Mediator` package wherever you define message types and handlers.
 Standard message handlers are automatically picked up and added to the DI container in the generated `AddMediator` method.
-Pipeline behaviors need to be added manually.
+*Pipeline behaviors need to be added manually.*
 
 For example implementations, see the [/samples](/samples) folder.
 See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real world setup.

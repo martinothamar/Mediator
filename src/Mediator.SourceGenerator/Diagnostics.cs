@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 #pragma warning disable RS2008 // Enable analyzer release tracking
 
 namespace Mediator.SourceGenerator;
@@ -63,6 +61,14 @@ public static class Diagnostics
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
+        ConflictingServiceLifetimeConfiguration = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} configuration warning",
+            $"{nameof(MediatorGenerator)} found conflicting configuration of service lifetimes: " + "{0} vs {1}",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
         static string GetNextId()
         {
             var count = _counter++;
@@ -80,9 +86,8 @@ public static class Diagnostics
     )
     {
         Diagnostic diagnostic;
-        if (typeof(T) == typeof(INamedTypeSymbol))
+        if (arg is ISymbol symbolArg)
         {
-            ref var symbolArg = ref Unsafe.As<T, INamedTypeSymbol>(ref arg);
             var location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
             var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
             diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, symbolName);
@@ -118,6 +123,17 @@ public static class Diagnostics
     public static readonly DiagnosticDescriptor MessageWithoutHandler;
     internal static Diagnostic ReportMessageWithoutHandler(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
         context.Report(MessageWithoutHandler, messageType);
+
+    public static readonly DiagnosticDescriptor ConflictingServiceLifetimeConfiguration;
+    internal static Diagnostic ReportConflictingServiceLifetimeConfiguration(this GeneratorExecutionContext context, Location? location, IFieldSymbol addMediatorCallLifetime, IFieldSymbol attributeLifetime)
+    {
+        var symbolName1 = addMediatorCallLifetime.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+        var symbolName2 = attributeLifetime.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+        var diagnostic = Diagnostic.Create(ConflictingServiceLifetimeConfiguration, location ?? Location.None, symbolName1, symbolName2);
+
+        context.ReportDiagnostic(diagnostic);
+        return diagnostic;
+    }
 }
 
 #pragma warning restore RS2008 // Enable analyzer release tracking

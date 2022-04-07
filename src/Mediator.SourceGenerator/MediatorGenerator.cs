@@ -57,5 +57,7 @@ public sealed partial class MediatorGenerator : ISourceGenerator
 
     public void Initialize(GeneratorInitializationContext context)
     {
+        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
+
 }
