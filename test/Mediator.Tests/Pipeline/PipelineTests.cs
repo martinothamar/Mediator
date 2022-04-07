@@ -64,6 +64,25 @@ public sealed class PipelineTests
     }
 
     [Fact]
+    public async Task Test_Command_Specific_Pipeline()
+    {
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CommandSpecificPipeline<,>));
+        });
+
+        var id = Guid.NewGuid();
+
+        var response = await mediator.Send(new SomeCommand(id));
+        Assert.NotNull(response);
+        Assert.Equal(id, response.Id);
+        Assert.Equal(1, CommandSpecificPipeline<SomeCommand, SomeResponse>.CallCount);
+
+        await mediator.Send(new SomeCommandWithoutResponse(id));
+        Assert.Equal(1, CommandSpecificPipeline<SomeCommandWithoutResponse, Unit>.CallCount);
+    }
+
+    [Fact]
     public async Task Test_Pipeline_Ordering()
     {
         var (sp, mediator) = Fixture.GetMediator(services =>
