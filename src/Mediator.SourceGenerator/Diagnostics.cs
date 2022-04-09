@@ -61,12 +61,20 @@ public static class Diagnostics
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
-        ConflictingServiceLifetimeConfiguration = new DiagnosticDescriptor(
+        ConflictingConfiguration = new DiagnosticDescriptor(
             GetNextId(),
-            $"{nameof(MediatorGenerator)} configuration warning",
-            $"{nameof(MediatorGenerator)} found conflicting configuration of service lifetimes: " + "{0} vs {1}",
+            $"{nameof(MediatorGenerator)} configuration error",
+            $"{nameof(MediatorGenerator)} found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.",
             nameof(MediatorGenerator),
-            DiagnosticSeverity.Warning,
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        InvalidCodeBasedConfiguration = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} configuration error",
+            $"{nameof(MediatorGenerator)} cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
         static string GetNextId()
@@ -100,6 +108,16 @@ public static class Diagnostics
         return diagnostic;
     }
 
+    private static Diagnostic Report(
+        this GeneratorExecutionContext context,
+        DiagnosticDescriptor diagnosticDescriptor
+    )
+    {
+        var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
+        context.ReportDiagnostic(diagnostic);
+        return diagnostic;
+    }
+
     public static readonly DiagnosticDescriptor GenericError;
     internal static Diagnostic ReportGenericError(this GeneratorExecutionContext context, Exception exception) =>
         context.Report(GenericError, exception);
@@ -124,16 +142,13 @@ public static class Diagnostics
     internal static Diagnostic ReportMessageWithoutHandler(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
         context.Report(MessageWithoutHandler, messageType);
 
-    public static readonly DiagnosticDescriptor ConflictingServiceLifetimeConfiguration;
-    internal static Diagnostic ReportConflictingServiceLifetimeConfiguration(this GeneratorExecutionContext context, Location? location, IFieldSymbol addMediatorCallLifetime, IFieldSymbol attributeLifetime)
-    {
-        var symbolName1 = addMediatorCallLifetime.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-        var symbolName2 = attributeLifetime.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-        var diagnostic = Diagnostic.Create(ConflictingServiceLifetimeConfiguration, location ?? Location.None, symbolName1, symbolName2);
+    public static readonly DiagnosticDescriptor ConflictingConfiguration;
+    internal static Diagnostic ReportConflictingConfiguration(this GeneratorExecutionContext context) =>
+        context.Report(ConflictingConfiguration);
 
-        context.ReportDiagnostic(diagnostic);
-        return diagnostic;
-    }
+    public static readonly DiagnosticDescriptor InvalidCodeBasedConfiguration;
+    internal static Diagnostic ReportInvalidCodeBasedConfiguration(this GeneratorExecutionContext context) =>
+        context.Report(InvalidCodeBasedConfiguration);
 }
 
 #pragma warning restore RS2008 // Enable analyzer release tracking

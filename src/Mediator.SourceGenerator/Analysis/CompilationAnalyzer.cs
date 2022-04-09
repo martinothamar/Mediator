@@ -446,7 +446,7 @@ internal sealed class CompilationAnalyzer
         var compilation = _compilation;
         var syntaxReceiver = _syntaxReceiver;
 
-
+        var configuredByAddMediator = false;
         if (syntaxReceiver is not null)
         {
             foreach (var addMediatorCall in syntaxReceiver.AddMediatorCalls)
@@ -455,10 +455,71 @@ internal sealed class CompilationAnalyzer
                 if (addMediatorCall.ArgumentList.Arguments.Count == 0)
                     continue;
 
+                configuredByAddMediator = true;
                 var lifetimeArgument = addMediatorCall.ArgumentList.Arguments.Last();
-                //System.Diagnostics.Debugger.Launch();
-                var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)lifetimeArgument.Expression).Name;
-                _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                if (lifetimeArgument.Expression is not SimpleLambdaExpressionSyntax lambda)
+                {
+                    ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    continue;
+                }
+                var body = lambda.Body;
+
+                if (body is AssignmentExpressionSyntax simpleAssignment)
+                {
+                    if (!ProcessAssignment(simpleAssignment))
+                        continue;  
+                }
+                else if (body is BlockSyntax block)
+                {
+                    foreach (var statement in block.Statements)
+                    {
+                        if (statement is not ExpressionStatementSyntax statementExpression)
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            break;
+                        }
+                        if (statementExpression.Expression is not AssignmentExpressionSyntax assignment)
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            break;
+                        }
+                        if (!ProcessAssignment(assignment))
+                            break;
+                    }
+                }
+                else
+                {
+                    ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                }
+
+                bool ProcessAssignment(AssignmentExpressionSyntax assignment)
+                {
+                    var opt = ((MemberAccessExpressionSyntax)assignment.Left).Name.Identifier.Text;
+                    if (opt == "Namespace")
+                    {
+                        if (assignment.Right is LiteralExpressionSyntax literal)
+                        {
+                            MediatorNamespace = literal.Token.ValueText;
+                        }
+                        else
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            return false;
+                        }
+                    }
+                    else if (opt == "DefaultServiceLifetime")
+                    {
+                        var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)assignment.Right).Name;
+                        _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                    }
+                    else
+                    {
+                        ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                        return false;
+                    }
+
+                    return true;
+                }
             }
         }
 
@@ -467,6 +528,11 @@ internal sealed class CompilationAnalyzer
             var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptions");
             if (optionsAttr is null)
                 return;
+
+            if (configuredByAddMediator)
+            {
+                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportConflictingConfiguration());
+            }
 
             var syntaxReference = optionsAttr.ApplicationSyntaxReference;
             if (syntaxReference is null)
@@ -488,14 +554,6 @@ internal sealed class CompilationAnalyzer
                 {
                     var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
                     var lifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
-                    if (_configuredLifetimeSymbol is not null && !SymbolEqualityComparer.Default.Equals(_configuredLifetimeSymbol, lifetimeSymbol))
-                    {
-                        ReportDiagnostic(
-                            (_configuredLifetimeSymbol, lifetimeSymbol),
-                            (in GeneratorExecutionContext c, (IFieldSymbol add, IFieldSymbol attr) t) =>
-                                c.ReportConflictingServiceLifetimeConfiguration(optionsAttrSyntax.GetLocation(), t.add, t.attr)
-                        );
-                    }
                     _configuredLifetimeSymbol = lifetimeSymbol;
                 }
                 else if (attrFieldName == "Namespace")
@@ -512,6 +570,13 @@ internal sealed class CompilationAnalyzer
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
     {
         var diagnostic = del(in _context, state);
+        _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
+    }
+
+    private delegate Diagnostic ReportDiagnosticDelegate(in GeneratorExecutionContext context);
+    private void ReportDiagnostic(ReportDiagnosticDelegate del)
+    {
+        var diagnostic = del(in _context);
         _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
     }
 }

@@ -143,8 +143,21 @@ public sealed class GenericStreamHandler<TMessage, TResponse> : IStreamPipelineB
 
 ### 3.4. Configuration
 
-There is an assembly level attribute for configuration: `MediatorOptionsAttribute`.
-Declare the attribute in the project where the source generator is installed.
+There are two ways to configure Mediator. Configuration values are needed during compile-time since this is a source generator:
+* Assembly level attribute for configuration: `MediatorOptionsAttribute`
+* Options configuration delegate in `AddMediator` function.
+
+```csharp
+services.AddMediator(options =>
+{
+    options.Namespace = "SimpleConsole.Mediator";
+    options.DefaultServiceLifetime = ServiceLifetime.Transient;
+});
+
+// or
+
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", DefaultServiceLifetime = ServiceLifetime.Transient)]
+```
 
 * `Namespace` - where the `IMediator` implementation is generated
 * `DefaultServiceLifetime` - the DI service lifetime
