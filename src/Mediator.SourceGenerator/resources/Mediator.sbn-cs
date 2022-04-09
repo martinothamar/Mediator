@@ -189,6 +189,9 @@ namespace {{ MediatorNamespace }}
         {{~ for message in RequestMessages ~}}
         /// <summary>
         /// Send a message of type {{ message.RequestFullName }}.
+        {{- if message.IsClass }}
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        {{- end }}
         /// </summary>
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -198,16 +201,16 @@ namespace {{ MediatorNamespace }}
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
+            {{- if message.IsClass }}
+            ThrowIfNull(message, nameof(message));
+            {{ end }}
             return _diCache.{{ message.HandlerWrapperPropertyName }}.Handle({{- message.ParameterModifier -}}message, cancellationToken);
         }
         {{~ end ~}}
 
-        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        private static void ThrowInvalidMessage(object msg) =>
-            throw new global::Mediator.MissingMessageHandlerException(msg);
-
         /// <summary>
         /// Send request.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="request">Incoming request</param>
@@ -230,7 +233,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(request);
+                    ThrowArgumentNullOrInvalidMessage(request, nameof(request));
                     return default;
                 }
             }
@@ -242,6 +245,7 @@ namespace {{ MediatorNamespace }}
         
         /// <summary>
         /// Create stream for request.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="request">Incoming message</param>
@@ -264,7 +268,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(request);
+                    ThrowArgumentNullOrInvalidMessage(request, nameof(request));
                     return default;
                 }
             }
@@ -276,6 +280,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Send command.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="command">Incoming command</param>
@@ -298,7 +303,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(command);
+                    ThrowArgumentNullOrInvalidMessage(command, nameof(command));
                     return default;
                 }
             }
@@ -310,6 +315,7 @@ namespace {{ MediatorNamespace }}
         
         /// <summary>
         /// Create stream for command.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="command">Incoming message</param>
@@ -332,7 +338,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(command);
+                    ThrowArgumentNullOrInvalidMessage(command, nameof(command));
                     return default;
                 }
             }
@@ -344,6 +350,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Send query.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="query">Incoming query</param>
@@ -366,7 +373,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(query);
+                    ThrowArgumentNullOrInvalidMessage(query, nameof(query));
                     return default;
                 }
             }
@@ -378,6 +385,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Create stream for query.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="query">Incoming message</param>
@@ -400,7 +408,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(query);
+                    ThrowArgumentNullOrInvalidMessage(query, nameof(query));
                     return default;
                 }
             }
@@ -412,6 +420,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Send message.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="message">Incoming message</param>
@@ -430,7 +439,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(message as global::Mediator.IMessage);
+                    ThrowArgumentNullOrInvalidMessage(message as global::Mediator.IMessage, nameof(message));
                     return default;
                 }
             }
@@ -442,6 +451,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Create stream.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
         /// </summary>
         /// <param name="message">Incoming message</param>
@@ -460,7 +470,7 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
+                    ThrowArgumentNullOrInvalidMessage(message as global::Mediator.IStreamMessage, nameof(message));
                     return default;
                 }
             }
@@ -472,6 +482,7 @@ namespace {{ MediatorNamespace }}
 
         /// <summary>
         /// Publish notification.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// </summary>
         /// <param name="notification">Incoming notification</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -489,18 +500,18 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowInvalidMessage(notification as global::Mediator.IMessage);
+                    ThrowIfNull(notification, nameof(notification));
                     return default;
                 }
             }
             {{ else }}
-            ThrowInvalidMessage(notification as global::Mediator.IMessage);
             return default;
             {{ end }}
         }
 
         /// <summary>
         /// Publish notification.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// </summary>
         /// <param name="notification">Incoming notification</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -511,12 +522,17 @@ namespace {{ MediatorNamespace }}
         )
             where TNotification : global::Mediator.INotification
         {
+            ThrowIfNull(notification, nameof(notification));
+
+            if (typeof(TNotification) == typeof(global::Mediator.INotification))
+                return this.Publish((object)notification, cancellationToken);
+
             var sp = _sp;
 
             var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
 
-            var count = handlers.Count();
-            if (handlers == null || count == 0)
+            int count = 0;
+            if (handlers == null || (count = handlers.Count()) == 0)
                 return default;
             else if (count == 1)
                 return handlers.First().Handle(notification, cancellationToken);
@@ -541,8 +557,48 @@ namespace {{ MediatorNamespace }}
                     }
                 }
 
-                if (exceptions != null)
-                    throw new global::System.AggregateException(exceptions);
+                MaybeThrowAggregateException(exceptions);
+            }
+        }
+
+        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        private static void ThrowInvalidMessage(object msg) =>
+            throw new global::Mediator.MissingMessageHandlerException(msg);
+            
+        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        private static void ThrowArgumentNull(string paramName) =>
+            throw new global::System.ArgumentNullException(paramName);
+
+        private static void ThrowIfNull<T>(T argument, string paramName)
+        {
+            if (argument is null)
+            {
+                ThrowArgumentNull(paramName);
+            }
+        }
+        
+        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        private static void ThrowArgumentNullOrInvalidMessage(object msg, string paramName)
+        {
+            if (msg is null)
+            {
+                ThrowArgumentNull(paramName);
+            }
+            else
+            {
+                ThrowInvalidMessage(msg);
+            }
+        }
+        
+        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        private static void ThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions) =>
+            throw new global::System.AggregateException(exceptions);
+
+        private static void MaybeThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions)
+        {
+            if (exceptions is not null)
+            {
+                ThrowAggregateException(exceptions);
             }
         }
     }

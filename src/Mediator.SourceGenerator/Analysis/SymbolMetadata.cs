@@ -22,6 +22,7 @@ internal abstract class SymbolMetadata<T> : IEquatable<T?>
     public override string ToString() => Symbol.Name;
 
     public bool IsStruct => Symbol.TypeKind == TypeKind.Struct;
+    public bool IsClass => !IsStruct;
     public bool IsReadOnly => Symbol.IsReadOnly;
     public string ParameterModifier => IsStruct && IsReadOnly ? "in " : string.Empty;
 }
