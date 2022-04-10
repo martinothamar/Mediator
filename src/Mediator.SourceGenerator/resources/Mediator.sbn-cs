@@ -27,6 +27,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddMediator(services, null);
         }
 
+        internal sealed class Dummy { }
+
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
@@ -73,6 +75,8 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ for handler in OpenGenericNotificationMessageHandlers ~}}
             {{ handler.OpenGenericServiceRegistrationBlock }}
             {{~ end ~}}
+
+            services.AddSingleton<Dummy>();
 
             return services;
         }
@@ -152,6 +156,8 @@ namespace {{ MediatorNamespace }}
         private readonly DICache _diCache;
         {{~ end ~}}
 
+        private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
+
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
@@ -163,6 +169,9 @@ namespace {{ MediatorNamespace }}
             {{~ else ~}}
             _diCache = new DICache(_sp);
             {{~ end ~}}
+
+            _getServicesLength = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>() is global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[]
+                 ? (s => ((object[])s).Length) : (s => s.Count());
         }
 
         private {{ if ServiceLifetimeIsSingleton; "sealed class"; else; "readonly struct"; end; }} DICache
@@ -173,12 +182,22 @@ namespace {{ MediatorNamespace }}
             {{~ for message in RequestMessages ~}}
             public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
             {{~ end ~}}
+            {{~ for message in NotificationMessages ~}}
+            public readonly global::Mediator.INotificationHandler<{{ message.FullName }}>[] Handlers_For_{{ message.IdentifierFullName }};
+            {{~ end ~}}
             {{~ else ~}}
             {{~ for message in RequestMessages ~}}
             public {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }}
             {
                 [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
                 get => _sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
+            }
+            {{~ end ~}}
+            {{~ for message in NotificationMessages ~}}
+            public global::System.Collections.Generic.IEnumerable<global::Mediator.INotificationHandler<{{ message.FullName }}>> Handlers_For_{{ message.IdentifierFullName }}
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                get => _sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>();
             }
             {{~ end ~}}
             {{~ end ~}}
@@ -190,6 +209,9 @@ namespace {{ MediatorNamespace }}
                 {{~ if ServiceLifetimeIsSingleton ~}}
                 {{~ for message in RequestMessages ~}}
                 {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
+                {{~ end ~}}
+                {{~ for message in NotificationMessages ~}}
+                Handlers_For_{{ message.IdentifierFullName }} = sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>().ToArray();
                 {{~ end ~}}
                 {{~ end ~}}
             }
@@ -505,7 +527,7 @@ namespace {{ MediatorNamespace }}
             switch (notification)
             {
                 {{~ for message in NotificationMessages ~}}
-                case {{ message.FullName }} n: return Publish<{{ message.FullName }}>(n, cancellationToken);
+                case {{ message.FullName }} n: return Publish(n, cancellationToken);
                 {{~ end ~}}
                 default:
                 {
@@ -541,10 +563,16 @@ namespace {{ MediatorNamespace }}
             var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
 
             int count = 0;
-            if (handlers == null || (count = handlers.Count()) == 0)
+            if (handlers == null || (count = _getServicesLength(handlers)) == 0)
+            {
                 return default;
+            }
             else if (count == 1)
-                return handlers.First().Handle(notification, cancellationToken);
+            {
+                return handlers is global::Mediator.INotificationHandler<TNotification>[] array ?
+                    array[0].Handle(notification, cancellationToken) :
+                    handlers.First().Handle(notification, cancellationToken);
+            }
 
             return Publish(notification, handlers, cancellationToken);
 

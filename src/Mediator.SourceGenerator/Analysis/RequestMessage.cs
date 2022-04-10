@@ -34,9 +34,10 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
         $"global::Mediator.IStreamPipelineBehavior<{RequestFullName}, {ResponseFullName}>" :
         $"global::Mediator.IPipelineBehavior<{RequestFullName}, {ResponseFullName}>";
 
+    public string IdentifierFullName => Symbol.GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false).Replace("global::", "").Replace('.', '_');
 
     public string HandlerWrapperPropertyName =>
-       $"Wrapper_For_{Symbol.GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false).Replace("global::", "").Replace('.', '_')}";
+       $"Wrapper_For_{IdentifierFullName}";
 
     public string SyncMethodName => IsStreaming ? "CreateStream" : "Send";
     public string AsyncMethodName => IsStreaming ? "CreateStream" : "Send";
