@@ -1,12 +1,14 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.DependencyModel;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Mediator.SourceGenerator.Tests;
 
 public static class Fixture
 {
-    public static Compilation CreateCompilation(params string[] source)
+    public static Compilation CreateLibrary(params string[] source)
     {
         var references = new List<MetadataReference>();
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
