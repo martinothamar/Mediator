@@ -1,4 +1,5 @@
 using Mediator.SourceGenerator.Extensions;
+using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 
 namespace Mediator.SourceGenerator;
@@ -8,6 +9,7 @@ internal sealed class CompilationAnalyzer
     private static readonly SymbolEqualityComparer _symbolComparer = SymbolEqualityComparer.Default;
     private readonly GeneratorExecutionContext _context;
     private readonly Compilation _compilation;
+    private readonly SyntaxReceiver? _syntaxReceiver;
     private readonly HashSet<RequestMessage> _requestMessages;
     private readonly HashSet<NotificationMessage> _notificationMessages;
     private readonly HashSet<RequestMessageHandler> _requestMessageHandlers;
@@ -73,7 +75,8 @@ internal sealed class CompilationAnalyzer
 
     public string GeneratorVersion { get; }
 
-    public IFieldSymbol ServiceLifetimeSymbol { get; private set; }
+    private IFieldSymbol? _configuredLifetimeSymbol;
+    public IFieldSymbol ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
     public IFieldSymbol SingletonServiceLifetimeSymbol { get; }
 
     public string ServiceLifetime => ServiceLifetimeSymbol.GetFieldSymbolFullName();
@@ -88,6 +91,7 @@ internal sealed class CompilationAnalyzer
     {
         _context = context;
         _compilation = context.Compilation;
+        _syntaxReceiver = context.SyntaxReceiver as SyntaxReceiver;
 
         _requestMessages = new();
         _notificationMessages = new();
@@ -112,7 +116,6 @@ internal sealed class CompilationAnalyzer
 
         var serviceLifetimeSymbol = _compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
         SingletonServiceLifetimeSymbol = (IFieldSymbol)serviceLifetimeSymbol.GetMembers().Single(m => m.Name == "Singleton");
-        ServiceLifetimeSymbol = SingletonServiceLifetimeSymbol;
 
         RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
         {
@@ -442,38 +445,150 @@ internal sealed class CompilationAnalyzer
     private void TryParseOptions(CancellationToken cancellationToken)
     {
         var compilation = _compilation;
+        var syntaxReceiver = _syntaxReceiver;
 
-        var attrs = compilation.Assembly.GetAttributes();
-        var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptions");
-        if (optionsAttr is null)
-            return;
-
-        var syntaxReference = optionsAttr.ApplicationSyntaxReference;
-        if (syntaxReference is null)
-            return;
-
-        var semanticModel = compilation.GetSemanticModel(syntaxReference.SyntaxTree);
-
-        var optionsAttrSyntax = optionsAttr.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
-        if (optionsAttrSyntax is null || optionsAttrSyntax.ArgumentList is null)
-            return;
-
-        foreach (var attrArg in optionsAttrSyntax.ArgumentList.Arguments)
+        var configuredByAddMediator = false;
+        if (syntaxReceiver is not null)
         {
-            if (attrArg.NameEquals is null)
-                throw new Exception("Error parsing MediatorOptions");
+            foreach (var addMediatorCall in syntaxReceiver.AddMediatorCalls)
+            {
+                var semanticModel = compilation.GetSemanticModel(addMediatorCall.SyntaxTree);
+                if (addMediatorCall.ArgumentList.Arguments.Count == 0)
+                    continue;
 
-            var attrFieldName = attrArg.NameEquals.Name.ToString();
-            if (attrFieldName == "DefaultServiceLifetime")
-            {
-                var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
-                ServiceLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                configuredByAddMediator = true;
+                var lifetimeArgument = addMediatorCall.ArgumentList.Arguments.Last();
+                if (lifetimeArgument.Expression is not SimpleLambdaExpressionSyntax lambda)
+                {
+                    ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    continue;
+                }
+                var body = lambda.Body;
+
+                if (body is AssignmentExpressionSyntax simpleAssignment)
+                {
+                    if (!ProcessAssignment(simpleAssignment))
+                        continue;  
+                }
+                else if (body is BlockSyntax block)
+                {
+                    foreach (var statement in block.Statements)
+                    {
+                        if (statement is not ExpressionStatementSyntax statementExpression)
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            break;
+                        }
+                        if (statementExpression.Expression is not AssignmentExpressionSyntax assignment)
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            break;
+                        }
+                        if (!ProcessAssignment(assignment))
+                            break;
+                    }
+                }
+                else
+                {
+                    ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                }
+
+                bool ProcessAssignment(AssignmentExpressionSyntax assignment)
+                {
+                    var opt = ((MemberAccessExpressionSyntax)assignment.Left).Name.Identifier.Text;
+                    if (opt == "Namespace")
+                    {
+                        if (assignment.Right is LiteralExpressionSyntax literal)
+                        {
+                            if (!literal.IsKind(SyntaxKind.NullLiteralExpression))
+                                MediatorNamespace = literal.Token.ValueText;
+                        }
+                        else if (assignment.Right is IdentifierNameSyntax identifier)
+                        {
+                            var variableSymbolValue = semanticModel.GetConstantValue(identifier, cancellationToken);
+                            if (variableSymbolValue.HasValue && variableSymbolValue.Value is string ns)
+                            {
+                                MediatorNamespace = ns;
+                            }
+                            else
+                            {
+                                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            return false;
+                        }
+                    }
+                    else if (opt == "DefaultServiceLifetime")
+                    {
+                        if (assignment.Right is MemberAccessExpressionSyntax enumAccess)
+                        {
+                            var identifierNameSyntax = (IdentifierNameSyntax)enumAccess.Name;
+                            _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                        }
+                        else if (assignment.Right is IdentifierNameSyntax identifier)
+                        {
+                            _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol!;
+                        }
+                        else
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                        return false;
+                    }
+
+                    return true;
+                }
             }
-            else if (attrFieldName == "Namespace")
+        }
+
+        {
+            var attrs = compilation.Assembly.GetAttributes();
+            var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptions");
+            if (optionsAttr is null)
+                return;
+
+            if (configuredByAddMediator)
             {
-                var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
-                if (!string.IsNullOrWhiteSpace(namespaceArg))
-                    MediatorNamespace = namespaceArg!;
+                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportConflictingConfiguration());
+            }
+
+            var syntaxReference = optionsAttr.ApplicationSyntaxReference;
+            if (syntaxReference is null)
+                return;
+
+            var semanticModel = compilation.GetSemanticModel(syntaxReference.SyntaxTree);
+
+            var optionsAttrSyntax = optionsAttr.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
+            if (optionsAttrSyntax is null || optionsAttrSyntax.ArgumentList is null)
+                return;
+
+            foreach (var attrArg in optionsAttrSyntax.ArgumentList.Arguments)
+            {
+                if (attrArg.NameEquals is null)
+                    throw new Exception("Error parsing MediatorOptions");
+
+                var attrFieldName = attrArg.NameEquals.Name.ToString();
+                if (attrFieldName == "DefaultServiceLifetime")
+                {
+                    var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
+                    var lifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                    _configuredLifetimeSymbol = lifetimeSymbol;
+                }
+                else if (attrFieldName == "Namespace")
+                {
+                    var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
+                    if (!string.IsNullOrWhiteSpace(namespaceArg))
+                        MediatorNamespace = namespaceArg!;
+                }
             }
         }
     }
@@ -482,6 +597,13 @@ internal sealed class CompilationAnalyzer
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
     {
         var diagnostic = del(in _context, state);
+        _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
+    }
+
+    private delegate Diagnostic ReportDiagnosticDelegate(in GeneratorExecutionContext context);
+    private void ReportDiagnostic(ReportDiagnosticDelegate del)
+    {
+        var diagnostic = del(in _context);
         _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
     }
 }

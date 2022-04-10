@@ -33,6 +33,7 @@ public sealed partial class MediatorGenerator : ISourceGenerator
         var generatorAssembly = GetType().Assembly;
         var generatorVersion = generatorAssembly.GetName().Version.ToString();
 
+        GenerateOptions(in context, generatorVersion);
         GenerateOptionsAttribute(in context, generatorVersion);
 
         var compilationAnalyzer = new CompilationAnalyzer(in context, generatorVersion);
@@ -43,6 +44,16 @@ public sealed partial class MediatorGenerator : ISourceGenerator
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
         mediatorImplementationGenerator.Generate(in context, compilationAnalyzer);
+    }
+
+    private void GenerateOptions(in GeneratorExecutionContext context, string generatorVersion)
+    {
+        var model = new { GeneratorVersion = generatorVersion };
+
+        var file = @"resources/MediatorOptions.sbn-cs";
+        var template = Template.Parse(EmbeddedResource.GetContent(file), file);
+        var output = template.Render(model, member => member.Name);
+        context.AddSource("MediatorOptions.g.cs", SourceText.From(output, Encoding.UTF8));
     }
 
     private void GenerateOptionsAttribute(in GeneratorExecutionContext context, string generatorVersion)
@@ -57,5 +68,7 @@ public sealed partial class MediatorGenerator : ISourceGenerator
 
     public void Initialize(GeneratorInitializationContext context)
     {
+        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
+
 }

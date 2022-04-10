@@ -1,7 +1,7 @@
 <Project>
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.194" PrivateAssets="all" />
-    <PackageReference Include="DotNet.ReproducibleBuilds" Version="0.1.34" PrivateAssets="All"/>
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.255" PrivateAssets="all" />
+    <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="All"/>
   </ItemGroup>
   <Import Project="..\Directory.Build.props" />
 </Project>

@@ -21,5 +21,6 @@
 
   <PropertyGroup>
     <DotNetVersion>6.0.*</DotNetVersion>
+    <CodeAnalysisVersion>4.1.0</CodeAnalysisVersion>
   </PropertyGroup>
 </Project>

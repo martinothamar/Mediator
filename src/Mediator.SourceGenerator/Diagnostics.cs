@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 #pragma warning disable RS2008 // Enable analyzer release tracking
 
 namespace Mediator.SourceGenerator;
@@ -63,6 +61,22 @@ public static class Diagnostics
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
+        ConflictingConfiguration = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} configuration error",
+            $"{nameof(MediatorGenerator)} found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        InvalidCodeBasedConfiguration = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} configuration error",
+            $"{nameof(MediatorGenerator)} cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
         static string GetNextId()
         {
             var count = _counter++;
@@ -80,9 +94,8 @@ public static class Diagnostics
     )
     {
         Diagnostic diagnostic;
-        if (typeof(T) == typeof(INamedTypeSymbol))
+        if (arg is ISymbol symbolArg)
         {
-            ref var symbolArg = ref Unsafe.As<T, INamedTypeSymbol>(ref arg);
             var location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
             var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
             diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, symbolName);
@@ -91,6 +104,16 @@ public static class Diagnostics
         {
             diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, arg);
         }
+        context.ReportDiagnostic(diagnostic);
+        return diagnostic;
+    }
+
+    private static Diagnostic Report(
+        this GeneratorExecutionContext context,
+        DiagnosticDescriptor diagnosticDescriptor
+    )
+    {
+        var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
         context.ReportDiagnostic(diagnostic);
         return diagnostic;
     }
@@ -118,6 +141,14 @@ public static class Diagnostics
     public static readonly DiagnosticDescriptor MessageWithoutHandler;
     internal static Diagnostic ReportMessageWithoutHandler(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
         context.Report(MessageWithoutHandler, messageType);
+
+    public static readonly DiagnosticDescriptor ConflictingConfiguration;
+    internal static Diagnostic ReportConflictingConfiguration(this GeneratorExecutionContext context) =>
+        context.Report(ConflictingConfiguration);
+
+    public static readonly DiagnosticDescriptor InvalidCodeBasedConfiguration;
+    internal static Diagnostic ReportInvalidCodeBasedConfiguration(this GeneratorExecutionContext context) =>
+        context.Report(InvalidCodeBasedConfiguration);
 }
 
 #pragma warning restore RS2008 // Enable analyzer release tracking

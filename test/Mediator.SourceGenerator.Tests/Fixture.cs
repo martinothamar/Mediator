@@ -6,7 +6,7 @@ namespace Mediator.SourceGenerator.Tests;
 
 public static class Fixture
 {
-    public static Compilation CreateCompilation(params string[] source)
+    public static Compilation CreateLibrary(params string[] source)
     {
         var references = new List<MetadataReference>();
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -18,10 +18,16 @@ public static class Fixture
             }
         }
 
-        return CSharpCompilation.Create("compilation",
+        var compilation = CSharpCompilation.Create(
+            "compilation",
             source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray(),
             references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            new CSharpCompilationOptions(
+                OutputKind.DynamicallyLinkedLibrary
+            )
+        );
+
+        return compilation;
     }
 
     public static Task<string> SourceFromResourceFile(string file) => File.ReadAllTextAsync(Path.Combine("resources", file));

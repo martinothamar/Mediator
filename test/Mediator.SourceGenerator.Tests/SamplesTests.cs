@@ -1,31 +1,52 @@
 namespace Mediator.SourceGenerator.Tests;
 
+using Microsoft.CodeAnalysis.Testing;
+using Verifier = CSharpSourceGeneratorVerifier<MediatorGenerator>;
+
 public sealed class SamplesTests
 {
-    [Fact(Skip = "Test manually, programs containing top level statements must be executable")]
+    [Fact]
     public async Task Test_SimpleConsole()
     {
         var source = await Fixture.SourceFromResourceFile("SimpleConsoleProgram.cs");
-        var inputCompilation = Fixture.CreateCompilation(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await new Verifier.Test
+        {
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
+            TestState =
+            {
+                Sources = { source },
+            },
+        }.RunAsync();
     }
 
-    [Fact(Skip = "Test manually, programs containing top level statements must be executable")]
+    [Fact]
     public async Task Test_SimpleEndToEnd()
     {
         var source = await Fixture.SourceFromResourceFile("SimpleEndToEndProgram.cs");
-        var inputCompilation = Fixture.CreateCompilation(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await new Verifier.Test
+        {
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
+            TestState =
+            {
+                Sources = { source },
+            },
+        }.RunAsync();
     }
 
-    [Fact(Skip = "Test manually, programs containing top level statements must be executable")]
+    [Fact]
     public async Task Test_SimpleStreaming()
     {
         var source = await Fixture.SourceFromResourceFile("SimpleStreamingProgram.cs");
-        var inputCompilation = Fixture.CreateCompilation(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await new Verifier.Test
+        {
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
+            TestState =
+            {
+                Sources = { source },
+            },
+        }.RunAsync();
     }
 }

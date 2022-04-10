@@ -76,7 +76,7 @@ There are two NuGet packages needed to use this library
 You install the source generator package into your edge/outermost project (i.e. ASP.NET Core application, Background worker project),
 and then use the `Mediator` package wherever you define message types and handlers.
 Standard message handlers are automatically picked up and added to the DI container in the generated `AddMediator` method.
-Pipeline behaviors need to be added manually.
+*Pipeline behaviors need to be added manually.*
 
 For example implementations, see the [/samples](/samples) folder.
 See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real world setup.
@@ -143,8 +143,21 @@ public sealed class GenericStreamHandler<TMessage, TResponse> : IStreamPipelineB
 
 ### 3.4. Configuration
 
-There is an assembly level attribute for configuration: `MediatorOptionsAttribute`.
-Declare the attribute in the project where the source generator is installed.
+There are two ways to configure Mediator. Configuration values are needed during compile-time since this is a source generator:
+* Assembly level attribute for configuration: `MediatorOptionsAttribute`
+* Options configuration delegate in `AddMediator` function.
+
+```csharp
+services.AddMediator(options =>
+{
+    options.Namespace = "SimpleConsole.Mediator";
+    options.DefaultServiceLifetime = ServiceLifetime.Transient;
+});
+
+// or
+
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", DefaultServiceLifetime = ServiceLifetime.Transient)]
+```
 
 * `Namespace` - where the `IMediator` implementation is generated
 * `DefaultServiceLifetime` - the DI service lifetime

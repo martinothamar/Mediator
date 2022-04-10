@@ -16,13 +16,22 @@ namespace Microsoft.Extensions.DependencyInjection
     /// DI extensions for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    public static class DependencyInjectionExtensions
+    public static class MediatorDependencyInjectionExtensions
     {
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application.
         /// </summary>
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services)
+        {
+            return AddMediator(services, null);
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and handlers of your application, with specified options.
+        /// </summary>
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+        public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
         {
             {{~ if ServiceLifetimeIsScoped ~}}
             services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));

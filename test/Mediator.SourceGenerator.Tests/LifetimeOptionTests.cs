@@ -21,7 +21,7 @@ namespace Something
     }
 }
 ";
-        var inputCompilation = Fixture.CreateCompilation(source);
+        var inputCompilation = Fixture.CreateLibrary(source);
 
         inputCompilation.AssertGen(
             Assertions.CompilesWithoutDiagnostics
@@ -47,7 +47,7 @@ namespace Something
     }
 }
 ";
-        var inputCompilation = Fixture.CreateCompilation(source);
+        var inputCompilation = Fixture.CreateLibrary(source);
 
         inputCompilation.AssertGen(
             Assertions.CompilesWithoutDiagnostics
