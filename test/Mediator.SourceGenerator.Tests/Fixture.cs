@@ -1,7 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Extensions.DependencyModel;
-using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Mediator.SourceGenerator.Tests;
@@ -29,7 +27,6 @@ public static class Fixture
             )
         );
 
-        //compilation.LanguageVersion = LanguageVersion.CSharp9;
         return compilation;
     }
 
