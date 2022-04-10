@@ -130,6 +130,84 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_No_Messages_Program()
+    {
+        var source = await Fixture.SourceFromResourceFile("NoMessagesProgram.cs");
+        var inputCompilation = Fixture.CreateCompilation(source);
+
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics
+        );
+    }
+
+    [Fact]
+    public async Task Test_Null_Namespace_Variable()
+    {
+        var source = await Fixture.SourceFromResourceFile("NullNamespaceVariable.cs");
+        var inputCompilation = Fixture.CreateCompilation(source);
+
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics
+        );
+    }
+
+    [Fact]
+    public async Task Test_Cast_Lifetime_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("IntCastLifetime.cs");
+        var inputCompilation = Fixture.CreateCompilation(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+                Assert.True(result.Diagnostics.Length == 1);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Configuratoin_Conflict()
+    {
+        var source = await Fixture.SourceFromResourceFile("ConfigurationConflictProgram.cs");
+        var inputCompilation = Fixture.CreateCompilation(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.ConflictingConfiguration.Id);
+                Assert.True(result.Diagnostics.Length == 1);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Const_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("ConstVariablesConfig.cs");
+        var inputCompilation = Fixture.CreateCompilation(source);
+
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics
+        );
+    }
+
+    [Fact]
+    public async Task Test_Invalid_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("InvalidVariablesConfig.cs");
+        var inputCompilation = Fixture.CreateCompilation(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+                Assert.True(result.Diagnostics.Length == 1);
+            }
+        );
+    }
+
+    [Fact]
     public async Task Test_Request_Without_Handler_Warning()
     {
         var source = await Fixture.SourceFromResourceFile("RequestWithoutHandlerProgram.cs");

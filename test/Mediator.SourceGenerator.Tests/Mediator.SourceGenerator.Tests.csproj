@@ -13,10 +13,16 @@
 
   <ItemGroup>
     <Compile Remove="resources\AbstractHandlerProgram.cs" />
+    <Compile Remove="resources\ConfigurationConflictProgram.cs" />
+    <Compile Remove="resources\ConstVariablesConfig.cs" />
     <Compile Remove="resources\DeepNamespaceProgram.cs" />
     <Compile Remove="resources\DuplicateHandlersProgram.cs" />
+    <Compile Remove="resources\IntCastLifetime.cs" />
+    <Compile Remove="resources\InvalidVariablesConfig.cs" />
     <Compile Remove="resources\MultipleErrorsProgram.cs" />
+    <Compile Remove="resources\NoMessagesProgram.cs" />
     <Compile Remove="resources\NotificationWithoutHandlerProgram.cs" />
+    <Compile Remove="resources\NullNamespaceVariable.cs" />
     <Compile Remove="resources\RequestWithoutHandlerProgram.cs" />
     <Compile Remove="resources\StaticNestedHandlerProgram.cs" />
     <Compile Remove="resources\StreamingProgram.cs" />
@@ -56,6 +62,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="resources\NoMessagesProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

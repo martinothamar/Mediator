@@ -7,7 +7,7 @@ var services = new ServiceCollection();
 // We override the namespace in the "MediatorOptions" attribute above.
 services.AddMediator(options =>
 {
-    options.Namespace = "SimpleConsole.Mediator";
+    options.Namespace = null;
     options.DefaultServiceLifetime = ServiceLifetime.Transient;
 });
 

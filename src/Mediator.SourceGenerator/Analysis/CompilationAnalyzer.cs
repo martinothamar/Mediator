@@ -1,4 +1,5 @@
 using Mediator.SourceGenerator.Extensions;
+using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 
 namespace Mediator.SourceGenerator;
@@ -499,7 +500,21 @@ internal sealed class CompilationAnalyzer
                     {
                         if (assignment.Right is LiteralExpressionSyntax literal)
                         {
-                            MediatorNamespace = literal.Token.ValueText;
+                            if (!literal.IsKind(SyntaxKind.NullLiteralExpression))
+                                MediatorNamespace = literal.Token.ValueText;
+                        }
+                        else if (assignment.Right is IdentifierNameSyntax identifier)
+                        {
+                            var variableSymbolValue = semanticModel.GetConstantValue(identifier, cancellationToken);
+                            if (variableSymbolValue.HasValue && variableSymbolValue.Value is string ns)
+                            {
+                                MediatorNamespace = ns;
+                            }
+                            else
+                            {
+                                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                                return false;
+                            }
                         }
                         else
                         {
@@ -509,8 +524,20 @@ internal sealed class CompilationAnalyzer
                     }
                     else if (opt == "DefaultServiceLifetime")
                     {
-                        var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)assignment.Right).Name;
-                        _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                        if (assignment.Right is MemberAccessExpressionSyntax enumAccess)
+                        {
+                            var identifierNameSyntax = (IdentifierNameSyntax)enumAccess.Name;
+                            _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                        }
+                        else if (assignment.Right is IdentifierNameSyntax identifier)
+                        {
+                            _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol!;
+                        }
+                        else
+                        {
+                            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                            return false;
+                        }
                     }
                     else
                     {
