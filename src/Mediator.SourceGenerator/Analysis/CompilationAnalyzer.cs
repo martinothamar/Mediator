@@ -202,26 +202,15 @@ internal sealed class CompilationAnalyzer
 
         foreach (var notificationMessage in _notificationMessages)
         {
+            var handlerInterface = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1].Construct(notificationMessage.Symbol);
+
             foreach (var notificationMessageHandler in _notificationMessageHandlers)
             {
                 if (notificationMessageHandler.IsOpenGeneric) // These are added as open generics
                     continue;
 
-                foreach (var notificationMessageHandlerInterfaceSymbol in notificationMessageHandler.Symbol.AllInterfaces)
-                {
-                    if (notificationMessageHandlerInterfaceSymbol.ContainingNamespace.Name != Constants.MediatorLib)
-                        continue;
-
-                    if (!_symbolComparer.Equals(notificationMessageHandlerInterfaceSymbol.OriginalDefinition, _notificationHandlerInterfaceSymbol))
-                        continue;
-
-                    var candidateNotificationMessageSymbol = (INamedTypeSymbol)notificationMessageHandlerInterfaceSymbol.TypeArguments[0];
-
-                    if (_symbolComparer.Equals(candidateNotificationMessageSymbol, notificationMessage.Symbol))
-                        notificationMessage.AddHandlers(notificationMessageHandler);
-                    else if (_compilation.HasImplicitConversion(notificationMessage.Symbol, candidateNotificationMessageSymbol))
-                        notificationMessage.AddHandlers(notificationMessageHandler);
-                }
+                if (_compilation.HasImplicitConversion(notificationMessageHandler.Symbol, handlerInterface))
+                    notificationMessage.AddHandlers(notificationMessageHandler);
             }
 
             // This diagnostic is not safe to use here.

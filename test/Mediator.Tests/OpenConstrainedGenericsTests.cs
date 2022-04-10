@@ -80,8 +80,8 @@ public sealed class OpenConstrainedGenericsTests
         await mediator.Publish(notification);
 
         var handler = (CatchAllPolymorphicNotificationHandler)sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
-        Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
         Assert.NotNull(handler);
+        Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
     }
 
     [Fact]

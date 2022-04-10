@@ -63,11 +63,11 @@ public class NotificationBenchmarks
         (_serviceProvider as IDisposable)?.Dispose();
     }
 
-    //[Benchmark]
-    //public Task SendNotification_MediatR()
-    //{
-    //    return _mediatr.Publish(_notification, CancellationToken.None);
-    //}
+    [Benchmark]
+    public Task SendNotification_MediatR()
+    {
+        return _mediatr.Publish(_notification, CancellationToken.None);
+    }
 
     [Benchmark]
     public ValueTask SendNotification_IMediator()
@@ -81,15 +81,15 @@ public class NotificationBenchmarks
         return _concreteMediator.Publish(_notification, CancellationToken.None);
     }
 
-    //[Benchmark]
-    //public ValueTask SendNotification_MessagePipe()
-    //{
-    //    return _messagePipePublisher.PublishAsync(_notification, CancellationToken.None);
-    //}
+    [Benchmark]
+    public ValueTask SendNotification_MessagePipe()
+    {
+        return _messagePipePublisher.PublishAsync(_notification, CancellationToken.None);
+    }
 
-    //[Benchmark(Baseline = true)]
-    //public ValueTask SendNotification_Baseline()
-    //{
-    //    return _handler.Handle(_notification, CancellationToken.None);
-    //}
+    [Benchmark(Baseline = true)]
+    public ValueTask SendNotification_Baseline()
+    {
+        return _handler.Handle(_notification, CancellationToken.None);
+    }
 }
