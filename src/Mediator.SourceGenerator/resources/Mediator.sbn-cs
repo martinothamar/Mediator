@@ -562,7 +562,7 @@ namespace {{ MediatorNamespace }}
             var handlers = _diCache.Handlers_For_{{ message.IdentifierFullName }};
             
             {{~ if ServiceLifetimeIsSingleton ~}}
-            if (handlers == null || handlers.Length == 0)
+            if (handlers.Length == 0)
             {
                 return default;
             }
@@ -596,7 +596,7 @@ namespace {{ MediatorNamespace }}
             {{~ else ~}}
             if (handlers is global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlersArray)
             {
-                if (handlers == null || handlersArray.Length == 0)
+                if (handlersArray.Length == 0)
                 {
                     return default;
                 }
