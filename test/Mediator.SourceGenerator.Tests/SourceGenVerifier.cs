@@ -45,6 +45,8 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
             });
         }
 
+        public TSourceGenerator SourceGenerator => (TSourceGenerator)GetSourceGenerators().Single(); 
+
         protected override CompilationOptions CreateCompilationOptions()
         {
             var compilationOptions = base.CreateCompilationOptions();

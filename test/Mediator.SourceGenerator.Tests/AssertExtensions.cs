@@ -15,7 +15,7 @@ public static class AssertExtensions
 
         var runResult = driver.GetRunResult();
 
-        var result = new GeneratorResult(diagnostics, runResult, outputCompilation);
+        var result = new GeneratorResult(generator, diagnostics, runResult, outputCompilation);
 
         foreach (var assertions in assertionDelegates)
             assertions(result);

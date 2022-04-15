@@ -12,6 +12,12 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Mediator.SourceGenerator.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
   
   <ItemGroup>
     <Using Include="Microsoft.CodeAnalysis" />
