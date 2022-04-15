@@ -499,24 +499,13 @@ internal sealed class CompilationAnalyzer
                         }
                         else if (assignment.Right is IdentifierNameSyntax identifier)
                         {
-                            var variableSymbolValue = semanticModel.GetConstantValue(identifier, cancellationToken);
-                            if (variableSymbolValue.HasValue && variableSymbolValue.Value is string ns)
+                            var configuredNamespace = TryResolveNamespaceIdentifier(identifier, semanticModel, cancellationToken);
+                            if (configuredNamespace is not null)
                             {
-                                MediatorNamespace = ns;
+                                MediatorNamespace = configuredNamespace;
                             }
                             else
                             {
-                                var variableSymbol = semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol;
-                                if (variableSymbol is IFieldSymbol fieldSymbol)
-                                {
-                                    var syntaxReferences = fieldSymbol.DeclaringSyntaxReferences;
-                                    var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
-                                    if (syntaxNode is VariableDeclaratorSyntax variableDeclarator && variableDeclarator.Initializer?.Value is LiteralExpressionSyntax literal)
-                                    {
-                                        MediatorNamespace = literal.Token.ValueText;
-                                    }
-                                }
-
                                 ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
                                 return false;
                             }
@@ -527,7 +516,37 @@ internal sealed class CompilationAnalyzer
                                 if (variableSymbol is null)
                                     return null;
 
+                                if (variableSymbol is IFieldSymbol fieldSymbol)
+                                {
+                                    if (fieldSymbol.HasConstantValue)
+                                        return fieldSymbol.ConstantValue as string;
 
+                                    var syntaxReferences = fieldSymbol.DeclaringSyntaxReferences;
+                                    var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
+                                    if (syntaxNode is not VariableDeclaratorSyntax variableDeclarator)
+                                        return null;
+
+                                    if (variableDeclarator.Initializer?.Value is LiteralExpressionSyntax literal)
+                                        return literal.Token.ValueText;
+
+                                    if (variableDeclarator.Initializer?.Value is IdentifierNameSyntax reference)
+                                        return TryResolveNamespaceIdentifier(reference, semanticModel, cancellationToken);
+                                }
+                                else if (variableSymbol is IPropertySymbol propertySymbol)
+                                {
+                                    var syntaxReferences = propertySymbol.DeclaringSyntaxReferences;
+                                    var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
+                                    if (syntaxNode is not VariableDeclaratorSyntax variableDeclarator)
+                                        return null;
+
+                                    if (variableDeclarator.Initializer?.Value is LiteralExpressionSyntax literal)
+                                        return literal.Token.ValueText;
+
+                                    if (variableDeclarator.Initializer?.Value is IdentifierNameSyntax reference)
+                                        return TryResolveNamespaceIdentifier(reference, semanticModel, cancellationToken);
+                                }
+
+                                return null;
                             }
                         }
                         else
@@ -605,7 +624,7 @@ internal sealed class CompilationAnalyzer
             }
         }
 
-        IFieldSymbol GetServiceLifetimeSymbol(IdentifierNameSyntax identifierNameSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
+        IFieldSymbol? GetServiceLifetimeSymbol(IdentifierNameSyntax identifierNameSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol;
             if (symbol is IFieldSymbol lifetimeSymbol && SymbolEqualityComparer.Default.Equals(_serviceLifetimeEnumSymbol, lifetimeSymbol.ContainingType))
@@ -622,17 +641,34 @@ internal sealed class CompilationAnalyzer
                 {
                     var syntaxReferences = fieldSymbol.DeclaringSyntaxReferences;
                     var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
-                    return null!;
+                    if (syntaxNode is not VariableDeclaratorSyntax variableDeclarator)
+                        return null;
+
+                    if (variableDeclarator.Initializer?.Value is LiteralExpressionSyntax literal)
+                        return SingletonServiceLifetimeSymbol;  // Must be default(ServiceLifetime)?
+
+                    if (variableDeclarator.Initializer?.Value is MemberAccessExpressionSyntax memberAccess)
+                        return GetServiceLifetimeSymbol((IdentifierNameSyntax)memberAccess.Name, semanticModel, cancellationToken);
+
+                    if (variableDeclarator.Initializer?.Value is IdentifierNameSyntax reference)
+                        return GetServiceLifetimeSymbol(reference, semanticModel, cancellationToken);
                 }
             }
             else if (symbol is IPropertySymbol propertySymbol)
             {
                 var syntaxReferences = propertySymbol.DeclaringSyntaxReferences;
                 var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
-                return null!;
+                if (syntaxNode is not VariableDeclaratorSyntax variableDeclarator)
+                    return null;
+
+                if (variableDeclarator.Initializer?.Value is LiteralExpressionSyntax literal)
+                    return SingletonServiceLifetimeSymbol;  // Must be default(ServiceLifetime)?
+
+                if (variableDeclarator.Initializer?.Value is IdentifierNameSyntax reference)
+                    return GetServiceLifetimeSymbol(reference, semanticModel, cancellationToken);
             }
 
-            throw new Exception();
+            return null;
         }
     }
 

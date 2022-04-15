@@ -8,7 +8,7 @@ namespace Some.Nested.Types
 {
     public static class Program
     {
-        private static readonly string MediatorNamespace = "SimpleConsole.Mediator";
+        private static readonly string MediatorNamespace = Environment.GetEnvironmentVariable("NS");
         private static readonly ServiceLifetime Lifetime = ServiceLifetime.Transient;
 
         public static async Task Main()
