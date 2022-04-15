@@ -76,6 +76,7 @@ internal sealed class CompilationAnalyzer
     public string GeneratorVersion { get; }
 
     private IFieldSymbol? _configuredLifetimeSymbol;
+    private readonly INamedTypeSymbol _serviceLifetimeEnumSymbol;
     public IFieldSymbol ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
     public IFieldSymbol SingletonServiceLifetimeSymbol { get; }
 
@@ -114,8 +115,8 @@ internal sealed class CompilationAnalyzer
                 _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
         };
 
-        var serviceLifetimeSymbol = _compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
-        SingletonServiceLifetimeSymbol = (IFieldSymbol)serviceLifetimeSymbol.GetMembers().Single(m => m.Name == "Singleton");
+        _serviceLifetimeEnumSymbol = _compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
+        SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
 
         RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
         {
@@ -436,6 +437,8 @@ internal sealed class CompilationAnalyzer
         var compilation = _compilation;
         var syntaxReceiver = _syntaxReceiver;
 
+        //System.Diagnostics.Debugger.Launch();
+
         var configuredByAddMediator = false;
         if (syntaxReceiver is not null)
         {
@@ -444,6 +447,8 @@ internal sealed class CompilationAnalyzer
                 var semanticModel = compilation.GetSemanticModel(addMediatorCall.SyntaxTree);
                 if (addMediatorCall.ArgumentList.Arguments.Count == 0)
                     continue;
+
+                var wasAlreadyConfigured = configuredByAddMediator;
 
                 configuredByAddMediator = true;
                 var lifetimeArgument = addMediatorCall.ArgumentList.Arguments.Last();
@@ -501,8 +506,28 @@ internal sealed class CompilationAnalyzer
                             }
                             else
                             {
+                                var variableSymbol = semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol;
+                                if (variableSymbol is IFieldSymbol fieldSymbol)
+                                {
+                                    var syntaxReferences = fieldSymbol.DeclaringSyntaxReferences;
+                                    var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
+                                    if (syntaxNode is VariableDeclaratorSyntax variableDeclarator && variableDeclarator.Initializer?.Value is LiteralExpressionSyntax literal)
+                                    {
+                                        MediatorNamespace = literal.Token.ValueText;
+                                    }
+                                }
+
                                 ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
                                 return false;
+                            }
+
+                            string? TryResolveNamespaceIdentifier(IdentifierNameSyntax identifier, SemanticModel semanticModel, CancellationToken cancellationToken)
+                            {
+                                var variableSymbol = semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol;
+                                if (variableSymbol is null)
+                                    return null;
+
+
                             }
                         }
                         else
@@ -516,11 +541,11 @@ internal sealed class CompilationAnalyzer
                         if (assignment.Right is MemberAccessExpressionSyntax enumAccess)
                         {
                             var identifierNameSyntax = (IdentifierNameSyntax)enumAccess.Name;
-                            _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
+                            _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifierNameSyntax, semanticModel, cancellationToken);
                         }
                         else if (assignment.Right is IdentifierNameSyntax identifier)
                         {
-                            _configuredLifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol!;
+                            _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifier, semanticModel, cancellationToken);
                         }
                         else
                         {
@@ -569,8 +594,7 @@ internal sealed class CompilationAnalyzer
                 if (attrFieldName == "DefaultServiceLifetime")
                 {
                     var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
-                    var lifetimeSymbol = (IFieldSymbol)semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol!;
-                    _configuredLifetimeSymbol = lifetimeSymbol;
+                    _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifierNameSyntax, semanticModel, cancellationToken);
                 }
                 else if (attrFieldName == "Namespace")
                 {
@@ -579,6 +603,36 @@ internal sealed class CompilationAnalyzer
                         MediatorNamespace = namespaceArg!;
                 }
             }
+        }
+
+        IFieldSymbol GetServiceLifetimeSymbol(IdentifierNameSyntax identifierNameSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol;
+            if (symbol is IFieldSymbol lifetimeSymbol && SymbolEqualityComparer.Default.Equals(_serviceLifetimeEnumSymbol, lifetimeSymbol.ContainingType))
+                return lifetimeSymbol;
+
+            if (symbol is IFieldSymbol fieldSymbol)
+            {
+                if (fieldSymbol.HasConstantValue)
+                {
+                    var value = (int)fieldSymbol.ConstantValue;
+                    return _serviceLifetimeEnumSymbol.GetMembers().OfType<IFieldSymbol>().Single(m => (int)m.ConstantValue! == value);
+                }
+                else
+                {
+                    var syntaxReferences = fieldSymbol.DeclaringSyntaxReferences;
+                    var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
+                    return null!;
+                }
+            }
+            else if (symbol is IPropertySymbol propertySymbol)
+            {
+                var syntaxReferences = propertySymbol.DeclaringSyntaxReferences;
+                var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
+                return null!;
+            }
+
+            throw new Exception();
         }
     }
 

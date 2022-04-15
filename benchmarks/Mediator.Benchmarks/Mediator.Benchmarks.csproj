@@ -12,6 +12,10 @@
   <ItemGroup>
     <Using Include="BenchmarkDotNet.Attributes" />
     <Using Include="BenchmarkDotNet.Order" />
+    <Using Include="BenchmarkDotNet.Configs" />
+    <Using Include="BenchmarkDotNet.Jobs" />
+    <Using Include="BenchmarkDotNet.Diagnosers" />
+    <Using Include="BenchmarkDotNet.Loggers" />
   </ItemGroup>
 
   <ItemGroup>
