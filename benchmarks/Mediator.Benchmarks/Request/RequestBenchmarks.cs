@@ -32,9 +32,10 @@ public class AllServiceLifetimesConfig : ManualConfig
     public AllServiceLifetimesConfig()
     {
         Add(DefaultConfig.Instance);
+        this.KeepBenchmarkFiles(true);
         AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_SINGLETON") }).WithId("ServiceLifetime=Singleton"));
-        //AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_SCOPED") }).WithId("ServiceLifetime=Scoped"));
-        //AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_TRANSIENT") }).WithId("ServiceLifetime=Transient"));
+        AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_SCOPED") }).WithId("ServiceLifetime=Scoped"));
+        AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_TRANSIENT") }).WithId("ServiceLifetime=Transient"));
     }
 }
 
@@ -42,7 +43,7 @@ public class AllServiceLifetimesConfig : ManualConfig
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 [RankColumn]
-[EventPipeProfiler(EventPipeProfile.CpuSampling)]
+//[EventPipeProfiler(EventPipeProfile.CpuSampling)]
 public class RequestBenchmarks
 {
     private IServiceProvider _serviceProvider;
@@ -90,9 +91,6 @@ public class RequestBenchmarks
             };
         });
 
-        ConsoleLogger.Default.WriteLine("Running with lifetime: " + BuildServiceLifetime);
-        ConsoleLogger.Default.WriteLine();
-
         _serviceProvider = services.BuildServiceProvider();
         if (BuildServiceLifetime == ServiceLifetime.Scoped)
         {
@@ -108,6 +106,9 @@ public class RequestBenchmarks
         _messagePipeHandler = _serviceProvider.GetRequiredService<IAsyncRequestHandler<SomeRequest, SomeResponse>>();
         _handler = _serviceProvider.GetRequiredService<SomeHandlerClass>();
         _request = new(Guid.NewGuid());
+
+        ConsoleLogger.Default.WriteLine($"Running with lifetime: Build={BuildServiceLifetime}, Impl={_concreteMediator.ServiceLifetime}");
+        ConsoleLogger.Default.WriteLine();
     }
 
     [GlobalCleanup]

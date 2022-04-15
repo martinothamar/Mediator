@@ -156,6 +156,8 @@ namespace {{ MediatorNamespace }}
         private readonly DICache _diCache;
         {{~ end ~}}
 
+        public global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = {{ ServiceLifetime }};
+
         private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
 
         /// <summary>
