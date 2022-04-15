@@ -8,3 +8,5 @@ public interface ISomeNotification : INotification
 public sealed record SomeNotification(Guid Id) : ISomeNotification;
 
 public sealed record SomeOtherNotification(Guid Id) : ISomeNotification;
+
+public readonly record struct SomeStructNotification(Guid Id) : ISomeNotification;

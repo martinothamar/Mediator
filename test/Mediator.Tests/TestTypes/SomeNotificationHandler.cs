@@ -12,3 +12,16 @@ public sealed class SomeNotificationHandler : INotificationHandler<SomeNotificat
         return default;
     }
 }
+
+public sealed class SomeStructNotificationHandler : INotificationHandler<SomeStructNotification>
+{
+    internal static readonly ConcurrentBag<Guid> Ids = new();
+    internal static readonly ConcurrentBag<long> Addresses = new();
+
+    unsafe public ValueTask Handle(SomeStructNotification notification, CancellationToken cancellationToken)
+    {
+        var addr = *(long*)&notification;
+        Ids.Add(notification.Id);
+        return default;
+    }
+}

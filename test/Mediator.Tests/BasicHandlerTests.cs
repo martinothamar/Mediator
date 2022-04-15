@@ -1,5 +1,7 @@
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.InteropServices;
+using static Mediator.Tests.OpenConstrainedGenericsTests;
 
 namespace Mediator.Tests;
 
@@ -10,6 +12,21 @@ public class BasicHandlerTests
     {
         var (_, mediator) = Fixture.GetMediator();
         Assert.NotNull(mediator);
+    }
+
+    [Fact]
+    public void Test_Get_Handlers()
+    {
+        var (sp, _) = Fixture.GetMediator();
+
+        INotificationHandler<SomeStructNotification> handler1 = new SomeStructNotificationHandler();
+        //INotificationHandler<SomeStructNotification> handler2 = new CatchAllPolymorphicNotificationHandler();
+        INotificationHandler<SomeStructNotification> handler3 = new SomeGenericConstrainedNotificationHandler<SomeStructNotification>();
+
+        var handlers = sp.GetServices<INotificationHandler<SomeStructNotification>>();
+        Assert.NotNull(handlers);
+        var handlersArray = handlers.ToArray();
+        Assert.NotNull(handlersArray);
     }
 
     [Fact]
@@ -140,19 +157,36 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    public async Task Test_StructCommand_Handler()
+    unsafe public void Test_StructCommand_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
         var command = new SomeStructCommand(id);
+        var addr = *(long*)&command;
 
         var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
         Assert.NotNull(commandHandler);
-        await mediator.Send(command);
+        mediator.Send(command).GetAwaiter().GetResult();
         Assert.Contains(id, SomeStructCommandHandler.Ids);
-        await concrete.Send(in command);
+        Assert.Contains(addr, SomeStructCommandHandler.Addresses);
+    }
+
+    [Fact]
+    unsafe public void Test_StructCommand_Handler_Concrete()
+    {
+        var (sp, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+        var command = new SomeStructCommand(id);
+        var addr = *(long*)&command;
+
+        var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
+        concrete.Send(in command).GetAwaiter().GetResult();
+        Assert.Contains(id, SomeStructCommandHandler.Ids);
+        Assert.Contains(addr, SomeStructCommandHandler.Addresses);
     }
 
     [Fact]
@@ -166,6 +200,27 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+    }
+
+    [Fact]
+    unsafe public void Test_Struct_Notification_Handler()
+    {
+        var (sp, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+        var notification = new SomeStructNotification(id);
+        var addr = *(long*)&notification;
+
+        var handlers = sp.GetServices<INotificationHandler<SomeStructNotification>>();
+        Assert.True(handlers.Count() == 2);
+
+        var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
+        Assert.NotNull(notificationHandler);
+
+        concrete.Publish(in notification).GetAwaiter().GetResult();
+        Assert.Contains(id, SomeStructNotificationHandler.Ids);
+        //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
     }
 
     [Fact]

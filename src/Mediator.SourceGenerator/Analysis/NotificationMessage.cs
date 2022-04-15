@@ -16,6 +16,8 @@ internal sealed class NotificationMessage : SymbolMetadata<NotificationMessage>
 
     public string FullName => Symbol.GetTypeSymbolFullName();
 
+    public string IdentifierFullName => Symbol.GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false).Replace("global::", "").Replace('.', '_');
+
     public int HandlerCount => _handlers.Count;
 
     public string ServiceLifetime => Analyzer.ServiceLifetime;

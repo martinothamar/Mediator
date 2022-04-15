@@ -27,8 +27,4 @@
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!--<CompilerVisibleProperty Include="Mediator_AttachDebugger" />-->
-  </ItemGroup>
-
 </Project>

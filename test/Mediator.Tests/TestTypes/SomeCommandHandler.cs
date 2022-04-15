@@ -27,10 +27,13 @@ public sealed class SomeCommandWithoutResponseHandler : ICommandHandler<SomeComm
 public sealed class SomeStructCommandHandler : ICommandHandler<SomeStructCommand>
 {
     internal static readonly ConcurrentBag<Guid> Ids = new();
+    internal static readonly ConcurrentBag<long> Addresses = new();
 
-    public ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
+    unsafe public ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
     {
         Ids.Add(command.Id);
+        var addr = *(long*)&command;
+        Addresses.Add(addr);
         return default;
     }
 }
