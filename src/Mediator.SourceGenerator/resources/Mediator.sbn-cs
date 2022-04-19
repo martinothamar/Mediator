@@ -156,6 +156,9 @@ namespace {{ MediatorNamespace }}
         private readonly DICache _diCache;
         {{~ end ~}}
 
+        /// <summary>
+        /// The lifetime of Mediator-related service registrations in DI container.
+        /// </summary>
         public global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = {{ ServiceLifetime }};
 
         private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
