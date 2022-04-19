@@ -27,23 +27,12 @@ public sealed class SomeHandlerClass :
     public ValueTask<SomeResponse> InvokeAsync(SomeRequest request, CancellationToken cancellationToken) => _vtResponse;
 }
 
-public class AllServiceLifetimesConfig : ManualConfig
-{
-    public AllServiceLifetimesConfig()
-    {
-        Add(DefaultConfig.Instance);
-        this.KeepBenchmarkFiles(true);
-        AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_SINGLETON") }).WithId("ServiceLifetime=Singleton"));
-        AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_SCOPED") }).WithId("ServiceLifetime=Scoped"));
-        AddJob(Job.Default.WithArguments(new[] { new MsBuildArgument("/p:DefineConstants=SERVICE_LIFETIME_TRANSIENT") }).WithId("ServiceLifetime=Transient"));
-    }
-}
-
-[Config(typeof(AllServiceLifetimesConfig))]
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 [RankColumn]
 //[EventPipeProfiler(EventPipeProfile.CpuSampling)]
+//[DisassemblyDiagnoser]
+//[InliningDiagnoser(logFailuresOnly: true, allowedNamespaces: new[] { "Mediator" })]
 public class RequestBenchmarks
 {
     private IServiceProvider _serviceProvider;
@@ -55,24 +44,17 @@ public class RequestBenchmarks
     private SomeHandlerClass _handler;
     private SomeRequest _request;
 
-#if SERVICE_LIFETIME_SINGLETON
-    public const ServiceLifetime BuildServiceLifetime = ServiceLifetime.Singleton;
-#elif SERVICE_LIFETIME_SCOPED
-    public const ServiceLifetime BuildServiceLifetime = ServiceLifetime.Scoped;
-#elif SERVICE_LIFETIME_TRANSIENT
-    public const ServiceLifetime BuildServiceLifetime = ServiceLifetime.Transient;
-#else
-    public const ServiceLifetime BuildServiceLifetime = ServiceLifetime.Singleton;
-#endif
+    [Params(ServiceLifetime.Singleton)]
+    public ServiceLifetime ServiceLifetime { get; set; }
 
     [GlobalSetup]
     public void Setup()
     {
         var services = new ServiceCollection();
-        services.AddMediator(opts => opts.DefaultServiceLifetime = BuildServiceLifetime);
+        services.AddMediator(opts => opts.DefaultServiceLifetime = ServiceLifetime);
         services.AddMediatR(opts =>
         {
-            _ = BuildServiceLifetime switch
+            _ = ServiceLifetime switch
             {
                 ServiceLifetime.Singleton => opts.AsSingleton(),
                 ServiceLifetime.Scoped => opts.AsScoped(),
@@ -82,7 +64,7 @@ public class RequestBenchmarks
         }, typeof(SomeHandlerClass).Assembly);
         services.AddMessagePipe(opts =>
         {
-            opts.InstanceLifetime = BuildServiceLifetime switch
+            opts.InstanceLifetime = ServiceLifetime switch
             {
                 ServiceLifetime.Singleton => InstanceLifetime.Singleton,
                 ServiceLifetime.Scoped => InstanceLifetime.Scoped,
@@ -92,7 +74,7 @@ public class RequestBenchmarks
         });
 
         _serviceProvider = services.BuildServiceProvider();
-        if (BuildServiceLifetime == ServiceLifetime.Scoped)
+        if (ServiceLifetime == ServiceLifetime.Scoped)
         {
 #pragma warning disable CS0162 // Unreachable code detected
             _serviceScope = _serviceProvider.CreateScope();
@@ -106,9 +88,6 @@ public class RequestBenchmarks
         _messagePipeHandler = _serviceProvider.GetRequiredService<IAsyncRequestHandler<SomeRequest, SomeResponse>>();
         _handler = _serviceProvider.GetRequiredService<SomeHandlerClass>();
         _request = new(Guid.NewGuid());
-
-        ConsoleLogger.Default.WriteLine($"Running with lifetime: Build={BuildServiceLifetime}, Impl={_concreteMediator.ServiceLifetime}");
-        ConsoleLogger.Default.WriteLine();
     }
 
     [GlobalCleanup]
@@ -120,17 +99,17 @@ public class RequestBenchmarks
             (_serviceProvider as IDisposable)?.Dispose();
     }
 
-    //[Benchmark]
-    //public Task<SomeResponse> SendRequest_MediatR()
-    //{
-    //    return _mediatr.Send(_request, CancellationToken.None);
-    //}
+    [Benchmark]
+    public Task<SomeResponse> SendRequest_MediatR()
+    {
+        return _mediatr.Send(_request, CancellationToken.None);
+    }
 
-    //[Benchmark]
-    //public ValueTask<SomeResponse> SendRequest_IMediator()
-    //{
-    //    return _mediator.Send(_request, CancellationToken.None);
-    //}
+    [Benchmark]
+    public ValueTask<SomeResponse> SendRequest_IMediator()
+    {
+        return _mediator.Send(_request, CancellationToken.None);
+    }
 
     [Benchmark]
     public ValueTask<SomeResponse> SendRequest_Mediator()
@@ -138,15 +117,15 @@ public class RequestBenchmarks
         return _concreteMediator.Send(_request, CancellationToken.None);
     }
 
-    //[Benchmark]
-    //public ValueTask<SomeResponse> SendRequest_MessagePipe()
-    //{
-    //    return _messagePipeHandler.InvokeAsync(_request, CancellationToken.None);
-    //}
+    [Benchmark]
+    public ValueTask<SomeResponse> SendRequest_MessagePipe()
+    {
+        return _messagePipeHandler.InvokeAsync(_request, CancellationToken.None);
+    }
 
-    //[Benchmark(Baseline = true)]
-    //public ValueTask<SomeResponse> SendRequest_Baseline()
-    //{
-    //    return _handler.Handle(_request, CancellationToken.None);
-    //}
+    [Benchmark(Baseline = true)]
+    public ValueTask<SomeResponse> SendRequest_Baseline()
+    {
+        return _handler.Handle(_request, CancellationToken.None);
+    }
 }
