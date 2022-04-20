@@ -254,6 +254,55 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_Unassigned_Variables_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("UnassignedVariablesConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assertions.AssertCommon(result);
+
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Unassigned_Namespace_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("UnassignedNamespaceVariableConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assertions.AssertCommon(result);
+
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Unassigned_Lifetime_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("UnassignedLifetimeVariableConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assertions.AssertCommon(result);
+
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+                Assert.True(result.Diagnostics.Length == 1);
+            }
+        );
+    }
+
+    [Fact]
     public async Task Test_Request_Without_Handler_Warning()
     {
         var source = await Fixture.SourceFromResourceFile("RequestWithoutHandlerProgram.cs");

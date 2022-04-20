@@ -6,6 +6,12 @@ namespace Mediator.Tests.TransientLifetime;
 public sealed class TransientLifetimeTests
 {
     [Fact]
+    public void Test_Generated_Code_Lifetime()
+    {
+        Assert.Equal(ServiceLifetime.Transient, Mediator.ServiceLifetime);
+    }
+
+    [Fact]
     public void Test_Returns_Different_Instance_Every_Time()
     {
         var (sp, _) = Fixture.GetMediator();

@@ -1,6 +1,5 @@
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
-using System.Runtime.InteropServices;
 using static Mediator.Tests.OpenConstrainedGenericsTests;
 
 namespace Mediator.Tests;
