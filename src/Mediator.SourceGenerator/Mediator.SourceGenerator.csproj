@@ -7,36 +7,24 @@
         A high performance .NET Mediator pattern implemenation using source generation.
     </Description>
 
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <DevelopmentDependency>true</DevelopmentDependency>
-    <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Mediator.SourceGenerator.Tests</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Using Include="Microsoft.CodeAnalysis" />
-    <Using Include="Microsoft.CodeAnalysis.CSharp.Syntax" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <Compile Remove="resources\**" />
-    <EmbeddedResource Include="resources\**" />
+    <ProjectReference Include="..\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
+    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
+    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
+    <None Include="$(OutputPath)\Mediator.SourceGenerator.Implementation.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn38.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs" Visible="false" />
+    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn40.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotNetVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
-    <PackageReference Include="Scriban" Version="3.7.0" IncludeAssets="Build" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(CodeAnalysisVersion)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

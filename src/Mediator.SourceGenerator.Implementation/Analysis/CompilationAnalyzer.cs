@@ -1,15 +1,24 @@
 using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
 namespace Mediator.SourceGenerator;
 
+internal readonly record struct CompilationAnalyzerContext(
+    Compilation Compilation,
+    IReadOnlyList<InvocationExpressionSyntax>? AddMediatorCalls,
+    string GeneratorVersion,
+    Action<Diagnostic> ReportDiagnostic,
+    Action<string, SourceText> AddSource
+);
+
 internal sealed class CompilationAnalyzer
 {
     private static readonly SymbolEqualityComparer _symbolComparer = SymbolEqualityComparer.Default;
-    private readonly GeneratorExecutionContext _context;
-    private readonly Compilation _compilation;
-    private readonly SyntaxReceiver? _syntaxReceiver;
+    private readonly CompilationAnalyzerContext _context;
+    public CompilationAnalyzerContext Context => _context;
+
     private readonly HashSet<RequestMessage> _requestMessages;
     private readonly HashSet<NotificationMessage> _notificationMessages;
     private readonly HashSet<RequestMessageHandler> _requestMessageHandlers;
@@ -69,11 +78,11 @@ internal sealed class CompilationAnalyzer
 
     public INamedTypeSymbol UnitSymbol { get; }
 
-    public Compilation Compilation => _compilation;
+    public Compilation Compilation => _context.Compilation;
 
     public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
-    public string GeneratorVersion { get; }
+    public string GeneratorVersion => _context.GeneratorVersion;
 
     private IFieldSymbol? _configuredLifetimeSymbol;
     private readonly INamedTypeSymbol _serviceLifetimeEnumSymbol;
@@ -90,34 +99,34 @@ internal sealed class CompilationAnalyzer
 
     public bool ServiceLifetimeIsTransient => ServiceLifetimeSymbol.Name == "Transient";
 
-    public CompilationAnalyzer(in GeneratorExecutionContext context, string generatorVersion)
+    public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
         _context = context;
-        _compilation = context.Compilation;
-        _syntaxReceiver = context.SyntaxReceiver as SyntaxReceiver;
 
         _requestMessages = new();
         _notificationMessages = new();
         _requestMessageHandlers = new();
         _notificationMessageHandlers = new();
 
-        UnitSymbol = _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.Unit")!.OriginalDefinition;
+        var compilation = _context.Compilation;
+
+        UnitSymbol = compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.Unit")!.OriginalDefinition;
 
         _baseHandlerSymbols = new INamedTypeSymbol[]
         {
                 // Handler
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`2")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequestHandler`2")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`2")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommandHandler`2")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQueryHandler`2")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`2")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequestHandler`2")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`2")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommandHandler`2")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQueryHandler`2")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
         };
 
-        _serviceLifetimeEnumSymbol = _compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
+        _serviceLifetimeEnumSymbol = compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
         SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
 
         RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
@@ -135,20 +144,18 @@ internal sealed class CompilationAnalyzer
         _baseMessageSymbols = new INamedTypeSymbol[]
         {
                 // Message types
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequest`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommand`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQuery`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQuery`1")!.OriginalDefinition,
-                _compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequest`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommand`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQuery`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQuery`1")!.OriginalDefinition,
+                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,
         };
 
         _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
-
-        GeneratorVersion = generatorVersion;
     }
 
     public void Analyze(CancellationToken cancellationToken)
@@ -164,11 +171,13 @@ internal sealed class CompilationAnalyzer
 
     private void FindGlobalNamespaces(Queue<INamespaceOrTypeSymbol> queue)
     {
-        queue.Enqueue(_compilation.Assembly.GlobalNamespace);
+        var compilation = _context.Compilation;
 
-        foreach (var reference in _compilation.References)
+        queue.Enqueue(compilation.Assembly.GlobalNamespace);
+
+        foreach (var reference in compilation.References)
         {
-            if (_compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol)
+            if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol)
                 continue;
 
             if (!assemblySymbol.Modules.Any(m => m.ReferencedAssemblies.Any(ra => ra.Name == Constants.MediatorLib)))
@@ -180,6 +189,8 @@ internal sealed class CompilationAnalyzer
 
     private void PopulateMetadata(Queue<INamespaceOrTypeSymbol> queue)
     {
+        var compilation = _context.Compilation;
+
 #pragma warning disable RS1024 // Compare symbols correctly
         var requestMessageHandlerMap = new Dictionary<INamedTypeSymbol, object?>(_symbolComparer);
 #pragma warning restore RS1024 // Compare symbols correctly
@@ -200,7 +211,7 @@ internal sealed class CompilationAnalyzer
             if (kvp.Value is not RequestMessage message)
                 continue;
 
-            ReportDiagnostic(message.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
+            ReportDiagnostic(message.Symbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
         }
 
         foreach (var notificationMessage in _notificationMessages)
@@ -212,7 +223,7 @@ internal sealed class CompilationAnalyzer
                 if (notificationMessageHandler.IsOpenGeneric) // These are added as open generics
                     continue;
 
-                if (_compilation.HasImplicitConversion(notificationMessageHandler.Symbol, handlerInterface))
+                if (compilation.HasImplicitConversion(notificationMessageHandler.Symbol, handlerInterface))
                     notificationMessage.AddHandlers(notificationMessageHandler);
             }
 
@@ -279,7 +290,7 @@ internal sealed class CompilationAnalyzer
                         if (isStruct)
                         {
                             // Handlers must be classes
-                            ReportDiagnostic(typeSymbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportInvalidHandlerType(s));
+                            ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportInvalidHandlerType(s));
                             return false;
                         }
 
@@ -294,7 +305,7 @@ internal sealed class CompilationAnalyzer
                             if (IsOpenGeneric(typeSymbol))
                             {
                                 // Handlers must be classes
-                                ReportDiagnostic(typeSymbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportOpenGenericRequestHandler(s));
+                                ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportOpenGenericRequestHandler(s));
                                 return false;
                             }
 
@@ -307,7 +318,7 @@ internal sealed class CompilationAnalyzer
                                 if (requestMessageObj is null || requestMessageObj is not RequestMessage requestMessage)
                                 {
                                     // Signal that we have duplicates
-                                    ReportDiagnostic(typeSymbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMultipleHandlers(s));
+                                    ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMultipleHandlers(s));
                                     return false;
                                 }
                                 mapping[requestMessageSymbol] = null;
@@ -344,7 +355,7 @@ internal sealed class CompilationAnalyzer
                         {
                             // If this symbol has already been added,
                             // the type implements multiple base message types.
-                            ReportDiagnostic(typeSymbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageDerivesFromMultipleMessageInterfaces(s));
+                            ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageDerivesFromMultipleMessageInterfaces(s));
                             return false;
                         }
                         else
@@ -367,7 +378,7 @@ internal sealed class CompilationAnalyzer
                         {
                             // If this symbol has already been added,
                             // the type implements multiple base message types.
-                            ReportDiagnostic(typeSymbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageDerivesFromMultipleMessageInterfaces(s));
+                            ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageDerivesFromMultipleMessageInterfaces(s));
                             return false;
                         }
                     }
@@ -436,27 +447,38 @@ internal sealed class CompilationAnalyzer
 
     private void TryParseConfiguration(CancellationToken cancellationToken)
     {
-        var compilation = _compilation;
-        var syntaxReceiver = _syntaxReceiver;
+        var compilation = _context.Compilation;
+        var addMediatorCalls = _context.AddMediatorCalls;
 
         //System.Diagnostics.Debugger.Launch();
 
         var configuredByAddMediator = false;
-        if (syntaxReceiver is not null)
+        if (addMediatorCalls is not null && addMediatorCalls.Count > 0)
         {
-            ProcessAddMediatorConfiguration(syntaxReceiver, ref configuredByAddMediator, cancellationToken);
+            ProcessAddMediatorConfiguration(addMediatorCalls, ref configuredByAddMediator, cancellationToken);
         }
 
         var attrs = compilation.Assembly.GetAttributes();
-        var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptions");
+        var optionsAttr = attrs.SingleOrDefault(a =>
+        {
+            if (a.AttributeClass is null)
+                return false;
+            var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
+            return attributeFullName == "Mediator.MediatorOptionsAttribute" || attributeFullName == "MediatorOptions";
+        });
         if (optionsAttr is not null)
             ProcessAttributeConfiguration(optionsAttr, configuredByAddMediator, cancellationToken);
     }
 
-    private void ProcessAddMediatorConfiguration(SyntaxReceiver syntaxReceiver, ref bool configuredByAddMediator, CancellationToken cancellationToken)
+    private void ProcessAddMediatorConfiguration(
+        IReadOnlyList<InvocationExpressionSyntax> addMediatorCalls,
+        ref bool configuredByAddMediator,
+        CancellationToken cancellationToken
+    )
     {
-        var compilation = _compilation;
-        foreach (var addMediatorCall in syntaxReceiver.AddMediatorCalls)
+        var compilation = _context.Compilation;
+
+        foreach (var addMediatorCall in addMediatorCalls)
         {
             var semanticModel = compilation.GetSemanticModel(addMediatorCall.SyntaxTree);
             if (addMediatorCall.ArgumentList.Arguments.Count == 0)
@@ -468,7 +490,7 @@ internal sealed class CompilationAnalyzer
             var lifetimeArgument = addMediatorCall.ArgumentList.Arguments.Last();
             if (lifetimeArgument.Expression is not SimpleLambdaExpressionSyntax lambda)
             {
-                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                 continue;
             }
             var body = lambda.Body;
@@ -484,12 +506,12 @@ internal sealed class CompilationAnalyzer
                 {
                     if (statement is not ExpressionStatementSyntax statementExpression)
                     {
-                        ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                        ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                         break;
                     }
                     if (statementExpression.Expression is not AssignmentExpressionSyntax assignment)
                     {
-                        ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                        ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                         break;
                     }
                     if (!ProcessAddMediatorAssignmentStatement(assignment, semanticModel, cancellationToken))
@@ -498,18 +520,18 @@ internal sealed class CompilationAnalyzer
             }
             else
             {
-                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
             }
         }
     }
 
     private void ProcessAttributeConfiguration(AttributeData optionsAttr, bool configuredByAddMediator, CancellationToken cancellationToken)
     {
-        var compilation = _compilation;
+        var compilation = _context.Compilation;
 
         if (configuredByAddMediator)
         {
-            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportConflictingConfiguration());
+            ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportConflictingConfiguration());
         }
 
         var syntaxReference = optionsAttr.ApplicationSyntaxReference;
@@ -561,13 +583,13 @@ internal sealed class CompilationAnalyzer
                 }
                 else
                 {
-                    ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                     return false;
                 }
             }
             else
             {
-                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                 return false;
             }
         }
@@ -584,13 +606,13 @@ internal sealed class CompilationAnalyzer
             }
             else
             {
-                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                 return false;
             }
         }
         else
         {
-            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+            ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
             return false;
         }
 
@@ -631,7 +653,7 @@ internal sealed class CompilationAnalyzer
 
             if (initializerExpression is null)
             {
-                ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                 return null;
             }
 
@@ -665,7 +687,7 @@ internal sealed class CompilationAnalyzer
     {
         if (symbol is IFieldSymbol fieldSymbol && fieldSymbol.HasConstantValue)
         {
-            var value = (int)fieldSymbol.ConstantValue;
+            var value = (int)fieldSymbol.ConstantValue!;
             return _serviceLifetimeEnumSymbol.GetMembers().OfType<IFieldSymbol>().Single(m => (int)m.ConstantValue! == value);
         }
         if (symbol is ILocalSymbol localSymbol && localSymbol.HasConstantValue)
@@ -685,7 +707,7 @@ internal sealed class CompilationAnalyzer
 
         if (initializerExpression is null)
         {
-            ReportDiagnostic((in GeneratorExecutionContext c) => c.ReportInvalidCodeBasedConfiguration());
+            ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
             return null;
         }
 
@@ -704,14 +726,14 @@ internal sealed class CompilationAnalyzer
         return null;
     }
 
-    private delegate Diagnostic ReportDiagnosticDelegate<T>(in GeneratorExecutionContext context, T state);
+    private delegate Diagnostic ReportDiagnosticDelegate<T>(in CompilationAnalyzerContext context, T state);
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
     {
         var diagnostic = del(in _context, state);
         _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
     }
 
-    private delegate Diagnostic ReportDiagnosticDelegate(in GeneratorExecutionContext context);
+    private delegate Diagnostic ReportDiagnosticDelegate(in CompilationAnalyzerContext context);
     private void ReportDiagnostic(ReportDiagnosticDelegate del)
     {
         var diagnostic = del(in _context);

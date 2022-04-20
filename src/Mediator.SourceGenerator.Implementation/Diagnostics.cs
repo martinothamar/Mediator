@@ -9,6 +9,8 @@ public static class Diagnostics
 
     public static IReadOnlyCollection<string> Ids => _ids;
 
+    private static class MediatorGenerator { }
+
     static Diagnostics()
     {
         _ids = new();
@@ -88,7 +90,7 @@ public static class Diagnostics
     }
 
     private static Diagnostic Report<T>(
-        this GeneratorExecutionContext context,
+        this CompilationAnalyzerContext context,
         DiagnosticDescriptor diagnosticDescriptor,
         T arg
     )
@@ -109,7 +111,7 @@ public static class Diagnostics
     }
 
     private static Diagnostic Report(
-        this GeneratorExecutionContext context,
+        this CompilationAnalyzerContext context,
         DiagnosticDescriptor diagnosticDescriptor
     )
     {
@@ -119,35 +121,35 @@ public static class Diagnostics
     }
 
     public static readonly DiagnosticDescriptor GenericError;
-    internal static Diagnostic ReportGenericError(this GeneratorExecutionContext context, Exception exception) =>
+    internal static Diagnostic ReportGenericError(this CompilationAnalyzerContext context, Exception exception) =>
         context.Report(GenericError, exception);
 
     public static readonly DiagnosticDescriptor MultipleHandlersError;
-    internal static Diagnostic ReportMultipleHandlers(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+    internal static Diagnostic ReportMultipleHandlers(this CompilationAnalyzerContext context, INamedTypeSymbol messageType) =>
         context.Report(MultipleHandlersError, messageType);
 
     public static readonly DiagnosticDescriptor InvalidHandlerTypeError;
-    internal static Diagnostic ReportInvalidHandlerType(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
+    internal static Diagnostic ReportInvalidHandlerType(this CompilationAnalyzerContext context, INamedTypeSymbol handlerType) =>
         context.Report(InvalidHandlerTypeError, handlerType);
 
     public static readonly DiagnosticDescriptor OpenGenericRequestHandler;
-    internal static Diagnostic ReportOpenGenericRequestHandler(this GeneratorExecutionContext context, INamedTypeSymbol handlerType) =>
+    internal static Diagnostic ReportOpenGenericRequestHandler(this CompilationAnalyzerContext context, INamedTypeSymbol handlerType) =>
         context.Report(OpenGenericRequestHandler, handlerType);
 
     public static readonly DiagnosticDescriptor MessageDerivesFromMultipleMessageInterfaces;
-    internal static Diagnostic ReportMessageDerivesFromMultipleMessageInterfaces(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+    internal static Diagnostic ReportMessageDerivesFromMultipleMessageInterfaces(this CompilationAnalyzerContext context, INamedTypeSymbol messageType) =>
         context.Report(MessageDerivesFromMultipleMessageInterfaces, messageType);
 
     public static readonly DiagnosticDescriptor MessageWithoutHandler;
-    internal static Diagnostic ReportMessageWithoutHandler(this GeneratorExecutionContext context, INamedTypeSymbol messageType) =>
+    internal static Diagnostic ReportMessageWithoutHandler(this CompilationAnalyzerContext context, INamedTypeSymbol messageType) =>
         context.Report(MessageWithoutHandler, messageType);
 
     public static readonly DiagnosticDescriptor ConflictingConfiguration;
-    internal static Diagnostic ReportConflictingConfiguration(this GeneratorExecutionContext context) =>
+    internal static Diagnostic ReportConflictingConfiguration(this CompilationAnalyzerContext context) =>
         context.Report(ConflictingConfiguration);
 
     public static readonly DiagnosticDescriptor InvalidCodeBasedConfiguration;
-    internal static Diagnostic ReportInvalidCodeBasedConfiguration(this GeneratorExecutionContext context) =>
+    internal static Diagnostic ReportInvalidCodeBasedConfiguration(this CompilationAnalyzerContext context) =>
         context.Report(InvalidCodeBasedConfiguration);
 }
 
