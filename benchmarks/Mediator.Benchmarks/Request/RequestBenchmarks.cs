@@ -45,7 +45,7 @@ public class RequestBenchmarks
     private SomeRequest _request;
 
     [Params(ServiceLifetime.Singleton)]
-    public ServiceLifetime ServiceLifetime { get; set; }
+    public ServiceLifetime ServiceLifetime { get; set; } = ServiceLifetime.Singleton;
 
     [GlobalSetup]
     public void Setup()

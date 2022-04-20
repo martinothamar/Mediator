@@ -448,7 +448,7 @@ internal sealed class CompilationAnalyzer
         }
 
         var attrs = compilation.Assembly.GetAttributes();
-        var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptions");
+        var optionsAttr = attrs.SingleOrDefault(a => a.AttributeClass?.Name == "MediatorOptionsAttribute");
         if (optionsAttr is not null)
             ProcessAttributeConfiguration(optionsAttr, configuredByAddMediator, cancellationToken);
     }

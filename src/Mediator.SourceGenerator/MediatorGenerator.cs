@@ -1,11 +1,7 @@
-using Microsoft.CodeAnalysis.Text;
-using Scriban;
-using System.Text;
-
 namespace Mediator.SourceGenerator;
 
 [Generator]
-public sealed partial class MediatorGenerator : ISourceGenerator
+public sealed class MediatorGenerator : ISourceGenerator
 {
     internal CompilationAnalyzer? CompilationAnalyzer { get; private set; }
 
@@ -15,8 +11,6 @@ public sealed partial class MediatorGenerator : ISourceGenerator
 
         if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
             System.Diagnostics.Debugger.Launch();
-
-        //System.Diagnostics.Debugger.Launch();
 
         try
         {
@@ -32,11 +26,7 @@ public sealed partial class MediatorGenerator : ISourceGenerator
 
     private void ExecuteInternal(in GeneratorExecutionContext context)
     {
-        var generatorAssembly = GetType().Assembly;
-        var generatorVersion = generatorAssembly.GetName().Version.ToString();
-
-        GenerateOptions(in context, generatorVersion);
-        GenerateOptionsAttribute(in context, generatorVersion);
+        var generatorVersion = Versioning.GetVersion();
 
         CompilationAnalyzer = new CompilationAnalyzer(in context, generatorVersion);
         CompilationAnalyzer.Analyze(context.CancellationToken);
@@ -48,28 +38,14 @@ public sealed partial class MediatorGenerator : ISourceGenerator
         mediatorImplementationGenerator.Generate(in context, CompilationAnalyzer);
     }
 
-    private void GenerateOptions(in GeneratorExecutionContext context, string generatorVersion)
-    {
-        var model = new { GeneratorVersion = generatorVersion };
-
-        var file = @"resources/MediatorOptions.sbn-cs";
-        var template = Template.Parse(EmbeddedResource.GetContent(file), file);
-        var output = template.Render(model, member => member.Name);
-        context.AddSource("MediatorOptions.g.cs", SourceText.From(output, Encoding.UTF8));
-    }
-
-    private void GenerateOptionsAttribute(in GeneratorExecutionContext context, string generatorVersion)
-    {
-        var model = new { GeneratorVersion = generatorVersion };
-
-        var file = @"resources/MediatorOptionsAttribute.sbn-cs";
-        var template = Template.Parse(EmbeddedResource.GetContent(file), file);
-        var output = template.Render(model, member => member.Name);
-        context.AddSource("MediatorOptionsAttribute.g.cs", SourceText.From(output, Encoding.UTF8));
-    }
-
     public void Initialize(GeneratorInitializationContext context)
     {
+        context.RegisterForPostInitialization(context =>
+        {
+            var generatorVersion = Versioning.GetVersion();
+
+            MediatorOptionsGenerator.Generate(in context, generatorVersion);
+        });
         context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
