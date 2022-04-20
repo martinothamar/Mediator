@@ -6,9 +6,9 @@ namespace Mediator.SourceGenerator;
 
 internal sealed partial class MediatorImplementationGenerator
 {
-    internal void Generate(in GeneratorExecutionContext context, CompilationAnalyzer compilationAnalyzer)
+    internal void Generate(CompilationAnalyzer compilationAnalyzer)
     {
-        var compilation = context.Compilation;
+        var compilation = compilationAnalyzer.Compilation;
 
         var file = @"resources/Mediator.sbn-cs";
         var template = Template.Parse(EmbeddedResource.GetContent(file), file);
@@ -16,6 +16,6 @@ internal sealed partial class MediatorImplementationGenerator
 
         //System.Diagnostics.Debugger.Launch();
 
-        context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
+        compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
     }
 }
