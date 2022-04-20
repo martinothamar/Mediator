@@ -16,8 +16,6 @@ public sealed partial class MediatorGenerator : ISourceGenerator
         if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
             System.Diagnostics.Debugger.Launch();
 
-        //System.Diagnostics.Debugger.Launch();
-
         try
         {
             ExecuteInternal(in context);

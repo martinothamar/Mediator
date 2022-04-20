@@ -6,9 +6,7 @@ internal sealed class SyntaxReceiver : ISyntaxReceiver
 
     public void OnVisitSyntaxNode(SyntaxNode context)
     {
-        if (context is not InvocationExpressionSyntax invocationSyntax)
-            return;
-        if (invocationSyntax.Expression is not MemberAccessExpressionSyntax identifier)
+        if (context is not InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax identifier } invocationSyntax)
             return;
         if (identifier.Name.Identifier.ValueText != "AddMediator")
             return;

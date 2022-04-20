@@ -28,10 +28,11 @@ internal sealed class NotificationMessage : SymbolMetadata<NotificationMessage>
     {
         get
         {
+            var handlerTypeOfExpression = HandlerTypeOfExpression;
             foreach (var handler in _handlers)
             {
                 var getExpression = $"sp => sp.GetRequiredService<{handler.FullName}>()";
-                yield return $"services.Add(new SD({HandlerTypeOfExpression}, {getExpression}, {ServiceLifetime}));";
+                yield return $"services.Add(new SD({handlerTypeOfExpression}, {getExpression}, {ServiceLifetime}));";
             }
         }
     }
