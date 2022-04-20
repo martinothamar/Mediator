@@ -19,10 +19,6 @@ public sealed class SamplesTests
             },
         };
         await tester.RunAsync();
-
-        var analyzer = tester.SourceGenerator.CompilationAnalyzer;
-
-        //Assert.NotNull(analyzer);
     }
 
     [Fact]
