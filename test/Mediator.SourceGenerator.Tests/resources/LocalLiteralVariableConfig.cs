@@ -8,17 +8,17 @@ namespace Some.Nested.Types
 {
     public static class Program
     {
-        private const string MediatorNamespace = "SimpleConsole.Mediator";
-        private const ServiceLifetime Lifetime = ServiceLifetime.Transient;
-
         public static async Task Main()
         {
             var services = new ServiceCollection();
 
+            var ns = "SomeNamespace";
+            var lifetime = ServiceLifetime.Scoped;
+
             services.AddMediator(options =>
             {
-                options.Namespace = MediatorNamespace;
-                options.ServiceLifetime = Lifetime;
+                options.Namespace = ns;
+                options.ServiceLifetime = lifetime;
             });
 
             var serviceProvider = services.BuildServiceProvider();

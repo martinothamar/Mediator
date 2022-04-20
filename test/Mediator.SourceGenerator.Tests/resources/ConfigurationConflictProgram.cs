@@ -4,7 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", DefaultServiceLifetime = ServiceLifetime.Transient)]
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Transient)]
 
 namespace Some.Nested.Types
 {
@@ -17,7 +17,7 @@ namespace Some.Nested.Types
             services.AddMediator(options =>
             {
                 options.Namespace = "SimpleConsole.Mediator";
-                options.DefaultServiceLifetime = ServiceLifetime.Transient;
+                options.ServiceLifetime = ServiceLifetime.Transient;
             });
 
             var serviceProvider = services.BuildServiceProvider();

@@ -10,14 +10,19 @@ public sealed class SamplesTests
     {
         var source = await Fixture.SourceFromResourceFile("SimpleConsoleProgram.cs");
 
-        await new Verifier.Test
+        var tester = new Verifier.Test
         {
             TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
             TestState =
             {
                 Sources = { source },
             },
-        }.RunAsync();
+        };
+        await tester.RunAsync();
+
+        var analyzer = tester.SourceGenerator.CompilationAnalyzer;
+
+        //Assert.NotNull(analyzer);
     }
 
     [Fact]

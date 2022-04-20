@@ -7,6 +7,8 @@ namespace Mediator.SourceGenerator;
 [Generator]
 public sealed partial class MediatorGenerator : ISourceGenerator
 {
+    internal CompilationAnalyzer? CompilationAnalyzer { get; private set; }
+
     public void Execute(GeneratorExecutionContext context)
     {
         var debugOptionExists = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Mediator_AttachDebugger", out _);
@@ -36,14 +38,14 @@ public sealed partial class MediatorGenerator : ISourceGenerator
         GenerateOptions(in context, generatorVersion);
         GenerateOptionsAttribute(in context, generatorVersion);
 
-        var compilationAnalyzer = new CompilationAnalyzer(in context, generatorVersion);
-        compilationAnalyzer.Analyze(context.CancellationToken);
+        CompilationAnalyzer = new CompilationAnalyzer(in context, generatorVersion);
+        CompilationAnalyzer.Analyze(context.CancellationToken);
 
-        if (compilationAnalyzer.HasErrors)
+        if (CompilationAnalyzer.HasErrors)
             return;
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-        mediatorImplementationGenerator.Generate(in context, compilationAnalyzer);
+        mediatorImplementationGenerator.Generate(in context, CompilationAnalyzer);
     }
 
     private void GenerateOptions(in GeneratorExecutionContext context, string generatorVersion)

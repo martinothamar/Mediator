@@ -21,7 +21,7 @@ namespace Mediator
         /// the Mediator source generator.
         /// Singleton by default.
         /// </summary>
-        public global::Microsoft.Extensions.DependencyInjection.ServiceLifetime DefaultServiceLifetime { get; set; } =
+        public global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; set; } =
             global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
     }
 }

@@ -8,8 +8,7 @@ namespace Some.Nested.Types
 {
     public static class Program
     {
-        private const string MediatorNamespace = "SimpleConsole.Mediator";
-        private const ServiceLifetime Lifetime = ServiceLifetime.Transient;
+        private static ServiceLifetime Lifetime { get; }
 
         public static async Task Main()
         {
@@ -17,7 +16,6 @@ namespace Some.Nested.Types
 
             services.AddMediator(options =>
             {
-                options.Namespace = MediatorNamespace;
                 options.ServiceLifetime = Lifetime;
             });
 

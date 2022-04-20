@@ -19,6 +19,8 @@
     <Compile Remove="resources\DuplicateHandlersProgram.cs" />
     <Compile Remove="resources\IntCastLifetime.cs" />
     <Compile Remove="resources\InvalidVariablesConfig.cs" />
+    <Compile Remove="resources\LocalLiteralVariableConfig.cs" />
+    <Compile Remove="resources\LocalVariablesReferencingConstsConfig.cs" />
     <Compile Remove="resources\MultipleErrorsProgram.cs" />
     <Compile Remove="resources\NoMessagesProgram.cs" />
     <Compile Remove="resources\NotificationWithoutHandlerProgram.cs" />
@@ -27,6 +29,9 @@
     <Compile Remove="resources\StaticNestedHandlerProgram.cs" />
     <Compile Remove="resources\StreamingProgram.cs" />
     <Compile Remove="resources\StructHandlerProgram.cs" />
+    <Compile Remove="resources\UnassignedLifetimeVariableConfig.cs" />
+    <Compile Remove="resources\UnassignedNamespaceVariableConfig.cs" />
+    <Compile Remove="resources\UnassignedVariablesConfig.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -88,6 +88,8 @@ namespace MyCode
         inputCompilation.AssertGen(
             result =>
             {
+                Assertions.AssertCommon(result);
+
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
                 Assert.Single(result.Diagnostics);
             }
@@ -103,6 +105,8 @@ namespace MyCode
         inputCompilation.AssertGen(
             result =>
             {
+                Assertions.AssertCommon(result);
+
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
                 Assert.Contains(
                     result.Diagnostics,
@@ -122,6 +126,8 @@ namespace MyCode
         inputCompilation.AssertGen(
             result =>
             {
+                Assertions.AssertCommon(result);
+
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
                 Assert.True(result.Diagnostics.Length == 2);
@@ -160,6 +166,8 @@ namespace MyCode
         inputCompilation.AssertGen(
             result =>
             {
+                Assertions.AssertCommon(result);
+
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
                 Assert.True(result.Diagnostics.Length == 1);
             }
@@ -175,6 +183,8 @@ namespace MyCode
         inputCompilation.AssertGen(
             result =>
             {
+                Assertions.AssertCommon(result);
+
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.ConflictingConfiguration.Id);
                 Assert.True(result.Diagnostics.Length == 1);
             }
@@ -193,6 +203,40 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_Local_Literal_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("LocalLiteralVariableConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var analyzer = result.Generator.CompilationAnalyzer;
+                Assert.True(analyzer?.ServiceLifetimeIsScoped);
+                Assert.Equal("SomeNamespace", analyzer?.MediatorNamespace);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Local_Variables_Referencing_Consts_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("LocalVariablesReferencingConstsConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var analyzer = result.Generator.CompilationAnalyzer;
+                Assert.True(analyzer?.ServiceLifetimeIsScoped);
+                Assert.Equal("SomeNamespace", analyzer?.MediatorNamespace);
+            }
+        );
+    }
+
+    [Fact]
     public async Task Test_Invalid_Variable_In_Config()
     {
         var source = await Fixture.SourceFromResourceFile("InvalidVariablesConfig.cs");
@@ -201,6 +245,57 @@ namespace MyCode
         inputCompilation.AssertGen(
             result =>
             {
+                Assertions.AssertCommon(result);
+
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+                Assert.True(result.Diagnostics.Length == 1);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Unassigned_Variables_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("UnassignedVariablesConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assertions.AssertCommon(result);
+
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Unassigned_Namespace_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("UnassignedNamespaceVariableConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assertions.AssertCommon(result);
+
+                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Unassigned_Lifetime_Variable_In_Config()
+    {
+        var source = await Fixture.SourceFromResourceFile("UnassignedLifetimeVariableConfig.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(
+            result =>
+            {
+                Assertions.AssertCommon(result);
+
                 Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
                 Assert.True(result.Diagnostics.Length == 1);
             }

@@ -7,15 +7,22 @@
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
     <Using Include="BenchmarkDotNet.Attributes" />
     <Using Include="BenchmarkDotNet.Order" />
+    <Using Include="BenchmarkDotNet.Configs" />
+    <Using Include="BenchmarkDotNet.Jobs" />
+    <Using Include="BenchmarkDotNet.Diagnosers" />
+    <Using Include="BenchmarkDotNet.Loggers" />
+    <Using Include="BenchmarkDotNet.Diagnostics.Windows.Configs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.1" />
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="MessagePipe" Version="1.7.1" />

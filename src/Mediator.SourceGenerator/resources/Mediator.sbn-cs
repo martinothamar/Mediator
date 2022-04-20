@@ -150,11 +150,15 @@ namespace {{ MediatorNamespace }}
     {
         private readonly global::System.IServiceProvider _sp;
         {{~ if ServiceLifetimeIsSingleton ~}}
-        private readonly global::System.Lazy<DICache> _diCacheLazy;
-        private DICache _diCache => _diCacheLazy.Value;
+        private FastLazyValue<DICache> _diCacheLazy;
         {{~ else ~}}
-        private readonly DICache _diCache;
+        private DICache _diCache;
         {{~ end ~}}
+
+        /// <summary>
+        /// The lifetime of Mediator-related service registrations in DI container.
+        /// </summary>
+        public static global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = {{ ServiceLifetime }};
 
         private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
 
@@ -165,7 +169,7 @@ namespace {{ MediatorNamespace }}
         {
             _sp = sp;
             {{~ if ServiceLifetimeIsSingleton ~}}
-            _diCacheLazy = new global::System.Lazy<DICache>(() => new DICache(_sp));
+            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp));
             {{~ else ~}}
             _diCache = new DICache(_sp);
             {{~ end ~}}
@@ -174,7 +178,65 @@ namespace {{ MediatorNamespace }}
                  ? (s => ((object[])s).Length) : (s => s.Count());
         }
 
-        private {{ if ServiceLifetimeIsSingleton; "sealed class"; else; "readonly struct"; end; }} DICache
+        private struct FastLazyValue<T>
+            where T : struct
+        {
+            private const long UNINIT = 0;
+            private const long INITING = 1;
+            private const long INITD = 2;
+
+            private global::System.Func<T> _generator;
+            private long _state;
+            private T _value;
+
+            public T Value
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                get
+                {
+                    if (_state != INITD)
+                        return ValueSlow;
+
+                    return _value;
+                }
+            }
+
+            private T ValueSlow
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+                get
+                {
+                    var prevState = global::System.Threading.Interlocked.CompareExchange(ref _state, INITING, UNINIT);
+                    switch (prevState)
+                    {
+                        case INITD:
+                            // Someone has already completed init
+                            return _value;
+                        case INITING:
+                            // Wait for someone else to complete
+                            var spinWait = default(global::System.Threading.SpinWait);
+                            while (global::System.Threading.Interlocked.Read(ref _state) < INITD)
+                                spinWait.SpinOnce();
+                            return _value;
+                        case UNINIT:
+                            _value = _generator();
+                            global::System.Threading.Interlocked.Exchange(ref _state, INITD);
+                            return _value;
+                    }
+
+                    return _value;
+                }
+            }
+
+            public FastLazyValue(global::System.Func<T> generator)
+            {
+                _generator = generator;
+                _state = UNINIT;
+                _value = default;
+            }
+        }
+
+        private readonly struct DICache
         {
             private readonly global::System.IServiceProvider _sp;
 
@@ -235,7 +297,11 @@ namespace {{ MediatorNamespace }}
             {{- if message.IsClass }}
             ThrowIfNull(message, nameof(message));
             {{ end }}
+            {{~ if ServiceLifetimeIsSingleton ~}}
+            return _diCacheLazy.Value.{{ message.HandlerWrapperPropertyName }}.Handle({{- message.ParameterModifier -}}message, cancellationToken);
+            {{~ else ~}}
             return _diCache.{{ message.HandlerWrapperPropertyName }}.Handle({{- message.ParameterModifier -}}message, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
 
@@ -559,7 +625,11 @@ namespace {{ MediatorNamespace }}
             ThrowIfNull(notification, nameof(notification));
             {{ end }}
 
+            {{~ if ServiceLifetimeIsSingleton ~}}
+            var handlers = _diCacheLazy.Value.Handlers_For_{{ message.IdentifierFullName }};
+            {{~ else ~}}
             var handlers = _diCache.Handlers_For_{{ message.IdentifierFullName }};
+            {{~ end ~}}
             
             {{~ if ServiceLifetimeIsSingleton ~}}
             if (handlers.Length == 0)

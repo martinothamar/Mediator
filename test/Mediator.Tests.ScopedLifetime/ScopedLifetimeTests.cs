@@ -6,6 +6,12 @@ namespace Mediator.Tests.ScopedLifetime;
 public sealed class ScopedLifetimeTests
 {
     [Fact]
+    public void Test_Generated_Code_Lifetime()
+    {
+        Assert.Equal(ServiceLifetime.Scoped, Mediator.ServiceLifetime);
+    }
+
+    [Fact]
     public void Test_Returns_Same_Instance_In_Scope()
     {
         var (sp, _) = Fixture.GetMediator(createScope: true);

@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**">
+    <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**;..\Mediator.Tests\SingletonLifetimeTests.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>

@@ -11,7 +11,7 @@ var services = new ServiceCollection();
 services.AddMediator(options =>
 {
     options.Namespace = null;
-    options.DefaultServiceLifetime = ServiceLifetime.Transient;
+    options.ServiceLifetime = ServiceLifetime.Transient;
 });
 
 // Standard handlers are added by default, but we need to add pipeline steps manually.

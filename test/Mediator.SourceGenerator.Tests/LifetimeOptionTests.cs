@@ -24,7 +24,13 @@ namespace Something
         var inputCompilation = Fixture.CreateLibrary(source);
 
         inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var analyzer = result.Generator.CompilationAnalyzer;
+                Assert.True(analyzer?.ServiceLifetimeIsSingleton);
+                Assert.Equal("Mediator", analyzer?.MediatorNamespace);
+            }
         );
     }
 
@@ -35,7 +41,7 @@ namespace Something
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: MediatorOptions(Namespace = ""Mediator2"", DefaultServiceLifetime = ServiceLifetime.Transient)]
+[assembly: MediatorOptions(Namespace = ""Mediator2"", ServiceLifetime = ServiceLifetime.Transient)]
 
 namespace Something
 {
@@ -50,7 +56,13 @@ namespace Something
         var inputCompilation = Fixture.CreateLibrary(source);
 
         inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var analyzer = result.Generator.CompilationAnalyzer;
+                Assert.True(analyzer?.ServiceLifetimeIsTransient);
+                Assert.Equal("Mediator2", analyzer?.MediatorNamespace);
+            }
         );
     }
 }
