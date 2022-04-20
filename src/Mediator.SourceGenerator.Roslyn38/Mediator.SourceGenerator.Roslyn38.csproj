@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Mediator.SourceGenerator.Tests" />
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.Roslyn38.Tests" />
   </ItemGroup>
   
   <ItemGroup>

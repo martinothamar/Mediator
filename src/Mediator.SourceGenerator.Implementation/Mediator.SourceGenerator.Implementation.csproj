@@ -9,6 +9,8 @@
     <InternalsVisibleTo Include="Mediator.SourceGenerator.Tests" />
     <InternalsVisibleTo Include="Mediator.SourceGenerator.Roslyn38" />
     <InternalsVisibleTo Include="Mediator.SourceGenerator.Roslyn40" />
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.Roslyn38.Tests" />
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.Roslyn40.Tests" />
   </ItemGroup>
 
   <ItemGroup>
