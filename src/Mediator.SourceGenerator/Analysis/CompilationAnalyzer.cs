@@ -563,7 +563,7 @@ internal sealed class CompilationAnalyzer
                             return false;
                         }
                     }
-                    else if (opt == "DefaultServiceLifetime")
+                    else if (opt == "ServiceLifetime")
                     {
                         if (assignment.Right is MemberAccessExpressionSyntax enumAccess)
                         {
@@ -618,7 +618,7 @@ internal sealed class CompilationAnalyzer
                     throw new Exception("Error parsing MediatorOptions");
 
                 var attrFieldName = attrArg.NameEquals.Name.ToString();
-                if (attrFieldName == "DefaultServiceLifetime")
+                if (attrFieldName == "ServiceLifetime")
                 {
                     var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
                     _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifierNameSyntax, semanticModel, cancellationToken);

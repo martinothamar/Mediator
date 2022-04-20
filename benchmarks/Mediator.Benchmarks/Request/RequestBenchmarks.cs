@@ -51,7 +51,7 @@ public class RequestBenchmarks
     public void Setup()
     {
         var services = new ServiceCollection();
-        services.AddMediator(opts => opts.DefaultServiceLifetime = ServiceLifetime);
+        services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
         services.AddMediatR(opts =>
         {
             _ = ServiceLifetime switch

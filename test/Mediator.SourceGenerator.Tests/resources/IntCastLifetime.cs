@@ -14,7 +14,7 @@ namespace Some.Nested.Types
 
             services.AddMediator(options =>
             {
-                options.DefaultServiceLifetime = (ServiceLifetime)(int)ServiceLifetime.Transient;
+                options.ServiceLifetime = (ServiceLifetime)(int)ServiceLifetime.Transient;
             });
 
             var serviceProvider = services.BuildServiceProvider();

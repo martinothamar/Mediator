@@ -41,7 +41,7 @@ namespace Something
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: MediatorOptions(Namespace = ""Mediator2"", DefaultServiceLifetime = ServiceLifetime.Transient)]
+[assembly: MediatorOptions(Namespace = ""Mediator2"", ServiceLifetime = ServiceLifetime.Transient)]
 
 namespace Something
 {
