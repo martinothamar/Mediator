@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <!--<ItemGroup>
-    <PackageReference Include="Mediator.SourceGenerator" Version="2.0.6-preview.g05b9d689f6">
+    <PackageReference Include="Mediator.SourceGenerator" Version="2.0.*-*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

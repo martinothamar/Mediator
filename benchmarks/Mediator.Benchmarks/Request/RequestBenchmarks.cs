@@ -44,8 +44,8 @@ public class RequestBenchmarks
     private SomeHandlerClass _handler;
     private SomeRequest _request;
 
-    [Params(ServiceLifetime.Singleton)]
-    public ServiceLifetime ServiceLifetime { get; set; } = ServiceLifetime.Singleton;
+    [Params(MediatorConfig.Lifetime)]
+    public ServiceLifetime ServiceLifetime { get; set; } = MediatorConfig.Lifetime;
 
     [GlobalSetup]
     public void Setup()
