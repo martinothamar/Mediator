@@ -188,7 +188,7 @@ namespace {{ MediatorNamespace }}
             {{ if IsTestRun }}internal const long CACHED = 3;{{ end }}
 
             {{ if IsTestRun }}internal{{ else }}private{{ end }} global::System.Func<T> _generator;
-            {{ if IsTestRun }}internal{{ else }}private{{ end }} long _state = UNINIT;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} long _state;
             {{ if IsTestRun }}internal{{ else }}private{{ end }} T _value;
 
             public T Value
