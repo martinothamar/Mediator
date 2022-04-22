@@ -5,6 +5,7 @@
 
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <!--<ReportAnalyzer>true</ReportAnalyzer>-->
   </PropertyGroup>
 

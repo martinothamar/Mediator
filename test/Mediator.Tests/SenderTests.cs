@@ -3,8 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests;
 
-
-
 public sealed class SenderTests
 {
     [Fact]
