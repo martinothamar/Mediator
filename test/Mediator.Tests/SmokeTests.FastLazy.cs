@@ -1,4 +1,4 @@
-using Mediator.Tests.TestTypes;
+using DICache = Mediator.Mediator.DICache;
 using LazyDICache = Mediator.Mediator.FastLazyValue<Mediator.Mediator.DICache>;
 
 namespace Mediator.Tests;
@@ -22,23 +22,29 @@ public partial class SmokeTests
 
         var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        var threads = new Task<long>[concurrency];
+        var threads = new Task<(DICache Cache, long State)>[concurrency];
         for (int i = 0; i < concurrency; i++)
         {
             threads[i] = Task.Run(Thread);
         }
 
         start.SetResult();
-        var states = await Task.WhenAll(threads).ConfigureAwait(false);
+        var values = await Task.WhenAll(threads).ConfigureAwait(false);
+        var states = values.Select(v => v.State).ToArray();
+
         Assert.DoesNotContain(LazyDICache.INVALID, states);
         Assert.Single(states.Where(s => s == LazyDICache.UNINIT));
 
-        async Task<long> Thread()
+        var handlers = values.Select(v => v.Cache.Wrapper_For_Mediator_Tests_TestTypes_SomeRequest).ToArray();
+        var handler = handlers[0];
+
+        Assert.All(handlers, h => Assert.Same(handler, h));
+
+        async Task<(DICache Cache, long State)> Thread()
         {
             await start.Task.ConfigureAwait(false);
 
-            var (_, state) = concrete._diCacheLazy.ValueInstrumented;
-            return state;
+            return concrete._diCacheLazy.ValueInstrumented;
         }
     }
 }

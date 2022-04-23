@@ -237,13 +237,13 @@ namespace {{ MediatorNamespace }}
                 get
                 {
                     if (_state != INITD)
-                        return ValueSlowIntrumented;
+                        return ValueSlowInstrumented;
 
                     return (_value, CACHED);
                 }
             }
 
-            internal (T, long) ValueSlowIntrumented
+            internal (T, long) ValueSlowInstrumented
             {
                 [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
                 get
