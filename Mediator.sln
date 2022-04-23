@@ -64,13 +64,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStreaming", "samples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASPNET", "samples\ASPNET\ASPNET.csproj", "{35D4B136-E164-48A3-ADC3-E22237CCDC9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.SourceGenerator.Roslyn38", "src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj", "{FCB31060-4C23-4BB7-9A95-4C636B43F6B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator.Roslyn38", "src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj", "{FCB31060-4C23-4BB7-9A95-4C636B43F6B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.SourceGenerator.Roslyn40", "src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj", "{C5AD8C4D-D731-4DDD-96BD-A6776A1FF20E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator.Roslyn40", "src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj", "{C5AD8C4D-D731-4DDD-96BD-A6776A1FF20E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.SourceGenerator.Implementation", "src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj", "{22984D49-8DDF-4263-8375-D018643E44B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator.Implementation", "src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj", "{22984D49-8DDF-4263-8375-D018643E44B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.SourceGenerator.Roslyn40.Tests", "test\Mediator.SourceGenerator.Roslyn40.Tests\Mediator.SourceGenerator.Roslyn40.Tests.csproj", "{E4EE80C5-179C-4483-9E91-3107B3E1CD5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator.Roslyn40.Tests", "test\Mediator.SourceGenerator.Roslyn40.Tests\Mediator.SourceGenerator.Roslyn40.Tests.csproj", "{E4EE80C5-179C-4483-9E91-3107B3E1CD5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.SmokeTestConsole", "test\Mediator.SmokeTestConsole\Mediator.SmokeTestConsole.csproj", "{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -322,6 +324,18 @@ Global
 		{E4EE80C5-179C-4483-9E91-3107B3E1CD5A}.Release|x64.Build.0 = Release|Any CPU
 		{E4EE80C5-179C-4483-9E91-3107B3E1CD5A}.Release|x86.ActiveCfg = Release|Any CPU
 		{E4EE80C5-179C-4483-9E91-3107B3E1CD5A}.Release|x86.Build.0 = Release|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Debug|x64.Build.0 = Debug|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Debug|x86.Build.0 = Debug|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Release|x64.ActiveCfg = Release|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Release|x64.Build.0 = Release|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Release|x86.ActiveCfg = Release|Any CPU
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -348,6 +362,7 @@ Global
 		{C5AD8C4D-D731-4DDD-96BD-A6776A1FF20E} = {438C928E-FBB5-45B2-9CD2-7ED3341AC75E}
 		{22984D49-8DDF-4263-8375-D018643E44B2} = {438C928E-FBB5-45B2-9CD2-7ED3341AC75E}
 		{E4EE80C5-179C-4483-9E91-3107B3E1CD5A} = {ED1809FC-733B-4D9E-8FEE-70D3BB0BBD84}
+		{65D8C0F8-E4CF-452D-86FB-482FE63C7C89} = {ED1809FC-733B-4D9E-8FEE-70D3BB0BBD84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D45B5457-4190-49B6-BF89-7FA5F4C8ABE2}

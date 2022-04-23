@@ -99,6 +99,9 @@ internal sealed class CompilationAnalyzer
 
     public bool ServiceLifetimeIsTransient => ServiceLifetimeSymbol.Name == "Transient";
 
+    public bool IsTestRun => (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false) ||
+        (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
+
     public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
         _context = context;
