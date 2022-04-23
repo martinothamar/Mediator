@@ -49,7 +49,6 @@ public static class Fixture
         return (sp, mediator!);
     }
 
-
     private sealed class CustomServiceProvider : IServiceProvider
     {
         private readonly IServiceCollection _services;
