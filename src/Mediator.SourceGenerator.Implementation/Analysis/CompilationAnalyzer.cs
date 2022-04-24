@@ -318,7 +318,7 @@ internal sealed class CompilationAnalyzer
                             var requestMessageSymbol = (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0];
                             if (mapping.TryGetValue(requestMessageSymbol, out var requestMessageObj))
                             {
-                                if (requestMessageObj is null || requestMessageObj is not RequestMessage requestMessage)
+                                if (requestMessageObj is not RequestMessage requestMessage)
                                 {
                                     // Signal that we have duplicates
                                     ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMultipleHandlers(s));

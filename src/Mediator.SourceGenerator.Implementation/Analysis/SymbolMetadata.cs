@@ -7,7 +7,7 @@ internal abstract class SymbolMetadata<T> : IEquatable<T?>
     public readonly INamedTypeSymbol Symbol;
     protected readonly CompilationAnalyzer Analyzer;
 
-    public SymbolMetadata(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
+    protected SymbolMetadata(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
     {
         Symbol = symbol;
         Analyzer = analyzer;
