@@ -150,9 +150,9 @@ namespace {{ MediatorNamespace }}
     {
         private readonly global::System.IServiceProvider _sp;
         {{~ if ServiceLifetimeIsSingleton ~}}
-        private FastLazyValue<DICache> _diCacheLazy;
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<DICache> _diCacheLazy;
         {{~ else ~}}
-        private DICache _diCache;
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} DICache _diCache;
         {{~ end ~}}
 
         /// <summary>
@@ -178,16 +178,18 @@ namespace {{ MediatorNamespace }}
                  ? (s => ((object[])s).Length) : (s => s.Count());
         }
 
-        private struct FastLazyValue<T>
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} struct FastLazyValue<T>
             where T : struct
         {
-            private const long UNINIT = 0;
-            private const long INITING = 1;
-            private const long INITD = 2;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} const long UNINIT = 0;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} const long INITING = 1;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} const long INITD = 2;
+            {{ if IsTestRun }}internal const long INVALID = -1;{{ end }}
+            {{ if IsTestRun }}internal const long CACHED = 3;{{ end }}
 
-            private global::System.Func<T> _generator;
-            private long _state;
-            private T _value;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} global::System.Func<T> _generator;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} long _state;
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} T _value;
 
             public T Value
             {
@@ -201,7 +203,7 @@ namespace {{ MediatorNamespace }}
                 }
             }
 
-            private T ValueSlow
+            {{ if IsTestRun }}internal{{ else }}private{{ end }} T ValueSlow
             {
                 [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
                 get
@@ -228,6 +230,47 @@ namespace {{ MediatorNamespace }}
                 }
             }
 
+            {{~ if IsTestRun ~}}
+            internal (T, long) ValueInstrumented
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                get
+                {
+                    if (_state != INITD)
+                        return ValueSlowInstrumented;
+
+                    return (_value, CACHED);
+                }
+            }
+
+            internal (T, long) ValueSlowInstrumented
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+                get
+                {
+                    var prevState = global::System.Threading.Interlocked.CompareExchange(ref _state, INITING, UNINIT);
+                    switch (prevState)
+                    {
+                        case INITD:
+                            // Someone has already completed init
+                            return (_value, INITD);
+                        case INITING:
+                            // Wait for someone else to complete
+                            var spinWait = default(global::System.Threading.SpinWait);
+                            while (global::System.Threading.Interlocked.Read(ref _state) < INITD)
+                                spinWait.SpinOnce();
+                            return (_value, INITING);
+                        case UNINIT:
+                            _value = _generator();
+                            global::System.Threading.Interlocked.Exchange(ref _state, INITD);
+                            return (_value, UNINIT);
+                    }
+
+                    return (_value, INVALID);
+                }
+            }
+            {{~ end ~}}
+
             public FastLazyValue(global::System.Func<T> generator)
             {
                 _generator = generator;
@@ -236,7 +279,7 @@ namespace {{ MediatorNamespace }}
             }
         }
 
-        private readonly struct DICache
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} readonly struct DICache
         {
             private readonly global::System.IServiceProvider _sp;
 

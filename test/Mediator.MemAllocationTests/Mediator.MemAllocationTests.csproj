@@ -6,6 +6,7 @@
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <!--<ReportAnalyzer>true</ReportAnalyzer>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,18 +26,14 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="JetBrains.DotMemoryUnit" Version="3.1.20200127.214830" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**;..\Mediator.Tests\SingletonLifetimeTests.cs;..\Mediator.Tests\SmokeTests.FastLazy.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
+    <ProjectReference Include="..\Mediator.Tests.Common\Mediator.Tests.Common.csproj" />
   </ItemGroup>
 
 </Project>

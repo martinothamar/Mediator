@@ -2,7 +2,8 @@
   <ItemGroup>
     <ProjectReference Include="src/Mediator/Mediator.csproj" />
     <ProjectReference Include="src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj" />
-    <ProjectReference Include="test/Mediator.SourceGenerator.Tests/Mediator.SourceGenerator.Tests.csproj" />
+    <ProjectReference Include="test/Mediator.SourceGenerator.Roslyn38.Tests/Mediator.SourceGenerator.Roslyn38.Tests.csproj" />
+    <ProjectReference Include="test/Mediator.SourceGenerator.Roslyn40.Tests/Mediator.SourceGenerator.Roslyn40.Tests.csproj" />
     <ProjectReference Include="test/Mediator.Tests/Mediator.Tests.csproj" />
     <ProjectReference Include="test/Mediator.Tests.TransientLifetime/Mediator.Tests.TransientLifetime.csproj" />
     <ProjectReference Include="test/Mediator.Tests.ScopedLifetime/Mediator.Tests.ScopedLifetime.csproj" />

@@ -1,6 +1,6 @@
 ## Benchmarks
 
-Here are some of the benchmarks I've run on my slightly old development laptop.
+This document contains benchmarks that are run on consistent desktop hardware as this library is developed.
 
 Naming convention:
 * `<name>_Baseline`: simple method call into the handler class
@@ -11,15 +11,86 @@ Naming convention:
 
 ### Requests
 
-![Requests benchmark](/img/request_benchmark.png "Requests benchmark")
+``` ini
+
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19044.1586 (21H2)
+AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
+.NET SDK=6.0.300-preview.22204.3
+  [Host]     : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+  DefaultJob : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+
+
+```
+|                  Method | ServiceLifetime |       Mean |     Error |    StdDev | Ratio | RatioSD | Rank |  Gen 0 | Allocated |
+|------------------------ |---------------- |-----------:|----------:|----------:|------:|--------:|-----:|-------:|----------:|
+|    SendRequest_Baseline |       Singleton |   5.064 ns | 0.1133 ns | 0.1060 ns |  1.00 |    0.00 |    1 |      - |         - |
+|    SendRequest_Mediator |       Singleton |   9.952 ns | 0.1441 ns | 0.1348 ns |  1.97 |    0.05 |    2 |      - |         - |
+| SendRequest_MessagePipe |       Singleton |  10.328 ns | 0.0368 ns | 0.0287 ns |  2.03 |    0.05 |    3 |      - |         - |
+|   SendRequest_IMediator |       Singleton |  20.229 ns | 0.2793 ns | 0.2613 ns |  4.00 |    0.11 |    4 |      - |         - |
+|     SendRequest_MediatR |       Singleton | 503.202 ns | 6.6759 ns | 6.2447 ns | 99.41 |    2.61 |    5 | 0.0792 |   1,328 B |
+
+
+### Notifications
+
+``` ini
+
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19044.1586 (21H2)
+AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
+.NET SDK=6.0.300-preview.22204.3
+  [Host]     : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+  DefaultJob : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+
+
+```
+|                       Method | ServiceLifetime |       Mean |     Error |    StdDev | Ratio | RatioSD | Rank |  Gen 0 | Allocated |
+|----------------------------- |---------------- |-----------:|----------:|----------:|------:|--------:|-----:|-------:|----------:|
+|    SendNotification_Baseline |       Singleton |   7.566 ns | 0.1193 ns | 0.1116 ns |  1.00 |    0.00 |    1 |      - |         - |
+|    SendNotification_Mediator |       Singleton |   8.557 ns | 0.1118 ns | 0.1046 ns |  1.13 |    0.02 |    2 |      - |         - |
+|   SendNotification_IMediator |       Singleton |  12.300 ns | 0.1530 ns | 0.1431 ns |  1.63 |    0.03 |    3 |      - |         - |
+| SendNotification_MessagePipe |       Singleton |  42.258 ns | 0.5543 ns | 0.5185 ns |  5.59 |    0.09 |    4 | 0.0024 |      40 B |
+|     SendNotification_MediatR |       Singleton | 119.268 ns | 1.5950 ns | 1.4920 ns | 15.77 |    0.30 |    5 | 0.0153 |     256 B |
+
 
 ### Streaming
 
 An `IAsyncEnumerable` doing 10 iterations, being fully consumed.
 
-![Streaming benchmark](/img/stream_benchmark.png "Streaming benchmark")
+``` ini
+
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19044.1586 (21H2)
+AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
+.NET SDK=6.0.300-preview.22204.3
+  [Host]     : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+  DefaultJob : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+
+
+```
+|           Method | ServiceLifetime |     Mean |    Error |  StdDev | Ratio | RatioSD | Rank |  Gen 0 | Allocated |
+|----------------- |---------------- |---------:|---------:|--------:|------:|--------:|-----:|-------:|----------:|
+|  Stream_Baseline |       Singleton | 250.5 ns |  4.87 ns | 4.78 ns |  1.00 |    0.00 |    1 | 0.0057 |      96 B |
+| Stream_IMediator |       Singleton | 266.5 ns |  4.24 ns | 3.97 ns |  1.06 |    0.02 |    2 | 0.0057 |      96 B |
+|  Stream_Mediator |       Singleton | 268.3 ns |  2.60 ns | 2.03 ns |  1.07 |    0.02 |    2 | 0.0057 |      96 B |
+|   Stream_MediatR |       Singleton | 910.8 ns | 10.32 ns | 9.65 ns |  3.64 |    0.07 |    3 | 0.0372 |     632 B |
+
 
 ### Big struct requests
 
-![Big struct requests benchmark](/img/struct_request_benchmark.png "Big struct requests benchmark")
+``` ini
+
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19044.1586 (21H2)
+AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
+.NET SDK=6.0.300-preview.22204.3
+  [Host]     : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+  DefaultJob : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+
+
+```
+|                        Method | ServiceLifetime |       Mean |     Error |    StdDev |  Ratio | RatioSD | Rank |  Gen 0 | Allocated |
+|------------------------------ |---------------- |-----------:|----------:|----------:|-------:|--------:|-----:|-------:|----------:|
+|    SendStructRequest_Baseline |       Singleton |   4.956 ns | 0.0930 ns | 0.0870 ns |   1.00 |    0.00 |    1 |      - |         - |
+|    SendStructRequest_Mediator |       Singleton |  11.964 ns | 0.1643 ns | 0.1537 ns |   2.41 |    0.04 |    2 |      - |         - |
+| SendStructRequest_MessagePipe |       Singleton |  18.317 ns | 0.2966 ns | 0.2775 ns |   3.70 |    0.07 |    3 |      - |         - |
+|   SendStructRequest_IMediator |       Singleton |  27.634 ns | 0.3807 ns | 0.3561 ns |   5.58 |    0.15 |    4 | 0.0052 |      88 B |
+|     SendStructRequest_MediatR |       Singleton | 594.018 ns | 7.8648 ns | 7.3568 ns | 119.92 |    3.18 |    5 | 0.0839 |   1,416 B |
+
 
