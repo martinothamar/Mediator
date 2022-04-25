@@ -76,7 +76,7 @@ internal sealed class CompilationAnalyzer
 
     public bool HasErrors => _hasErrors;
 
-    public INamedTypeSymbol UnitSymbol { get; }
+    public readonly INamedTypeSymbol UnitSymbol;
 
     public Compilation Compilation => _context.Compilation;
 
@@ -87,7 +87,7 @@ internal sealed class CompilationAnalyzer
     private IFieldSymbol? _configuredLifetimeSymbol;
     private readonly INamedTypeSymbol _serviceLifetimeEnumSymbol;
     public IFieldSymbol ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
-    public IFieldSymbol SingletonServiceLifetimeSymbol { get; }
+    public readonly IFieldSymbol SingletonServiceLifetimeSymbol;
 
     public string ServiceLifetime => ServiceLifetimeSymbol.GetFieldSymbolFullName();
 
@@ -111,54 +111,124 @@ internal sealed class CompilationAnalyzer
         _requestMessageHandlers = new();
         _notificationMessageHandlers = new();
 
-        var compilation = _context.Compilation;
+        TryLoadUnitSymbol(out UnitSymbol);
 
-        UnitSymbol = compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.Unit")!.OriginalDefinition;
+        TryLoadBaseHandlerSymbols(out _baseHandlerSymbols);
 
-        _baseHandlerSymbols = new INamedTypeSymbol[]
-        {
-                // Handler
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequestHandler`2")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequestHandler`2")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommandHandler`2")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommandHandler`2")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQueryHandler`2")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQueryHandler`2")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationHandler`1")!.OriginalDefinition,
-        };
-
-        _serviceLifetimeEnumSymbol = compilation.GetTypeByMetadataName("Microsoft.Extensions.DependencyInjection.ServiceLifetime")!;
-        SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
+        TryLoadDISymbols(out _serviceLifetimeEnumSymbol, out SingletonServiceLifetimeSymbol);
 
         RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
         {
-                new RequestMessageHandlerWrapper("Request", this),
-                new RequestMessageHandlerWrapper("StreamRequest", this),
-                new RequestMessageHandlerWrapper("Command", this),
-                new RequestMessageHandlerWrapper("StreamCommand", this),
-                new RequestMessageHandlerWrapper("Query", this),
-                new RequestMessageHandlerWrapper("StreamQuery", this),
+            new RequestMessageHandlerWrapper("Request", this),
+            new RequestMessageHandlerWrapper("StreamRequest", this),
+            new RequestMessageHandlerWrapper("Command", this),
+            new RequestMessageHandlerWrapper("StreamCommand", this),
+            new RequestMessageHandlerWrapper("Query", this),
+            new RequestMessageHandlerWrapper("StreamQuery", this),
         }.ToImmutableArray();
 
         _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
 
-        _baseMessageSymbols = new INamedTypeSymbol[]
+        TryLoadBaseMessageSymbols(out _baseMessageSymbols, out _notificationInterfaceSymbol);
+    }
+
+    private void TryLoadUnitSymbol(out INamedTypeSymbol UnitSymbol)
+    {
+        var unitSymbolName = $"{Constants.MediatorLib}.Unit";
+        var unitSymbol = _context.Compilation.GetTypeByMetadataName(unitSymbolName)?.OriginalDefinition;
+        if (unitSymbol is null)
         {
-                // Message types
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IRequest`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamRequest`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ICommand`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamCommand`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IQuery`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.IStreamQuery`1")!.OriginalDefinition,
-                compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotification")!.OriginalDefinition,
+            UnitSymbol = null!;
+            ReportDiagnostic(unitSymbolName, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+        }
+        else
+        {
+            UnitSymbol = unitSymbol;
+        }
+    }
+
+    private void TryLoadBaseHandlerSymbols(out INamedTypeSymbol[] _baseHandlerSymbols)
+    {
+        var baseHandlerSymbolNames = new[]
+        {
+            $"{Constants.MediatorLib}.IRequestHandler`1", $"{Constants.MediatorLib}.IRequestHandler`2",
+            $"{Constants.MediatorLib}.IStreamRequestHandler`2", $"{Constants.MediatorLib}.ICommandHandler`1",
+            $"{Constants.MediatorLib}.ICommandHandler`2", $"{Constants.MediatorLib}.IStreamCommandHandler`2",
+            $"{Constants.MediatorLib}.IQueryHandler`2", $"{Constants.MediatorLib}.IStreamQueryHandler`2",
+            $"{Constants.MediatorLib}.INotificationHandler`1",
         };
 
-        _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
+        var baseHandlerSymbols =
+            baseHandlerSymbolNames.Select(n => (Name: n, Symbol: _context.Compilation.GetTypeByMetadataName(n)?.OriginalDefinition))
+                .ToArray();
+
+        _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
+        if (baseHandlerSymbols.Any(s => s.Symbol is null))
+        {
+            foreach (var (name, symbol) in baseHandlerSymbols)
+            {
+                if (symbol is not null)
+                    continue;
+                ReportDiagnostic(name, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+            }
+        }
+        else
+        {
+            _baseHandlerSymbols = baseHandlerSymbols
+                .Select(s => s.Symbol!)
+                .ToArray();
+        }
+    }
+
+    private void TryLoadDISymbols(out INamedTypeSymbol _serviceLifetimeEnumSymbol, out IFieldSymbol SingletonServiceLifetimeSymbol)
+    {
+        var serviceLifetimeEnumSymbolName = "Microsoft.Extensions.DependencyInjection.ServiceLifetime";
+        var serviceLifetimeEnumSymbol = _context.Compilation.GetTypeByMetadataName(serviceLifetimeEnumSymbolName);
+        if (serviceLifetimeEnumSymbol is null)
+        {
+            _serviceLifetimeEnumSymbol = null!;
+            SingletonServiceLifetimeSymbol = null!;
+            ReportDiagnostic(serviceLifetimeEnumSymbolName, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+        }
+        else
+        {
+            _serviceLifetimeEnumSymbol = serviceLifetimeEnumSymbol;
+            SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
+        }
+    }
+
+    private void TryLoadBaseMessageSymbols(out INamedTypeSymbol[] _baseMessageSymbols, out INamedTypeSymbol _notificationInterfaceSymbol)
+    {
+        var baseMessageSymbolNames = new[]
+        {
+            $"{Constants.MediatorLib}.IRequest", $"{Constants.MediatorLib}.IRequest`1",
+            $"{Constants.MediatorLib}.IStreamRequest`1", $"{Constants.MediatorLib}.ICommand",
+            $"{Constants.MediatorLib}.ICommand`1", $"{Constants.MediatorLib}.IStreamCommand`1",
+            $"{Constants.MediatorLib}.IQuery`1", $"{Constants.MediatorLib}.IStreamQuery`1",
+            $"{Constants.MediatorLib}.INotification",
+        };
+        var baseMessageSymbols =
+            baseMessageSymbolNames.Select(n => (Name: n, Symbol: _context.Compilation.GetTypeByMetadataName(n)?.OriginalDefinition))
+                .ToArray();
+
+        _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
+        if (baseMessageSymbols.Any(s => s.Symbol is null))
+        {
+            _notificationInterfaceSymbol = null!;
+            foreach (var (name, symbol) in baseMessageSymbols)
+            {
+                if (symbol is not null)
+                    continue;
+                ReportDiagnostic(name, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+            }
+        }
+        else
+        {
+            _baseMessageSymbols = baseMessageSymbols
+                .Select(s => s.Symbol!)
+                .ToArray();
+            _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
+        }
     }
 
     public void Analyze(CancellationToken cancellationToken)

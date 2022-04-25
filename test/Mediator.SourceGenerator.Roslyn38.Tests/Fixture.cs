@@ -1,15 +1,32 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace Mediator.SourceGenerator.Tests;
 
 public static class Fixture
 {
+    public static readonly Assembly[] ImportantAssemblies = new[]
+    {
+        typeof(object).Assembly,
+        typeof(IMessage).Assembly,
+        typeof(ServiceLifetime).Assembly,
+        typeof(ServiceProvider).Assembly,
+        typeof(MulticastDelegate).Assembly
+    };
+
+    public static Assembly[] AssemblyReferencesForCodegen =>
+        AppDomain.CurrentDomain.GetAssemblies()
+            .Concat(ImportantAssemblies)
+            .Distinct()
+            .Where(a => !a.IsDynamic)
+            .ToArray();
+
     public static Compilation CreateLibrary(params string[] source)
     {
         var references = new List<MetadataReference>();
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        var assemblies = AssemblyReferencesForCodegen;;
         foreach (Assembly assembly in assemblies)
         {
             if (!assembly.IsDynamic)
