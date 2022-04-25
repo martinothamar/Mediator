@@ -79,6 +79,14 @@ public static class Diagnostics
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
+        RequiredSymbolNotFound = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} symbol not found during analysis",
+            $"{nameof(MediatorGenerator)} could not find symbol required during analysis: {0}",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
         static string GetNextId()
         {
             var count = _counter++;
@@ -94,6 +102,7 @@ public static class Diagnostics
         DiagnosticDescriptor diagnosticDescriptor,
         T arg
     )
+    where T : class
     {
         Diagnostic diagnostic;
         if (arg is ISymbol symbolArg)
@@ -151,6 +160,10 @@ public static class Diagnostics
     public static readonly DiagnosticDescriptor InvalidCodeBasedConfiguration;
     internal static Diagnostic ReportInvalidCodeBasedConfiguration(this CompilationAnalyzerContext context) =>
         context.Report(InvalidCodeBasedConfiguration);
+
+    public static readonly DiagnosticDescriptor RequiredSymbolNotFound;
+    internal static Diagnostic ReportRequiredSymbolNotFound(this CompilationAnalyzerContext context, string name) =>
+        context.Report(RequiredSymbolNotFound, name);
 }
 
 #pragma warning restore RS2008 // Enable analyzer release tracking

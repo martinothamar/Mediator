@@ -1,4 +1,5 @@
 
+using Mediator.SourceGenerator.Tests;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
@@ -12,16 +13,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
     {
         public Test()
         {
-            var includeRefs = new[]
-            {
-                "Microsoft.Extensions.DependencyInjection",
-                "Mediator",
-            };
-
-            var refs = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .Where(a => a.FullName is not null && includeRefs.Any(r => a.FullName.Contains(r)))
+            var refs = Fixture.AssemblyReferencesForCodegen
                 .Select(a => a.Location)
                 .ToImmutableArray();
 
@@ -45,7 +37,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
             });
         }
 
-        public TSourceGenerator SourceGenerator => (TSourceGenerator)GetSourceGenerators().Single(); 
+        public TSourceGenerator SourceGenerator => (TSourceGenerator)GetSourceGenerators().Single();
 
         protected override CompilationOptions CreateCompilationOptions()
         {

@@ -16,10 +16,10 @@
     <PackageTags>mediator mediator-pattern source-generation source-gen source-generator sourcegenerator C# .NET .NET5 dotnet dotnet5 dotnet6</PackageTags>
     <RepositoryType>git</RepositoryType>
     <Authors>Martin Othamar</Authors>
-    <Copyright>Copyright 2021 Martin Othamar</Copyright>
+    <Copyright>Copyright 2022 Martin Othamar</Copyright>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DotNetVersion>6.0.*</DotNetVersion>
+    <DotNetVersion>6.0.0</DotNetVersion>
   </PropertyGroup>
 </Project>

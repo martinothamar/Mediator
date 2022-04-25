@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.1.32127.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{438C928E-FBB5-45B2-9CD2-7ED3341AC75E}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator", "src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj", "{D3F185A5-0145-4333-8CFF-548E3BD478DE}"
 EndProject
@@ -76,7 +79,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SmokeTestConsole",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.MemAllocationTests", "test\Mediator.MemAllocationTests\Mediator.MemAllocationTests.csproj", "{EECFACC8-E841-4EF5-A1D7-A64C84B7DBCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.Tests.Common", "test\Mediator.Tests.Common\Mediator.Tests.Common.csproj", "{32DC3B96-7E6E-40B0-AA12-40656B2D0381}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.Common", "test\Mediator.Tests.Common\Mediator.Tests.Common.csproj", "{32DC3B96-7E6E-40B0-AA12-40656B2D0381}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -24,8 +24,10 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             context.AddSource
         );
         CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
-        CompilationAnalyzer.Analyze(context.CancellationToken);
+        if (CompilationAnalyzer.HasErrors)
+            return;
 
+        CompilationAnalyzer.Analyze(context.CancellationToken);
         if (CompilationAnalyzer.HasErrors)
             return;
 
