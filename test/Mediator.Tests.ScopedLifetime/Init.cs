@@ -7,8 +7,7 @@ namespace Mediator.Tests.ScopedLifetime;
 
 public class Framework : XunitTestFramework
 {
-    public Framework(IMessageSink messageSink)
-      : base(messageSink)
+    public Framework(IMessageSink messageSink) : base(messageSink)
     {
         Fixture.CreateServiceScope = true;
     }

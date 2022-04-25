@@ -8,10 +8,15 @@ public sealed class StreamingPipelineTests
     [Fact]
     public async Task Test_Pipeline()
     {
-        var (sp, mediator) = Fixture.GetMediator(services =>
-        {
-            services.AddSingleton<IStreamPipelineBehavior<SomeStreamingQuery, SomeResponse>, SomeStreamingPipeline>();
-        });
+        var (sp, mediator) = Fixture.GetMediator(
+            services =>
+            {
+                services.AddSingleton<
+                    IStreamPipelineBehavior<SomeStreamingQuery, SomeResponse>,
+                    SomeStreamingPipeline
+                >();
+            }
+        );
 
         var id = Guid.NewGuid();
 
@@ -27,11 +32,13 @@ public sealed class StreamingPipelineTests
     [Fact]
     public async Task Test_Generic_Pipeline()
     {
-        var (sp, mediator) = Fixture.GetMediator(services =>
-        {
-            services.AddSingleton<GenericPipelineState>();
-            services.AddSingleton(typeof(IStreamPipelineBehavior<,>), typeof(GenericStreamPipeline<,>));
-        });
+        var (sp, mediator) = Fixture.GetMediator(
+            services =>
+            {
+                services.AddSingleton<GenericPipelineState>();
+                services.AddSingleton(typeof(IStreamPipelineBehavior<,>), typeof(GenericStreamPipeline<,>));
+            }
+        );
 
         var query = new SomeStreamingQuery(Guid.NewGuid());
 

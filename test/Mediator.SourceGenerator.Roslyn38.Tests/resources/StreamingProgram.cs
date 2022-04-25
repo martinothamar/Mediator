@@ -42,7 +42,10 @@ namespace Some.Nested.Types
 
         public sealed class PingHandler : IStreamRequestHandler<StreamPing, Pong>
         {
-            public async IAsyncEnumerable<Pong> Handle(StreamPing request, [EnumeratorCancellation] CancellationToken cancellationToken)
+            public async IAsyncEnumerable<Pong> Handle(
+                StreamPing request,
+                [EnumeratorCancellation] CancellationToken cancellationToken
+            )
             {
                 for (int i = 0; i < 5; i++)
                 {

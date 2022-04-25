@@ -20,7 +20,8 @@ public class BasicHandlerTests
 
         INotificationHandler<SomeStructNotification> handler1 = new SomeStructNotificationHandler();
         //INotificationHandler<SomeStructNotification> handler2 = new CatchAllPolymorphicNotificationHandler();
-        INotificationHandler<SomeStructNotification> handler3 = new SomeGenericConstrainedNotificationHandler<SomeStructNotification>();
+        INotificationHandler<SomeStructNotification> handler3 =
+            new SomeGenericConstrainedNotificationHandler<SomeStructNotification>();
 
         var handlers = sp.GetServices<INotificationHandler<SomeStructNotification>>();
         Assert.NotNull(handlers);

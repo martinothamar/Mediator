@@ -7,7 +7,10 @@ public sealed class MediatorGenerator : ISourceGenerator
 
     public void Execute(GeneratorExecutionContext context)
     {
-        var debugOptionExists = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.Mediator_AttachDebugger", out _);
+        var debugOptionExists = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue(
+            "build_property.Mediator_AttachDebugger",
+            out _
+        );
 
         if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
             System.Diagnostics.Debugger.Launch();

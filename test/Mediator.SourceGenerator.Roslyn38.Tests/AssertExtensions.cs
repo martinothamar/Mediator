@@ -11,7 +11,11 @@ public static class AssertExtensions
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+        driver = driver.RunGeneratorsAndUpdateCompilation(
+            inputCompilation,
+            out var outputCompilation,
+            out var diagnostics
+        );
 
         var runResult = driver.GetRunResult();
 

@@ -14,7 +14,11 @@ public static class Assertions
         var analyzer = result.Generator.CompilationAnalyzer;
 
         Assert.NotNull(analyzer);
-        Assert.True(analyzer!.ServiceLifetimeIsSingleton || analyzer.ServiceLifetimeIsScoped || analyzer.ServiceLifetimeIsTransient);
+        Assert.True(
+            analyzer!.ServiceLifetimeIsSingleton
+                || analyzer.ServiceLifetimeIsScoped
+                || analyzer.ServiceLifetimeIsTransient
+        );
     }
 
     public static void CompilesWithoutDiagnostics(GeneratorResult result)

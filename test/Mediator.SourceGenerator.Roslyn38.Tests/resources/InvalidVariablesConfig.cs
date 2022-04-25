@@ -15,11 +15,13 @@ namespace Some.Nested.Types
         {
             var services = new ServiceCollection();
 
-            services.AddMediator(options =>
-            {
-                options.Namespace = MediatorNamespace;
-                options.ServiceLifetime = Lifetime;
-            });
+            services.AddMediator(
+                options =>
+                {
+                    options.Namespace = MediatorNamespace;
+                    options.ServiceLifetime = Lifetime;
+                }
+            );
 
             var serviceProvider = services.BuildServiceProvider();
 

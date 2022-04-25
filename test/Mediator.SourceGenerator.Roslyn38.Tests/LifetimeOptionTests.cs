@@ -5,7 +5,8 @@ public sealed class LifetimeOptionTests
     [Fact]
     public void Test_No_Args()
     {
-        var source = @"
+        var source =
+            @"
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -37,7 +38,8 @@ namespace Something
     [Fact]
     public void Test_Transient_Lifetime_With_Named_Namespace_Arg()
     {
-        var source = @"
+        var source =
+            @"
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 

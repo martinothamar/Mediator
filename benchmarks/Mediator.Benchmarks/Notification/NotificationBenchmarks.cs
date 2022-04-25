@@ -8,19 +8,19 @@ namespace Mediator.Benchmarks.Notification;
 
 public sealed record SomeNotification(Guid Id) : INotification, MediatR.INotification;
 
-public sealed class SomeHandlerClass :
-    INotificationHandler<SomeNotification>,
-    MediatR.INotificationHandler<SomeNotification>,
-    IAsyncMessageHandler<SomeNotification>
+public sealed class SomeHandlerClass
+    : INotificationHandler<SomeNotification>,
+      MediatR.INotificationHandler<SomeNotification>,
+      IAsyncMessageHandler<SomeNotification>
 {
-    public ValueTask Handle(SomeNotification notification, CancellationToken cancellationToken) =>
-        default;
+    public ValueTask Handle(SomeNotification notification, CancellationToken cancellationToken) => default;
 
-    public ValueTask HandleAsync(SomeNotification message, CancellationToken cancellationToken) =>
-        default;
+    public ValueTask HandleAsync(SomeNotification message, CancellationToken cancellationToken) => default;
 
-    Task MediatR.INotificationHandler<SomeNotification>.Handle(SomeNotification notification, CancellationToken cancellationToken) =>
-        Task.CompletedTask;
+    Task MediatR.INotificationHandler<SomeNotification>.Handle(
+        SomeNotification notification,
+        CancellationToken cancellationToken
+    ) => Task.CompletedTask;
 }
 
 [MemoryDiagnoser]
@@ -50,26 +50,31 @@ public class NotificationBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(opts =>
-        {
-            _ = ServiceLifetime switch
+        services.AddMediatR(
+            opts =>
             {
-                ServiceLifetime.Singleton => opts.AsSingleton(),
-                ServiceLifetime.Scoped => opts.AsScoped(),
-                ServiceLifetime.Transient => opts.AsTransient(),
-                _ => throw new InvalidOperationException(),
-            };
-        }, typeof(SomeHandlerClass).Assembly);
-        services.AddMessagePipe(opts =>
-        {
-            opts.InstanceLifetime = ServiceLifetime switch
+                _ = ServiceLifetime switch
+                {
+                    ServiceLifetime.Singleton => opts.AsSingleton(),
+                    ServiceLifetime.Scoped => opts.AsScoped(),
+                    ServiceLifetime.Transient => opts.AsTransient(),
+                    _ => throw new InvalidOperationException(),
+                };
+            },
+            typeof(SomeHandlerClass).Assembly
+        );
+        services.AddMessagePipe(
+            opts =>
             {
-                ServiceLifetime.Singleton => InstanceLifetime.Singleton,
-                ServiceLifetime.Scoped => InstanceLifetime.Scoped,
-                ServiceLifetime.Transient => InstanceLifetime.Transient,
-                _ => throw new InvalidOperationException(),
-            };
-        });
+                opts.InstanceLifetime = ServiceLifetime switch
+                {
+                    ServiceLifetime.Singleton => InstanceLifetime.Singleton,
+                    ServiceLifetime.Scoped => InstanceLifetime.Scoped,
+                    ServiceLifetime.Transient => InstanceLifetime.Transient,
+                    _ => throw new InvalidOperationException(),
+                };
+            }
+        );
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)

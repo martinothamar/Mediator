@@ -17,7 +17,8 @@ public static class Fixture
     };
 
     public static Assembly[] AssemblyReferencesForCodegen =>
-        AppDomain.CurrentDomain.GetAssemblies()
+        AppDomain.CurrentDomain
+            .GetAssemblies()
             .Concat(ImportantAssemblies)
             .Distinct()
             .Where(a => !a.IsDynamic)
@@ -26,7 +27,7 @@ public static class Fixture
     public static Compilation CreateLibrary(params string[] source)
     {
         var references = new List<MetadataReference>();
-        var assemblies = AssemblyReferencesForCodegen;;
+        var assemblies = AssemblyReferencesForCodegen;
         foreach (Assembly assembly in assemblies)
         {
             if (!assembly.IsDynamic)
@@ -39,13 +40,12 @@ public static class Fixture
             "compilation",
             source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray(),
             references,
-            new CSharpCompilationOptions(
-                OutputKind.DynamicallyLinkedLibrary
-            )
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
         return compilation;
     }
 
-    public static Task<string> SourceFromResourceFile(string file) => File.ReadAllTextAsync(Path.Combine("resources", file));
+    public static Task<string> SourceFromResourceFile(string file) =>
+        File.ReadAllTextAsync(Path.Combine("resources", file));
 }

@@ -15,8 +15,6 @@ public sealed class TodoItemQueryHandler : IQueryHandler<GetTodoItems, IEnumerab
     {
         var items = await _repository.GetItems(cancellationToken);
 
-        return items
-            .Select(i => new TodoItemDto(i.Title, i.Text, i.Done))
-            .ToArray();
+        return items.Select(i => new TodoItemDto(i.Title, i.Text, i.Done)).ToArray();
     }
 }

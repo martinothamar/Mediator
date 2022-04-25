@@ -4,7 +4,10 @@ public sealed record SomeStreamingQuery(Guid Id) : IStreamQuery<SomeResponse>;
 
 public sealed class SomeStreamingQueryHandler : IStreamQueryHandler<SomeStreamingQuery, SomeResponse>
 {
-    public async IAsyncEnumerable<SomeResponse> Handle(SomeStreamingQuery query, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<SomeResponse> Handle(
+        SomeStreamingQuery query,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
     {
         for (int i = 0; i < 3; i++)
         {

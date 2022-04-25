@@ -49,9 +49,9 @@ public sealed class RequestInheritanceTests
         public int N { get; }
     }
 
-    public sealed class CreateHandler :
-        IRequestHandler<CreateRequest, CreateResponse>,
-        IRequestHandler<CreateRequestWithN, CreateResponseWithN>
+    public sealed class CreateHandler
+        : IRequestHandler<CreateRequest, CreateResponse>,
+          IRequestHandler<CreateRequestWithN, CreateResponseWithN>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
         internal static readonly ConcurrentBag<Guid> IdsForN = new();

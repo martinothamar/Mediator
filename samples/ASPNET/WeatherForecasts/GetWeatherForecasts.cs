@@ -8,18 +8,35 @@ namespace ASPNET.WeatherForecasts
     {
         private static readonly string[] Summaries = new[]
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+            "Freezing",
+            "Bracing",
+            "Chilly",
+            "Cool",
+            "Mild",
+            "Warm",
+            "Balmy",
+            "Hot",
+            "Sweltering",
+            "Scorching"
         };
 
-        public ValueTask<IEnumerable<WeatherForecast>> Handle(GetWeatherForecasts query, CancellationToken cancellationToken)
+        public ValueTask<IEnumerable<WeatherForecast>> Handle(
+            GetWeatherForecasts query,
+            CancellationToken cancellationToken
+        )
         {
-            var result = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            var result = Enumerable
+                .Range(1, 5)
+                .Select(
+                    index =>
+                        new WeatherForecast
+                        {
+                            Date = DateTime.Now.AddDays(index),
+                            TemperatureC = Random.Shared.Next(-20, 55),
+                            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                        }
+                )
+                .ToArray();
 
             return new ValueTask<IEnumerable<WeatherForecast>>(result);
         }

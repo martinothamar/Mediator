@@ -57,6 +57,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_files", "_files", "{FDAEEF
 		NuGet.config = NuGet.config
 		README.md = README.md
 		version.json = version.json
+		.csharpierrc.json = .csharpierrc.json
+		Build.csproj = Build.csproj
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.TransientLifetime", "test\Mediator.Tests.TransientLifetime\Mediator.Tests.TransientLifetime.csproj", "{4C18FD08-BCE4-4C6A-9D84-9A81C4561586}"

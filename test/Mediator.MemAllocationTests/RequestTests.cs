@@ -53,21 +53,22 @@ public class RequestTests
         var afterBytes = GC.GetAllocatedBytesForCurrentThread();
 
         Assert.Equal(0, afterBytes - beforeBytes);
-        dotMemory.Check(memory =>
-        {
-            var traffic = memory.GetDifference(checkpoint);
-            var newObjects = traffic.GetNewObjects();
-            foreach (var obj in newObjects.GroupByType())
-                _output.WriteLine($"Allocations for {obj.TypeFullyQualifiedName}: {obj.SizeInBytes} bytes");
+        dotMemory.Check(
+            memory =>
+            {
+                var traffic = memory.GetDifference(checkpoint);
+                var newObjects = traffic.GetNewObjects();
+                foreach (var obj in newObjects.GroupByType())
+                    _output.WriteLine($"Allocations for {obj.TypeFullyQualifiedName}: {obj.SizeInBytes} bytes");
 
-            //_output.WriteLine($"Allocated: {traffic.AllocatedMemory.SizeInBytes}");
-            //foreach (var obj in traffic.GroupByType())
-            //    _output.WriteLine($"Allocations for {obj.TypeFullyQualifiedName}: {obj.AllocatedMemoryInfo.SizeInBytes}");
+                //_output.WriteLine($"Allocated: {traffic.AllocatedMemory.SizeInBytes}");
+                //foreach (var obj in traffic.GroupByType())
+                //    _output.WriteLine($"Allocations for {obj.TypeFullyQualifiedName}: {obj.AllocatedMemoryInfo.SizeInBytes}");
 
-            Assert.Equal(0, traffic.GetNewObjects().ObjectsCount);
-        });
+                Assert.Equal(0, traffic.GetNewObjects().ObjectsCount);
+            }
+        );
     }
-
 
     [Fact]
     public void Test_Request_Handler()

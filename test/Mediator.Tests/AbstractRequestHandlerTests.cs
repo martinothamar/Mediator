@@ -9,14 +9,20 @@ public sealed class AbstractNotificationHandlerTests
 
     public abstract class AbstractNotificationHandler : INotificationHandler<NotificationWithAbstractHandler>
     {
-        public abstract ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken);
+        public abstract ValueTask Handle(
+            NotificationWithAbstractHandler notification,
+            CancellationToken cancellationToken
+        );
     }
 
     public sealed class ConcreteNotificationHandler : AbstractNotificationHandler
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
 
-        public override ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken)
+        public override ValueTask Handle(
+            NotificationWithAbstractHandler notification,
+            CancellationToken cancellationToken
+        )
         {
             Ids.Add(notification.Id);
             return default;
@@ -27,7 +33,10 @@ public sealed class AbstractNotificationHandlerTests
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
 
-        public override ValueTask Handle(NotificationWithAbstractHandler notification, CancellationToken cancellationToken)
+        public override ValueTask Handle(
+            NotificationWithAbstractHandler notification,
+            CancellationToken cancellationToken
+        )
         {
             Ids.Add(notification.Id);
             return default;

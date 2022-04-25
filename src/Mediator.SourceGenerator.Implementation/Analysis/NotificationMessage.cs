@@ -6,8 +6,7 @@ internal sealed class NotificationMessage : SymbolMetadata<NotificationMessage>
 {
     private readonly HashSet<NotificationMessageHandler> _handlers;
 
-    public NotificationMessage(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
-        : base(symbol, analyzer)
+    public NotificationMessage(INamedTypeSymbol symbol, CompilationAnalyzer analyzer) : base(symbol, analyzer)
     {
         _handlers = new();
     }
@@ -16,13 +15,18 @@ internal sealed class NotificationMessage : SymbolMetadata<NotificationMessage>
 
     public string FullName => Symbol.GetTypeSymbolFullName();
 
-    public string IdentifierFullName => Symbol.GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false).Replace("global::", "").Replace('.', '_');
+    public string IdentifierFullName =>
+        Symbol
+            .GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false)
+            .Replace("global::", "")
+            .Replace('.', '_');
 
     public int HandlerCount => _handlers.Count;
 
     public string ServiceLifetime => Analyzer.ServiceLifetime;
 
-    public string HandlerTypeOfExpression => $"typeof(global::Mediator.INotificationHandler<{Symbol.GetTypeSymbolFullName()}>)";
+    public string HandlerTypeOfExpression =>
+        $"typeof(global::Mediator.INotificationHandler<{Symbol.GetTypeSymbolFullName()}>)";
 
     public IEnumerable<string> HandlerServicesRegistrationBlock
     {

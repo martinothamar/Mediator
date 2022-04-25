@@ -7,9 +7,9 @@ namespace Mediator.Benchmarks.Request;
 
 public sealed record SomeStreamRequest(Guid Id) : IStreamRequest<SomeResponse>, MediatR.IStreamRequest<SomeResponse>;
 
-public sealed class SomeStreamHandlerClass :
-    IStreamRequestHandler<SomeStreamRequest, SomeResponse>,
-    MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
+public sealed class SomeStreamHandlerClass
+    : IStreamRequestHandler<SomeStreamRequest, SomeResponse>,
+      MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
@@ -26,8 +26,10 @@ public sealed class SomeStreamHandlerClass :
     public IAsyncEnumerable<SomeResponse> Handle(SomeStreamRequest request, CancellationToken cancellationToken) =>
         _enumerate();
 
-    IAsyncEnumerable<SomeResponse> MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>.Handle(SomeStreamRequest request, CancellationToken cancellationToken) =>
-        _enumerate();
+    IAsyncEnumerable<SomeResponse> MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>.Handle(
+        SomeStreamRequest request,
+        CancellationToken cancellationToken
+    ) => _enumerate();
 }
 
 [MemoryDiagnoser]
@@ -54,16 +56,19 @@ public class StreamingBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(opts =>
-        {
-            _ = ServiceLifetime switch
+        services.AddMediatR(
+            opts =>
             {
-                ServiceLifetime.Singleton => opts.AsSingleton(),
-                ServiceLifetime.Scoped => opts.AsScoped(),
-                ServiceLifetime.Transient => opts.AsTransient(),
-                _ => throw new InvalidOperationException(),
-            };
-        }, typeof(SomeHandlerClass).Assembly);
+                _ = ServiceLifetime switch
+                {
+                    ServiceLifetime.Singleton => opts.AsSingleton(),
+                    ServiceLifetime.Scoped => opts.AsScoped(),
+                    ServiceLifetime.Transient => opts.AsTransient(),
+                    _ => throw new InvalidOperationException(),
+                };
+            },
+            typeof(SomeHandlerClass).Assembly
+        );
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)

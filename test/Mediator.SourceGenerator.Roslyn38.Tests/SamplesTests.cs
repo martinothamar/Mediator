@@ -13,10 +13,7 @@ public sealed class SamplesTests
         var tester = new Verifier.Test
         {
             TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
-            TestState =
-            {
-                Sources = { source },
-            },
+            TestState = { Sources = { source }, },
         };
         await tester.RunAsync();
     }
@@ -29,10 +26,7 @@ public sealed class SamplesTests
         await new Verifier.Test
         {
             TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
-            TestState =
-            {
-                Sources = { source },
-            },
+            TestState = { Sources = { source }, },
         }.RunAsync();
     }
 
@@ -44,10 +38,7 @@ public sealed class SamplesTests
         await new Verifier.Test
         {
             TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
-            TestState =
-            {
-                Sources = { source },
-            },
+            TestState = { Sources = { source }, },
         }.RunAsync();
     }
 }

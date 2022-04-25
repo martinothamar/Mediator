@@ -13,7 +13,10 @@ internal sealed class SyntaxReceiver : ISyntaxReceiver
     public static bool ShouldVisit(SyntaxNode context, out InvocationExpressionSyntax? invocation)
     {
         invocation = null;
-        if (context is not InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax identifier } invocationSyntax)
+        if (
+            context
+            is not InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax identifier } invocationSyntax
+        )
             return false;
         if (identifier.Name.Identifier.ValueText != "AddMediator")
             return false;

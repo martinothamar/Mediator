@@ -32,14 +32,11 @@ internal sealed class CompilationAnalyzer
     private readonly INamedTypeSymbol _notificationHandlerInterfaceSymbol;
     private readonly INamedTypeSymbol _notificationInterfaceSymbol;
 
-    public IEnumerable<RequestMessage> RequestMessages =>
-        _requestMessages.Where(r => r.Handler is not null);
+    public IEnumerable<RequestMessage> RequestMessages => _requestMessages.Where(r => r.Handler is not null);
 
-    public IEnumerable<NotificationMessage> NotificationMessages =>
-        _notificationMessages;
+    public IEnumerable<NotificationMessage> NotificationMessages => _notificationMessages;
 
-    public IEnumerable<RequestMessageHandler> RequestMessageHandlers =>
-        _requestMessageHandlers;
+    public IEnumerable<RequestMessageHandler> RequestMessageHandlers => _requestMessageHandlers;
 
     public IEnumerable<NotificationMessageHandler> NotificationMessageHandlers =>
         _notificationMessageHandlers.Where(h => !h.IsOpenGeneric);
@@ -51,9 +48,11 @@ internal sealed class CompilationAnalyzer
     public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
     public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
 
-    public bool HasStreamRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
+    public bool HasStreamRequests =>
+        _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
     public bool HasStreamQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
-    public bool HasStreamCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
+    public bool HasStreamCommands =>
+        _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
 
     public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
 
@@ -61,16 +60,24 @@ internal sealed class CompilationAnalyzer
 
     public bool HasNotifications => _notificationMessages.Any();
 
-    public IEnumerable<RequestMessage> IRequestMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
-    public IEnumerable<RequestMessage> ICommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
-    public IEnumerable<RequestMessage> IQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
+    public IEnumerable<RequestMessage> IRequestMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
+    public IEnumerable<RequestMessage> ICommandMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
+    public IEnumerable<RequestMessage> IQueryMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
 
-    public IEnumerable<RequestMessage> IStreamRequestMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest");
-    public IEnumerable<RequestMessage> IStreamQueryMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery");
-    public IEnumerable<RequestMessage> IStreamCommandMessages => _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand");
+    public IEnumerable<RequestMessage> IStreamRequestMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest");
+    public IEnumerable<RequestMessage> IStreamQueryMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery");
+    public IEnumerable<RequestMessage> IStreamCommandMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand");
 
-    public IEnumerable<RequestMessage> IMessages => _requestMessages.Where(r => r.Handler is not null && !r.IsStreaming);
-    public IEnumerable<RequestMessage> IStreamMessages => _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
+    public IEnumerable<RequestMessage> IMessages =>
+        _requestMessages.Where(r => r.Handler is not null && !r.IsStreaming);
+    public IEnumerable<RequestMessage> IStreamMessages =>
+        _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
 
     private bool _hasErrors;
 
@@ -99,8 +106,9 @@ internal sealed class CompilationAnalyzer
 
     public bool ServiceLifetimeIsTransient => ServiceLifetimeSymbol.Name == "Transient";
 
-    public bool IsTestRun => (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false) ||
-        (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
+    public bool IsTestRun =>
+        (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false)
+        || (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
 
     public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
@@ -139,7 +147,10 @@ internal sealed class CompilationAnalyzer
         if (unitSymbol is null)
         {
             UnitSymbol = null!;
-            ReportDiagnostic(unitSymbolName, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+            ReportDiagnostic(
+                unitSymbolName,
+                ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name))
+            );
         }
         else
         {
@@ -151,16 +162,20 @@ internal sealed class CompilationAnalyzer
     {
         var baseHandlerSymbolNames = new[]
         {
-            $"{Constants.MediatorLib}.IRequestHandler`1", $"{Constants.MediatorLib}.IRequestHandler`2",
-            $"{Constants.MediatorLib}.IStreamRequestHandler`2", $"{Constants.MediatorLib}.ICommandHandler`1",
-            $"{Constants.MediatorLib}.ICommandHandler`2", $"{Constants.MediatorLib}.IStreamCommandHandler`2",
-            $"{Constants.MediatorLib}.IQueryHandler`2", $"{Constants.MediatorLib}.IStreamQueryHandler`2",
+            $"{Constants.MediatorLib}.IRequestHandler`1",
+            $"{Constants.MediatorLib}.IRequestHandler`2",
+            $"{Constants.MediatorLib}.IStreamRequestHandler`2",
+            $"{Constants.MediatorLib}.ICommandHandler`1",
+            $"{Constants.MediatorLib}.ICommandHandler`2",
+            $"{Constants.MediatorLib}.IStreamCommandHandler`2",
+            $"{Constants.MediatorLib}.IQueryHandler`2",
+            $"{Constants.MediatorLib}.IStreamQueryHandler`2",
             $"{Constants.MediatorLib}.INotificationHandler`1",
         };
 
-        var baseHandlerSymbols =
-            baseHandlerSymbolNames.Select(n => (Name: n, Symbol: _context.Compilation.GetTypeByMetadataName(n)?.OriginalDefinition))
-                .ToArray();
+        var baseHandlerSymbols = baseHandlerSymbolNames
+            .Select(n => (Name: n, Symbol: _context.Compilation.GetTypeByMetadataName(n)?.OriginalDefinition))
+            .ToArray();
 
         _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
         if (baseHandlerSymbols.Any(s => s.Symbol is null))
@@ -169,18 +184,22 @@ internal sealed class CompilationAnalyzer
             {
                 if (symbol is not null)
                     continue;
-                ReportDiagnostic(name, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+                ReportDiagnostic(
+                    name,
+                    ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name))
+                );
             }
         }
         else
         {
-            _baseHandlerSymbols = baseHandlerSymbols
-                .Select(s => s.Symbol!)
-                .ToArray();
+            _baseHandlerSymbols = baseHandlerSymbols.Select(s => s.Symbol!).ToArray();
         }
     }
 
-    private void TryLoadDISymbols(out INamedTypeSymbol _serviceLifetimeEnumSymbol, out IFieldSymbol SingletonServiceLifetimeSymbol)
+    private void TryLoadDISymbols(
+        out INamedTypeSymbol _serviceLifetimeEnumSymbol,
+        out IFieldSymbol SingletonServiceLifetimeSymbol
+    )
     {
         var serviceLifetimeEnumSymbolName = "Microsoft.Extensions.DependencyInjection.ServiceLifetime";
         var serviceLifetimeEnumSymbol = _context.Compilation.GetTypeByMetadataName(serviceLifetimeEnumSymbolName);
@@ -188,28 +207,40 @@ internal sealed class CompilationAnalyzer
         {
             _serviceLifetimeEnumSymbol = null!;
             SingletonServiceLifetimeSymbol = null!;
-            ReportDiagnostic(serviceLifetimeEnumSymbolName, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+            ReportDiagnostic(
+                serviceLifetimeEnumSymbolName,
+                ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name))
+            );
         }
         else
         {
             _serviceLifetimeEnumSymbol = serviceLifetimeEnumSymbol;
-            SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
+            SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol
+                .GetMembers()
+                .Single(m => m.Name == "Singleton");
         }
     }
 
-    private void TryLoadBaseMessageSymbols(out INamedTypeSymbol[] _baseMessageSymbols, out INamedTypeSymbol _notificationInterfaceSymbol)
+    private void TryLoadBaseMessageSymbols(
+        out INamedTypeSymbol[] _baseMessageSymbols,
+        out INamedTypeSymbol _notificationInterfaceSymbol
+    )
     {
         var baseMessageSymbolNames = new[]
         {
-            $"{Constants.MediatorLib}.IRequest", $"{Constants.MediatorLib}.IRequest`1",
-            $"{Constants.MediatorLib}.IStreamRequest`1", $"{Constants.MediatorLib}.ICommand",
-            $"{Constants.MediatorLib}.ICommand`1", $"{Constants.MediatorLib}.IStreamCommand`1",
-            $"{Constants.MediatorLib}.IQuery`1", $"{Constants.MediatorLib}.IStreamQuery`1",
+            $"{Constants.MediatorLib}.IRequest",
+            $"{Constants.MediatorLib}.IRequest`1",
+            $"{Constants.MediatorLib}.IStreamRequest`1",
+            $"{Constants.MediatorLib}.ICommand",
+            $"{Constants.MediatorLib}.ICommand`1",
+            $"{Constants.MediatorLib}.IStreamCommand`1",
+            $"{Constants.MediatorLib}.IQuery`1",
+            $"{Constants.MediatorLib}.IStreamQuery`1",
             $"{Constants.MediatorLib}.INotification",
         };
-        var baseMessageSymbols =
-            baseMessageSymbolNames.Select(n => (Name: n, Symbol: _context.Compilation.GetTypeByMetadataName(n)?.OriginalDefinition))
-                .ToArray();
+        var baseMessageSymbols = baseMessageSymbolNames
+            .Select(n => (Name: n, Symbol: _context.Compilation.GetTypeByMetadataName(n)?.OriginalDefinition))
+            .ToArray();
 
         _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
         if (baseMessageSymbols.Any(s => s.Symbol is null))
@@ -219,14 +250,15 @@ internal sealed class CompilationAnalyzer
             {
                 if (symbol is not null)
                     continue;
-                ReportDiagnostic(name, ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name)));
+                ReportDiagnostic(
+                    name,
+                    ((in CompilationAnalyzerContext c, string name) => c.ReportRequiredSymbolNotFound(name))
+                );
             }
         }
         else
         {
-            _baseMessageSymbols = baseMessageSymbols
-                .Select(s => s.Symbol!)
-                .ToArray();
+            _baseMessageSymbols = baseMessageSymbols.Select(s => s.Symbol!).ToArray();
             _notificationInterfaceSymbol = _baseMessageSymbols[_baseMessageSymbols.Length - 1];
         }
     }
@@ -284,12 +316,17 @@ internal sealed class CompilationAnalyzer
             if (kvp.Value is not RequestMessage message)
                 continue;
 
-            ReportDiagnostic(message.Symbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
+            ReportDiagnostic(
+                message.Symbol,
+                (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s)
+            );
         }
 
         foreach (var notificationMessage in _notificationMessages)
         {
-            var handlerInterface = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1].Construct(notificationMessage.Symbol);
+            var handlerInterface = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1].Construct(
+                notificationMessage.Symbol
+            );
 
             foreach (var notificationMessageHandler in _notificationMessageHandlers)
             {
@@ -319,7 +356,11 @@ internal sealed class CompilationAnalyzer
         const int IS_REQUEST = 3;
         const int IS_NOTIFICATION = 4;
 
-        void ProcessMember(Queue<INamespaceOrTypeSymbol> queue, INamespaceOrTypeSymbol member, Dictionary<INamedTypeSymbol, object?> mapping)
+        void ProcessMember(
+            Queue<INamespaceOrTypeSymbol> queue,
+            INamespaceOrTypeSymbol member,
+            Dictionary<INamedTypeSymbol, object?> mapping
+        )
         {
             if (member is INamespaceSymbol childNsSymbol)
             {
@@ -351,19 +392,30 @@ internal sealed class CompilationAnalyzer
             }
         }
 
-        bool ProcessInterface(int i, INamedTypeSymbol typeSymbol, INamedTypeSymbol typeInterfaceSymbol, bool isStruct, Dictionary<INamedTypeSymbol, object?> mapping)
+        bool ProcessInterface(
+            int i,
+            INamedTypeSymbol typeSymbol,
+            INamedTypeSymbol typeInterfaceSymbol,
+            bool isStruct,
+            Dictionary<INamedTypeSymbol, object?> mapping
+        )
         {
             var codeOfInterest = IsInteresting(typeInterfaceSymbol);
             switch (codeOfInterest)
             {
-                case NOT_RELEVANT: break; // Continue loop
+                case NOT_RELEVANT:
+                    break; // Continue loop
                 case IS_REQUEST_HANDLER:
                 case IS_NOTIFICATION_HANDLER:
+
                     {
                         if (isStruct)
                         {
                             // Handlers must be classes
-                            ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportInvalidHandlerType(s));
+                            ReportDiagnostic(
+                                typeSymbol,
+                                (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportInvalidHandlerType(s)
+                            );
                             return false;
                         }
 
@@ -378,11 +430,18 @@ internal sealed class CompilationAnalyzer
                             if (IsOpenGeneric(typeSymbol))
                             {
                                 // Handlers must be classes
-                                ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportOpenGenericRequestHandler(s));
+                                ReportDiagnostic(
+                                    typeSymbol,
+                                    (in CompilationAnalyzerContext c, INamedTypeSymbol s) =>
+                                        c.ReportOpenGenericRequestHandler(s)
+                                );
                                 return false;
                             }
 
-                            var messageType = typeInterfaceSymbol.Name.Substring(1, typeInterfaceSymbol.Name.IndexOf("Handler") - 1);
+                            var messageType = typeInterfaceSymbol.Name.Substring(
+                                1,
+                                typeInterfaceSymbol.Name.IndexOf("Handler") - 1
+                            );
 
                             var handler = new RequestMessageHandler(typeSymbol, messageType, this);
                             var requestMessageSymbol = (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0];
@@ -391,7 +450,11 @@ internal sealed class CompilationAnalyzer
                                 if (requestMessageObj is not RequestMessage requestMessage)
                                 {
                                     // Signal that we have duplicates
-                                    ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMultipleHandlers(s));
+                                    ReportDiagnostic(
+                                        typeSymbol,
+                                        (in CompilationAnalyzerContext c, INamedTypeSymbol s) =>
+                                            c.ReportMultipleHandlers(s)
+                                    );
                                     return false;
                                 }
                                 mapping[requestMessageSymbol] = null;
@@ -411,24 +474,31 @@ internal sealed class CompilationAnalyzer
                     }
                     break;
                 case IS_REQUEST:
+
                     {
-                        var responseMessageSymbol = typeInterfaceSymbol.TypeArguments.Length > 0 ?
-                            (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0] :
-                            UnitSymbol;
+                        var responseMessageSymbol =
+                            typeInterfaceSymbol.TypeArguments.Length > 0
+                                ? (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0]
+                                : UnitSymbol;
 
                         if (IsAlreadyHandledByDerivedInterface(i, 0, typeSymbol, typeInterfaceSymbol))
                             break;
 
-                        var messageType = typeInterfaceSymbol.Name.IndexOf('<') == -1 ?
-                            typeInterfaceSymbol.Name.Substring(1) :
-                            typeInterfaceSymbol.Name.Substring(1, typeInterfaceSymbol.Name.IndexOf('<') - 1);
+                        var messageType =
+                            typeInterfaceSymbol.Name.IndexOf('<') == -1
+                                ? typeInterfaceSymbol.Name.Substring(1)
+                                : typeInterfaceSymbol.Name.Substring(1, typeInterfaceSymbol.Name.IndexOf('<') - 1);
 
                         var message = new RequestMessage(typeSymbol, responseMessageSymbol, messageType, this);
                         if (!_requestMessages.Add(message))
                         {
                             // If this symbol has already been added,
                             // the type implements multiple base message types.
-                            ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageDerivesFromMultipleMessageInterfaces(s));
+                            ReportDiagnostic(
+                                typeSymbol,
+                                (in CompilationAnalyzerContext c, INamedTypeSymbol s) =>
+                                    c.ReportMessageDerivesFromMultipleMessageInterfaces(s)
+                            );
                             return false;
                         }
                         else
@@ -446,12 +516,17 @@ internal sealed class CompilationAnalyzer
                     }
                     break;
                 case IS_NOTIFICATION:
+
                     {
                         if (!_notificationMessages.Add(new NotificationMessage(typeSymbol, this)))
                         {
                             // If this symbol has already been added,
                             // the type implements multiple base message types.
-                            ReportDiagnostic(typeSymbol, (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageDerivesFromMultipleMessageInterfaces(s));
+                            ReportDiagnostic(
+                                typeSymbol,
+                                (in CompilationAnalyzerContext c, INamedTypeSymbol s) =>
+                                    c.ReportMessageDerivesFromMultipleMessageInterfaces(s)
+                            );
                             return false;
                         }
                     }
@@ -469,18 +544,18 @@ internal sealed class CompilationAnalyzer
             {
                 var baseSymbol = _baseHandlerSymbols[i];
                 if (_symbolComparer.Equals(baseSymbol, originalInterfaceSymbol))
-                    return _symbolComparer.Equals(baseSymbol, _notificationHandlerInterfaceSymbol) ?
-                        IS_NOTIFICATION_HANDLER :
-                        IS_REQUEST_HANDLER;
+                    return _symbolComparer.Equals(baseSymbol, _notificationHandlerInterfaceSymbol)
+                      ? IS_NOTIFICATION_HANDLER
+                      : IS_REQUEST_HANDLER;
             }
 
             for (int i = 0; i < _baseMessageSymbols.Length; i++)
             {
                 var baseSymbol = _baseMessageSymbols[i];
                 if (_symbolComparer.Equals(baseSymbol, originalInterfaceSymbol))
-                    return _symbolComparer.Equals(baseSymbol, _notificationInterfaceSymbol) ?
-                        IS_NOTIFICATION :
-                        IS_REQUEST;
+                    return _symbolComparer.Equals(baseSymbol, _notificationInterfaceSymbol)
+                      ? IS_NOTIFICATION
+                      : IS_REQUEST;
             }
 
             return NOT_RELEVANT;
@@ -493,9 +568,10 @@ internal sealed class CompilationAnalyzer
             INamedTypeSymbol typeInterfaceSymbol
         )
         {
-            var mightSkip = typeInterfaceSymbol.TypeArguments.Length > responseTypeArgumentIndex &&
-                typeInterfaceSymbol.TypeArguments[responseTypeArgumentIndex] is INamedTypeSymbol responseTypeSymbol &&
-                _symbolComparer.Equals(responseTypeSymbol, UnitSymbol);
+            var mightSkip =
+                typeInterfaceSymbol.TypeArguments.Length > responseTypeArgumentIndex
+                && typeInterfaceSymbol.TypeArguments[responseTypeArgumentIndex] is INamedTypeSymbol responseTypeSymbol
+                && _symbolComparer.Equals(responseTypeSymbol, UnitSymbol);
 
             if (!mightSkip)
                 return false;
@@ -532,13 +608,16 @@ internal sealed class CompilationAnalyzer
         }
 
         var attrs = compilation.Assembly.GetAttributes();
-        var optionsAttr = attrs.SingleOrDefault(a =>
-        {
-            if (a.AttributeClass is null)
-                return false;
-            var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
-            return attributeFullName == "Mediator.MediatorOptionsAttribute" || attributeFullName == "MediatorOptions";
-        });
+        var optionsAttr = attrs.SingleOrDefault(
+            a =>
+            {
+                if (a.AttributeClass is null)
+                    return false;
+                var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
+                return attributeFullName == "Mediator.MediatorOptionsAttribute"
+                    || attributeFullName == "MediatorOptions";
+            }
+        );
         if (optionsAttr is not null)
             ProcessAttributeConfiguration(optionsAttr, configuredByAddMediator, cancellationToken);
     }
@@ -598,7 +677,11 @@ internal sealed class CompilationAnalyzer
         }
     }
 
-    private void ProcessAttributeConfiguration(AttributeData optionsAttr, bool configuredByAddMediator, CancellationToken cancellationToken)
+    private void ProcessAttributeConfiguration(
+        AttributeData optionsAttr,
+        bool configuredByAddMediator,
+        CancellationToken cancellationToken
+    )
     {
         var compilation = _context.Compilation;
 
@@ -625,19 +708,30 @@ internal sealed class CompilationAnalyzer
             var attrFieldName = attrArg.NameEquals.Name.ToString();
             if (attrFieldName == "ServiceLifetime")
             {
-                var identifierNameSyntax = (IdentifierNameSyntax)((MemberAccessExpressionSyntax)attrArg.Expression).Name;
-                _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifierNameSyntax, semanticModel, cancellationToken);
+                var identifierNameSyntax = (IdentifierNameSyntax)(
+                    (MemberAccessExpressionSyntax)attrArg.Expression
+                ).Name;
+                _configuredLifetimeSymbol = GetServiceLifetimeSymbol(
+                    identifierNameSyntax,
+                    semanticModel,
+                    cancellationToken
+                );
             }
             else if (attrFieldName == "Namespace")
             {
-                var namespaceArg = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
+                var namespaceArg =
+                    semanticModel.GetConstantValue(attrArg.Expression, cancellationToken).Value as string;
                 if (!string.IsNullOrWhiteSpace(namespaceArg))
                     MediatorNamespace = namespaceArg!;
             }
         }
     }
 
-    private bool ProcessAddMediatorAssignmentStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+    private bool ProcessAddMediatorAssignmentStatement(
+        AssignmentExpressionSyntax assignment,
+        SemanticModel semanticModel,
+        CancellationToken cancellationToken
+    )
     {
         var opt = ((MemberAccessExpressionSyntax)assignment.Left).Name.Identifier.Text;
         if (opt == "Namespace")
@@ -671,7 +765,11 @@ internal sealed class CompilationAnalyzer
             if (assignment.Right is MemberAccessExpressionSyntax enumAccess)
             {
                 var identifierNameSyntax = (IdentifierNameSyntax)enumAccess.Name;
-                _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifierNameSyntax, semanticModel, cancellationToken);
+                _configuredLifetimeSymbol = GetServiceLifetimeSymbol(
+                    identifierNameSyntax,
+                    semanticModel,
+                    cancellationToken
+                );
             }
             else if (assignment.Right is IdentifierNameSyntax identifier)
             {
@@ -691,8 +789,11 @@ internal sealed class CompilationAnalyzer
 
         return true;
 
-
-        string? TryResolveNamespaceIdentifier(IdentifierNameSyntax identifier, SemanticModel semanticModel, CancellationToken cancellationToken)
+        string? TryResolveNamespaceIdentifier(
+            IdentifierNameSyntax identifier,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken
+        )
         {
             var variableSymbol = semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol;
             if (variableSymbol is null)
@@ -708,7 +809,11 @@ internal sealed class CompilationAnalyzer
             return null;
         }
 
-        string? TryResolveNamespaceSymbol(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        string? TryResolveNamespaceSymbol(
+            ISymbol symbol,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken
+        )
         {
             if (symbol is IFieldSymbol fieldSymbol && fieldSymbol.HasConstantValue)
                 return fieldSymbol.ConstantValue as string;
@@ -718,11 +823,11 @@ internal sealed class CompilationAnalyzer
             var syntaxReferences = symbol.DeclaringSyntaxReferences;
             var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
 
-            var initializerExpression = syntaxNode is VariableDeclaratorSyntax variableDeclarator ?
-                variableDeclarator.Initializer?.Value :
-                syntaxNode is PropertyDeclarationSyntax propertyDeclaration ?
-                propertyDeclaration.Initializer?.Value :
-                null;
+            var initializerExpression = syntaxNode is VariableDeclaratorSyntax variableDeclarator
+                ? variableDeclarator.Initializer?.Value
+                : syntaxNode is PropertyDeclarationSyntax propertyDeclaration
+                    ? propertyDeclaration.Initializer?.Value
+                    : null;
 
             if (initializerExpression is null)
             {
@@ -740,10 +845,17 @@ internal sealed class CompilationAnalyzer
         }
     }
 
-    private IFieldSymbol? GetServiceLifetimeSymbol(IdentifierNameSyntax identifierNameSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
+    private IFieldSymbol? GetServiceLifetimeSymbol(
+        IdentifierNameSyntax identifierNameSyntax,
+        SemanticModel semanticModel,
+        CancellationToken cancellationToken
+    )
     {
         var symbol = semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol;
-        if (symbol is IFieldSymbol lifetimeSymbol && SymbolEqualityComparer.Default.Equals(_serviceLifetimeEnumSymbol, lifetimeSymbol.ContainingType))
+        if (
+            symbol is IFieldSymbol lifetimeSymbol
+            && SymbolEqualityComparer.Default.Equals(_serviceLifetimeEnumSymbol, lifetimeSymbol.ContainingType)
+        )
             return lifetimeSymbol;
 
         if (symbol is IFieldSymbol fieldSymbol)
@@ -756,27 +868,37 @@ internal sealed class CompilationAnalyzer
         return null;
     }
 
-    private IFieldSymbol? TryGetServiceLifetimeSymbol(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+    private IFieldSymbol? TryGetServiceLifetimeSymbol(
+        ISymbol symbol,
+        SemanticModel semanticModel,
+        CancellationToken cancellationToken
+    )
     {
         if (symbol is IFieldSymbol fieldSymbol && fieldSymbol.HasConstantValue)
         {
             var value = (int)fieldSymbol.ConstantValue!;
-            return _serviceLifetimeEnumSymbol.GetMembers().OfType<IFieldSymbol>().Single(m => (int)m.ConstantValue! == value);
+            return _serviceLifetimeEnumSymbol
+                .GetMembers()
+                .OfType<IFieldSymbol>()
+                .Single(m => (int)m.ConstantValue! == value);
         }
         if (symbol is ILocalSymbol localSymbol && localSymbol.HasConstantValue)
         {
             var value = (int)localSymbol.ConstantValue!;
-            return _serviceLifetimeEnumSymbol.GetMembers().OfType<IFieldSymbol>().Single(m => (int)m.ConstantValue! == value);
+            return _serviceLifetimeEnumSymbol
+                .GetMembers()
+                .OfType<IFieldSymbol>()
+                .Single(m => (int)m.ConstantValue! == value);
         }
 
         var syntaxReferences = symbol.DeclaringSyntaxReferences;
         var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
 
-        var initializerExpression = syntaxNode is VariableDeclaratorSyntax variableDeclarator ?
-            variableDeclarator.Initializer?.Value :
-            syntaxNode is PropertyDeclarationSyntax propertyDeclaration ?
-            propertyDeclaration.Initializer?.Value :
-            null;
+        var initializerExpression = syntaxNode is VariableDeclaratorSyntax variableDeclarator
+            ? variableDeclarator.Initializer?.Value
+            : syntaxNode is PropertyDeclarationSyntax propertyDeclaration
+                ? propertyDeclaration.Initializer?.Value
+                : null;
 
         if (initializerExpression is null)
         {
@@ -787,7 +909,10 @@ internal sealed class CompilationAnalyzer
         if (initializerExpression is LiteralExpressionSyntax literal)
         {
             var value = (int)literal.Token.Value!;
-            return _serviceLifetimeEnumSymbol.GetMembers().OfType<IFieldSymbol>().Single(m => (int)m.ConstantValue! == value);
+            return _serviceLifetimeEnumSymbol
+                .GetMembers()
+                .OfType<IFieldSymbol>()
+                .Single(m => (int)m.ConstantValue! == value);
         }
 
         if (initializerExpression is MemberAccessExpressionSyntax memberAccess)
@@ -800,6 +925,7 @@ internal sealed class CompilationAnalyzer
     }
 
     private delegate Diagnostic ReportDiagnosticDelegate<T>(in CompilationAnalyzerContext context, T state);
+
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
     {
         var diagnostic = del(in _context, state);
@@ -807,6 +933,7 @@ internal sealed class CompilationAnalyzer
     }
 
     private delegate Diagnostic ReportDiagnosticDelegate(in CompilationAnalyzerContext context);
+
     private void ReportDiagnostic(ReportDiagnosticDelegate del)
     {
         var diagnostic = del(in _context);

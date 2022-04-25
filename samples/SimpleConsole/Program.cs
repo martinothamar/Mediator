@@ -8,16 +8,18 @@ var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Microsoft.Extensions.DependencyInjection" namespace.
 // We override the namespace in the "MediatorOptions" attribute above.
-services.AddMediator(options =>
-{
-    options.Namespace = null;
-    options.ServiceLifetime = ServiceLifetime.Transient;
-});
+services.AddMediator(
+    options =>
+    {
+        options.Namespace = null;
+        options.ServiceLifetime = ServiceLifetime.Transient;
+    }
+);
 
 // Standard handlers are added by default, but we need to add pipeline steps manually.
 // Here are two examples.
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericLoggerHandler<,>)); // This will run 1st
-services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>();                // This will run 2nd
+services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>(); // This will run 2nd
 
 var serviceProvider = services.BuildServiceProvider();
 
@@ -46,7 +48,11 @@ public sealed record Pong(Guid Id);
 public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
     where TMessage : IMessage
 {
-    public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    public async ValueTask<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    )
     {
         Console.WriteLine("1) Running logger handler");
         try
@@ -65,7 +71,11 @@ public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavio
 
 public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
-    public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken, MessageHandlerDelegate<Ping, Pong> next)
+    public ValueTask<Pong> Handle(
+        Ping request,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<Ping, Pong> next
+    )
     {
         Console.WriteLine("2) Running ping validator");
         if (request is null || request.Id == default)

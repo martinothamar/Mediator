@@ -8,8 +8,11 @@ public sealed class GenericPipelineState : IPipelineTestData
     public Guid Id => Message is null ? default : (Guid)Message.GetType()!.GetProperty("Id")!.GetValue(Message)!;
     public long LastMsgTimestamp { get; private set; }
 
-    public ValueTask<TResponse> Handle<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
-        where TMessage : IMessage
+    public ValueTask<TResponse> Handle<TMessage, TResponse>(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    ) where TMessage : IMessage
     {
         LastMsgTimestamp = Stopwatch.GetTimestamp();
 
@@ -18,8 +21,11 @@ public sealed class GenericPipelineState : IPipelineTestData
         return next(message, cancellationToken);
     }
 
-    public IAsyncEnumerable<TResponse> Handle<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken, StreamHandlerDelegate<TMessage, TResponse> next)
-        where TMessage : IStreamMessage
+    public IAsyncEnumerable<TResponse> Handle<TMessage, TResponse>(
+        TMessage message,
+        CancellationToken cancellationToken,
+        StreamHandlerDelegate<TMessage, TResponse> next
+    ) where TMessage : IStreamMessage
     {
         LastMsgTimestamp = Stopwatch.GetTimestamp();
 
@@ -40,12 +46,16 @@ public sealed class GenericPipeline<TMessage, TResponse> : IPipelineBehavior<TMe
 
     public long LastMsgTimestamp => _state.LastMsgTimestamp;
 
-    public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next) =>
-        _state.Handle(message, cancellationToken, next);
+    public ValueTask<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    ) => _state.Handle(message, cancellationToken, next);
 }
 
-public sealed class GenericStreamPipeline<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>, IPipelineTestData
-    where TMessage : IStreamMessage
+public sealed class GenericStreamPipeline<TMessage, TResponse>
+    : IStreamPipelineBehavior<TMessage, TResponse>,
+      IPipelineTestData where TMessage : IStreamMessage
 {
     private readonly GenericPipelineState _state;
 
@@ -55,6 +65,9 @@ public sealed class GenericStreamPipeline<TMessage, TResponse> : IStreamPipeline
 
     public long LastMsgTimestamp => _state.LastMsgTimestamp;
 
-    public IAsyncEnumerable<TResponse> Handle(TMessage message, CancellationToken cancellationToken, StreamHandlerDelegate<TMessage, TResponse> next) =>
-        _state.Handle(message, cancellationToken, next);
+    public IAsyncEnumerable<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        StreamHandlerDelegate<TMessage, TResponse> next
+    ) => _state.Handle(message, cancellationToken, next);
 }
