@@ -12,7 +12,7 @@ services.AddMediator(
     options =>
     {
         options.Namespace = null;
-        options.ServiceLifetime = ServiceLifetime.Singleton;
+        options.ServiceLifetime = ServiceLifetime.Transient;
     }
 );
 
@@ -29,6 +29,11 @@ var id = Guid.NewGuid();
 var request = new Ping(id);
 
 var response = await mediator.Send(request);
+
+Console.WriteLine("-----------------------------------");
+Console.WriteLine("ID: " + id);
+Console.WriteLine(request);
+Console.WriteLine(response);
 
 return response.Id == id ? 0 : 1;
 
@@ -49,9 +54,11 @@ public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavio
         MessageHandlerDelegate<TMessage, TResponse> next
     )
     {
+        Console.WriteLine("1) Running logger handler");
         try
         {
             var response = await next(message, cancellationToken);
+            Console.WriteLine("5) No error!");
             return response;
         }
         catch (Exception ex)
@@ -70,6 +77,12 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
         MessageHandlerDelegate<Ping, Pong> next
     )
     {
+        Console.WriteLine("2) Running ping validator");
+        if (request is null || request.Id == default)
+            throw new ArgumentException("Invalid input");
+        else
+            Console.WriteLine("3) Valid input!");
+
         return next(request, cancellationToken);
     }
 }
@@ -78,28 +91,7 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
 {
     public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
     {
+        Console.WriteLine("4) Returning pong!");
         return new ValueTask<Pong>(new Pong(request.Id));
-    }
-}
-
-
-public sealed record Pinged(Ping Ping) : INotification;
-
-public sealed class AllNotificationsHandler : INotificationHandler<INotification>
-{
-    public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
-    {
-        return default;
-    }
-}
-
-public sealed record IntegrationEvent<T>(T Message) : INotification
-    where T : IMessage;
-
-public sealed class PingedHandler : INotificationHandler<Pinged>
-{
-    public ValueTask Handle(Pinged notification, CancellationToken cancellationToken)
-    {
-        return default;
     }
 }

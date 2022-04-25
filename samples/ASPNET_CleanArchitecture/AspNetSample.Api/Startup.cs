@@ -18,7 +18,12 @@ public class Startup
     {
         services.AddControllers();
 
-        services.AddMediator();
+        services.AddMediator(
+            options =>
+            {
+                options.ServiceLifetime = ServiceLifetime.Scoped;
+            }
+        );
 
         services.AddApplication();
         services.AddInfrastructure();
