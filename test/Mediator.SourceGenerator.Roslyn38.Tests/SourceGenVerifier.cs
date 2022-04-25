@@ -13,13 +13,6 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
     {
         public Test()
         {
-            // var includeRefs = new[]
-            // {
-            //     "Microsoft.Extensions.DependencyInjection",
-            //     "Microsoft.Extensions.DependencyInjection.Abstractions",
-            //     "Mediator",
-            // };
-
             var refs = Fixture.AssemblyReferencesForCodegen
                 .Select(a => a.Location)
                 .ToImmutableArray();
