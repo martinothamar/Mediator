@@ -8,29 +8,10 @@ namespace Mediator.SourceGenerator.Tests;
 
 public class CleanArchitectureSampleTests
 {
-    static CleanArchitectureSampleTests()
-    {
-        var instance = MSBuildLocator.RegisterDefaults();
-        foreach (var context in AssemblyLoadContext.All)
-        {
-            context.Resolving += (assemblyLoadContext, assemblyName) =>
-            {
-                // System.Diagnostics.Debugger.Launch();
-                Console.WriteLine("Loading assembly: " + assemblyName.Name);
-                var msBuildPath = Path.Combine(instance.MSBuildPath, assemblyName.Name + ".dll");
-                var projPath = assemblyName.Name + ".dll";
-                if (File.Exists(msBuildPath))
-                    return assemblyLoadContext.LoadFromAssemblyPath(msBuildPath);
-                else if (File.Exists(projPath))
-                    return assemblyLoadContext.LoadFromAssemblyPath(projPath);
-
-                return null;
-            };
-        }
-    }
-
     public async Task Test_Source_Gen()
     {
+        var instance = MSBuildLocator.RegisterDefaults();
+
         Console.WriteLine("Building workspace...");
         using var workspace = MSBuildWorkspace.Create();
 
