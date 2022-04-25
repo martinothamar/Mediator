@@ -1,3 +1,80 @@
+﻿using Mediator.SourceGenerator;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+
+namespace Mediator.Benchmarks.SourceGenerator;
+
+[MemoryDiagnoser]
+[Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
+[InProcess]
+//[EventPipeProfiler(EventPipeProfile.CpuSampling)]
+//[DisassemblyDiagnoser]
+//[InliningDiagnoser(logFailuresOnly: true, allowedNamespaces: new[] { "Mediator" })]
+public class SourceGeneratorBenchmark
+{
+    static readonly Assembly[] ImportantAssemblies = new[]
+    {
+        typeof(object).Assembly,
+        typeof(IMessage).Assembly,
+        typeof(ServiceLifetime).Assembly,
+        typeof(ServiceProvider).Assembly,
+        typeof(MulticastDelegate).Assembly
+    };
+
+    private Compilation _compilation;
+
+    private CSharpGeneratorDriver _driver;
+
+    static Assembly[] AssemblyReferencesForCodegen =>
+        AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Concat(ImportantAssemblies)
+            .Distinct()
+            .Where(a => !a.IsDynamic)
+            .ToArray();
+
+    static Compilation CreateLibrary(params string[] source)
+    {
+        var references = new List<MetadataReference>();
+        var assemblies = AssemblyReferencesForCodegen;
+        foreach (Assembly assembly in assemblies)
+        {
+            if (!assembly.IsDynamic)
+            {
+                references.Add(MetadataReference.CreateFromFile(assembly.Location));
+            }
+        }
+
+        var compilation = CSharpCompilation.Create(
+            "compilation",
+            source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray(),
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+
+        return compilation;
+    }
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _compilation = CreateLibrary(_code);
+
+        var generator = new MediatorGenerator();
+
+        _driver = CSharpGeneratorDriver.Create(generator);
+    }
+
+    [Benchmark]
+    public GeneratorDriver Compile()
+    {
+        return _driver.RunGenerators(_compilation);
+    }
+
+    private static readonly string _code =
+        @"
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -6,8 +83,6 @@ using System.Threading.Tasks;
 
 var services = new ServiceCollection();
 
-// This extensions method is generated, and is put in the "Microsoft.Extensions.DependencyInjection" namespace.
-// We override the namespace in the "MediatorOptions" attribute above.
 services.AddMediator(
     options =>
     {
@@ -102,4 +177,6 @@ public sealed class PingedHandler : INotificationHandler<Pinged>
     {
         return default;
     }
+}
+    ";
 }

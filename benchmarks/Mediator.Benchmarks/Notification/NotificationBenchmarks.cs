@@ -2,8 +2,6 @@ using MediatR;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 
-#nullable disable
-
 namespace Mediator.Benchmarks.Notification;
 
 public sealed record SomeNotification(Guid Id) : INotification, MediatR.INotification;

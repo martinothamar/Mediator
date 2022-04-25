@@ -1,8 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-#nullable disable
-
 namespace Mediator.Benchmarks.Request;
 
 public sealed record SomeStreamRequest(Guid Id) : IStreamRequest<SomeResponse>, MediatR.IStreamRequest<SomeResponse>;
