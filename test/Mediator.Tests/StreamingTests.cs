@@ -6,10 +6,10 @@ public sealed class StreamingTests
 {
     public static IEnumerable<IStreamMessage[]> TestMessages = new IStreamMessage[][]
     {
-            new IStreamMessage[] { new SomeStreamingQuery(Guid.NewGuid()) },
-            new IStreamMessage[] { new SomeStreamingCommand(Guid.NewGuid()) },
-            new IStreamMessage[] { new SomeStreamingQuery(Guid.NewGuid()) },
-            new IStreamMessage[] { new SomeStreamingCommandStruct(Guid.NewGuid()) },
+        new IStreamMessage[] { new SomeStreamingQuery(Guid.NewGuid()) },
+        new IStreamMessage[] { new SomeStreamingCommand(Guid.NewGuid()) },
+        new IStreamMessage[] { new SomeStreamingQuery(Guid.NewGuid()) },
+        new IStreamMessage[] { new SomeStreamingCommandStruct(Guid.NewGuid()) },
     };
 
     private static Guid GetId(IStreamMessage message) => (Guid)message.GetType().GetProperty("Id")!.GetValue(message)!;

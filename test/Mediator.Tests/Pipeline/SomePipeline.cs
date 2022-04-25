@@ -8,7 +8,11 @@ public sealed class SomePipeline : IPipelineBehavior<SomeRequest, SomeResponse>,
     public Guid Id { get; private set; }
     public long LastMsgTimestamp { get; private set; }
 
-    public ValueTask<SomeResponse> Handle(SomeRequest message, CancellationToken cancellationToken, MessageHandlerDelegate<SomeRequest, SomeResponse> next)
+    public ValueTask<SomeResponse> Handle(
+        SomeRequest message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<SomeRequest, SomeResponse> next
+    )
     {
         LastMsgTimestamp = Stopwatch.GetTimestamp();
 

@@ -4,7 +4,8 @@ namespace Mediator.Tests.TestTypes;
 
 public sealed class SomeRequestHandler : IRequestHandler<SomeRequest, SomeResponse>
 {
-    public ValueTask<SomeResponse> Handle(SomeRequest request, CancellationToken cancellationToken) => new ValueTask<SomeResponse>(new SomeResponse(request.Id));
+    public ValueTask<SomeResponse> Handle(SomeRequest request, CancellationToken cancellationToken) =>
+        new ValueTask<SomeResponse>(new SomeResponse(request.Id));
 }
 
 public sealed class SomeRequestWithoutResponseHandler : IRequestHandler<SomeRequestWithoutResponse>
@@ -26,7 +27,10 @@ public static class SomeStaticClass
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
 
-        public async ValueTask<SomeResponse> Handle(SomeStaticNestedRequest request, CancellationToken cancellationToken)
+        public async ValueTask<SomeResponse> Handle(
+            SomeStaticNestedRequest request,
+            CancellationToken cancellationToken
+        )
         {
             await Task.Yield();
             Ids.Add(request.Id);

@@ -12,10 +12,12 @@ namespace Some.Nested.Types
         {
             var services = new ServiceCollection();
 
-            services.AddMediator(options =>
-            {
-                options.ServiceLifetime = (ServiceLifetime)(int)ServiceLifetime.Transient;
-            });
+            services.AddMediator(
+                options =>
+                {
+                    options.ServiceLifetime = (ServiceLifetime)(int)ServiceLifetime.Transient;
+                }
+            );
 
             var serviceProvider = services.BuildServiceProvider();
 

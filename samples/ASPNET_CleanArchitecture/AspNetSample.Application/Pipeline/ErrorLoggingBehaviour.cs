@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace AspNetSample.Application;
 
 public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
-        where TMessage : IMessage
+    where TMessage : IMessage
 {
     private readonly ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> _logger;
 
@@ -13,7 +13,11 @@ public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavi
         _logger = logger;
     }
 
-    public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    public async ValueTask<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    )
     {
         try
         {

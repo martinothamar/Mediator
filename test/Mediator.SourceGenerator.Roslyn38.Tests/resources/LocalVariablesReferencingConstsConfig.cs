@@ -24,11 +24,13 @@ namespace Some.Nested.Types
             var ns = NSStaticProp;
             var lifetime = LifetimeStaticProp;
 
-            services.AddMediator(options =>
-            {
-                options.Namespace = ns;
-                options.ServiceLifetime = lifetime;
-            });
+            services.AddMediator(
+                options =>
+                {
+                    options.Namespace = ns;
+                    options.ServiceLifetime = lifetime;
+                }
+            );
 
             var serviceProvider = services.BuildServiceProvider();
 

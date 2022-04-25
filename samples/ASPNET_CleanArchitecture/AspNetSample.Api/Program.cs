@@ -9,13 +9,19 @@ public class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            })
-            .ConfigureLogging(builder =>
-                builder.AddSimpleConsole(Options =>
+            .ConfigureWebHostDefaults(
+                webBuilder =>
                 {
-                    Options.SingleLine = true;
-                }));
+                    webBuilder.UseStartup<Startup>();
+                }
+            )
+            .ConfigureLogging(
+                builder =>
+                    builder.AddSimpleConsole(
+                        Options =>
+                        {
+                            Options.SingleLine = true;
+                        }
+                    )
+            );
 }

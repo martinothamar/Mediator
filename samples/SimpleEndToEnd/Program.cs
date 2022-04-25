@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 var services = new ServiceCollection();
 
 services.AddMediator();
+
 // Ordering of pipeline behavior registrations matter!
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggerHandler<,>));
 services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>();
@@ -32,12 +33,12 @@ catch (ArgumentException) // The ErrorLoggerHandler should handle the logging fo
 
 var statsHandler = sp.GetRequiredService<StatsNotificationHandler>();
 var (messageCount, messageErrorCount) = statsHandler.Stats;
+
 // First Ping succeeded, second failed validation
-Debug.Assert(messageCount == 2,      "We sent 2 pings");
+Debug.Assert(messageCount == 2, "We sent 2 pings");
 Debug.Assert(messageErrorCount == 1, "1 of them failed validation");
 
 Console.WriteLine("Done!");
-
 
 // Types used below
 
@@ -55,7 +56,11 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
 
 public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
-    public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken, MessageHandlerDelegate<Ping, Pong> next)
+    public ValueTask<Pong> Handle(
+        Ping request,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<Ping, Pong> next
+    )
     {
         if (request is null || request.Id == default)
             throw new ArgumentException("Invalid input");
@@ -78,7 +83,11 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
         _mediator = mediator;
     }
 
-    public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    public async ValueTask<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    )
     {
         try
         {

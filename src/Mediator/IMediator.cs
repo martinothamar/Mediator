@@ -1,5 +1,3 @@
 namespace Mediator;
 
-public interface IMediator : ISender, IPublisher
-{
-}
+public interface IMediator : ISender, IPublisher { }

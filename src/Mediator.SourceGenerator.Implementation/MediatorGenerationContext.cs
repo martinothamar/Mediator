@@ -6,7 +6,11 @@ internal readonly struct MediatorGenerationContext
     public readonly IEnumerable<INamedTypeSymbol> HandlerTypes;
     public readonly string MediatorNamespace;
 
-    public MediatorGenerationContext(IReadOnlyDictionary<INamedTypeSymbol, List<INamedTypeSymbol>> handlerMap, IEnumerable<INamedTypeSymbol> handlerTypes, string mediatorNamespace)
+    public MediatorGenerationContext(
+        IReadOnlyDictionary<INamedTypeSymbol, List<INamedTypeSymbol>> handlerMap,
+        IEnumerable<INamedTypeSymbol> handlerTypes,
+        string mediatorNamespace
+    )
     {
         HandlerMap = handlerMap;
         HandlerTypes = handlerTypes;

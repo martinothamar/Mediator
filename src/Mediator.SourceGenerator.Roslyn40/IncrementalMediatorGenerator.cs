@@ -13,7 +13,6 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
         IReadOnlyList<InvocationExpressionSyntax> addMediatorCalls
     )
     {
-
         var generatorVersion = Versioning.GetVersion();
 
         var analyzerContext = new CompilationAnalyzerContext(
@@ -39,12 +38,14 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
     {
         //System.Diagnostics.Debugger.Launch();
 
-        context.RegisterPostInitializationOutput(context =>
-        {
-            var generatorVersion = Versioning.GetVersion();
+        context.RegisterPostInitializationOutput(
+            context =>
+            {
+                var generatorVersion = Versioning.GetVersion();
 
-            MediatorOptionsGenerator.Generate(context.AddSource, generatorVersion);
-        });
+                MediatorOptionsGenerator.Generate(context.AddSource, generatorVersion);
+            }
+        );
 
         var compilationProvider = context.CompilationProvider;
         var addMediatorCalls = context.SyntaxProvider.CreateSyntaxProvider(
@@ -55,9 +56,12 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
         IncrementalValueProvider<(Compilation Compilation, ImmutableArray<InvocationExpressionSyntax> AddMediatorCalls)> source =
             compilationProvider.Combine(addMediatorCalls.Collect());
 
-        context.RegisterSourceOutput(source, (context, source) =>
-        {
-            ExecuteInternal(in context, source.Compilation, source.AddMediatorCalls);
-        });
+        context.RegisterSourceOutput(
+            source,
+            (context, source) =>
+            {
+                ExecuteInternal(in context, source.Compilation, source.AddMediatorCalls);
+            }
+        );
     }
 }

@@ -7,7 +7,8 @@ public sealed class ReportingTests
     [Fact]
     public void Test_Empty_Program()
     {
-        var inputCompilation = Fixture.CreateLibrary(@"
+        var inputCompilation = Fixture.CreateLibrary(
+            @"
 namespace MyCode
 {
     public class Program
@@ -17,15 +18,16 @@ namespace MyCode
         }
     }
 }
-");
+"
+        );
 
         inputCompilation.AssertGen(
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {
                 Assert.True(result.OutputCompilation.SyntaxTrees.Count() == 4); // Original + attribute + options + mediator impl
-                    Assert.True(result.RunResult.GeneratedTrees.Length == 3); // attribute + options + mediator impl
-                }
+                Assert.True(result.RunResult.GeneratedTrees.Length == 3); // attribute + options + mediator impl
+            }
         );
     }
 
@@ -35,9 +37,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("DeepNamespaceProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
-        );
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -46,9 +46,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("StaticNestedHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
-        );
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -141,9 +139,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("NoMessagesProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
-        );
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -152,9 +148,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("NullNamespaceVariable.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
-        );
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -197,9 +191,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("ConstVariablesConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            Assertions.CompilesWithoutDiagnostics
-        );
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]

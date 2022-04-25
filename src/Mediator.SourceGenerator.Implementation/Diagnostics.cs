@@ -21,7 +21,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} got unknown error: " + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         MultipleHandlersError = new DiagnosticDescriptor(
             GetNextId(),
@@ -29,7 +30,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} found multiple handlers " + "of message type {0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         InvalidHandlerTypeError = new DiagnosticDescriptor(
             GetNextId(),
@@ -37,15 +39,18 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} found invalid handler type " + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         OpenGenericRequestHandler = new DiagnosticDescriptor(
             GetNextId(),
             $"{nameof(MediatorGenerator)} invalid handler",
-            $"{nameof(MediatorGenerator)} found invalid handler type, request/query/command handlers cannot be generic: " + "{0}",
+            $"{nameof(MediatorGenerator)} found invalid handler type, request/query/command handlers cannot be generic: "
+                + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         MessageDerivesFromMultipleMessageInterfaces = new DiagnosticDescriptor(
             GetNextId(),
@@ -53,7 +58,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} found message that derives from multiple message interfaces: " + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         MessageWithoutHandler = new DiagnosticDescriptor(
             GetNextId(),
@@ -61,7 +67,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} found message without any registered handler: " + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         ConflictingConfiguration = new DiagnosticDescriptor(
             GetNextId(),
@@ -69,7 +76,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         InvalidCodeBasedConfiguration = new DiagnosticDescriptor(
             GetNextId(),
@@ -77,7 +85,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         RequiredSymbolNotFound = new DiagnosticDescriptor(
             GetNextId(),
@@ -85,7 +94,8 @@ public static class Diagnostics
             $"{nameof(MediatorGenerator)} could not find symbol required during analysis: {0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+            isEnabledByDefault: true
+        );
 
         static string GetNextId()
         {
@@ -101,8 +111,7 @@ public static class Diagnostics
         this CompilationAnalyzerContext context,
         DiagnosticDescriptor diagnosticDescriptor,
         T arg
-    )
-    where T : class
+    ) where T : class
     {
         Diagnostic diagnostic;
         if (arg is ISymbol symbolArg)
@@ -119,10 +128,7 @@ public static class Diagnostics
         return diagnostic;
     }
 
-    private static Diagnostic Report(
-        this CompilationAnalyzerContext context,
-        DiagnosticDescriptor diagnosticDescriptor
-    )
+    private static Diagnostic Report(this CompilationAnalyzerContext context, DiagnosticDescriptor diagnosticDescriptor)
     {
         var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
         context.ReportDiagnostic(diagnostic);
@@ -130,38 +136,57 @@ public static class Diagnostics
     }
 
     public static readonly DiagnosticDescriptor GenericError;
+
     internal static Diagnostic ReportGenericError(this CompilationAnalyzerContext context, Exception exception) =>
         context.Report(GenericError, exception);
 
     public static readonly DiagnosticDescriptor MultipleHandlersError;
-    internal static Diagnostic ReportMultipleHandlers(this CompilationAnalyzerContext context, INamedTypeSymbol messageType) =>
-        context.Report(MultipleHandlersError, messageType);
+
+    internal static Diagnostic ReportMultipleHandlers(
+        this CompilationAnalyzerContext context,
+        INamedTypeSymbol messageType
+    ) => context.Report(MultipleHandlersError, messageType);
 
     public static readonly DiagnosticDescriptor InvalidHandlerTypeError;
-    internal static Diagnostic ReportInvalidHandlerType(this CompilationAnalyzerContext context, INamedTypeSymbol handlerType) =>
-        context.Report(InvalidHandlerTypeError, handlerType);
+
+    internal static Diagnostic ReportInvalidHandlerType(
+        this CompilationAnalyzerContext context,
+        INamedTypeSymbol handlerType
+    ) => context.Report(InvalidHandlerTypeError, handlerType);
 
     public static readonly DiagnosticDescriptor OpenGenericRequestHandler;
-    internal static Diagnostic ReportOpenGenericRequestHandler(this CompilationAnalyzerContext context, INamedTypeSymbol handlerType) =>
-        context.Report(OpenGenericRequestHandler, handlerType);
+
+    internal static Diagnostic ReportOpenGenericRequestHandler(
+        this CompilationAnalyzerContext context,
+        INamedTypeSymbol handlerType
+    ) => context.Report(OpenGenericRequestHandler, handlerType);
 
     public static readonly DiagnosticDescriptor MessageDerivesFromMultipleMessageInterfaces;
-    internal static Diagnostic ReportMessageDerivesFromMultipleMessageInterfaces(this CompilationAnalyzerContext context, INamedTypeSymbol messageType) =>
-        context.Report(MessageDerivesFromMultipleMessageInterfaces, messageType);
+
+    internal static Diagnostic ReportMessageDerivesFromMultipleMessageInterfaces(
+        this CompilationAnalyzerContext context,
+        INamedTypeSymbol messageType
+    ) => context.Report(MessageDerivesFromMultipleMessageInterfaces, messageType);
 
     public static readonly DiagnosticDescriptor MessageWithoutHandler;
-    internal static Diagnostic ReportMessageWithoutHandler(this CompilationAnalyzerContext context, INamedTypeSymbol messageType) =>
-        context.Report(MessageWithoutHandler, messageType);
+
+    internal static Diagnostic ReportMessageWithoutHandler(
+        this CompilationAnalyzerContext context,
+        INamedTypeSymbol messageType
+    ) => context.Report(MessageWithoutHandler, messageType);
 
     public static readonly DiagnosticDescriptor ConflictingConfiguration;
+
     internal static Diagnostic ReportConflictingConfiguration(this CompilationAnalyzerContext context) =>
         context.Report(ConflictingConfiguration);
 
     public static readonly DiagnosticDescriptor InvalidCodeBasedConfiguration;
+
     internal static Diagnostic ReportInvalidCodeBasedConfiguration(this CompilationAnalyzerContext context) =>
         context.Report(InvalidCodeBasedConfiguration);
 
     public static readonly DiagnosticDescriptor RequiredSymbolNotFound;
+
     internal static Diagnostic ReportRequiredSymbolNotFound(this CompilationAnalyzerContext context, string name) =>
         context.Report(RequiredSymbolNotFound, name);
 }

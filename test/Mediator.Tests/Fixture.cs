@@ -75,15 +75,17 @@ public static class Fixture
                 return list;
             }
 
-            var descriptor = _services.FirstOrDefault(s => s.ServiceType == serviceType) ??
-                _services.FirstOrDefault(s => s.ServiceType.IsAssignableTo(serviceType));
+            var descriptor =
+                _services.FirstOrDefault(s => s.ServiceType == serviceType)
+                ?? _services.FirstOrDefault(s => s.ServiceType.IsAssignableTo(serviceType));
 
             if (descriptor is null)
                 throw new Exception("Service not found");
 
-            var result = descriptor.ImplementationInstance ??
-                descriptor.ImplementationFactory?.Invoke(this) ??
-                ActivatorUtilities.CreateInstance(this, descriptor.ImplementationType!);
+            var result =
+                descriptor.ImplementationInstance
+                ?? descriptor.ImplementationFactory?.Invoke(this)
+                ?? ActivatorUtilities.CreateInstance(this, descriptor.ImplementationType!);
 
             if (result is null)
                 throw new Exception("Service not found");
@@ -99,7 +101,11 @@ public static class Fixture
         }
     }
 
-    private sealed class CustomServiceProviderScope : IServiceScope, IServiceProvider, IAsyncDisposable, IServiceScopeFactory
+    private sealed class CustomServiceProviderScope
+        : IServiceScope,
+          IServiceProvider,
+          IAsyncDisposable,
+          IServiceScopeFactory
     {
         public CustomServiceProviderScope(CustomServiceProvider provider, bool isRootScope)
         {
@@ -123,9 +129,7 @@ public static class Fixture
 
         public IServiceScope CreateScope() => RootProvider.CreateScope();
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         public ValueTask DisposeAsync()
         {

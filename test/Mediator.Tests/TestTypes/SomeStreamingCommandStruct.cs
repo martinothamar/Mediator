@@ -4,7 +4,10 @@ public record struct SomeStreamingCommandStruct(Guid Id) : IStreamCommand<SomeRe
 
 public sealed class SomeStreamingCommandStructHandler : IStreamCommandHandler<SomeStreamingCommandStruct, SomeResponse>
 {
-    public async IAsyncEnumerable<SomeResponse> Handle(SomeStreamingCommandStruct command, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<SomeResponse> Handle(
+        SomeStreamingCommandStruct command,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
     {
         for (int i = 0; i < 3; i++)
         {

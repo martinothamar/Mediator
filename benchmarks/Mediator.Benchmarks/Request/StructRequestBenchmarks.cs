@@ -24,18 +24,26 @@ public readonly struct SomeStructRequest : IRequest<SomeResponse>, MediatR.IRequ
     }
 }
 
-public sealed class SomeStructHandler : IRequestHandler<SomeStructRequest, SomeResponse>, MediatR.IRequestHandler<SomeStructRequest, SomeResponse>, IAsyncRequestHandler<SomeStructRequest, SomeResponse>
+public sealed class SomeStructHandler
+    : IRequestHandler<SomeStructRequest, SomeResponse>,
+      MediatR.IRequestHandler<SomeStructRequest, SomeResponse>,
+      IAsyncRequestHandler<SomeStructRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
     private static readonly Task<SomeResponse> _tResponse = Task.FromResult(_response);
     private static ValueTask<SomeResponse> _vtResponse => new ValueTask<SomeResponse>(_response);
 
-    public ValueTask<SomeResponse> Handle(SomeStructRequest request, CancellationToken cancellationToken) => _vtResponse;
+    public ValueTask<SomeResponse> Handle(SomeStructRequest request, CancellationToken cancellationToken) =>
+        _vtResponse;
 
-    Task<SomeResponse> MediatR.IRequestHandler<SomeStructRequest, SomeResponse>.Handle(SomeStructRequest request, CancellationToken cancellationToken) => _tResponse;
+    Task<SomeResponse> MediatR.IRequestHandler<SomeStructRequest, SomeResponse>.Handle(
+        SomeStructRequest request,
+        CancellationToken cancellationToken
+    ) => _tResponse;
 
-    public ValueTask<SomeResponse> InvokeAsync(SomeStructRequest request, CancellationToken cancellationToken) => _vtResponse;
+    public ValueTask<SomeResponse> InvokeAsync(SomeStructRequest request, CancellationToken cancellationToken) =>
+        _vtResponse;
 }
 
 [MemoryDiagnoser]
@@ -63,26 +71,31 @@ public class StructRequestBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(opts =>
-        {
-            _ = ServiceLifetime switch
+        services.AddMediatR(
+            opts =>
             {
-                ServiceLifetime.Singleton => opts.AsSingleton(),
-                ServiceLifetime.Scoped => opts.AsScoped(),
-                ServiceLifetime.Transient => opts.AsTransient(),
-                _ => throw new InvalidOperationException(),
-            };
-        }, typeof(SomeHandlerClass).Assembly);
-        services.AddMessagePipe(opts =>
-        {
-            opts.InstanceLifetime = ServiceLifetime switch
+                _ = ServiceLifetime switch
+                {
+                    ServiceLifetime.Singleton => opts.AsSingleton(),
+                    ServiceLifetime.Scoped => opts.AsScoped(),
+                    ServiceLifetime.Transient => opts.AsTransient(),
+                    _ => throw new InvalidOperationException(),
+                };
+            },
+            typeof(SomeHandlerClass).Assembly
+        );
+        services.AddMessagePipe(
+            opts =>
             {
-                ServiceLifetime.Singleton => InstanceLifetime.Singleton,
-                ServiceLifetime.Scoped => InstanceLifetime.Scoped,
-                ServiceLifetime.Transient => InstanceLifetime.Transient,
-                _ => throw new InvalidOperationException(),
-            };
-        });
+                opts.InstanceLifetime = ServiceLifetime switch
+                {
+                    ServiceLifetime.Singleton => InstanceLifetime.Singleton,
+                    ServiceLifetime.Scoped => InstanceLifetime.Scoped,
+                    ServiceLifetime.Transient => InstanceLifetime.Transient,
+                    _ => throw new InvalidOperationException(),
+                };
+            }
+        );
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)
@@ -96,7 +109,9 @@ public class StructRequestBenchmarks
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
         _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-        _messagePipeHandler = _serviceProvider.GetRequiredService<IAsyncRequestHandler<SomeStructRequest, SomeResponse>>();
+        _messagePipeHandler = _serviceProvider.GetRequiredService<
+            IAsyncRequestHandler<SomeStructRequest, SomeResponse>
+        >();
         _handler = _serviceProvider.GetRequiredService<SomeStructHandler>();
         _request = new(Guid.NewGuid());
     }

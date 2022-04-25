@@ -1,7 +1,6 @@
 namespace Mediator.SourceGenerator;
 
-internal abstract class SymbolMetadata<T> : IEquatable<T?>
-        where T : SymbolMetadata<T>
+internal abstract class SymbolMetadata<T> : IEquatable<T?> where T : SymbolMetadata<T>
 {
     private static readonly SymbolEqualityComparer _comparer = SymbolEqualityComparer.Default;
     public readonly INamedTypeSymbol Symbol;
