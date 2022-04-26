@@ -48,11 +48,7 @@ public class RequestTests
         GC.Collect();
 
         var checkpoint = dotMemory.Check();
-        var beforeBytes = GC.GetAllocatedBytesForCurrentThread();
         await mediator.Send(request);
-        var afterBytes = GC.GetAllocatedBytesForCurrentThread();
-
-        Assert.Equal(0, afterBytes - beforeBytes);
         dotMemory.Check(
             memory =>
             {

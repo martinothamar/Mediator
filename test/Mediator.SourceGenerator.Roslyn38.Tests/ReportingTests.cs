@@ -312,6 +312,15 @@ namespace MyCode
         );
     }
 
+    [Fact]
+    public async Task Test_Generic_Request_Works()
+    {
+        var source = await Fixture.SourceFromResourceFile("GenericRequestProgram.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+    }
+
     [Fact(Skip = "We can't statically prove a notification isn't handled yet, see TODO in CompilationAnalyzer")]
     public async Task Test_Notification_Without_Any_Handlers()
     {

@@ -427,7 +427,7 @@ internal sealed class CompilationAnalyzer
 
                         if (isRequest)
                         {
-                            if (IsOpenGeneric(typeSymbol))
+                            if (IsOpenGeneric(typeSymbol, typeInterfaceSymbol))
                             {
                                 // Handlers must be classes
                                 ReportDiagnostic(
@@ -444,7 +444,9 @@ internal sealed class CompilationAnalyzer
                             );
 
                             var handler = new RequestMessageHandler(typeSymbol, messageType, this);
-                            var requestMessageSymbol = (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0];
+                            var requestMessageSymbol = (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[
+                                0
+                            ].OriginalDefinition;
                             if (mapping.TryGetValue(requestMessageSymbol, out var requestMessageObj))
                             {
                                 if (requestMessageObj is not RequestMessage requestMessage)
@@ -591,8 +593,18 @@ internal sealed class CompilationAnalyzer
         }
     }
 
-    static bool IsOpenGeneric(INamedTypeSymbol symbol) =>
-        symbol.TypeArguments.Length > 0 && symbol.TypeArguments[0] is ITypeParameterSymbol;
+    static bool IsOpenGeneric(INamedTypeSymbol symbol, INamedTypeSymbol interfaceSymbol)
+    {
+        var isGeneric =
+            symbol.TypeArguments.Length > 0 && symbol.TypeArguments[0] is ITypeParameterSymbol genericTypeParam;
+        var interfaceTypeArgument = interfaceSymbol.TypeArguments[0];
+        var handlesGenericMessage =
+            interfaceTypeArgument is not ITypeParameterSymbol
+            && interfaceTypeArgument is INamedTypeSymbol genericMessageSymbol
+            && genericMessageSymbol.TypeArguments.Length > 0
+            && _symbolComparer.Equals(genericMessageSymbol.TypeArguments[0], symbol.TypeArguments[0]);
+        return isGeneric && !handlesGenericMessage;
+    }
 
     private void TryParseConfiguration(CancellationToken cancellationToken)
     {
