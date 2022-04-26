@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <LangVersion>latest</LangVersion>
     <TargetFramework>net6.0</TargetFramework>
+    <Nullable>disable</Nullable>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -27,11 +28,19 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="MessagePipe" Version="1.7.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.0.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    <PackageReference Include="NuGet.ProjectModel" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
 

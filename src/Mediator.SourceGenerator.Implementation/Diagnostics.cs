@@ -91,7 +91,7 @@ public static class Diagnostics
         RequiredSymbolNotFound = new DiagnosticDescriptor(
             GetNextId(),
             $"{nameof(MediatorGenerator)} symbol not found during analysis",
-            $"{nameof(MediatorGenerator)} could not find symbol required during analysis: {0}",
+            $"{nameof(MediatorGenerator)} could not find symbol required during analysis: " + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
             isEnabledByDefault: true

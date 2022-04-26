@@ -2,8 +2,6 @@ using MediatR;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 
-#nullable disable
-
 namespace Mediator.Benchmarks.Request;
 
 public readonly struct SomeStructRequest : IRequest<SomeResponse>, MediatR.IRequest<SomeResponse>

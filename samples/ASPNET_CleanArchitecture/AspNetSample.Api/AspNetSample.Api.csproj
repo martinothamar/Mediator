@@ -7,11 +7,12 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="10.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
     <ProjectReference Include="..\AspNetSample.Application\AspNetSample.Application.csproj" />
     <ProjectReference Include="..\AspNetSample.Infrastructure\AspNetSample.Infrastructure.csproj" />

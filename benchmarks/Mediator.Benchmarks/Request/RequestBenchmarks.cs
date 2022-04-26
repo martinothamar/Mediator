@@ -2,8 +2,6 @@ using MediatR;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 
-#nullable disable
-
 namespace Mediator.Benchmarks.Request;
 
 public sealed record SomeRequest(Guid Id) : IRequest<SomeResponse>, MediatR.IRequest<SomeResponse>;
