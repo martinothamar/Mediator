@@ -55,3 +55,12 @@ public sealed class SomeOtherClass
         }
     }
 }
+
+public sealed class SomeRequestReturningByteArrayHandler : IRequestHandler<SomeRequestReturningByteArray, byte[]>
+{
+    public ValueTask<byte[]> Handle(SomeRequestReturningByteArray request, CancellationToken cancellationToken)
+    {
+        var bytes = request.Id.ToByteArray();
+        return new ValueTask<byte[]>(bytes);
+    }
+}

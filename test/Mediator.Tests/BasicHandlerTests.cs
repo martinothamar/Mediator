@@ -322,4 +322,17 @@ public class BasicHandlerTests
         Assert.Equal(id, response.Id);
         Assert.Contains(id, SomeOtherClass.SomeNestedHandler.Ids);
     }
+
+    [Fact]
+    public async Task Test_Request_Returning_Array()
+    {
+        var (sp, mediator) = Fixture.GetMediator();
+
+        var id = Guid.NewGuid();
+        var bytes = id.ToByteArray();
+
+        var request = new SomeRequestReturningByteArray(id);
+        var receivedBytes = await mediator.Send(request);
+        Assert.Equal(bytes, receivedBytes);
+    }
 }
