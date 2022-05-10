@@ -25,7 +25,7 @@ internal sealed class RequestMessageHandlerWrapper
 
     public string HandlerWrapperTypeNameWithGenericTypeArguments(
         INamedTypeSymbol requestSymbol,
-        INamedTypeSymbol responseSymbol
+        ITypeSymbol responseSymbol
     ) =>
         $"{HandlerWrapperTypeFullName(requestSymbol.TypeKind)}<{requestSymbol.GetTypeSymbolFullName()}, {responseSymbol.GetTypeSymbolFullName()}>";
 

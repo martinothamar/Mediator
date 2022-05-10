@@ -152,6 +152,15 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_Byte_Array_Response_Program()
+    {
+        var source = await Fixture.SourceFromResourceFile("ByteArrayResponseProgram.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
     public async Task Test_Cast_Lifetime_Config()
     {
         var source = await Fixture.SourceFromResourceFile("IntCastLifetime.cs");

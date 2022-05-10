@@ -476,9 +476,9 @@ internal sealed class CompilationAnalyzer
                 case IS_REQUEST:
 
                     {
-                        var responseMessageSymbol =
+                        ITypeSymbol responseMessageSymbol =
                             typeInterfaceSymbol.TypeArguments.Length > 0
-                                ? (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0]
+                                ? typeInterfaceSymbol.TypeArguments[0]
                                 : UnitSymbol;
 
                         if (IsAlreadyHandledByDerivedInterface(i, 0, typeSymbol, typeInterfaceSymbol))

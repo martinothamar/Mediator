@@ -6,7 +6,7 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
 {
     public RequestMessageHandler? Handler { get; private set; }
 
-    public readonly INamedTypeSymbol ResponseSymbol;
+    public readonly ITypeSymbol ResponseSymbol;
 
     public readonly RequestMessageHandlerWrapper WrapperType;
 
@@ -16,7 +16,7 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
 
     public RequestMessage(
         INamedTypeSymbol symbol,
-        INamedTypeSymbol responseSymbol,
+        ITypeSymbol responseSymbol,
         string messageType,
         CompilationAnalyzer analyzer
     ) : base(symbol, analyzer)
