@@ -200,6 +200,9 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+
+        var handlers = sp.GetServices<INotificationHandler<SomeNotification>>();
+        Assert.True(handlers.Distinct().Count() == handlers.Count());
     }
 
     [Fact]
@@ -214,6 +217,7 @@ public class BasicHandlerTests
 
         var handlers = sp.GetServices<INotificationHandler<SomeStructNotification>>();
         Assert.True(handlers.Count() == 2);
+        Assert.True(handlers.Distinct().Count() == handlers.Count());
 
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
@@ -234,6 +238,9 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish<INotification>(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+
+        var handlers = sp.GetServices<INotificationHandler<SomeNotification>>();
+        Assert.True(handlers.Distinct().Count() == handlers.Count());
     }
 
     [Fact]

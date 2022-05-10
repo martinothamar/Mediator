@@ -27,6 +27,28 @@ In particular, source generators in this library is used to
   * You can use both `IMediator` and `Mediator`, the latter allows for better performance
 * Generate diagnostics related messages and message handlers
 
+---
+**NOTE**
+
+I am currently working on 2.0 version of Mediator.
+This version is currently in preview and includes a lot of improvements:
+
+- [x] Configure Mediator through `AddMediator` call (assembly attribute still works) (#21, #24)
+- [x] Throw `ArgumentNullException` for null messages (#22)
+- [x] Pass `Publish<INotification>` calls to `Publish(object)` (#22)
+- [x] Optimize notifications (52ns -> 11ns for the most common case) (#23)
+- [x] Cleanup and optimization in source generator (#25, thanks @Timmoth)
+- [x] Modernize source generator to support both 3.8 and 4.0 Roslyn versions (also prepare for incremental codegen) (#26)
+- [x] Updated benchmarks to account for changes (#27)
+- [x] Smoketests, unittests, memory allocation tests (#28, 29)
+- [x] Cleanup analysis-part of source generator, use 6.0.0 of .NET references (#30)
+- [x] Use [csharpier](https://github.com/belav/csharpier) for consistent formatting (#31)
+- [x] Benchmark for source generation process (#32)
+- [ ] Support generic messages
+
+---
+
+
 - [Mediator](#mediator)
   - [2. Benchmarks](#2-benchmarks)
   - [3. Usage and abstractions](#3-usage-and-abstractions)
