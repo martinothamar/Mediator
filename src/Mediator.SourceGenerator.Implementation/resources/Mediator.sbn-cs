@@ -622,11 +622,8 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
-            ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
-            return default;
-            {{ end }}
 			
+            {{- if HasAnyValueTypeStreamResponse }}
 			static async IAsyncEnumerable<object> AsyncWrapper<T>(IAsyncEnumerable<T> wrapped) where T : struct
             {
                 await foreach (var value in wrapped)
@@ -634,6 +631,12 @@ namespace {{ MediatorNamespace }}
                     yield return value;
                 }
             }
+            {{ end }}	
+			
+            {{ else }}
+            ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
+            return default;
+            {{ end }}				
         }
 
         /// <summary>
