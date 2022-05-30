@@ -609,8 +609,8 @@ namespace {{ MediatorNamespace }}
                 case {{ message.RequestFullName }} m: 
 				{
 					{{- if message.ResponseIsValueType }}
-                    var task = CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
-					return default;
+                    var value = CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+					return AsyncWrapper(value);
 					{{ else }}
                     return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
                     {{ end }}
@@ -626,6 +626,14 @@ namespace {{ MediatorNamespace }}
             ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
             return default;
             {{ end }}
+			
+			static async IAsyncEnumerable<object> AsyncWrapper<T>(IAsyncEnumerable<T> wrapped) where T : struct
+            {
+                await foreach (var value in wrapped)
+                {
+                    yield return value;
+                }
+            }
         }
 
         /// <summary>
