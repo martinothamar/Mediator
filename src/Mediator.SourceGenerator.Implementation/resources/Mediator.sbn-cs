@@ -606,7 +606,15 @@ namespace {{ MediatorNamespace }}
             switch (message)
             {
                 {{~ for message in IStreamMessages ~}}
-                case {{ message.RequestFullName }} m: return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+                case {{ message.RequestFullName }} m: 
+				{
+					{{- if message.ResponseIsValueType }}
+                    var value = CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+					return AsyncWrapper(value);
+					{{ else }}
+                    return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+                    {{ end }}
+                }
                 {{~ end ~}}
                 default:
                 {
@@ -614,10 +622,21 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
+			
+            {{- if HasAnyValueTypeStreamResponse }}
+            static async global::System.Collections.Generic.IAsyncEnumerable<object> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
+            {
+                await foreach (var value in wrapped.WithCancellation(cancellationToken))
+                {
+                    yield return value;
+                }
+            }
+            {{ end }}
+			
             {{ else }}
             ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
             return default;
-            {{ end }}
+            {{ end }}				
         }
 
         /// <summary>
