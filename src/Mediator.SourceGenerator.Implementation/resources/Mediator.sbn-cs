@@ -606,7 +606,15 @@ namespace {{ MediatorNamespace }}
             switch (message)
             {
                 {{~ for message in IStreamMessages ~}}
-                case {{ message.RequestFullName }} m: return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+                case {{ message.RequestFullName }} m: 
+				{
+					{{- if message.ResponseIsValueType }}
+                    var task = CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+					return default;
+					{{ else }}
+                    return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
+                    {{ end }}
+                }
                 {{~ end ~}}
                 default:
                 {
