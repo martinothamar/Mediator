@@ -624,14 +624,14 @@ namespace {{ MediatorNamespace }}
             }
 			
             {{- if HasAnyValueTypeStreamResponse }}
-            static async IAsyncEnumerable<object> AsyncWrapper<T>(IAsyncEnumerable<T> wrapped, [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : struct
+            static async global::System.Collections.Generic.IAsyncEnumerable<object> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
             {
                 await foreach (var value in wrapped.WithCancellation(cancellationToken))
                 {
                     yield return value;
                 }
             }
-            {{ end }}	
+            {{ end }}
 			
             {{ else }}
             ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
