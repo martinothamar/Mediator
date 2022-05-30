@@ -37,6 +37,10 @@ public sealed class StructResponseTests
             [EnumeratorCancellation] CancellationToken cancellationToken
         )
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                yield break;
+            }
             await Task.Yield();
             yield return new Response(stream.Id);
         }
@@ -150,5 +154,25 @@ public sealed class StructResponseTests
         }
 
         Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public async Task Test_Stream_Object_WithCancellation()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+
+        var id = Guid.NewGuid();
+        object message = new Stream(id);
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+        var response = mediator.CreateStream(message);
+        int count = 0;
+        await foreach (var value in response.WithCancellation(cts.Token))
+        {
+            Assert.Equal(id, ((Response)value!).Id);
+            count++;
+        }
+
+        Assert.Equal(0, count);
     }
 }

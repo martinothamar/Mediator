@@ -624,9 +624,9 @@ namespace {{ MediatorNamespace }}
             }
 			
             {{- if HasAnyValueTypeStreamResponse }}
-			static async IAsyncEnumerable<object> AsyncWrapper<T>(IAsyncEnumerable<T> wrapped) where T : struct
+            static async IAsyncEnumerable<object> AsyncWrapper<T>(IAsyncEnumerable<T> wrapped, [EnumeratorCancellation] CancellationToken cancellationToken = default) where T : struct
             {
-                await foreach (var value in wrapped)
+                await foreach (var value in wrapped.WithCancellation(cancellationToken))
                 {
                     yield return value;
                 }
