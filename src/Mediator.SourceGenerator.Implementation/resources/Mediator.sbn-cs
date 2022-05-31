@@ -626,7 +626,7 @@ namespace {{ MediatorNamespace }}
             {{- if HasAnyValueTypeStreamResponse }}
             static async global::System.Collections.Generic.IAsyncEnumerable<object> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
             {
-                await foreach (var value in wrapped.WithCancellation(cancellationToken))
+                await foreach (var value in global::System.Threading.Tasks.TaskAsyncEnumerableExtensions.WithCancellation(wrapped, cancellationToken))
                 {
                     yield return value;
                 }
