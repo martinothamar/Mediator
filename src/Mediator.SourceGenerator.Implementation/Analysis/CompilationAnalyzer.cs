@@ -10,7 +10,8 @@ internal readonly record struct CompilationAnalyzerContext(
     IReadOnlyList<InvocationExpressionSyntax>? AddMediatorCalls,
     string GeneratorVersion,
     Action<Diagnostic> ReportDiagnostic,
-    Action<string, SourceText> AddSource
+    Action<string, SourceText> AddSource,
+    CancellationToken CancellationToken
 );
 
 internal sealed class CompilationAnalyzer
@@ -24,13 +25,13 @@ internal sealed class CompilationAnalyzer
     private readonly HashSet<RequestMessageHandler> _requestMessageHandlers;
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
 
-    public readonly ImmutableArray<RequestMessageHandlerWrapper> RequestMessageHandlerWrappers;
+    public ImmutableArray<RequestMessageHandlerWrapper> RequestMessageHandlerWrappers;
 
-    private readonly INamedTypeSymbol[] _baseHandlerSymbols;
-    private readonly INamedTypeSymbol[] _baseMessageSymbols;
+    private INamedTypeSymbol[] _baseHandlerSymbols;
+    private INamedTypeSymbol[] _baseMessageSymbols;
 
-    private readonly INamedTypeSymbol _notificationHandlerInterfaceSymbol;
-    private readonly INamedTypeSymbol _notificationInterfaceSymbol;
+    private INamedTypeSymbol? _notificationHandlerInterfaceSymbol;
+    private INamedTypeSymbol? _notificationInterfaceSymbol;
 
     public IEnumerable<RequestMessage> RequestMessages => _requestMessages.Where(r => r.Handler is not null);
 
@@ -81,32 +82,31 @@ internal sealed class CompilationAnalyzer
     public IEnumerable<RequestMessage> IStreamMessages =>
         _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
 
-    private bool _hasErrors;
+    public bool HasErrors { get; private set; }
 
-    public bool HasErrors => _hasErrors;
-
-    public readonly INamedTypeSymbol UnitSymbol;
+    public INamedTypeSymbol? UnitSymbol;
 
     public Compilation Compilation => _context.Compilation;
 
     public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
-    public string GeneratorVersion => _context.GeneratorVersion;
+    public string GeneratorVersion =>
+        string.IsNullOrWhiteSpace(_context.GeneratorVersion) ? "1.0.0.0" : _context.GeneratorVersion;
 
     private IFieldSymbol? _configuredLifetimeSymbol;
-    private readonly INamedTypeSymbol _serviceLifetimeEnumSymbol;
-    public IFieldSymbol ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
-    public readonly IFieldSymbol SingletonServiceLifetimeSymbol;
+    private INamedTypeSymbol? _serviceLifetimeEnumSymbol;
+    public IFieldSymbol? ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
+    public IFieldSymbol? SingletonServiceLifetimeSymbol;
 
-    public string ServiceLifetime => ServiceLifetimeSymbol.GetFieldSymbolFullName();
+    public string? ServiceLifetime => ServiceLifetimeSymbol?.GetFieldSymbolFullName();
 
-    public string SingletonServiceLifetime => SingletonServiceLifetimeSymbol.GetFieldSymbolFullName();
+    public string? SingletonServiceLifetime => SingletonServiceLifetimeSymbol?.GetFieldSymbolFullName();
 
-    public bool ServiceLifetimeIsSingleton => ServiceLifetimeSymbol.Name == "Singleton";
+    public bool ServiceLifetimeIsSingleton => ServiceLifetimeSymbol?.Name == "Singleton";
 
-    public bool ServiceLifetimeIsScoped => ServiceLifetimeSymbol.Name == "Scoped";
+    public bool ServiceLifetimeIsScoped => ServiceLifetimeSymbol?.Name == "Scoped";
 
-    public bool ServiceLifetimeIsTransient => ServiceLifetimeSymbol.Name == "Transient";
+    public bool ServiceLifetimeIsTransient => ServiceLifetimeSymbol?.Name == "Transient";
 
     public bool IsTestRun =>
         (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false)
@@ -115,31 +115,45 @@ internal sealed class CompilationAnalyzer
     public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
         _context = context;
-
         _requestMessages = new();
-        _notificationMessages = new();
         _requestMessageHandlers = new();
+        _notificationMessages = new();
         _notificationMessageHandlers = new();
+        _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
+        _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
+    }
 
-        TryLoadUnitSymbol(out UnitSymbol);
-
-        TryLoadBaseHandlerSymbols(out _baseHandlerSymbols);
-
-        TryLoadDISymbols(out _serviceLifetimeEnumSymbol, out SingletonServiceLifetimeSymbol);
-
-        RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
+    public void Initialize()
+    {
+        try
         {
-            new RequestMessageHandlerWrapper("Request", this),
-            new RequestMessageHandlerWrapper("StreamRequest", this),
-            new RequestMessageHandlerWrapper("Command", this),
-            new RequestMessageHandlerWrapper("StreamCommand", this),
-            new RequestMessageHandlerWrapper("Query", this),
-            new RequestMessageHandlerWrapper("StreamQuery", this),
-        }.ToImmutableArray();
+            TryLoadUnitSymbol(out UnitSymbol);
 
-        _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
+            TryLoadBaseHandlerSymbols(out _baseHandlerSymbols);
 
-        TryLoadBaseMessageSymbols(out _baseMessageSymbols, out _notificationInterfaceSymbol);
+            TryLoadDISymbols(out _serviceLifetimeEnumSymbol, out SingletonServiceLifetimeSymbol);
+
+            RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
+            {
+                new RequestMessageHandlerWrapper("Request", this),
+                new RequestMessageHandlerWrapper("StreamRequest", this),
+                new RequestMessageHandlerWrapper("Command", this),
+                new RequestMessageHandlerWrapper("StreamCommand", this),
+                new RequestMessageHandlerWrapper("Query", this),
+                new RequestMessageHandlerWrapper("StreamQuery", this),
+            }.ToImmutableArray();
+
+            _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
+
+            TryLoadBaseMessageSymbols(out _baseMessageSymbols, out _notificationInterfaceSymbol);
+
+            TryParseConfiguration();
+        }
+        catch (Exception ex)
+        {
+            _context.ReportGenericError(ex);
+            HasErrors = true;
+        }
     }
 
     private void TryLoadUnitSymbol(out INamedTypeSymbol UnitSymbol)
@@ -265,15 +279,24 @@ internal sealed class CompilationAnalyzer
         }
     }
 
-    public void Analyze(CancellationToken cancellationToken)
+    public void Analyze()
     {
-        TryParseConfiguration(cancellationToken);
+        if (HasErrors)
+            return;
 
-        var queue = new Queue<INamespaceOrTypeSymbol>();
+        try
+        {
+            var queue = new Queue<INamespaceOrTypeSymbol>();
 
-        FindGlobalNamespaces(queue);
+            FindGlobalNamespaces(queue);
 
-        PopulateMetadata(queue);
+            PopulateMetadata(queue);
+        }
+        catch (Exception ex)
+        {
+            _context.ReportGenericError(ex);
+            HasErrors = true;
+        }
     }
 
     private void FindGlobalNamespaces(Queue<INamespaceOrTypeSymbol> queue)
@@ -297,6 +320,9 @@ internal sealed class CompilationAnalyzer
     private void PopulateMetadata(Queue<INamespaceOrTypeSymbol> queue)
     {
         var compilation = _context.Compilation;
+
+        if (UnitSymbol is null)
+            return;
 
 #pragma warning disable RS1024 // Compare symbols correctly
         var requestMessageHandlerMap = new Dictionary<INamedTypeSymbol, object?>(_symbolComparer);
@@ -596,8 +622,9 @@ internal sealed class CompilationAnalyzer
     static bool IsOpenGeneric(INamedTypeSymbol symbol) =>
         symbol.TypeArguments.Length > 0 && symbol.TypeArguments[0] is ITypeParameterSymbol;
 
-    private void TryParseConfiguration(CancellationToken cancellationToken)
+    private void TryParseConfiguration()
     {
+        var cancellationToken = _context.CancellationToken;
         var compilation = _context.Compilation;
         var addMediatorCalls = _context.AddMediatorCalls;
 
@@ -856,6 +883,7 @@ internal sealed class CompilationAnalyzer
         var symbol = semanticModel.GetSymbolInfo(identifierNameSyntax, cancellationToken).Symbol;
         if (
             symbol is IFieldSymbol lifetimeSymbol
+            && _serviceLifetimeEnumSymbol is not null
             && SymbolEqualityComparer.Default.Equals(_serviceLifetimeEnumSymbol, lifetimeSymbol.ContainingType)
         )
             return lifetimeSymbol;
@@ -880,7 +908,7 @@ internal sealed class CompilationAnalyzer
         {
             var value = (int)fieldSymbol.ConstantValue!;
             return _serviceLifetimeEnumSymbol
-                .GetMembers()
+                ?.GetMembers()
                 .OfType<IFieldSymbol>()
                 .Single(m => (int)m.ConstantValue! == value);
         }
@@ -888,7 +916,7 @@ internal sealed class CompilationAnalyzer
         {
             var value = (int)localSymbol.ConstantValue!;
             return _serviceLifetimeEnumSymbol
-                .GetMembers()
+                ?.GetMembers()
                 .OfType<IFieldSymbol>()
                 .Single(m => (int)m.ConstantValue! == value);
         }
@@ -912,7 +940,7 @@ internal sealed class CompilationAnalyzer
         {
             var value = (int)literal.Token.Value!;
             return _serviceLifetimeEnumSymbol
-                .GetMembers()
+                ?.GetMembers()
                 .OfType<IFieldSymbol>()
                 .Single(m => (int)m.ConstantValue! == value);
         }
@@ -931,7 +959,7 @@ internal sealed class CompilationAnalyzer
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
     {
         var diagnostic = del(in _context, state);
-        _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
+        HasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
     }
 
     private delegate Diagnostic ReportDiagnosticDelegate(in CompilationAnalyzerContext context);
@@ -939,6 +967,6 @@ internal sealed class CompilationAnalyzer
     private void ReportDiagnostic(ReportDiagnosticDelegate del)
     {
         var diagnostic = del(in _context);
-        _hasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
+        HasErrors |= diagnostic.Severity == DiagnosticSeverity.Error;
     }
 }

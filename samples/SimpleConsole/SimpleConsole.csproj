@@ -5,6 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <ImplicitUsings>disable</ImplicitUsings>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>

@@ -108,7 +108,7 @@ namespace {{ MediatorNamespace }}
 
             _rootHandler = handler;
         }
-        
+
         public {{ wrapperType.ReturnTypeName }} Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
             _rootHandler(request, cancellationToken);
     }
@@ -382,7 +382,7 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        
+
         /// <summary>
         /// Create stream for request.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -452,7 +452,7 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        
+
         /// <summary>
         /// Create stream for command.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -606,7 +606,7 @@ namespace {{ MediatorNamespace }}
             switch (message)
             {
                 {{~ for message in IStreamMessages ~}}
-                case {{ message.RequestFullName }} m: 
+                case {{ message.RequestFullName }} m:
 				{
 					{{- if message.ResponseIsValueType }}
                     var value = CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
@@ -622,7 +622,7 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-			
+
             {{- if HasAnyValueTypeStreamResponse }}
             static async global::System.Collections.Generic.IAsyncEnumerable<object> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
             {
@@ -632,11 +632,11 @@ namespace {{ MediatorNamespace }}
                 }
             }
             {{ end }}
-			
+
             {{ else }}
             ThrowInvalidMessage(message as global::Mediator.IStreamMessage);
             return default;
-            {{ end }}				
+            {{ end }}
         }
 
         /// <summary>
@@ -692,7 +692,7 @@ namespace {{ MediatorNamespace }}
             {{~ else ~}}
             var handlers = _diCache.Handlers_For_{{ message.IdentifierFullName }};
             {{~ end ~}}
-            
+
             {{~ if ServiceLifetimeIsSingleton ~}}
             if (handlers.Length == 0)
             {
@@ -831,7 +831,7 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidMessage(object msg) =>
             throw new global::Mediator.MissingMessageHandlerException(msg);
-            
+
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowArgumentNull(string paramName) =>
             throw new global::System.ArgumentNullException(paramName);
@@ -843,7 +843,7 @@ namespace {{ MediatorNamespace }}
                 ThrowArgumentNull(paramName);
             }
         }
-        
+
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowArgumentNullOrInvalidMessage(object msg, string paramName)
         {
@@ -856,7 +856,7 @@ namespace {{ MediatorNamespace }}
                 ThrowInvalidMessage(msg);
             }
         }
-        
+
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions) =>
             throw new global::System.AggregateException(exceptions);
