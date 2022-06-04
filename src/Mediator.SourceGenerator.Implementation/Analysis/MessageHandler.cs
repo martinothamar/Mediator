@@ -22,5 +22,5 @@ internal abstract class MessageHandler<T> : SymbolMetadata<MessageHandler<T>>
     public string ServiceRegistrationBlock =>
         $"services.TryAdd(new SD({TypeOfExpression()}, {TypeOfExpression()}, {ServiceLifetime}));";
 
-    public string ServiceLifetime => Analyzer.ServiceLifetime;
+    public string? ServiceLifetime => Analyzer.ServiceLifetime;
 }

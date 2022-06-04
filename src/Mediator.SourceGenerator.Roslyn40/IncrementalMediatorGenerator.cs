@@ -20,15 +20,14 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             addMediatorCalls,
             generatorVersion,
             context.ReportDiagnostic,
-            context.AddSource
+            context.AddSource,
+            context.CancellationToken
         );
-        CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
-        if (CompilationAnalyzer.HasErrors)
-            return;
 
-        CompilationAnalyzer.Analyze(context.CancellationToken);
-        if (CompilationAnalyzer.HasErrors)
-            return;
+        CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
+
+        CompilationAnalyzer.Initialize();
+        CompilationAnalyzer.Analyze();
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
         mediatorImplementationGenerator.Generate(CompilationAnalyzer);
@@ -36,8 +35,6 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        //System.Diagnostics.Debugger.Launch();
-
         context.RegisterPostInitializationOutput(
             context =>
             {

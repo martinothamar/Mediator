@@ -18,7 +18,7 @@ public static class Diagnostics
         GenericError = new DiagnosticDescriptor(
             GetNextId(),
             $"{nameof(MediatorGenerator)} unknown error",
-            $"{nameof(MediatorGenerator)} got unknown error: " + "{0}",
+            $"{nameof(MediatorGenerator)} got unknown error while generating mediator implementation: " + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
             isEnabledByDefault: true
@@ -137,8 +137,12 @@ public static class Diagnostics
 
     public static readonly DiagnosticDescriptor GenericError;
 
-    internal static Diagnostic ReportGenericError(this CompilationAnalyzerContext context, Exception exception) =>
-        context.Report(GenericError, exception);
+    internal static Diagnostic ReportGenericError(this CompilationAnalyzerContext context, Exception exception)
+    {
+        var diagnostic = Diagnostic.Create(GenericError, Location.None, exception);
+        context.ReportDiagnostic(diagnostic);
+        return diagnostic;
+    }
 
     public static readonly DiagnosticDescriptor MultipleHandlersError;
 
@@ -189,6 +193,14 @@ public static class Diagnostics
 
     internal static Diagnostic ReportRequiredSymbolNotFound(this CompilationAnalyzerContext context, string name) =>
         context.Report(RequiredSymbolNotFound, name);
+
+    public static void InjectError()
+    {
+        if (true)
+        {
+            throw new Exception("Injected error");
+        }
+    }
 }
 
 #pragma warning restore RS2008 // Enable analyzer release tracking

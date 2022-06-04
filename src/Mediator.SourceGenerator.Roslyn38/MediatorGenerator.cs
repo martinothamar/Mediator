@@ -15,8 +15,6 @@ public sealed class MediatorGenerator : ISourceGenerator
         if (debugOptionExists && !System.Diagnostics.Debugger.IsAttached)
             System.Diagnostics.Debugger.Launch();
 
-        //System.Diagnostics.Debugger.Launch();
-
         ExecuteInternal(in context);
     }
 
@@ -31,15 +29,14 @@ public sealed class MediatorGenerator : ISourceGenerator
             (context.SyntaxReceiver as SyntaxReceiver)?.AddMediatorCalls,
             generatorVersion,
             context.ReportDiagnostic,
-            context.AddSource
+            context.AddSource,
+            context.CancellationToken
         );
-        CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
-        if (CompilationAnalyzer.HasErrors)
-            return;
 
-        CompilationAnalyzer.Analyze(context.CancellationToken);
-        if (CompilationAnalyzer.HasErrors)
-            return;
+        CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
+
+        CompilationAnalyzer.Initialize();
+        CompilationAnalyzer.Analyze();
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
         mediatorImplementationGenerator.Generate(CompilationAnalyzer);
