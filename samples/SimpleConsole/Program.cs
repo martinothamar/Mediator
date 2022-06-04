@@ -87,11 +87,20 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
     }
 }
 
-public sealed class PingHandler : IRequestHandler<Ping, Pong>
+public abstract class BasePingHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
 {
-    public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
+    public ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken) =>
+        new ValueTask<TResponse>(Handle(request));
+
+    protected abstract TResponse Handle(TRequest request);
+}
+
+public sealed class PingHandler : BasePingHandler<Ping, Pong>
+{
+    protected override Pong Handle(Ping request)
     {
         Console.WriteLine("4) Returning pong!");
-        return new ValueTask<Pong>(new Pong(request.Id));
+        return new Pong(request.Id);
     }
 }
