@@ -25,16 +25,22 @@ internal sealed partial class MediatorImplementationGenerator
         catch (Exception ex)
         {
             compilationAnalyzer.Context.ReportGenericError(ex);
-            GenerateFallback(compilationAnalyzer);
         }
     }
 
     private void GenerateFallback(CompilationAnalyzer compilationAnalyzer)
     {
-        var file = "resources/MediatorFallback.sbn-cs";
-        var template = Template.Parse(EmbeddedResource.GetContent(file), file);
-        var output = template.Render(compilationAnalyzer, member => member.Name);
+        try
+        {
+            var file = "resources/MediatorFallback.sbn-cs";
+            var template = Template.Parse(EmbeddedResource.GetContent(file), file);
+            var output = template.Render(compilationAnalyzer, member => member.Name);
 
-        compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
+            compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
+        }
+        catch (Exception ex)
+        {
+            compilationAnalyzer.Context.ReportGenericError(ex);
+        }
     }
 }
