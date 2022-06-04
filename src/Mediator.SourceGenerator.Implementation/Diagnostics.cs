@@ -1,5 +1,7 @@
 #pragma warning disable RS2008 // Enable analyzer release tracking
 
+using System.Runtime.CompilerServices;
+
 namespace Mediator.SourceGenerator;
 
 public static class Diagnostics
@@ -18,7 +20,8 @@ public static class Diagnostics
         GenericError = new DiagnosticDescriptor(
             GetNextId(),
             $"{nameof(MediatorGenerator)} unknown error",
-            $"{nameof(MediatorGenerator)} got unknown error while generating mediator implementation: " + "{0}",
+            $"{nameof(MediatorGenerator)} got unknown error while generating mediator implementation, please report this to the issue tracker on github at https://github.com/martinothamar/Mediator/issues/new . Error: "
+                + "{0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
             isEnabledByDefault: true
@@ -139,7 +142,9 @@ public static class Diagnostics
 
     internal static Diagnostic ReportGenericError(this CompilationAnalyzerContext context, Exception exception)
     {
-        var diagnostic = Diagnostic.Create(GenericError, Location.None, exception);
+        var error =
+            $"{exception.Message}: {exception.StackTrace}{(exception.InnerException is not null ? $"\nInner: {exception.InnerException}" : "")}";
+        var diagnostic = Diagnostic.Create(GenericError, Location.None, error);
         context.ReportDiagnostic(diagnostic);
         return diagnostic;
     }
@@ -194,6 +199,7 @@ public static class Diagnostics
     internal static Diagnostic ReportRequiredSymbolNotFound(this CompilationAnalyzerContext context, string name) =>
         context.Report(RequiredSymbolNotFound, name);
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void InjectError()
     {
         if (true)

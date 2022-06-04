@@ -90,7 +90,8 @@ internal sealed class CompilationAnalyzer
 
     public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
-    public string GeneratorVersion => _context.GeneratorVersion;
+    public string GeneratorVersion =>
+        string.IsNullOrWhiteSpace(_context.GeneratorVersion) ? "1.0.0.0" : _context.GeneratorVersion;
 
     private IFieldSymbol? _configuredLifetimeSymbol;
     private INamedTypeSymbol? _serviceLifetimeEnumSymbol;
