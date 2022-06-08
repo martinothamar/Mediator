@@ -138,7 +138,7 @@ public class StructRequestBenchmarks
     [Benchmark]
     public ValueTask<SomeResponse> SendStructRequest_Mediator()
     {
-        return _concreteMediator.Send(in _request, CancellationToken.None);
+        return _concreteMediator.Send(_request, CancellationToken.None);
     }
 
     [Benchmark]

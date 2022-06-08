@@ -40,7 +40,7 @@ public class CustomContainerTests
         SomeStructNotificationHandler.Ids.Clear();
         Assert.DoesNotContain(id, SomeStructNotificationHandler.Ids);
 
-        await concrete.Publish(in notification);
+        await concrete.Publish(notification);
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
     }
 

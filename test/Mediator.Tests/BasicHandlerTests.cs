@@ -186,7 +186,7 @@ public class BasicHandlerTests
         var addr = *(long*)&command;
 
         var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
-        concrete.Send(in command).GetAwaiter().GetResult();
+        concrete.Send(command).GetAwaiter().GetResult();
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
     }
@@ -224,7 +224,7 @@ public class BasicHandlerTests
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
 
-        concrete.Publish(in notification).GetAwaiter().GetResult();
+        concrete.Publish(notification).GetAwaiter().GetResult();
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
         //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
     }
