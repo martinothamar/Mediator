@@ -79,6 +79,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<Dummy>();
 
             return services;
+			
+			{{~ if HasNotifications ~}}
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            static global::System.Func<global::System.IServiceProvider, T> GetRequiredService<T>() where T : notnull => sp => sp.GetRequiredService<T>();
+			{{~ end ~}}
         }
     }
 }

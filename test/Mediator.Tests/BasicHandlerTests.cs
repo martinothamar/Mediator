@@ -1,5 +1,7 @@
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
+using System.Reflection;
 using static Mediator.Tests.OpenConstrainedGenericsTests;
 
 namespace Mediator.Tests;
@@ -334,5 +336,36 @@ public class BasicHandlerTests
         var request = new SomeRequestReturningByteArray(id);
         var receivedBytes = await mediator.Send(request);
         Assert.Equal(bytes, receivedBytes);
+    }
+
+    [Fact]
+    public async Task Test_Remove_NotificationHandler()
+    {
+        var (sp, mediator) = Fixture.GetMediator(
+            sc =>
+            {
+                var sds = sc.Where(
+                    static a =>
+                        a.ImplementationFactory is { } implFac
+                        && implFac.Method.IsGenericMethod
+                        && implFac.Method
+                            .GetGenericArguments()
+                            .Any(static b => b.Name == nameof(SomeNotificationHandler))
+                );
+                var sd = Assert.Single(sds);
+                sc.Remove(sd);
+            }
+        );
+
+        var id = Guid.NewGuid();
+
+        var handler1 = sp.GetRequiredService<SomeNotificationHandler>();
+        var handler2 = sp.GetRequiredService<SomeOtherNotificationHandler>();
+        Assert.NotNull(handler1);
+        Assert.NotNull(handler2);
+        await mediator.Publish(new SomeNotification(id));
+        await mediator.Publish((object)new SomeNotification(id));
+        Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
+        Assert.Contains(id, SomeOtherNotificationHandler.Ids);
     }
 }
