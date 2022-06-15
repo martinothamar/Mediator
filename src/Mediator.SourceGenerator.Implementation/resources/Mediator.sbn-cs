@@ -140,7 +140,7 @@ namespace {{ MediatorNamespace }}
             _rootHandler = handler;
         }
 
-        public {{ wrapperType.ReturnTypeName }} Handle(in TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
+        public {{ wrapperType.ReturnTypeName }} Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
             _rootHandler(request, cancellationToken);
     }
     {{~ end ~}}
