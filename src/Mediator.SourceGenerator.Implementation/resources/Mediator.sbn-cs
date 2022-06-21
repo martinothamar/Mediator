@@ -16,12 +16,13 @@ namespace Microsoft.Extensions.DependencyInjection
     /// DI extensions for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public static class MediatorDependencyInjectionExtensions
     {
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application.
         /// </summary>
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
             return AddMediator(services, null);
@@ -32,7 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
         {
             {{~ if ServiceLifetimeIsScoped ~}}
@@ -92,6 +92,8 @@ namespace {{ MediatorNamespace }}
 {
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class {{ wrapperType.ClassHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : class, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
@@ -118,6 +120,8 @@ namespace {{ MediatorNamespace }}
             _rootHandler(request, cancellationToken);
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class {{ wrapperType.StructHandlerWrapperTypeNameWithGenericTypeArguments }}
         where TRequest : struct, global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
@@ -151,6 +155,8 @@ namespace {{ MediatorNamespace }}
     /// Can be used directly for high performance scenarios.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
@@ -182,7 +188,7 @@ namespace {{ MediatorNamespace }}
             _getServicesLength = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>() is global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[]
                  ? (s => ((object[])s).Length) : (s => s.Count());
         }
-
+        
         {{ if IsTestRun }}internal{{ else }}private{{ end }} struct FastLazyValue<T>
             where T : struct
         {
