@@ -28,25 +28,29 @@ In particular, source generators in this library is used to
 * Generate diagnostics related messages and message handlers
 
 ---
-**NOTE**
 
-I am currently working on 2.0 version of Mediator.
-This version is currently in preview and includes a lot of improvements:
+> **Note**
+> I am currently working on 2.0 version of Mediator, I recommend using the preview releases at this point.
+> This version is currently in preview and includes a lot of improvements:
 
-- [x] Configure Mediator through `AddMediator` call (assembly attribute still works) (#21, #24)
-- [x] Throw `ArgumentNullException` for null messages (#22)
-- [x] Pass `Publish<INotification>` calls to `Publish(object)` (#22)
-- [x] Optimize notifications (52ns -> 11ns for the most common case) (#23)
-- [x] Cleanup and optimization in source generator (#25, thanks @Timmoth)
-- [x] Modernize source generator to support both 3.8 and 4.0 Roslyn versions (also prepare for incremental codegen) (#26)
-- [x] Updated benchmarks to account for changes (#27)
-- [x] Smoketests, unittests, memory allocation tests (#28, 29)
-- [x] Cleanup analysis-part of source generator, use 6.0.0 of .NET references (#30)
-- [x] Use [csharpier](https://github.com/belav/csharpier) for consistent formatting (#31)
-- [x] Benchmark for source generation process (#32)
+- [x] Configure Mediator through `AddMediator` call (assembly attribute still works) (https://github.com/martinothamar/Mediator/pull/21, https://github.com/martinothamar/Mediator/pull/24)
+- [x] Throw `ArgumentNullException` for null messages (https://github.com/martinothamar/Mediator/pull/22)
+- [x] Pass `Publish<INotification>` calls to `Publish(object)` (https://github.com/martinothamar/Mediator/pull/22)
+- [x] Optimize notifications (52ns -> 11ns for the most common case) (https://github.com/martinothamar/Mediator/pull/23)
+- [x] Cleanup and optimization in source generator (https://github.com/martinothamar/Mediator/pull/25, thanks [@Timmoth](https://github.com/Timmoth))
+- [x] Modernize source generator to support both 3.8 and 4.0 Roslyn versions (also prepare for incremental codegen) (https://github.com/martinothamar/Mediator/pull/26)
+- [x] Updated benchmarks to account for changes (https://github.com/martinothamar/Mediator/pull/27)
+- [x] Smoketests, unittests, memory allocation tests (https://github.com/martinothamar/Mediator/pull/28, https://github.com/martinothamar/Mediator/pull/29)
+- [x] Cleanup analysis-part of source generator, use 6.0.0 of .NET references (https://github.com/martinothamar/Mediator/pull/30)
+- [x] Use [csharpier](https://github.com/belav/csharpier) for consistent formatting (https://github.com/martinothamar/Mediator/pull/31)
+- [x] Benchmark for source generation process (https://github.com/martinothamar/Mediator/pull/32)
+- [x] Bugfix for using arrays as response types (https://github.com/martinothamar/Mediator/issues/33, https://github.com/martinothamar/Mediator/pull/34)
+- [x] Multiple bugfixes for stream requests and structs (see linked PRs https://github.com/martinothamar/Mediator/issues/36, thanks [@Tornhoof](https://github.com/Tornhoof)!) 
+- [x] Improve error handling in source generation process (https://github.com/martinothamar/Mediator/issues/33#issuecomment-1146689609, https://github.com/martinothamar/Mediator/pull/40)
+- [x] Support Notification Handler Identification via Reflection (https://github.com/martinothamar/Mediator/issues/39, https://github.com/martinothamar/Mediator/pull/42, thanks [@Tornhoof](https://github.com/Tornhoof)!) 
+- [x] Fix defensive copy for non-readonly structs (https://github.com/martinothamar/Mediator/issues/43, https://github.com/martinothamar/Mediator/pull/44, thanks [@Tornhoof](https://github.com/Tornhoof)!)
+- [x] Add missing debugger attributes (https://github.com/martinothamar/Mediator/pull/46)
 - [ ] Support generic messages
-
----
 
 
 - [Mediator](#mediator)
@@ -68,6 +72,8 @@ This version is currently in preview and includes a lot of improvements:
     - [4.9. Use streaming messages](#49-use-streaming-messages)
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
+
+---
 
 ## 2. Benchmarks
 
