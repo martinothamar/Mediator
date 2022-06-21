@@ -359,6 +359,8 @@ namespace {{ MediatorNamespace }}
         }
         {{~ end ~}}
 
+        
+
         /// <summary>
         /// Send request.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -373,6 +375,9 @@ namespace {{ MediatorNamespace }}
         )
         {
             {{- if HasRequests }}
+
+
+
             switch (request)
             {
                 {{~ for message in IRequestMessages ~}}
@@ -809,6 +814,17 @@ namespace {{ MediatorNamespace }}
         }
         {{~ end ~}}
 
+        private static class NotificationTypeIndex
+        {
+            private static readonly global::System.Func<INotification, global::System.Threading.Tasks.ValueTask>[] Handlers;
+            private static int _typeIndex = -1;
+
+            public static class NotificationTypeId<TNotification> where TNotification : global::Mediator.INotification
+            {
+                public static readonly int Id = Interlocked.Increment(ref _typeIndex);
+            }
+        }
+
         /// <summary>
         /// Publish notification.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -823,17 +839,21 @@ namespace {{ MediatorNamespace }}
             where TNotification : global::Mediator.INotification
         {
             {{- if HasNotifications }}
-            switch (notification)
+
+            ThrowIfNull(notification, nameof(notification));
+
+            {{~ for message in NotificationMessages ~}}
+            var handler = NotificationTypeIndex.Handlers[NotificationTypeIndex.NotificationTypeId<TNotification>.Id]
+
+            if (notification.GetType() == typeof({{ message.FullName }}))
             {
-                {{~ for message in NotificationMessages ~}}
-                case {{ message.FullName }} n: return Publish(n, cancellationToken);
-                {{~ end ~}}
-                default:
-                {
-                    ThrowIfNull(notification, nameof(notification));
-                    return default;
-                }
+               ref var n = ref global::System.Runtime.CompilerServices.Unsafe.As<TNotification, {{ message.FullName }}>(ref notification);
+               return Publish(n, cancellationToken);
             }
+            {{~ end ~}}
+
+            return default;
+
             {{ else }}
             return default;
             {{ end }}
