@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Mediator.Tests.TestTypes;
 
 public record struct SomeStreamingCommandStruct(Guid Id) : IStreamCommand<SomeResponse>;

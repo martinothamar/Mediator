@@ -1,3 +1,5 @@
+using System;
+
 namespace Mediator.Tests.TestTypes;
 
 public interface ISomeNotification : INotification

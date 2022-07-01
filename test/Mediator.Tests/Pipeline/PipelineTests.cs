@@ -1,5 +1,8 @@
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mediator.Tests.Pipeline;
 

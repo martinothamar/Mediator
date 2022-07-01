@@ -1,3 +1,5 @@
+using System;
+
 namespace Mediator.Tests.Common;
 
 public static class Allocations

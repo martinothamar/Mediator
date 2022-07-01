@@ -11,6 +11,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator", "src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj", "{D3F185A5-0145-4333-8CFF-548E3BD478DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{ED1809FC-733B-4D9E-8FEE-70D3BB0BBD84}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests", "test\Mediator.Tests\Mediator.Tests.csproj", "{488A6892-3435-4E72-9B74-A847F2E4197F}"
 EndProject
@@ -48,17 +51,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleEndToEnd", "samples\S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_files", "_files", "{FDAEEFFB-30BC-4BC2-9E76-2F98D801FC34}"
 	ProjectSection(SolutionItems) = preProject
+		.csharpierrc.json = .csharpierrc.json
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		Build.csproj = Build.csproj
 		Directory.Build.props = Directory.Build.props
 		global.json = global.json
 		LICENSE = LICENSE
 		NuGet.config = NuGet.config
 		README.md = README.md
 		version.json = version.json
-		.csharpierrc.json = .csharpierrc.json
-		Build.csproj = Build.csproj
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.TransientLifetime", "test\Mediator.Tests.TransientLifetime\Mediator.Tests.TransientLifetime.csproj", "{4C18FD08-BCE4-4C6A-9D84-9A81C4561586}"
@@ -83,7 +86,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.MemAllocationTests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.Common", "test\Mediator.Tests.Common\Mediator.Tests.Common.csproj", "{32DC3B96-7E6E-40B0-AA12-40656B2D0381}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.Samples.SourceGenerator.Tests", "test\Mediator.Samples.SourceGenerator.Tests\Mediator.Samples.SourceGenerator.Tests.csproj", "{8625B7F2-F974-47E7-ABF1-C75AB9C305B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Samples.SourceGenerator.Tests", "test\Mediator.Samples.SourceGenerator.Tests\Mediator.Samples.SourceGenerator.Tests.csproj", "{8625B7F2-F974-47E7-ABF1-C75AB9C305B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
