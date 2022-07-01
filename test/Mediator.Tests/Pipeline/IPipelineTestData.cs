@@ -1,3 +1,5 @@
+using System;
+
 namespace Mediator.Tests.Pipeline;
 
 public interface IPipelineTestData

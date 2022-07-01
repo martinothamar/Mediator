@@ -1,4 +1,6 @@
 using Microsoft.CodeAnalysis;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mediator.SourceGenerator.Tests;
 

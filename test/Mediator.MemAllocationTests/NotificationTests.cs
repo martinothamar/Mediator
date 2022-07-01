@@ -1,5 +1,6 @@
 using Mediator.Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Mediator.MemAllocationTests;
 

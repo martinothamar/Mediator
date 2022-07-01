@@ -2,6 +2,8 @@ using JetBrains.dotMemoryUnit;
 using JetBrains.dotMemoryUnit.Kernel;
 using Mediator.Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace Mediator.MemAllocationTests;

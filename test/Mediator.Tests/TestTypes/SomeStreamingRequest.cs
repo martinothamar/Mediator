@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Mediator.Tests.TestTypes;
 
 public sealed record SomeStreamingRequest(Guid Id) : IStreamRequest<SomeResponse>;

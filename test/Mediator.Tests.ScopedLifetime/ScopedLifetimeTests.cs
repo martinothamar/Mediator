@@ -1,5 +1,6 @@
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Mediator.Tests.ScopedLifetime;
 
