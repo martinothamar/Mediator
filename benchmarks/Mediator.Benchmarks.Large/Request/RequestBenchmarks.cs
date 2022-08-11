@@ -1,17 +1,26 @@
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.Request;
 
-public sealed record SomeRequest(Guid Id) : IRequest<SomeResponse>;
+public sealed record SomeRequest(Guid Id) : IRequest<SomeResponse>, MediatR.IRequest<SomeResponse>;
 
 public sealed record SomeResponse(Guid Id);
 
-public sealed class SomeHandlerClass : IRequestHandler<SomeRequest, SomeResponse>
+public sealed class SomeHandlerClass
+    : IRequestHandler<SomeRequest, SomeResponse>,
+      MediatR.IRequestHandler<SomeRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
     private static ValueTask<SomeResponse> _vtResponse => new ValueTask<SomeResponse>(_response);
+    private static readonly Task<SomeResponse> _tResponse = Task.FromResult(_response);
 
     public ValueTask<SomeResponse> Handle(SomeRequest request, CancellationToken cancellationToken) => _vtResponse;
+
+    Task<SomeResponse> MediatR.IRequestHandler<SomeRequest, SomeResponse>.Handle(
+        SomeRequest request,
+        CancellationToken cancellationToken
+    ) => _tResponse;
 }
 
 [MemoryDiagnoser]
@@ -26,6 +35,7 @@ public class RequestBenchmarks
     private IServiceScope _serviceScope;
     private IMediator _mediator;
     private Mediator _concreteMediator;
+    private MediatR.IMediator _mediatr;
     private SomeHandlerClass _handler;
     private SomeRequest _request;
 
@@ -37,6 +47,19 @@ public class RequestBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
+        services.AddMediatR(
+            opts =>
+            {
+                _ = ServiceLifetime switch
+                {
+                    ServiceLifetime.Singleton => opts.AsSingleton(),
+                    ServiceLifetime.Scoped => opts.AsScoped(),
+                    ServiceLifetime.Transient => opts.AsTransient(),
+                    _ => throw new InvalidOperationException(),
+                };
+            },
+            typeof(SomeHandlerClass).Assembly
+        );
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)
@@ -49,6 +72,7 @@ public class RequestBenchmarks
 
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
+        _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
         _handler = _serviceProvider.GetRequiredService<SomeHandlerClass>();
         _request = new(Guid.NewGuid());
     }
@@ -72,6 +96,12 @@ public class RequestBenchmarks
     public ValueTask<SomeResponse> SendRequest_Mediator()
     {
         return _concreteMediator.Send(_request, CancellationToken.None);
+    }
+
+    [Benchmark]
+    public Task<SomeResponse> SendRequest_MediatR()
+    {
+        return _mediatr.Send(_request, CancellationToken.None);
     }
 
     [Benchmark(Baseline = true)]
