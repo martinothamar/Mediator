@@ -59,7 +59,8 @@ internal sealed class CompilationAnalyzer
 
     public bool HasAnyStreamRequest => HasStreamRequests || HasStreamQueries || HasStreamCommands;
 
-    public bool HasAnyValueTypeStreamResponse => _requestMessages.Any(r => r.ResponseIsValueType);
+    public bool HasAnyValueTypeStreamResponse =>
+        _requestMessages.Any(r => r.MessageType.StartsWith("Stream") && r.ResponseIsValueType);
 
     public bool HasNotifications => _notificationMessages.Any();
 
