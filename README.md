@@ -2,7 +2,7 @@
 [![Abstractions NuGet current](https://img.shields.io/nuget/v/Mediator.Abstractions?label=Mediator.Abstractions)](https://www.nuget.org/packages/Mediator.Abstractions)
 [![SourceGenerator NuGet current](https://img.shields.io/nuget/v/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)<br/>
 [![Abstractions NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.Abstractions?label=Mediator.Abstractions)](https://www.nuget.org/packages/Mediator.Abstractions)
-[![SourceGenerator NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)
+[![SourceGenerator NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)<br/>
 
 # Mediator
 
@@ -30,8 +30,8 @@ In particular, source generators in this library is used to
 ---
 
 > **Note**
-> I am currently working on 2.0 version of Mediator, I recommend using the preview releases at this point.
-> This version is currently in preview and includes a lot of improvements:
+
+> I am currently working on 2.0 version of Mediator, I recommend using the preview releases at this point. This version is currently in preview and includes a lot of improvements:
 
 - [x] Configure Mediator through `AddMediator` call (assembly attribute still works) (https://github.com/martinothamar/Mediator/pull/21, https://github.com/martinothamar/Mediator/pull/24)
 - [x] Throw `ArgumentNullException` for null messages (https://github.com/martinothamar/Mediator/pull/22)
@@ -50,8 +50,11 @@ In particular, source generators in this library is used to
 - [x] Support Notification Handler Identification via Reflection (https://github.com/martinothamar/Mediator/issues/39, https://github.com/martinothamar/Mediator/pull/42, thanks [@Tornhoof](https://github.com/Tornhoof)!) 
 - [x] Fix defensive copy for non-readonly structs (https://github.com/martinothamar/Mediator/issues/43, https://github.com/martinothamar/Mediator/pull/44, thanks [@Tornhoof](https://github.com/Tornhoof)!)
 - [x] Add missing debugger attributes (https://github.com/martinothamar/Mediator/pull/46)
-- [ ] Support generic messages
+- [x] Bugfixes and benchmark for larger projects (https://github.com/martinothamar/Mediator/pull/41)
 
+---
+
+## Table of Contents
 
 - [Mediator](#mediator)
   - [2. Benchmarks](#2-benchmarks)
@@ -72,8 +75,6 @@ In particular, source generators in this library is used to
     - [4.9. Use streaming messages](#49-use-streaming-messages)
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
-
----
 
 ## 2. Benchmarks
 
