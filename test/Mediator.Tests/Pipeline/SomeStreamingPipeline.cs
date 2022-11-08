@@ -9,8 +9,8 @@ public sealed class SomeStreamingPipeline : IStreamPipelineBehavior<SomeStreamin
 {
     public async IAsyncEnumerable<SomeResponse> Handle(
         SomeStreamingQuery message,
-        [EnumeratorCancellation] CancellationToken cancellationToken,
-        StreamHandlerDelegate<SomeStreamingQuery, SomeResponse> next
+        StreamHandlerDelegate<SomeStreamingQuery, SomeResponse> next,
+        [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
         await foreach (var response in next(message, cancellationToken))

@@ -58,8 +58,8 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
     public ValueTask<Pong> Handle(
         Ping request,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<Ping, Pong> next
+        MessageHandlerDelegate<Ping, Pong> next,
+        CancellationToken cancellationToken
     )
     {
         if (request is null || request.Id == default)
@@ -85,8 +85,8 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
 
     public async ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         try

@@ -10,8 +10,8 @@ public sealed class CommandSpecificPipeline<TCommand, TResponse> : IPipelineBeha
 
     public ValueTask<TResponse> Handle(
         TCommand message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TCommand, TResponse> next
+        MessageHandlerDelegate<TCommand, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         CallCount++;
