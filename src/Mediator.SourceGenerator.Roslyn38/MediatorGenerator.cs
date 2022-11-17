@@ -41,7 +41,7 @@ public sealed class MediatorGenerator : ISourceGenerator
         CompilationAnalyzer = compilationAnalyzer;
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-        mediatorImplementationGenerator.Generate(CompilationAnalyzer);
+        mediatorImplementationGenerator.Generate(compilationAnalyzer);
     }
 
     public void Initialize(GeneratorInitializationContext context)
