@@ -3,7 +3,7 @@ namespace Mediator.SourceGenerator;
 [Generator]
 public sealed class MediatorGenerator : ISourceGenerator
 {
-    internal CompilationAnalyzer? CompilationAnalyzer { get; private set; }
+    internal CompilationAnalyzer? CompilationAnalyzer;
 
     public void Execute(GeneratorExecutionContext context)
     {
@@ -33,13 +33,15 @@ public sealed class MediatorGenerator : ISourceGenerator
             context.CancellationToken
         );
 
-        CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
+        var compilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
 
-        CompilationAnalyzer.Initialize();
-        CompilationAnalyzer.Analyze();
+        compilationAnalyzer.Initialize();
+        compilationAnalyzer.Analyze();
+
+        CompilationAnalyzer = compilationAnalyzer;
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-        mediatorImplementationGenerator.Generate(CompilationAnalyzer);
+        mediatorImplementationGenerator.Generate(compilationAnalyzer);
     }
 
     public void Initialize(GeneratorInitializationContext context)

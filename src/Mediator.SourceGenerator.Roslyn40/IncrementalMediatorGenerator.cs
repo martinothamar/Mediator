@@ -5,7 +5,7 @@ namespace Mediator.SourceGenerator;
 [Generator]
 public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
 {
-    internal CompilationAnalyzer? CompilationAnalyzer { get; private set; }
+    internal CompilationAnalyzer? CompilationAnalyzer;
 
     private void ExecuteInternal(
         in SourceProductionContext context,
@@ -24,19 +24,21 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             context.CancellationToken
         );
 
-        CompilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
+        var compilationAnalyzer = new CompilationAnalyzer(in analyzerContext);
 
-        CompilationAnalyzer.Initialize();
-        CompilationAnalyzer.Analyze();
+        compilationAnalyzer.Initialize();
+        compilationAnalyzer.Analyze();
+
+        CompilationAnalyzer = compilationAnalyzer;
 
         var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-        mediatorImplementationGenerator.Generate(CompilationAnalyzer);
+        mediatorImplementationGenerator.Generate(compilationAnalyzer);
     }
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(
-            context =>
+            static context =>
             {
                 var generatorVersion = Versioning.GetVersion();
 
