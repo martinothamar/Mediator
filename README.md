@@ -114,7 +114,7 @@ See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real worl
 
 * `IMessage` - marker interface
 * `IStreamMessage` - marker interface
-* `IBaseRequest` - market interface for requests
+* `IBaseRequest` - marker interface for requests
 * `IRequest` - a request message, no return value (`ValueTask<Unit>`)
 * `IRequest<out TResponse>` - a request message with a response (`ValueTask<TResponse>`)
 * `IStreamRequest<out TResponse>` - a request message with a streaming response (`IAsyncEnumerable<TResponse>`)
