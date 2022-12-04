@@ -27,32 +27,9 @@ In particular, source generators in this library is used to
   * You can use both `IMediator` and `Mediator`, the latter allows for better performance
 * Generate diagnostics related messages and message handlers
 
----
+See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash), covering both similarities and differences between Mediator and MediatR
 
-> **Note**
-
-> I am currently working on 2.0 version of Mediator, I recommend using the preview releases at this point. This version is currently in preview and includes a lot of improvements:
-
-- [x] Configure Mediator through `AddMediator` call (assembly attribute still works) (https://github.com/martinothamar/Mediator/pull/21, https://github.com/martinothamar/Mediator/pull/24)
-- [x] Throw `ArgumentNullException` for null messages (https://github.com/martinothamar/Mediator/pull/22)
-- [x] Pass `Publish<INotification>` calls to `Publish(object)` (https://github.com/martinothamar/Mediator/pull/22)
-- [x] Optimize notifications (52ns -> 11ns for the most common case) (https://github.com/martinothamar/Mediator/pull/23)
-- [x] Cleanup and optimization in source generator (https://github.com/martinothamar/Mediator/pull/25, thanks [@Timmoth](https://github.com/Timmoth))
-- [x] Modernize source generator to support both 3.8 and 4.0 Roslyn versions (also prepare for incremental codegen) (https://github.com/martinothamar/Mediator/pull/26)
-- [x] Updated benchmarks to account for changes (https://github.com/martinothamar/Mediator/pull/27)
-- [x] Smoketests, unittests, memory allocation tests (https://github.com/martinothamar/Mediator/pull/28, https://github.com/martinothamar/Mediator/pull/29)
-- [x] Cleanup analysis-part of source generator, use 6.0.0 of .NET references (https://github.com/martinothamar/Mediator/pull/30)
-- [x] Use [csharpier](https://github.com/belav/csharpier) for consistent formatting (https://github.com/martinothamar/Mediator/pull/31)
-- [x] Benchmark for source generation process (https://github.com/martinothamar/Mediator/pull/32)
-- [x] Bugfix for using arrays as response types (https://github.com/martinothamar/Mediator/issues/33, https://github.com/martinothamar/Mediator/pull/34)
-- [x] Multiple bugfixes for stream requests and structs (see linked PRs https://github.com/martinothamar/Mediator/issues/36, thanks [@Tornhoof](https://github.com/Tornhoof)!) 
-- [x] Improve error handling in source generation process (https://github.com/martinothamar/Mediator/issues/33#issuecomment-1146689609, https://github.com/martinothamar/Mediator/pull/40)
-- [x] Support Notification Handler Identification via Reflection (https://github.com/martinothamar/Mediator/issues/39, https://github.com/martinothamar/Mediator/pull/42, thanks [@Tornhoof](https://github.com/Tornhoof)!) 
-- [x] Fix defensive copy for non-readonly structs (https://github.com/martinothamar/Mediator/issues/43, https://github.com/martinothamar/Mediator/pull/44, thanks [@Tornhoof](https://github.com/Tornhoof)!)
-- [x] Add missing debugger attributes (https://github.com/martinothamar/Mediator/pull/46)
-- [x] Bugfixes and benchmark for larger projects (https://github.com/martinothamar/Mediator/pull/41)
-
----
+[![Using MediatR in .NET? Maybe replace it with this](https://img.youtube.com/vi/aaFLtcf8cO4/0.jpg)](https://www.youtube.com/watch?v=aaFLtcf8cO4)
 
 ## Table of Contents
 
@@ -204,16 +181,16 @@ See the full runnable sample code in the [SimpleEndToEnd sample](/samples/Simple
 ### 4.1. Add package
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 1.0.*
-dotnet add package Mediator.Abstractions --version 1.0.*
+dotnet add package Mediator.SourceGenerator --version 2.0.*
+dotnet add package Mediator.Abstractions --version 2.0.*
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="1.0.*">
+<PackageReference Include="Mediator.SourceGenerator" Version="2.0.*">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator.Abstractions" Version="1.0.*" />
+<PackageReference Include="Mediator.Abstractions" Version="2.0.*" />
 ```
 
 ### 4.2. Add Mediator to DI container
