@@ -410,3 +410,4 @@ This is a work in progress list on the differences between this library and Medi
   * This library relies on the `Microsoft.Extensions.DependencyInjection`, so it only works with DI containers that integrate with those abstractions.
 * Singleton service lifetime by default
   * MediatR in combination with `MediatR.Extensions.Microsoft.DependencyInjection` does transient service registration by default, which leads to a lot of allocations. Even if it is configured for singleton lifetime, `IMediator` and `ServiceFactory` services are registered as transient (not configurable).
+* Methods return `ValueTask<T>` instead of `Task<T>`, to allow for fewer allocations (for example if the handler completes synchronously, or using async method builder pooling/`PoolingAsyncValueTaskMethodBuilder<T>`)
