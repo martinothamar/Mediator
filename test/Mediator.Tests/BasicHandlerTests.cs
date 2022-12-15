@@ -57,11 +57,39 @@ public class BasicHandlerTests
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
-        var id = Guid.NewGuid();
-
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IRequest<SomeResponse>)null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeRequest)null!));
+    }
+
+    [Fact]
+    public async Task Test_Request_Handler_NonNull_NonRequest()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+
+        object message = new { Id = id };
+        var request = Unsafe.As<object, IRequest>(ref message);
+
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(request));
+    }
+
+    [Fact]
+    public async Task Test_Request_NonNull_NoHandler()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+
+        var request = new SomeRequestWithoutHandler(id);
+
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send((object)request));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(request));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await concrete.Send(request));
     }
 
     [Fact]
@@ -110,6 +138,36 @@ public class BasicHandlerTests
     }
 
     [Fact]
+    public async Task Test_Query_Handler_NonNull_NonQuery()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+
+        object message = new { Id = id };
+        var query = Unsafe.As<object, IQuery<SomeResponse>>(ref message);
+
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(query));
+    }
+
+    [Fact]
+    public async Task Test_Query_NonNull_NoHandler()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+
+        var query = new SomeQueryWithoutHandler(id);
+
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send((object)query));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(query));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await concrete.Send(query));
+    }
+
+    [Fact]
     public async Task Test_Command_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
@@ -144,6 +202,36 @@ public class BasicHandlerTests
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((ICommand<SomeResponse>)null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeCommand)null!));
+    }
+
+    [Fact]
+    public async Task Test_Command_Handler_NonNull_NonCommand()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+
+        object message = new { Id = id };
+        var command = Unsafe.As<object, ICommand>(ref message);
+
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task Test_Command_NonNull_NoHandler()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+        var concrete = (Mediator)mediator;
+
+        var id = Guid.NewGuid();
+
+        var command = new SomeCommandWithoutHandler(id);
+
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send((object)command));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(command));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await concrete.Send(command));
     }
 
     [Fact]

@@ -1,3 +1,5 @@
-﻿namespace Mediator;
+namespace Mediator;
 
-public interface IStreamQuery<out TResponse> : IStreamMessage { }
+public interface IBaseStreamQuery : IStreamMessage { }
+
+public interface IStreamQuery<out TResponse> : IBaseStreamQuery { }

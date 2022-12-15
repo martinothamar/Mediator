@@ -1,5 +1,9 @@
 namespace Mediator;
 
+/// <summary>
+/// Exception that is thrown when Mediator receives messages
+/// that have no registered handlers.
+/// </summary>
 public class MissingMessageHandlerException : Exception
 {
     public object? MediatorMessage { get; }

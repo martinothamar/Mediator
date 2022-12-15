@@ -29,3 +29,7 @@ public sealed class SomeStreamingCommandHandler : IStreamCommandHandler<SomeStre
         }
     }
 }
+
+#pragma warning disable MSG0005 // MediatorGenerator message warning
+public sealed record SomeStreamingCommandWithoutHandler(Guid Id) : IStreamCommand<SomeResponse>;
+#pragma warning restore MSG0005 // MediatorGenerator message warning

@@ -84,6 +84,6 @@ public sealed class SenderTests
         object obj = new { Id = id };
 
         var request = Unsafe.As<object, IRequest>(ref obj);
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await sender.Send(request));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await sender.Send(request));
     }
 }
