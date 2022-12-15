@@ -809,8 +809,9 @@ namespace {{ MediatorNamespace }}
         /// <summary>
         /// Publish notification.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::Mediator.InvalidMessageException"/> if notification does not implement <see cref="global::Mediator.INotification"/>.
         /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// Drops messages 
+        /// Drops messages
         /// </summary>
         /// <param name="notification">Incoming notification</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -828,12 +829,12 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowIfNull(notification, nameof(notification));
+                    ThrowInvalidNotification(notification, nameof(notification));
                     return default;
                 }
             }
             {{ else }}
-            ThrowIfNull(notification, nameof(notification));
+            ThrowInvalidNotification(notification, nameof(notification));
             return default;
             {{ end }}
         }
@@ -972,6 +973,7 @@ namespace {{ MediatorNamespace }}
         /// <summary>
         /// Publish notification.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::Mediator.InvalidMessageException"/> if notification does not implement <see cref="global::Mediator.INotification"/>.
         /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
         /// </summary>
         /// <param name="notification">Incoming notification</param>
@@ -991,11 +993,12 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowIfNull(notification, nameof(notification));
+                    ThrowInvalidNotification(notification, nameof(notification));
                     return default;
                 }
             }
             {{ else }}
+            ThrowInvalidNotification(notification, nameof(notification));
             return default;
             {{ end }}
         }
@@ -1005,89 +1008,89 @@ namespace {{ MediatorNamespace }}
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidMessage(object msg, string paramName = null)
+        private static void ThrowInvalidMessage<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IMessage)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidRequest(object msg, string paramName = null)
+        private static void ThrowInvalidRequest<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IBaseRequest)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidCommand(object msg, string paramName = null)
+        private static void ThrowInvalidCommand<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IBaseCommand)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidQuery(object msg, string paramName = null)
+        private static void ThrowInvalidQuery<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IBaseQuery)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamMessage(object msg, string paramName = null)
+        private static void ThrowInvalidStreamMessage<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IStreamMessage)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamRequest(object msg, string paramName = null)
+        private static void ThrowInvalidStreamRequest<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IBaseStreamRequest)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamCommand(object msg, string paramName = null)
+        private static void ThrowInvalidStreamCommand<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IBaseStreamCommand)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamQuery(object msg, string paramName = null)
+        private static void ThrowInvalidStreamQuery<T>(T msg, string paramName = null)
         {
             if (msg is null)
                 ThrowArgumentNull(paramName);
             else if (msg is not global::Mediator.IBaseStreamQuery)
-                throw new global::Mediator.InvalidMessageException(msg);
+                ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
         }
@@ -1096,12 +1099,22 @@ namespace {{ MediatorNamespace }}
         private static void ThrowArgumentNull(string paramName) =>
             throw new global::System.ArgumentNullException(paramName);
 
+        [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        private static void ThrowInvalidMessage<T>(T msg) =>
+            throw new global::Mediator.InvalidMessageException(msg);
+
         private static void ThrowIfNull<T>(T argument, string paramName)
         {
             if (argument is null)
-            {
                 ThrowArgumentNull(paramName);
-            }
+        }
+
+        private static void ThrowInvalidNotification<T>(T argument, string paramName)
+        {
+            if (argument is null)
+                ThrowArgumentNull(paramName);
+            else if (argument is not global::Mediator.INotification)
+                ThrowInvalidMessage(argument);
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]

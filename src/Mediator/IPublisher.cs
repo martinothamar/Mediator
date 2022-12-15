@@ -8,6 +8,7 @@ public interface IPublisher
     /// <summary>
     /// Publish notification.
     /// Throws <see cref="ArgumentNullException"/> if message is null.
+    /// Throws <see cref="InvalidMessageException"/> if notification does not implement <see cref="INotification"/>.
     /// Throws <see cref="AggregateException"/> if handlers throw exceptions.
     /// </summary>
     /// <param name="notification">Incoming notification</param>
@@ -19,6 +20,7 @@ public interface IPublisher
     /// <summary>
     /// Publish notification.
     /// Throws <see cref="ArgumentNullException"/> if message is null.
+    /// Throws <see cref="InvalidMessageException"/> if notification does not implement <see cref="INotification"/>.
     /// Throws <see cref="AggregateException"/> if handlers throw exception(s).
     /// Drops messages
     /// </summary>
