@@ -7,9 +7,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <LangVersion>preview</LangVersion>
     <!--<ReportAnalyzer>true</ReportAnalyzer>-->
   </PropertyGroup>
-  
+
   <ItemGroup>
     <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs"/>
     <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs"/>
