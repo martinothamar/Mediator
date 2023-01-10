@@ -76,7 +76,7 @@ See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request) for more details 
 There are two NuGet packages needed to use this library
 * Mediator.SourceGenerator
   * To generate the `IMediator` implementation and dependency injection setup.
-* Mediator
+* Mediator.Abstractions
   * Message types (`IRequest<,>`, `INotification`), handler types (`IRequestHandler<,>`, `INotificationHandler<>`), pipeline types (`IPipelineBehavior`)
 
 You install the source generator package into your edge/outermost project (i.e. ASP.NET Core application, Background worker project),
