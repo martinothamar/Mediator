@@ -35,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
         {
-            {{~ if ServiceLifetimeIsScoped ~}}
+            {{~ if ServiceLifetimeIsScoped || ServiceLifetimeIsTransient ~}}
             services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
@@ -189,6 +189,7 @@ namespace {{ MediatorNamespace }}
                  ? (s => ((object[])s).Length) : (s => s.Count());
         }
         
+        {{~ if ServiceLifetimeIsSingleton ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} struct FastLazyValue<T>
             where T : struct
         {
@@ -289,6 +290,7 @@ namespace {{ MediatorNamespace }}
                 _value = default;
             }
         }
+        {{~ end ~}}
 
         {{ if IsTestRun }}internal{{ else }}private{{ end }} readonly struct DICache
         {
