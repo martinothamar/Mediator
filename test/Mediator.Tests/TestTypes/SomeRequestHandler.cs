@@ -5,10 +5,14 @@ using System.Threading.Tasks;
 
 namespace Mediator.Tests.TestTypes;
 
-public sealed class SomeRequestHandler : IRequestHandler<SomeRequest, SomeResponse>
+public sealed class SomeRequestHandler : IRequestHandler<SomeRequest, SomeResponse>, IDisposable
 {
+    public bool Disposed { get; private set; }
+
     public ValueTask<SomeResponse> Handle(SomeRequest request, CancellationToken cancellationToken) =>
         new ValueTask<SomeResponse>(new SomeResponse(request.Id));
+
+    public void Dispose() => Disposed = true;
 }
 
 public sealed class SomeRequestWithoutResponseHandler : IRequestHandler<SomeRequestWithoutResponse>

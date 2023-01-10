@@ -1,6 +1,7 @@
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace Mediator.Tests.ScopedLifetime;
 
@@ -25,27 +26,30 @@ public sealed class ScopedLifetimeTests
     }
 
     [Fact]
-    public void Test_Returns_Different_Instances_From_Different_Scopes()
+    public async Task Test_Returns_Different_Instances_From_Different_Scopes()
     {
         var services = new ServiceCollection();
 
         services.AddMediator();
 
-        IServiceProvider sp = services.BuildServiceProvider(validateScopes: true);
+        await using var sp = services.BuildServiceProvider(validateScopes: true);
 
         IMediator mediator1;
         IMediator mediator2;
 
-        using (var scope1 = sp.CreateScope())
+        await using (var scope1 = sp.CreateAsyncScope())
         {
             mediator1 = scope1.ServiceProvider.GetRequiredService<IMediator>();
             var handler1 = scope1.ServiceProvider.GetRequiredService<SomeRequestHandler>();
             var handler2 = scope1.ServiceProvider.GetRequiredService<SomeRequestHandler>();
+
+            await mediator1.Send(new SomeRequest(Guid.NewGuid()));
+
             Assert.NotNull(handler1);
             Assert.NotNull(handler2);
             Assert.Equal(handler1, handler2);
         }
-        using (var scope2 = sp.CreateScope())
+        await using (var scope2 = sp.CreateAsyncScope())
         {
             mediator2 = scope2.ServiceProvider.GetRequiredService<IMediator>();
         }
@@ -53,6 +57,33 @@ public sealed class ScopedLifetimeTests
         Assert.NotNull(mediator1);
         Assert.NotNull(mediator2);
         Assert.NotEqual(mediator1, mediator2);
+    }
+
+    [Fact]
+    public async Task Test_Disposes_Handler_Correctly()
+    {
+        var services = new ServiceCollection();
+
+        services.AddMediator();
+
+        SomeRequestHandler handler;
+        await using (var sp = services.BuildServiceProvider(validateScopes: true))
+        {
+            await using (var scope = sp.CreateAsyncScope())
+            {
+                var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+                handler = scope.ServiceProvider.GetRequiredService<SomeRequestHandler>();
+
+                await mediator.Send(new SomeRequest(Guid.NewGuid()));
+
+                Assert.NotNull(handler);
+                Assert.False(handler.Disposed);
+            }
+
+            Assert.True(handler.Disposed);
+        }
+
+        Assert.True(handler.Disposed);
     }
 
     [Fact]
