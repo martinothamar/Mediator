@@ -6,7 +6,14 @@
     <IsPackable>false</IsPackable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+    <!--<ReportAnalyzer>true</ReportAnalyzer>-->
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs"/>
+    <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs"/>
+  </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
@@ -34,7 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**;..\Mediator.Tests\SingletonLifetimeTests.cs;..\Mediator.Tests\SmokeTests.FastLazy.cs">
+    <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**;..\Mediator.Tests\Generated\**;..\Mediator.Tests\SingletonLifetimeTests.cs;..\Mediator.Tests\SmokeTests.FastLazy.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
