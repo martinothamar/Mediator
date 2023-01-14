@@ -30,22 +30,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Benchmarks", "benchmarks\Mediator.Benchmarks\Mediator.Benchmarks.csproj", "{A1E16465-9155-4957-BB97-ADCCF1648958}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASPNET_CleanArchitecture", "ASPNET_CleanArchitecture", "{B0120C11-5024-491A-B3AD-821E1D2CD8F2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ASPNET_Core_CleanArchitecture", "ASPNET_Core_CleanArchitecture", "{B0120C11-5024-491A-B3AD-821E1D2CD8F2}"
 	ProjectSection(SolutionItems) = preProject
-		samples\ASPNET_CleanArchitecture\README.md = samples\ASPNET_CleanArchitecture\README.md
+		samples\ASPNET_Core_CleanArchitecture\README.md = samples\ASPNET_Core_CleanArchitecture\README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Api", "samples\ASPNET_CleanArchitecture\AspNetSample.Api\AspNetSample.Api.csproj", "{05746941-ABD5-46C6-9E9A-9B107F6B0076}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample.Api", "samples\ASPNET_Core_CleanArchitecture\AspNetCoreSample.Api\AspNetCoreSample.Api.csproj", "{05746941-ABD5-46C6-9E9A-9B107F6B0076}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Application", "samples\ASPNET_CleanArchitecture\AspNetSample.Application\AspNetSample.Application.csproj", "{BEF59A60-ED18-4F08-A0A4-F99D64F71E18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample.Application", "samples\ASPNET_Core_CleanArchitecture\AspNetCoreSample.Application\AspNetCoreSample.Application.csproj", "{BEF59A60-ED18-4F08-A0A4-F99D64F71E18}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Domain", "samples\ASPNET_CleanArchitecture\AspNetSample.Domain\AspNetSample.Domain.csproj", "{E98D92E0-2029-47D8-9EEE-E3A19DF9354A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample.Domain", "samples\ASPNET_Core_CleanArchitecture\AspNetCoreSample.Domain\AspNetCoreSample.Domain.csproj", "{E98D92E0-2029-47D8-9EEE-E3A19DF9354A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator.Roslyn38.Tests", "test\Mediator.SourceGenerator.Roslyn38.Tests\Mediator.SourceGenerator.Roslyn38.Tests.csproj", "{A36EE34F-9EA1-460E-841F-C84BC603929B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleConsoleAOT", "samples\SimpleConsoleAOT\SimpleConsoleAOT.csproj", "{45FC79C1-76EB-4B30-B54F-DD1762BA15EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetSample.Infrastructure", "samples\ASPNET_CleanArchitecture\AspNetSample.Infrastructure\AspNetSample.Infrastructure.csproj", "{CE5A582D-3CC6-44D7-AF3F-CD741BA53833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreSample.Infrastructure", "samples\ASPNET_Core_CleanArchitecture\AspNetCoreSample.Infrastructure\AspNetCoreSample.Infrastructure.csproj", "{CE5A582D-3CC6-44D7-AF3F-CD741BA53833}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleEndToEnd", "samples\SimpleEndToEnd\SimpleEndToEnd.csproj", "{B9E8DA69-C6FA-446F-B949-EF48856551D8}"
 EndProject
@@ -70,7 +70,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.ScopedLifeti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleStreaming", "samples\SimpleStreaming\SimpleStreaming.csproj", "{D24BCAD4-0C17-40D0-8ADC-B8A5E8700047}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASPNET", "samples\ASPNET\ASPNET.csproj", "{35D4B136-E164-48A3-ADC3-E22237CCDC9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASPNET_Core", "samples\ASPNET_Core\ASPNET_Core.csproj", "{35D4B136-E164-48A3-ADC3-E22237CCDC9C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.SourceGenerator.Roslyn38", "src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj", "{FCB31060-4C23-4BB7-9A95-4C636B43F6B5}"
 EndProject
@@ -88,7 +88,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Tests.Common", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Samples.SourceGenerator.Tests", "test\Mediator.Samples.SourceGenerator.Tests\Mediator.Samples.SourceGenerator.Tests.csproj", "{8625B7F2-F974-47E7-ABF1-C75AB9C305B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mediator.Benchmarks.Large", "benchmarks\Mediator.Benchmarks.Large\Mediator.Benchmarks.Large.csproj", "{19078764-4D01-403D-9806-7842AF257FFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mediator.Benchmarks.Large", "benchmarks\Mediator.Benchmarks.Large\Mediator.Benchmarks.Large.csproj", "{19078764-4D01-403D-9806-7842AF257FFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

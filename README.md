@@ -90,7 +90,7 @@ Standard message handlers are automatically picked up and added to the DI contai
 *Pipeline behaviors need to be added manually (including pre/post/exception behaviors).*
 
 For example implementations, see the [/samples](/samples) folder.
-See the [ASP.NET Core sample](/samples/ASPNET_CleanArchitecture) for a more real world setup.
+See the [ASP.NET Core clean architecture sample](/samples/ASPNET_Core_CleanArchitecture) for a more real world setup.
 
 ### 3.1. Message types
 

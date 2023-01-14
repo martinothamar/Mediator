@@ -4,6 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches: [ main, release/v** ]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'img/**'
+      - 'benchmarks/**'
+      - 'samples/**'
+      - '*.sln'
   pull_request:
     branches: [ main ]
 
