@@ -220,12 +220,19 @@ public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : MessageExceptio
     )
     {
         _logger.LogError(exception, "Error handling message of type {messageType}", message.GetType().Name);
+        // Let the exception bubble up by using the base class helper NotHandled:
         return NotHandled;
+        // Or if the exception is properly handled, you can just return your own response,
+        // using the base class helper Handle().
+        // This requires you to know something about TResponse,
+        // so TResponse needs to be constrained to something,
+        // typically with a static abstract member acting as a consructor on an interface or abstract class.
+        return Handled(null!);
     }
 }
 
 // Register as IPipelineBehavior<,> in either case
-services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(MessageValidatorBehaviour<,>))
+services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggingBehaviour<,>))
 ```
 
 ### 3.4. Configuration
@@ -343,6 +350,7 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 Add open generic handler to process all or a subset of messages passing through Mediator.
 This handler will log any error that is thrown from message handlers (`IRequest`, `ICommand`, `IQuery`).
 It also publishes a notification allowing notification handlers to react to errors.
+Message pre- and post-processors along with the exception handlers can also constrain the generic type parameters in the same way.
 
 ```csharp
 services.AddMediator();
