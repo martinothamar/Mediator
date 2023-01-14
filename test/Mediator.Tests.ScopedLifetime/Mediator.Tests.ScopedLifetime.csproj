@@ -8,6 +8,8 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     <!--<ReportAnalyzer>true</ReportAnalyzer>-->
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,6 +8,8 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
     <!--<ReportAnalyzer>true</ReportAnalyzer>-->
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +41,7 @@
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="..\Mediator.Tests\**\*.cs" Exclude="..\Mediator.Tests\obj\**;..\Mediator.Tests\bin\**;..\Mediator.Tests\Generated\**;..\Mediator.Tests\SingletonLifetimeTests.cs;..\Mediator.Tests\SmokeTests.FastLazy.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>

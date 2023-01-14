@@ -1,6 +1,8 @@
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/martinothamar/Mediator/Build)](https://github.com/martinothamar/Mediator/actions)<br/>
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/martinothamar/Mediator/build.yml?branch=main)](https://github.com/martinothamar/Mediator/actions)
+[![GitHub](https://img.shields.io/github/license/martinothamar/Mediator?style=flat-square)](https://github.com/martinothamar/Mediator/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/nuget/dt/mediator.abstractions?style=flat-square)](https://www.nuget.org/packages/Mediator.Abstractions/)<br/>
 [![Abstractions NuGet current](https://img.shields.io/nuget/v/Mediator.Abstractions?label=Mediator.Abstractions)](https://www.nuget.org/packages/Mediator.Abstractions)
-[![SourceGenerator NuGet current](https://img.shields.io/nuget/v/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)<br/>
+[![SourceGenerator NuGet current](https://img.shields.io/nuget/v/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)
 [![Abstractions NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.Abstractions?label=Mediator.Abstractions)](https://www.nuget.org/packages/Mediator.Abstractions)
 [![SourceGenerator NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)<br/>
 
@@ -34,11 +36,14 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
 ## Table of Contents
 
 - [Mediator](#mediator)
+  - [Table of Contents](#table-of-contents)
   - [2. Benchmarks](#2-benchmarks)
   - [3. Usage and abstractions](#3-usage-and-abstractions)
     - [3.1. Message types](#31-message-types)
     - [3.2. Handler types](#32-handler-types)
     - [3.3. Pipeline types](#33-pipeline-types)
+      - [3.3.1. Message validation example](#331-message-validation-example)
+      - [3.3.2. Error logging example](#332-error-logging-example)
     - [3.4. Configuration](#34-configuration)
   - [4. Getting started](#4-getting-started)
     - [4.1. Add package](#41-add-package)
@@ -80,12 +85,12 @@ There are two NuGet packages needed to use this library
   * Message types (`IRequest<,>`, `INotification`), handler types (`IRequestHandler<,>`, `INotificationHandler<>`), pipeline types (`IPipelineBehavior`)
 
 You install the source generator package into your edge/outermost project (i.e. ASP.NET Core application, Background worker project),
-and then use the `Mediator` package wherever you define message types and handlers.
+and then use the `Mediator.Abstractions` package wherever you define message types and handlers.
 Standard message handlers are automatically picked up and added to the DI container in the generated `AddMediator` method.
-*Pipeline behaviors need to be added manually.*
+*Pipeline behaviors need to be added manually (including pre/post/exception behaviors).*
 
 For example implementations, see the [/samples](/samples) folder.
-See the [ASP.NET sample](/samples/ASPNET_CleanArchitecture) for a more real world setup.
+See the [ASP.NET Core sample](/samples/ASPNET_CleanArchitecture) for a more real world setup.
 
 ### 3.1. Message types
 
@@ -124,27 +129,110 @@ These types are used in correlation with the message types above.
 
 * `IPipelineBehavior<TMessage, TResponse>`
 * `IStreamPipelineBehavior<TMessage, TResponse>`
+* `MessagePreProcessor<TMessage, TResponse>`
+* `MessagePostProcessor<TMessage, TResponse>`
+* `MessageExceptionHandler<TMessage, TResponse, TException>`
+
+#### 3.3.1. Message validation example
 
 ```csharp
-public sealed class GenericHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
-    where TMessage : IMessage
+// As a normal pipeline behavior
+public sealed class MessageValidatorBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+    where TMessage : IValidate
 {
-    public ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    public ValueTask<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    )
     {
-        // ...
+        if (!message.IsValid(out var validationError))
+            throw new ValidationException(validationError);
+
         return next(message, cancellationToken);
     }
 }
 
-public sealed class GenericStreamHandler<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
-    where TMessage : IStreamMessage
+// Or as a pre-processor
+public sealed class MessageValidatorBehaviour<TMessage, TResponse> : MessagePreProcessor<TMessage, TResponse>
+    where TMessage : IValidate
 {
-    public IAsyncEnumerable<TResponse> Handle(TMessage message, CancellationToken cancellationToken, StreamHandlerDelegate<TMessage, TResponse> next)
+    protected override ValueTask Handle(TMessage message, CancellationToken cancellationToken)
     {
-        // ...
-        return next(message, cancellationToken);
+        if (!message.IsValid(out var validationError))
+            throw new ValidationException(validationError);
+
+        return default;
     }
 }
+
+// Register as IPipelineBehavior<,> in either case
+services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(MessageValidatorBehaviour<,>))
+```
+
+#### 3.3.2. Error logging example
+
+```csharp
+// As a normal pipeline behavior
+public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+    where TMessage : IMessage
+{
+    private readonly ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> _logger;
+
+    public ErrorLoggingBehaviour(ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> logger)
+    {
+        _logger = logger;
+    }
+
+    public async ValueTask<TResponse> Handle(
+        TMessage message,
+        CancellationToken cancellationToken,
+        MessageHandlerDelegate<TMessage, TResponse> next
+    )
+    {
+        try
+        {
+            return await next(message, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error handling message of type {messageType}", message.GetType().Name);
+            throw;
+        }
+    }
+}
+
+// Or as an exception handler
+public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : MessageExceptionHandler<TMessage, TResponse>
+    where TMessage : notnull, IMessage
+{
+    private readonly ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> _logger;
+
+    public ErrorLoggingBehaviour(ILogger<ErrorLoggingBehaviour<TMessage, TResponse>> logger)
+    {
+        _logger = logger;
+    }
+
+    protected override ValueTask<ExceptionHandlingResult<TResponse>> Handle(
+        TMessage message,
+        Exception exception,
+        CancellationToken cancellationToken
+    )
+    {
+        _logger.LogError(exception, "Error handling message of type {messageType}", message.GetType().Name);
+        // Let the exception bubble up by using the base class helper NotHandled:
+        return NotHandled;
+        // Or if the exception is properly handled, you can just return your own response,
+        // using the base class helper Handle().
+        // This requires you to know something about TResponse,
+        // so TResponse needs to be constrained to something,
+        // typically with a static abstract member acting as a consructor on an interface or abstract class.
+        return Handled(null!);
+    }
+}
+
+// Register as IPipelineBehavior<,> in either case
+services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggingBehaviour<,>))
 ```
 
 ### 3.4. Configuration
@@ -262,6 +350,7 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 Add open generic handler to process all or a subset of messages passing through Mediator.
 This handler will log any error that is thrown from message handlers (`IRequest`, `ICommand`, `IQuery`).
 It also publishes a notification allowing notification handlers to react to errors.
+Message pre- and post-processors along with the exception handlers can also constrain the generic type parameters in the same way.
 
 ```csharp
 services.AddMediator();
