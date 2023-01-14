@@ -41,7 +41,7 @@ public class GeneralHandlerTests
 
         public ExceptionHandler(State state) => _state = state;
 
-        protected override ValueTask<(bool Handled, TResponse Response)> Handle(
+        protected override ValueTask<ExceptionHandlingResult<TResponse>> Handle(
             TMessage message,
             Exception exception,
             CancellationToken cancellationToken
@@ -49,7 +49,7 @@ public class GeneralHandlerTests
         {
             _state.Exception = exception;
             var id = (Guid)typeof(TMessage).GetProperty("Id")!.GetValue(message)!;
-            return new ValueTask<(bool Handled, TResponse Response)>((true, TResponse.Create(id)));
+            return Handled(TResponse.Create(id));
         }
     }
 

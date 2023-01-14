@@ -39,14 +39,14 @@ public class OnlyLoggingHandlerTests
 
         public ExceptionHandler(State state) => _state = state;
 
-        protected override ValueTask<(bool Handled, TResponse? Response)> Handle(
+        protected override ValueTask<ExceptionHandlingResult<TResponse?>> Handle(
             TMessage message,
             Exception exception,
             CancellationToken cancellationToken
         )
         {
             _state.Exception = exception;
-            return new ValueTask<(bool Handled, TResponse? Response)>((false, default));
+            return NotHandled;
         }
     }
 

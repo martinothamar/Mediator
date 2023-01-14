@@ -72,7 +72,7 @@ public class MultipleHandlerTests
 
         public ExceptionHandler(State state) => _state = state;
 
-        protected override ValueTask<(bool Handled, TResponse Response)> Handle(
+        protected override ValueTask<ExceptionHandlingResult<TResponse>> Handle(
             TMessage message,
             Exception exception,
             CancellationToken cancellationToken
@@ -83,8 +83,14 @@ public class MultipleHandlerTests
             var n = (int)typeof(TMessage).GetProperty("N")!.GetValue(message)!;
             var handled = n is 1 or 3;
             if (handled)
+            {
                 _state.Handler1Exception = exception;
-            return new ValueTask<(bool Handled, TResponse Response)>((handled, TResponse.Create(id)));
+                return Handled(TResponse.Create(id));
+            }
+            else
+            {
+                return NotHandled;
+            }
         }
     }
 
@@ -96,7 +102,7 @@ public class MultipleHandlerTests
 
         public ExceptionHandler2(State state) => _state = state;
 
-        protected override ValueTask<(bool Handled, TResponse Response)> Handle(
+        protected override ValueTask<ExceptionHandlingResult<TResponse>> Handle(
             TMessage message,
             Exception exception,
             CancellationToken cancellationToken
@@ -107,8 +113,14 @@ public class MultipleHandlerTests
             var n = (int)typeof(TMessage).GetProperty("N")!.GetValue(message)!;
             var handled = n is 2 or 3 ? true : false;
             if (handled)
+            {
                 _state.Handler2Exception = exception;
-            return new ValueTask<(bool Handled, TResponse Response)>((handled, TResponse.Create(id)));
+                return Handled(TResponse.Create(id));
+            }
+            else
+            {
+                return NotHandled;
+            }
         }
     }
 

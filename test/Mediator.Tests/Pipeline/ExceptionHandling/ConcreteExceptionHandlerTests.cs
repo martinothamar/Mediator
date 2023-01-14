@@ -44,7 +44,7 @@ public class ConcreteExceptionHandlerTests
 
         public ExceptionHandler(State state) => _state = state;
 
-        protected override ValueTask<(bool Handled, TResponse Response)> Handle(
+        protected override ValueTask<ExceptionHandlingResult<TResponse>> Handle(
             TMessage message,
             NotImplementedException exception,
             CancellationToken cancellationToken
@@ -52,7 +52,7 @@ public class ConcreteExceptionHandlerTests
         {
             _state.Exception = exception;
             var id = (Guid)typeof(TMessage).GetProperty("Id")!.GetValue(message)!;
-            return new ValueTask<(bool Handled, TResponse Response)>((true, TResponse.Create(id)));
+            return Handled(TResponse.Create(id));
         }
     }
 
