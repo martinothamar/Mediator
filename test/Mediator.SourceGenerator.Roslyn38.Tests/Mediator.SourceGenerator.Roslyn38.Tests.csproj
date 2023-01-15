@@ -30,6 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\samples\GenericNotificationExample\Program.cs" Link="resources\GenericNotificationExampleProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\..\samples\SimpleConsole\Program.cs" Link="resources\SimpleConsoleProgram.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

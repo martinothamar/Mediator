@@ -21,6 +21,19 @@ public sealed class SamplesTests
     }
 
     [Fact]
+    public async Task Test_GenericNotificationExample()
+    {
+        var source = await Fixture.SourceFromResourceFile("GenericNotificationExampleProgram.cs");
+
+        var tester = new Verifier.Test
+        {
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
+            TestState = { Sources = { source }, },
+        };
+        await tester.RunAsync();
+    }
+
+    [Fact]
     public async Task Test_SimpleEndToEnd()
     {
         var source = await Fixture.SourceFromResourceFile("SimpleEndToEndProgram.cs");
