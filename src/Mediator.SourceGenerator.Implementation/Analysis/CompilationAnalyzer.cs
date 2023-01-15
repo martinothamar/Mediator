@@ -311,11 +311,17 @@ internal sealed class CompilationAnalyzer
             if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol)
                 continue;
 
-            if (!assemblySymbol.Modules.Any(m => m.ReferencedAssemblies.Any(ra => ra.Name == Constants.MediatorLib)))
+            if (!assemblySymbol.Modules.Any(IsMediatorLibReferencedByTheModule))
                 continue;
 
             queue.Enqueue(assemblySymbol.GlobalNamespace);
         }
+    }
+
+    private static bool IsMediatorLibReferencedByTheModule(IModuleSymbol module)
+    {
+        return module.ReferencedAssemblies.Any(ra => ra.Name == Constants.MediatorLib)
+            || module.ReferencedAssemblySymbols.Any(ra => ra.Modules.Any(IsMediatorLibReferencedByTheModule));
     }
 
     private void PopulateMetadata(Queue<INamespaceOrTypeSymbol> queue)
