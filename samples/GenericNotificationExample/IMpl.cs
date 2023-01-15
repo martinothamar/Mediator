@@ -6,6 +6,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
 using System.Linq;
 
 using SD = global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
@@ -649,14 +650,21 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (notification)
+            if (notification.GetType().IsGenericType)
             {
-                case global::PostRequest<TRequest> n: return Publish(n, cancellationToken);
-                default:
-                    {
-                        ThrowIfNull(notification, nameof(notification));
-                        return default;
-                    }
+
+            }
+            else
+            {
+                switch (notification)
+                {
+                    //case global::PostRequest<TRequest> n: return Publish(n, cancellationToken);
+                    default:
+                        {
+                            ThrowIfNull(notification, nameof(notification));
+                            return default;
+                        }
+                }
             }
 
         }
@@ -761,14 +769,22 @@ namespace Mediator
         )
             where TNotification : global::Mediator.INotification
         {
-            switch (notification)
+            if (typeof(TNotification).IsGenericType)
             {
-                case global::PostRequest<TRequest> n: return Publish(n, cancellationToken);
-                default:
-                    {
-                        ThrowIfNull(notification, nameof(notification));
-                        return default;
-                    }
+                return Publish((object)notification, cancellationToken);
+            }
+            else
+            {
+                switch (notification)
+                {
+                    //case global::PostRequest<TRequest> n: return Publish(n, cancellationToken);
+                    default:
+                        {
+
+                            ThrowIfNull(notification, nameof(notification));
+                            return default;
+                        }
+                }
             }
 
         }

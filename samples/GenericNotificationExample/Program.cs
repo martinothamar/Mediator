@@ -114,9 +114,7 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
     }
 }
 
-public abstract record PostRequest : INotification;
-
-public sealed record PostRequest<TRequest> : PostRequest, INotification where TRequest : IBaseRequest;
+public sealed record PostRequest<TRequest> : INotification where TRequest : IBaseRequest;
 
 public sealed class PostRequestHandler<TRequest> : INotificationHandler<PostRequest<TRequest>>
     where TRequest : IBaseRequest
