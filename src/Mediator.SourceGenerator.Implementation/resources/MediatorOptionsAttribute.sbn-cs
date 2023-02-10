@@ -14,7 +14,7 @@ namespace Mediator
         /// <summary>
         /// The namespace in which the Mediator implementation is generated.
         /// </summary>
-        public string Namespace { get; set; }
+        public string Namespace { get; set; } = "Mediator";
 
         /// <summary>
         /// The default lifetime of the services registered in the DI container by

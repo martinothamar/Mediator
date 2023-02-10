@@ -100,6 +100,7 @@ internal sealed class CompilationAnalyzer
     public IFieldSymbol? SingletonServiceLifetimeSymbol;
 
     public string? ServiceLifetime => ServiceLifetimeSymbol?.GetFieldSymbolFullName();
+    public string? ServiceLifetimeShort => ServiceLifetimeSymbol?.Name;
 
     public string? SingletonServiceLifetime => SingletonServiceLifetimeSymbol?.GetFieldSymbolFullName();
 
@@ -112,6 +113,10 @@ internal sealed class CompilationAnalyzer
     public bool IsTestRun =>
         (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false)
         || (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
+
+    public bool ConfiguredViaAttribute { get; private set; }
+
+    public bool ConfiguredViaConfiguration { get; private set; }
 
     public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
@@ -669,6 +674,27 @@ internal sealed class CompilationAnalyzer
         foreach (var addMediatorCall in addMediatorCalls)
         {
             var semanticModel = compilation.GetSemanticModel(addMediatorCall.SyntaxTree);
+
+            var symbol = semanticModel.GetSymbolInfo(addMediatorCall).Symbol;
+            if (symbol is not null)
+            {
+                // This is actually expected not to hit,
+                // since the AddMediator method is generated after this analysis runs.
+                // So if we resolve a symbol here, it is likely from some other library
+                // so we need to check that the symbol name matches our expectations.
+
+                var assembly = symbol.ContainingAssembly;
+                if (!_symbolComparer.Equals(_context.Compilation.Assembly, assembly))
+                    continue;
+
+                var containingType = symbol.ContainingType.GetTypeSymbolFullName(withGlobalPrefix: false);
+                const string expectedGeneratedType =
+                    "Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions";
+
+                if (containingType != expectedGeneratedType)
+                    continue;
+            }
+
             if (addMediatorCall.ArgumentList.Arguments.Count == 0)
                 continue;
 
@@ -676,11 +702,40 @@ internal sealed class CompilationAnalyzer
 
             configuredByAddMediator = true;
             var lifetimeArgument = addMediatorCall.ArgumentList.Arguments.Last();
-            if (lifetimeArgument.Expression is not SimpleLambdaExpressionSyntax lambda)
+            if (
+                lifetimeArgument.Expression
+                is not SimpleLambdaExpressionSyntax
+                    and not ParenthesizedLambdaExpressionSyntax
+            )
             {
                 ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
                 continue;
             }
+
+            var lambda = (LambdaExpressionSyntax)lifetimeArgument.Expression;
+
+            if (
+                lambda is ParenthesizedLambdaExpressionSyntax parenthesizedLambda
+                && parenthesizedLambda.ParameterList.Parameters.Count != 1
+            )
+                continue;
+
+            var parameter = lambda switch
+            {
+                SimpleLambdaExpressionSyntax f => f.Parameter,
+                ParenthesizedLambdaExpressionSyntax f => f.ParameterList.Parameters[0],
+                _ => throw new Exception("Invalid state"),
+            };
+
+            var parameterSymbol = semanticModel.GetDeclaredSymbol(parameter);
+            if (parameterSymbol is not null)
+            {
+                var parameterTypeName = parameterSymbol.Type.GetTypeSymbolFullName(false);
+                // Parameter type name will be empty string if it can't be resolved
+                if (parameterTypeName != "" && parameterTypeName != "Mediator.MediatorOptions")
+                    continue;
+            }
+
             var body = lambda.Body;
 
             if (body is AssignmentExpressionSyntax simpleAssignment)
@@ -761,6 +816,8 @@ internal sealed class CompilationAnalyzer
                     MediatorNamespace = namespaceArg!;
             }
         }
+
+        ConfiguredViaAttribute = true;
     }
 
     private bool ProcessAddMediatorAssignmentStatement(
@@ -823,6 +880,7 @@ internal sealed class CompilationAnalyzer
             return false;
         }
 
+        ConfiguredViaConfiguration = true;
         return true;
 
         string? TryResolveNamespaceIdentifier(
