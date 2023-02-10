@@ -35,6 +35,20 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
         {
+            var opts = new global::Mediator.MediatorOptions();
+            if (options is not null)
+                options(opts);
+
+            var configuredViaAttribute = {{ ConfiguredViaAttribute }};
+            if (opts.ServiceLifetime != {{ ServiceLifetime }} && !configuredViaAttribute)
+            {
+                var errMsg = "Invalid configuration detected for Mediator. ";
+                errMsg += "Generated code for '{{ ServiceLifetimeShort }}' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
+                errMsg += "This means that the source generator hasn't seen the 'AddMediator' method call during compilation. ";
+                errMsg += "Make sure that the 'AddMediator' method is called from the project that references the Mediator.SourceGenerator package.";
+                throw new global::System.Exception(errMsg);
+            }
+
             {{~ if ServiceLifetimeIsScoped || ServiceLifetimeIsTransient ~}}
             services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));

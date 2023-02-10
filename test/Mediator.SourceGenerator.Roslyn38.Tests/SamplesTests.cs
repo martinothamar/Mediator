@@ -43,4 +43,16 @@ public sealed class SamplesTests
             TestState = { Sources = { source }, },
         }.RunAsync();
     }
+
+    [Fact]
+    public async Task Test_Multiple_AddMediator_Calls()
+    {
+        var source = await Fixture.SourceFromResourceFile("MultipleAddMediatorCalls.cs");
+
+        await new Verifier.Test
+        {
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
+            TestState = { Sources = { source }, },
+        }.RunAsync();
+    }
 }
