@@ -1,4 +1,4 @@
-﻿using Mediator.SourceGenerator;
+using Mediator.SourceGenerator;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,6 +12,7 @@ namespace Mediator.Benchmarks.SourceGenerator;
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 [InProcess]
 //[EventPipeProfiler(EventPipeProfile.CpuSampling)]
+//[EtwProfiler]
 //[DisassemblyDiagnoser]
 //[InliningDiagnoser(logFailuresOnly: true, allowedNamespaces: new[] { "Mediator" })]
 public class SourceGeneratorBenchmark
@@ -38,7 +39,7 @@ public class SourceGeneratorBenchmark
 
         var projectFile = Path.Combine(
             currentDirectory,
-            "../../samples/ASPNET_CleanArchitecture/AspNetSample.Api/AspNetSample.Api.csproj"
+            "../../samples/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj"
         );
         if (!File.Exists(projectFile))
             throw new Exception("Project doesnt exist");

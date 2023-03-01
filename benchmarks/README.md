@@ -94,3 +94,18 @@ AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
 |     SendStructRequest_MediatR |       Singleton | 594.018 ns | 7.8648 ns | 7.3568 ns | 119.92 |    3.18 |    5 | 0.0839 |   1,416 B |
 
 
+### Source generation
+
+``` ini
+
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22000
+AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
+.NET SDK=6.0.202
+  [Host] : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+
+Job=InProcess  Toolchain=InProcessEmitToolchain  
+
+```
+|  Method |     Mean |     Error |    StdDev |    Gen 0 |   Gen 1 | Allocated |
+|-------- |---------:|----------:|----------:|---------:|--------:|----------:|
+| Compile | 5.044 ms | 0.0371 ms | 0.0329 ms | 156.2500 | 31.2500 |      3 MB |
