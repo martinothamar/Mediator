@@ -311,22 +311,44 @@ internal sealed class CompilationAnalyzer
 
         queue.Enqueue(compilation.Assembly.GlobalNamespace);
 
+        var markerSymbol = UnitSymbol;
+        if (markerSymbol is null)
+            throw new Exception("Can't load marker symbol");
+
         foreach (var reference in compilation.References)
         {
             if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol)
                 continue;
 
-            if (!assemblySymbol.Modules.Any(IsMediatorLibReferencedByTheModule))
+            if (_symbolComparer.Equals(markerSymbol.ContainingAssembly, assemblySymbol))
+                continue;
+            if (assemblySymbol.Name.StartsWith("Mediator.SourceGenerator", StringComparison.Ordinal))
+                continue;
+
+            if (!assemblySymbol.Modules.Any(static m => IsMediatorLibReferencedByTheModule(m, 0)))
                 continue;
 
             queue.Enqueue(assemblySymbol.GlobalNamespace);
         }
     }
 
-    private static bool IsMediatorLibReferencedByTheModule(IModuleSymbol module)
+    private static bool IsMediatorLibReferencedByTheModule(IModuleSymbol module, int depth)
     {
-        return module.ReferencedAssemblies.Any(ra => ra.Name == Constants.MediatorLib)
-            || module.ReferencedAssemblySymbols.Any(ra => ra.Modules.Any(IsMediatorLibReferencedByTheModule));
+        if (module.ReferencedAssemblies.Any(static ra => ra.Name == Constants.MediatorLib))
+            return true;
+
+        // Above we've checked for direct dependencies on the Mediator.Abstractions package,
+        // but projects can implement Mediator messages using only a transitive dependency
+        // as well.
+        // Even so, going too deep recursively will severely impact build performance
+        // so for now the depth is limited to 3.
+        // This should be solved properly by changing how codegen works..
+        if (depth > 3)
+            return false;
+
+        return module.ReferencedAssemblySymbols.Any(
+            ra => ra.Modules.Any(m => IsMediatorLibReferencedByTheModule(m, depth + 1))
+        );
     }
 
     private void PopulateMetadata(Queue<INamespaceOrTypeSymbol> queue)
