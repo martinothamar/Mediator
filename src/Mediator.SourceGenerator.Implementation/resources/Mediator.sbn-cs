@@ -3,6 +3,7 @@
 // </auto-generated>
 
 #pragma warning disable CS8019 // Unused usings
+#pragma warning disable CS8321 // Unused local function
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -93,7 +94,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<Dummy>();
 
             return services;
-			
+
 			{{~ if HasNotifications ~}}
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             static global::System.Func<global::System.IServiceProvider, T> GetRequiredService<T>() where T : notnull => sp => sp.GetRequiredService<T>();
@@ -202,7 +203,7 @@ namespace {{ MediatorNamespace }}
             _getServicesLength = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>() is global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[]
                  ? (s => ((object[])s).Length) : (s => s.Count());
         }
-        
+
         {{~ if ServiceLifetimeIsSingleton ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} struct FastLazyValue<T>
             where T : struct

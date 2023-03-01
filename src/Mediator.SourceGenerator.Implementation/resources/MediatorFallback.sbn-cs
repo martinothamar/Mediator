@@ -3,6 +3,7 @@
 // </auto-generated>
 
 #pragma warning disable CS8019 // Unused usings
+#pragma warning disable CS8321 // Unused local function
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,12 +17,13 @@ namespace Microsoft.Extensions.DependencyInjection
     /// DI extensions for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public static class MediatorDependencyInjectionExtensions
     {
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application.
         /// </summary>
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services)
         {
             return AddMediator(services, null);
@@ -32,7 +34,6 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
         {
             services.AddSingleton<Dummy>();
