@@ -98,14 +98,15 @@ AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
 
 ``` ini
 
-BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22000
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22621
 AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
 .NET SDK=6.0.202
-  [Host] : .NET 6.0.4 (6.0.422.16404), X64 RyuJIT
+  [Host] : .NET 6.0.14 (6.0.1423.7309), X64 RyuJIT
 
-Job=InProcess  Toolchain=InProcessEmitToolchain  
+Job=InProcess  Toolchain=InProcessEmitToolchain
 
 ```
-|  Method |     Mean |     Error |    StdDev |    Gen 0 |   Gen 1 | Allocated |
-|-------- |---------:|----------:|----------:|---------:|--------:|----------:|
-| Compile | 5.044 ms | 0.0371 ms | 0.0329 ms | 156.2500 | 31.2500 |      3 MB |
+|  Method |     Mean |    Error |   StdDev |     Gen 0 |   Gen 1 | Allocated |
+|-------- |---------:|---------:|---------:|----------:|--------:|----------:|
+| Compile | 14.52 ms | 0.249 ms | 0.233 ms | 1406.2500 | 31.2500 |     23 MB |
+
