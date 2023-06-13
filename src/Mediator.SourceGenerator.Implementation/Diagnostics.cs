@@ -121,7 +121,7 @@ public static class Diagnostics
         {
             var location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
             var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-            diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, symbolName);
+            diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, symbolName);
         }
         else
         {
