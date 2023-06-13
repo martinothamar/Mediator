@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "xoofx.scriban",
+        "ms-dotnettools.csdevkit",
+        "editorconfig.editorconfig",
+        "github.vscode-github-actions"
+    ]
+}
