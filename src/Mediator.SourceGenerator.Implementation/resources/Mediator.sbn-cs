@@ -37,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
         {
             var opts = new global::Mediator.MediatorOptions();
-            if (options is not null)
+            if (options != null)
                 options(opts);
 
             var configuredViaAttribute = {{ ConfiguredViaAttribute }};
@@ -200,8 +200,12 @@ namespace {{ MediatorNamespace }}
             _diCache = new DICache(_sp);
             {{~ end ~}}
 
-            _getServicesLength = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>() is global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[]
-                 ? (s => ((object[])s).Length) : (s => s.Count());
+            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> fastGetLength = s => ((object[])s).Length;
+            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> slowGetLength = s => s.Count();
+
+            var dummy = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>();
+            _getServicesLength = dummy.GetType() == typeof(global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[])
+                 ? fastGetLength : slowGetLength;
         }
 
         {{~ if ServiceLifetimeIsSingleton ~}}
@@ -891,7 +895,7 @@ namespace {{ MediatorNamespace }}
 
         private static void MaybeThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions)
         {
-            if (exceptions is not null)
+            if (exceptions != null)
             {
                 ThrowAggregateException(exceptions);
             }
