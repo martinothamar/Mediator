@@ -402,8 +402,7 @@ namespace {{ MediatorNamespace }}
                     }
                     else
                     {                    
-                        var response = SendAsync(request, cancellationToken);
-                        return response;
+                        return SendAsync(request, cancellationToken);
                     }
                 }
                 {{~ end ~}}
@@ -419,6 +418,7 @@ namespace {{ MediatorNamespace }}
             {{ end }}
         }
 
+        #pragma warning disable CS1998
         /// <summary>
         /// Send request.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -427,7 +427,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
+        private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.IRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -450,10 +450,10 @@ namespace {{ MediatorNamespace }}
             }
             {{ else }}
             ThrowInvalidMessage(request);
-            await global::System.Threading.Tasks.Task.Delay(1);
             return default;
             {{ end }}
         }
+        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for request.
@@ -516,8 +516,7 @@ namespace {{ MediatorNamespace }}
                     }
                     else
                     {                    
-                        var response = SendAsync(command, cancellationToken);
-                        return response;
+                        return SendAsync(command, cancellationToken);
                     }
                 }
                 {{~ end ~}}
@@ -533,6 +532,7 @@ namespace {{ MediatorNamespace }}
             {{ end }}
         }
 
+        #pragma warning disable CS1998
         /// <summary>
         /// Send command.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -541,7 +541,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
+        private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.ICommand<TResponse> command,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -563,11 +563,11 @@ namespace {{ MediatorNamespace }}
                 }
             }
             {{ else }}
-            ThrowInvalidMessage(command);
-            await global::System.Threading.Tasks.Task.Delay(1);
+            ThrowInvalidMessage(command);            
             return default;
             {{ end }}
         }
+        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for command.
@@ -630,8 +630,7 @@ namespace {{ MediatorNamespace }}
                     }
                     else
                     {                    
-                        var response = SendAsync(query, cancellationToken);
-                        return response;
+                        return SendAsync(query, cancellationToken);
                     }
                 }
                 {{~ end ~}}
@@ -647,6 +646,7 @@ namespace {{ MediatorNamespace }}
             {{ end }}
         }
 
+        #pragma warning disable CS1998
         /// <summary>
         /// Send query.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -655,7 +655,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="query">Incoming query</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
+        private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.IQuery<TResponse> query,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -678,10 +678,10 @@ namespace {{ MediatorNamespace }}
             }
             {{ else }}
             ThrowInvalidMessage(query);
-            await global::System.Threading.Tasks.Task.Delay(1);
             return default;
             {{ end }}
         }
+        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for query.
