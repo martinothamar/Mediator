@@ -42,10 +42,18 @@ public sealed class ResponseInheritanceTests
         public CreateQueryRequest(Guid id) => Id = id;
     }
 
+    public class CreateStreamRequest : IStreamRequest<CreateResponse>
+    {
+        public Guid Id { get; }
+
+        public CreateStreamRequest(Guid id) => Id = id;
+    }
+
     public sealed class CreateHandler
         : ICommandHandler<CreateCommandRequest, CreateResponse>,
           IRequestHandler<CreateRequestRequest, CreateResponse>,
-          IQueryHandler<CreateQueryRequest, CreateResponse>
+          IQueryHandler<CreateQueryRequest, CreateResponse>,
+          IStreamRequestHandler<CreateStreamRequest, CreateResponse>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
 
@@ -69,10 +77,30 @@ public sealed class ResponseInheritanceTests
             Ids.Add(request.Id);
             return new CreateResponse(request.Id);
         }
+
+        public async IAsyncEnumerable<CreateResponse> Handle(
+            CreateStreamRequest query,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    await Task.Delay(100, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    yield break;
+                }
+
+                yield return new CreateResponse(query.Id);
+            }
+        }
     }
 
     [Fact]
-    public async Task Test_Creat()
+    public async Task Test_Requests()
     {
         var (sp, mediator) = Fixture.GetMediator();
 
@@ -100,21 +128,47 @@ public sealed class ResponseInheritanceTests
         }
     }
 
+    [Fact]
+    public async Task Test_Streaming_Requests()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+
+        var id = Guid.NewGuid();
+
+        int counter = 0;
+        await foreach (var response in RunRequestStream(mediator, new CreateStreamRequest(id)))
+        {
+            Assert.Equal(id, response.Id);
+            counter++;
+        }
+
+        Assert.Equal(3, counter);
+    }
+
     private async Task<BaseResponse> RunCommand<TCommand>(IMediator mediator, TCommand command)
         where TCommand : class, ICommand<BaseResponse>
     {
-        return await mediator.Send(command);
+        return await mediator.Send<BaseResponse>(command);
     }
 
     private async Task<BaseResponse> RunRequest<TRequest>(IMediator mediator, TRequest request)
         where TRequest : class, IRequest<BaseResponse>
     {
-        return await mediator.Send(request);
+        return await mediator.Send<BaseResponse>(request);
     }
 
     private async Task<BaseResponse> RunQuery<TQuery>(IMediator mediator, TQuery query)
         where TQuery : class, IQuery<BaseResponse>
     {
-        return await mediator.Send(query);
+        return await mediator.Send<BaseResponse>(query);
+    }
+
+    private async IAsyncEnumerable<BaseResponse> RunRequestStream<TRequest>(IMediator mediator, TRequest request)
+        where TRequest : class, IStreamRequest<BaseResponse>
+    {
+        await foreach (var response in mediator.CreateStream<BaseResponse>(request))
+        {
+            yield return response;
+        }
     }
 }

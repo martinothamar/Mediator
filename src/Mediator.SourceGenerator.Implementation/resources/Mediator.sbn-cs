@@ -4,6 +4,7 @@
 
 #pragma warning disable CS8019 // Unused usings
 #pragma warning disable CS8321 // Unused local function
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -405,7 +406,7 @@ namespace {{ MediatorNamespace }}
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     else
-                    {                    
+                    {
                         return SendAsync(request, cancellationToken);
                     }
                 }
@@ -422,7 +423,6 @@ namespace {{ MediatorNamespace }}
             {{ end }}
         }
 
-        #pragma warning disable CS1998
         /// <summary>
         /// Send request.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -457,7 +457,6 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for request.
@@ -519,7 +518,7 @@ namespace {{ MediatorNamespace }}
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     else
-                    {                    
+                    {
                         return SendAsync(command, cancellationToken);
                     }
                 }
@@ -536,7 +535,6 @@ namespace {{ MediatorNamespace }}
             {{ end }}
         }
 
-        #pragma warning disable CS1998
         /// <summary>
         /// Send command.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -555,7 +553,7 @@ namespace {{ MediatorNamespace }}
             {
                 {{~ for message in ICommandMessages ~}}
                 case {{ message.RequestFullName }} r:
-                {               
+                {
                     var response = await Send({{- message.ParameterModifier -}}r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
                 }
@@ -567,11 +565,10 @@ namespace {{ MediatorNamespace }}
                 }
             }
             {{ else }}
-            ThrowInvalidMessage(command);            
+            ThrowInvalidMessage(command);
             return default;
             {{ end }}
         }
-        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for command.
@@ -633,7 +630,7 @@ namespace {{ MediatorNamespace }}
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     else
-                    {                    
+                    {
                         return SendAsync(query, cancellationToken);
                     }
                 }
@@ -650,7 +647,6 @@ namespace {{ MediatorNamespace }}
             {{ end }}
         }
 
-        #pragma warning disable CS1998
         /// <summary>
         /// Send query.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -685,7 +681,6 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
-        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for query.
