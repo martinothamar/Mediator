@@ -13,8 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs"/>
-    <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs"/>
+    <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+    <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
   </ItemGroup>
 
   <ItemGroup>
