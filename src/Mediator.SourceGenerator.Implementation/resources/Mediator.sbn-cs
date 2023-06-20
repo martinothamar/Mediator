@@ -399,8 +399,15 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in IRequestMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    {
+                        var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    }
+                    else
+                    {                    
+                        return SendAsync(request, cancellationToken);
+                    }
                 }
                 {{~ end ~}}
                 default:
@@ -414,6 +421,43 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
+
+        #pragma warning disable CS1998
+        /// <summary>
+        /// Send request.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
+            global::Mediator.IRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasRequests }}
+            switch (request)
+            {
+                {{~ for message in IRequestMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {
+                    var response = await Send({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowArgumentNullOrInvalidMessage(request, nameof(request));
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(request);
+            return default;
+            {{ end }}
+        }
+        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for request.
@@ -469,8 +513,15 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in ICommandMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    {
+                        var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    }
+                    else
+                    {                    
+                        return SendAsync(command, cancellationToken);
+                    }
                 }
                 {{~ end ~}}
                 default:
@@ -484,6 +535,43 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
+
+        #pragma warning disable CS1998
+        /// <summary>
+        /// Send command.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
+            global::Mediator.ICommand<TResponse> command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasCommands }}
+            switch (command)
+            {
+                {{~ for message in ICommandMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {               
+                    var response = await Send({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowArgumentNullOrInvalidMessage(command, nameof(command));
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(command);            
+            return default;
+            {{ end }}
+        }
+        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for command.
@@ -539,8 +627,15 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in IQueryMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    {
+                        var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    }
+                    else
+                    {                    
+                        return SendAsync(query, cancellationToken);
+                    }
                 }
                 {{~ end ~}}
                 default:
@@ -554,6 +649,43 @@ namespace {{ MediatorNamespace }}
             return default;
             {{ end }}
         }
+
+        #pragma warning disable CS1998
+        /// <summary>
+        /// Send query.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
+        /// </summary>
+        /// <param name="query">Incoming query</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
+            global::Mediator.IQuery<TResponse> query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            {{- if HasQueries }}
+            switch (query)
+            {
+                {{~ for message in IQueryMessages ~}}
+                case {{ message.RequestFullName }} r:
+                {
+                    var response = await Send({{- message.ParameterModifier -}}r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
+                }
+                {{~ end ~}}
+                default:
+                {
+                    ThrowArgumentNullOrInvalidMessage(query, nameof(query));
+                    return default;
+                }
+            }
+            {{ else }}
+            ThrowInvalidMessage(query);
+            return default;
+            {{ end }}
+        }
+        #pragma warning restore CS1998
 
         /// <summary>
         /// Create stream for query.
