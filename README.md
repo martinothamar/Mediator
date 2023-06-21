@@ -22,6 +22,10 @@ Goals for this library
 * Build time errors instead of runtime errors
   * The generator includes diagnostics, i.e. if a handler is not defined for a request, a warning is emitted
 
+> **Note**
+>
+> **Version 3.0** is currently being developed. See status and provide feedback [here (#98)](https://github.com/martinothamar/Mediator/issues/98)
+
 In particular, source generators in this library is used to
 * Generate code for DI registration
 * Generate code for `IMediator` implementation
