@@ -344,7 +344,7 @@ services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>();
 
 public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
-    public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken, MessageHandlerDelegate<Ping, Pong> next)
+    public ValueTask<Pong> Handle(Ping request, MessageHandlerDelegate<Ping, Pong> next, CancellationToken cancellationToken)
     {
         if (request is null || request.Id == default)
             throw new ArgumentException("Invalid input");
@@ -380,7 +380,7 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
         _mediator = mediator;
     }
 
-    public async ValueTask<TResponse> Handle(TMessage message, CancellationToken cancellationToken, MessageHandlerDelegate<TMessage, TResponse> next)
+    public async ValueTask<TResponse> Handle(TMessage message, MessageHandlerDelegate<TMessage, TResponse> next, CancellationToken cancellationToken)
     {
         try
         {
