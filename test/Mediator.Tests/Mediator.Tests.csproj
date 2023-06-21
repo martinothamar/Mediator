@@ -10,6 +10,7 @@
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <LangVersion>preview</LangVersion>
     <!--<ReportAnalyzer>true</ReportAnalyzer>-->
+    <NoWarn>$(NoWarn);MSG0005</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>

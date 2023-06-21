@@ -18,3 +18,7 @@ public readonly struct SomeStructCommand : ICommand
 
     public Guid CorrelationId { get; }
 }
+
+#pragma warning disable MSG0005 // MediatorGenerator message warning
+public sealed record SomeCommandWithoutHandler(Guid Id) : ICommand;
+#pragma warning restore MSG0005 // MediatorGenerator message warning
