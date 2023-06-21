@@ -126,7 +126,7 @@ namespace {{ MediatorNamespace }}
             {
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, cancellationToken, handlerCopy);
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -154,7 +154,7 @@ namespace {{ MediatorNamespace }}
             {
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, cancellationToken, handlerCopy);
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;

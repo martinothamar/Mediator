@@ -30,8 +30,8 @@ public abstract class MessageExceptionHandler<TMessage, TResponse, TException> :
 {
     public async ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         try

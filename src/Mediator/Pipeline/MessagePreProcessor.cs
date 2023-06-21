@@ -5,21 +5,21 @@ public abstract class MessagePreProcessor<TMessage, TResponse> : IPipelineBehavi
 {
     public ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         var task = Handle(message, cancellationToken);
         if (task.IsCompletedSuccessfully)
             return next(message, cancellationToken);
 
-        return HandleInternal(task, message, cancellationToken, next);
+        return HandleInternal(task, message, next, cancellationToken);
 
         static async ValueTask<TResponse> HandleInternal(
             ValueTask task,
             TMessage message,
-            CancellationToken cancellationToken,
-            MessageHandlerDelegate<TMessage, TResponse> next
+            MessageHandlerDelegate<TMessage, TResponse> next,
+            CancellationToken cancellationToken
         )
         {
             await task;

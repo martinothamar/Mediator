@@ -52,8 +52,8 @@ public sealed class GenericPipeline<TMessage, TResponse> : IPipelineBehavior<TMe
 
     public ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     ) => _state.Handle(message, cancellationToken, next);
 }
 
@@ -71,7 +71,7 @@ public sealed class GenericStreamPipeline<TMessage, TResponse>
 
     public IAsyncEnumerable<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        StreamHandlerDelegate<TMessage, TResponse> next
+        StreamHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     ) => _state.Handle(message, cancellationToken, next);
 }

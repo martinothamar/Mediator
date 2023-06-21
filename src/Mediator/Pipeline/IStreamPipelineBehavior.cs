@@ -4,7 +4,7 @@ public interface IStreamPipelineBehavior<TMessage, TResponse> where TMessage : I
 {
     IAsyncEnumerable<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        StreamHandlerDelegate<TMessage, TResponse> next
+        StreamHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     );
 }

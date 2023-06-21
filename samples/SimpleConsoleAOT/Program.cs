@@ -43,8 +43,8 @@ public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavio
 {
     public async ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         Console.WriteLine("1) Running logger handler");
@@ -66,8 +66,8 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
     public ValueTask<Pong> Handle(
         Ping request,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<Ping, Pong> next
+        MessageHandlerDelegate<Ping, Pong> next,
+        CancellationToken cancellationToken
     )
     {
         Console.WriteLine("2) Running ping validator");

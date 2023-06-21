@@ -5,8 +5,8 @@ public abstract class MessagePostProcessor<TMessage, TResponse> : IPipelineBehav
 {
     public async ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         var response = await next(message, cancellationToken);
