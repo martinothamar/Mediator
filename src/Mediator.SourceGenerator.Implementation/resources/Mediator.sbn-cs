@@ -414,12 +414,12 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowArgumentNullOrInvalidMessage(request, nameof(request));
+                    ThrowInvalidRequest(request, nameof(request));
                     return default;
                 }
             }
             {{ else }}
-            ThrowInvalidMessage(request);
+            ThrowInvalidRequest(request, nameof(request));
             return default;
             {{ end }}
         }
@@ -528,12 +528,12 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowArgumentNullOrInvalidMessage(command, nameof(command));
+                    ThrowInvalidCommand(command, nameof(command));
                     return default;
                 }
             }
             {{ else }}
-            ThrowInvalidMessage(command);
+            ThrowInvalidCommand(command, nameof(command));
             return default;
             {{ end }}
         }
@@ -642,12 +642,12 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
                 default:
                 {
-                    ThrowArgumentNullOrInvalidMessage(query, nameof(query));
+                    ThrowInvalidQuery(query, nameof(query));
                     return default;
                 }
             }
             {{ else }}
-            ThrowInvalidMessage(query);
+            ThrowInvalidQuery(query, nameof(query));
             return default;
             {{ end }}
         }
@@ -1010,9 +1010,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidMessage<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IMessage)
+            else if (!(msg is global::Mediator.IMessage))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1021,9 +1021,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidRequest<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IBaseRequest)
+            else if (!(msg is global::Mediator.IBaseRequest))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1032,9 +1032,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidCommand<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IBaseCommand)
+            else if (!(msg is global::Mediator.IBaseCommand))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1043,9 +1043,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidQuery<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IBaseQuery)
+            else if (!(msg is global::Mediator.IBaseQuery))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1054,9 +1054,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidStreamMessage<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IStreamMessage)
+            else if (!(msg is global::Mediator.IStreamMessage))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1065,9 +1065,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidStreamRequest<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IBaseStreamRequest)
+            else if (!(msg is global::Mediator.IBaseStreamRequest))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1076,9 +1076,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidStreamCommand<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IBaseStreamCommand)
+            else if (!(msg is global::Mediator.IBaseStreamCommand))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1087,9 +1087,9 @@ namespace {{ MediatorNamespace }}
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidStreamQuery<T>(T msg, string paramName = null)
         {
-            if (msg is null)
+            if (msg == null)
                 ThrowArgumentNull(paramName);
-            else if (msg is not global::Mediator.IBaseStreamQuery)
+            else if (!(msg is global::Mediator.IBaseStreamQuery))
                 ThrowInvalidMessage(msg);
             else
                 ThrowMissingHandler(msg);
@@ -1105,15 +1105,15 @@ namespace {{ MediatorNamespace }}
 
         private static void ThrowIfNull<T>(T argument, string paramName)
         {
-            if (argument is null)
+            if (argument == null)
                 ThrowArgumentNull(paramName);
         }
 
         private static void ThrowInvalidNotification<T>(T argument, string paramName)
         {
-            if (argument is null)
+            if (argument == null)
                 ThrowArgumentNull(paramName);
-            else if (argument is not global::Mediator.INotification)
+            else if (!(argument is global::Mediator.INotification))
                 ThrowInvalidMessage(argument);
         }
 
