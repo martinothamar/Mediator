@@ -10,6 +10,7 @@
     <!--<ReportAnalyzer>true</ReportAnalyzer>-->
     <EnablePreviewFeatures>True</EnablePreviewFeatures>
     <LangVersion>preview</LangVersion>
+    <NoWarn>$(NoWarn);MSG0005</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
