@@ -8,6 +8,10 @@
 
 # Mediator
 
+> **Note**
+>
+> **Version 3.0** is currently being developed. See status and provide feedback [here (#98)](https://github.com/martinothamar/Mediator/issues/98)
+
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
 The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, with some deviations to allow for better performance.
 Packages are .NET Standard 2.1 compatible.
@@ -21,10 +25,6 @@ Goals for this library
   * MS are investing time in various AOT scenarios, and for example iOS requirees AOT compilation
 * Build time errors instead of runtime errors
   * The generator includes diagnostics, i.e. if a handler is not defined for a request, a warning is emitted
-
-> **Note**
->
-> **Version 3.0** is currently being developed. See status and provide feedback [here (#98)](https://github.com/martinothamar/Mediator/issues/98)
 
 In particular, source generators in this library is used to
 * Generate code for DI registration
@@ -75,6 +75,11 @@ I've also included the [MessagePipe](https://github.com/Cysharp/MessagePipe) lib
 * `<SendRequest | Stream>_MediatR`: the [MediatR](https://github.com/jbogard/MediatR) library
 
 See [benchmarks code](/benchmarks/Mediator.Benchmarks/Request) for more details on the measurement.
+
+> **Warning**
+>
+> A current limitation of this library is that performance degrades significantly for projects with a large number of messages (>500)
+> There is ongoing work on resolving this for version 3.0 ([#48](https://github.com/martinothamar/Mediator/issues/48)).
 
 ![Requests benchmark](/img/request_benchmark.png "Requests benchmark")
 
@@ -504,3 +509,4 @@ This is a work in progress list on the differences between this library and Medi
 * Singleton service lifetime by default
   * MediatR in combination with `MediatR.Extensions.Microsoft.DependencyInjection` does transient service registration by default, which leads to a lot of allocations. Even if it is configured for singleton lifetime, `IMediator` and `ServiceFactory` services are registered as transient (not configurable).
 * Methods return `ValueTask<T>` instead of `Task<T>`, to allow for fewer allocations (for example if the handler completes synchronously, or using async method builder pooling/`PoolingAsyncValueTaskMethodBuilder<T>`)
+* This library doesn't support generic requests/notifications
