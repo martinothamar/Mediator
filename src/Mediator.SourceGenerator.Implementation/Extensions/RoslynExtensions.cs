@@ -5,9 +5,14 @@ public static class RoslynExtensions
     public static string GetTypeSymbolFullName(
         this ITypeSymbol symbol,
         bool withGlobalPrefix = true,
-        bool includeTypeParameters = true
+        bool includeTypeParameters = true,
+        bool includeReferenceNullability = true
     )
     {
+        var miscOptions = SymbolDisplayMiscellaneousOptions.ExpandNullable;
+        if (includeReferenceNullability)
+            miscOptions |= SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier;
+
         return symbol.ToDisplayString(
             new SymbolDisplayFormat(
                 withGlobalPrefix
@@ -17,7 +22,7 @@ public static class RoslynExtensions
                 includeTypeParameters
                   ? SymbolDisplayGenericsOptions.IncludeTypeParameters
                   : SymbolDisplayGenericsOptions.None,
-                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
+                miscellaneousOptions: miscOptions
             )
         );
     }

@@ -6,6 +6,8 @@
 #pragma warning disable CS8321 // Unused local function
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
+#nullable enable
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
@@ -35,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
-        public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
+        public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
         {
             var opts = new global::Mediator.MediatorOptions();
             if (options != null)
@@ -401,7 +403,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in IRequestMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
@@ -515,7 +517,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in ICommandMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
@@ -629,7 +631,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in IQueryMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
@@ -732,7 +734,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public{{ if HasAnyRequest; " async "; else; " "; end; }}global::System.Threading.Tasks.ValueTask<object> Send(
+        public{{ if HasAnyRequest; " async "; else; " "; end; }}global::System.Threading.Tasks.ValueTask<object?> Send(
             object message,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -764,7 +766,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Async enumerable</returns>
-        public global::System.Collections.Generic.IAsyncEnumerable<object> CreateStream(
+        public global::System.Collections.Generic.IAsyncEnumerable<object?> CreateStream(
             object message,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -791,7 +793,7 @@ namespace {{ MediatorNamespace }}
             }
 
             {{- if HasAnyValueTypeStreamResponse }}
-            static async global::System.Collections.Generic.IAsyncEnumerable<object> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
+            static async global::System.Collections.Generic.IAsyncEnumerable<object?> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
             {
                 await foreach (var value in global::System.Threading.Tasks.TaskAsyncEnumerableExtensions.WithCancellation(wrapped, cancellationToken))
                 {
@@ -880,7 +882,7 @@ namespace {{ MediatorNamespace }}
             async global::System.Threading.Tasks.ValueTask Publish({{ message.FullName }} notification, global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlers, global::System.Threading.CancellationToken cancellationToken)
             {
                 // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception> exceptions = null;
+                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
 
                 for (int i = 0; i < handlers.Length; i++)
                 {
@@ -929,7 +931,7 @@ namespace {{ MediatorNamespace }}
             async global::System.Threading.Tasks.ValueTask Publish({{ message.FullName }} notification, global::System.Collections.Generic.IEnumerable<global::Mediator.INotificationHandler<{{ message.FullName }}>> handlers, global::System.Threading.CancellationToken cancellationToken)
             {
                 // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception> exceptions = null;
+                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
 
                 foreach (var handler in handlers)
                 {
@@ -949,7 +951,7 @@ namespace {{ MediatorNamespace }}
             async global::System.Threading.Tasks.ValueTask PublishArr({{ message.FullName }} notification, global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlers, global::System.Threading.CancellationToken cancellationToken)
             {
                 // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception> exceptions = null;
+                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
 
                 for (int i = 0; i < handlers.Length; i++)
                 {
@@ -1008,7 +1010,7 @@ namespace {{ MediatorNamespace }}
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidMessage<T>(T msg, string paramName = null)
+        private static void ThrowInvalidMessage<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1019,7 +1021,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidRequest<T>(T msg, string paramName = null)
+        private static void ThrowInvalidRequest<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1030,7 +1032,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidCommand<T>(T msg, string paramName = null)
+        private static void ThrowInvalidCommand<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1041,7 +1043,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidQuery<T>(T msg, string paramName = null)
+        private static void ThrowInvalidQuery<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1052,7 +1054,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamMessage<T>(T msg, string paramName = null)
+        private static void ThrowInvalidStreamMessage<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1063,7 +1065,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamRequest<T>(T msg, string paramName = null)
+        private static void ThrowInvalidStreamRequest<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1074,7 +1076,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamCommand<T>(T msg, string paramName = null)
+        private static void ThrowInvalidStreamCommand<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1085,7 +1087,7 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidStreamQuery<T>(T msg, string paramName = null)
+        private static void ThrowInvalidStreamQuery<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
                 ThrowArgumentNull(paramName);
@@ -1096,20 +1098,20 @@ namespace {{ MediatorNamespace }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowArgumentNull(string paramName) =>
+        private static void ThrowArgumentNull(string? paramName) =>
             throw new global::System.ArgumentNullException(paramName);
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void ThrowInvalidMessage<T>(T msg) =>
             throw new global::Mediator.InvalidMessageException(msg);
 
-        private static void ThrowIfNull<T>(T argument, string paramName)
+        private static void ThrowIfNull<T>(T? argument, string paramName)
         {
             if (argument == null)
                 ThrowArgumentNull(paramName);
         }
 
-        private static void ThrowInvalidNotification<T>(T argument, string paramName)
+        private static void ThrowInvalidNotification<T>(T? argument, string paramName)
         {
             if (argument == null)
                 ThrowArgumentNull(paramName);
@@ -1121,7 +1123,7 @@ namespace {{ MediatorNamespace }}
         private static void ThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions) =>
             throw new global::System.AggregateException(exceptions);
 
-        private static void MaybeThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions)
+        private static void MaybeThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception>? exceptions)
         {
             if (exceptions != null)
             {
