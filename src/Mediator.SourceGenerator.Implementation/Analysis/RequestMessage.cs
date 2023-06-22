@@ -27,8 +27,10 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
     }
 
     public string RequestFullName => Symbol.GetTypeSymbolFullName();
-    public bool ResponseIsValueType => ResponseSymbol!.IsValueType;
-    public string ResponseFullName => ResponseSymbol!.GetTypeSymbolFullName();
+    public bool ResponseIsValueType => ResponseSymbol.IsValueType;
+    public string ResponseFullName => ResponseSymbol.GetTypeSymbolFullName();
+    public string ResponseFullNameWithoutReferenceNullability =>
+        ResponseSymbol.GetTypeSymbolFullName(includeReferenceNullability: false);
 
     public void SetHandler(RequestMessageHandler handler) => Handler = handler;
 

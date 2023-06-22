@@ -403,7 +403,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in IRequestMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
@@ -517,7 +517,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in ICommandMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
@@ -631,7 +631,7 @@ namespace {{ MediatorNamespace }}
                 {{~ for message in IQueryMessages ~}}
                 case {{ message.RequestFullName }} r:
                 {
-                    if(typeof(TResponse) == typeof({{ message.ResponseFullName }}))
+                    if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
