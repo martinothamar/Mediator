@@ -12,6 +12,18 @@
 >
 > **Version 3.0** is currently being developed. See status and provide feedback [here (#98)](https://github.com/martinothamar/Mediator/issues/98)
 
+## 3.0
+
+Mediator.Abstractions (abstractions + source generator for impl + DI)
+Mediator.SourceGenerator (the runtime DI)
+
+Init scenarios:
+* Scoped - lazy init
+* Transient - lazy init
+* Singleton - eager init
+
+---
+
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
 The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, with some deviations to allow for better performance.
 Packages are .NET Standard 2.1 compatible.

@@ -12,6 +12,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\samples\SimpleConsole\Program.cs" Link="resources\SimpleConsoleProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\samples\SimpleEndToEnd\Program.cs" Link="resources\SimpleEndToEndProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\samples\SimpleStreaming\Program.cs" Link="resources\SimpleStreamingProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Compile Remove="resources\*.cs" />
+    <None Include="resources\*.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -24,6 +40,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.0.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
@@ -34,19 +51,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Mediator.SourceGenerator.Roslyn38.Tests\**\*.cs" Exclude="..\Mediator.SourceGenerator.Roslyn38.Tests\obj\**;..\Mediator.SourceGenerator.Roslyn38.Tests\bin\**;..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**;..\Mediator.SourceGenerator.Roslyn38.Tests\SamplesTests.cs;..\Mediator.SourceGenerator.Roslyn38.Tests\SourceGenVerifier.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <None Include="..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**">
-      <Link>%(RecursiveDir)\resources\%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" />
-    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" />
-    <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+    <ProjectReference Include="..\..\src\Mediator.Abstractions\Mediator.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" />
   </ItemGroup>
 
 </Project>
