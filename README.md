@@ -21,6 +21,42 @@ Init scenarios:
 * Scoped - lazy init
 * Transient - lazy init
 * Singleton - eager init
+---
+
+### A
+FastMediator:
+* Added to any project
+* src gens
+  * Project-implementation (ProjectMediator) - IF there are handlers
+  * Global-implementation (GlobalMediator) - IF `AddMediator(params Assembly[])` is called
+  * Configuration - `internal AddMediator(params Assembly[])` (registers GlobalMediator), `public AddMediatorProject()` (registers handlers + ProjectMediator)
+  * Interceptors
+* Interceptors -
+  * Take calls to the global mediator, and translates them to <TRequest, TResponse>
+  * TypeIndex maps to correct handler in correct (concrete) ProjectMediator
+
+- requires interceptor
+- extra indirection
+- complicated with several mediator impls
++ explicit assemblies config
+
+---
+
+### B
+FastMediator:
+* Added to any project
+* src gens
+  * Global-implementation (GlobalMediator) - IF `AddMediator(params Assembly[])` is called
+  * Handler proxies - ONLY for internal handlers
+  * Configuration - `public AddMediator(params Assembly[])` (registers GlobalMediator and handlers/proxies)
+  * Interceptors
+* Interceptors -
+  * Take calls to the global mediator, and translates them to <TRequest, TResponse>
+  * TypeIndex maps to correct handler in correct (concrete) ProjectMediator
+
+- requires interceptor
+- extra indirection (only for internal handlers)
++ explicit assemblies config
 
 ---
 
@@ -52,6 +88,9 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
 ## Table of Contents
 
 - [Mediator](#mediator)
+  - [3.0](#30)
+    - [A](#a)
+    - [B](#b)
   - [Table of Contents](#table-of-contents)
   - [2. Benchmarks](#2-benchmarks)
   - [3. Usage and abstractions](#3-usage-and-abstractions)
