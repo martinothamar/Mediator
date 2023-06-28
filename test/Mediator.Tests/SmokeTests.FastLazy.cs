@@ -37,7 +37,7 @@ public partial class SmokeTests
         Assert.DoesNotContain(LazyDICache.INVALID, states);
         Assert.Single(states.Where(s => s == LazyDICache.UNINIT));
 
-        var handlers = values.Select(v => v.Cache.Wrapper_For_Mediator_Tests_TestTypes_SomeRequest).ToArray();
+        var handlers = values.Select(v => v.Cache.Reqs[0]).ToArray();
         var handler = handlers[0];
 
         Assert.All(handlers, h => Assert.Same(handler, h));
