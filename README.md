@@ -22,7 +22,7 @@ Goals for this library
 * High performance
   * Runtime performance can be the same for both runtime reflection and source generator based approaches, but it's easier to optimize in the latter case
 * AOT friendly
-  * MS are investing time in various AOT scenarios, and for example iOS requirees AOT compilation
+  * MS are investing time in various AOT scenarios, and for example iOS requires AOT compilation
 * Build time errors instead of runtime errors
   * The generator includes diagnostics, i.e. if a handler is not defined for a request, a warning is emitted
 
@@ -503,7 +503,7 @@ Since this is a source generator, diagnostics are also included. Examples below
 This is a work in progress list on the differences between this library and MediatR.
 
 * `RequestHandlerDelegate<TResponse>()` -> `MessageHandlerDelegate<TMessage, TResponse>(TMessage message, CancellationToken cancellationToken)`
-  * This is to avoid excessive closure allocations. I thin it's worthwhile when the cost is simply passing along the message and the cancellationtoken.
+  * This is to avoid excessive closure allocations. I think it's worthwhile when the cost is simply passing along the message and the cancellation token.
 * No `ServiceFactory`
   * This library relies on the `Microsoft.Extensions.DependencyInjection`, so it only works with DI containers that integrate with those abstractions.
 * Singleton service lifetime by default
