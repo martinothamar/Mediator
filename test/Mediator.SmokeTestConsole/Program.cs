@@ -64,9 +64,9 @@ public sealed class Work : BackgroundService
             start.SetResult();
             var values = await Task.WhenAll(threads).ConfigureAwait(false);
             var states = values.Select(v => v.State).ToArray();
-            var firstHandlers = values.Select(v => v.Cache.Wrapper_For_Request).ToArray();
+            var firstHandlers = values.Select(v => v.Cache.Reqs[0]).ToArray();
             var firstHandler = firstHandlers[0];
-            var lastHandlers = values.Select(v => v.Cache.Wrapper_For_Request5).ToArray();
+            var lastHandlers = values.Select(v => v.Cache.Reqs[4]).ToArray();
             var lastHandler = lastHandlers[0];
 
             var hasInvalidHandler =

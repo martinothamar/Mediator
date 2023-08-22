@@ -12,6 +12,54 @@
 >
 > **Version 3.0** is currently being developed. See status and provide feedback [here (#98)](https://github.com/martinothamar/Mediator/issues/98)
 
+## 3.0
+
+Mediator.Abstractions (abstractions + source generator for impl + DI)
+Mediator.SourceGenerator (the runtime DI)
+
+Init scenarios:
+* Scoped - lazy init
+* Transient - lazy init
+* Singleton - eager init
+---
+
+### A
+FastMediator:
+* Added to any project
+* src gens
+  * Project-implementation (ProjectMediator) - IF there are handlers
+  * Global-implementation (GlobalMediator) - IF `AddMediator(params Assembly[])` is called
+  * Configuration - `internal AddMediator(params Assembly[])` (registers GlobalMediator), `public AddMediatorProject()` (registers handlers + ProjectMediator)
+  * Interceptors
+* Interceptors -
+  * Take calls to the global mediator, and translates them to <TRequest, TResponse>
+  * TypeIndex maps to correct handler in correct (concrete) ProjectMediator
+
+- requires interceptor
+- extra indirection
+- complicated with several mediator impls
++ explicit assemblies config
+
+---
+
+### B
+FastMediator:
+* Added to any project
+* src gens
+  * Global-implementation (GlobalMediator) - IF `AddMediator(params Assembly[])` is called
+  * Handler proxies - ONLY for internal handlers
+  * Configuration - `public AddMediator(params Assembly[])` (registers GlobalMediator and handlers/proxies)
+  * Interceptors
+* Interceptors -
+  * Take calls to the global mediator, and translates them to <TRequest, TResponse>
+  * TypeIndex maps to correct handler in correct (concrete) ProjectMediator
+
+- requires interceptor
+- extra indirection (only for internal handlers)
++ explicit assemblies config
+
+---
+
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
 The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, with some deviations to allow for better performance.
 Packages are .NET Standard 2.1 compatible.
@@ -40,6 +88,9 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
 ## Table of Contents
 
 - [Mediator](#mediator)
+  - [3.0](#30)
+    - [A](#a)
+    - [B](#b)
   - [Table of Contents](#table-of-contents)
   - [2. Benchmarks](#2-benchmarks)
   - [3. Usage and abstractions](#3-usage-and-abstractions)

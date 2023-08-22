@@ -316,43 +316,20 @@ namespace {{ MediatorNamespace }}
 
         {{ if IsTestRun }}internal{{ else }}private{{ end }} readonly struct DICache
         {
-            private readonly global::System.IServiceProvider _sp;
+            public readonly {{ if ServiceLifetimeIsSingleton }}global::System.Object{{ else }}global::System.Func<global::System.Object>{{ end }}[] Reqs =
+                new {{ if ServiceLifetimeIsSingleton }}global::System.Object{{ else }}global::System.Func<global::System.Object>{{ end }}[{{ object.size RequestMessages }}];
 
-            {{~ if ServiceLifetimeIsSingleton ~}}
-            {{~ for message in RequestMessages ~}}
-            public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
-            {{~ end ~}}
-            {{~ for message in NotificationMessages ~}}
-            public readonly global::Mediator.INotificationHandler<{{ message.FullName }}>[] Handlers_For_{{ message.IdentifierFullName }};
-            {{~ end ~}}
-            {{~ else ~}}
-            {{~ for message in RequestMessages ~}}
-            public {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }}
-            {
-                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-                get => _sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
-            }
-            {{~ end ~}}
-            {{~ for message in NotificationMessages ~}}
-            public global::System.Collections.Generic.IEnumerable<global::Mediator.INotificationHandler<{{ message.FullName }}>> Handlers_For_{{ message.IdentifierFullName }}
-            {
-                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-                get => _sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>();
-            }
-            {{~ end ~}}
-            {{~ end ~}}
+            public readonly {{ if ServiceLifetimeIsSingleton }}global::System.Object{{ else }}global::System.Func<global::System.Object>{{ end }}[] Nots =
+                new {{ if ServiceLifetimeIsSingleton }}global::System.Object{{ else }}global::System.Func<global::System.Object>{{ end }}[{{ object.size NotificationMessages }}];
 
             public DICache(global::System.IServiceProvider sp)
             {
-                _sp = sp;
-
-                {{~ if ServiceLifetimeIsSingleton ~}}
                 {{~ for message in RequestMessages ~}}
-                {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
+                Reqs[{{ for.index }}] = {{ if !ServiceLifetimeIsSingleton }}() => {{ end }}sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
                 {{~ end ~}}
+
                 {{~ for message in NotificationMessages ~}}
-                Handlers_For_{{ message.IdentifierFullName }} = sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>().ToArray();
-                {{~ end ~}}
+                Nots[{{ for.index }}] = {{ if !ServiceLifetimeIsSingleton }}() => {{ end }}sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>(){{ if ServiceLifetimeIsSingleton }}.ToArray(){{ end }};
                 {{~ end ~}}
             }
         }
@@ -375,11 +352,15 @@ namespace {{ MediatorNamespace }}
             {{- if message.IsClass }}
             ThrowIfNull(message, nameof(message));
             {{ end }}
+
             {{~ if ServiceLifetimeIsSingleton ~}}
-            return _diCacheLazy.Value.{{ message.HandlerWrapperPropertyName }}.Handle({{- message.ParameterModifier -}}message, cancellationToken);
+            var handlerObj = _diCacheLazy.Value.Reqs[{{ for.index }}];
             {{~ else ~}}
-            return _diCache.{{ message.HandlerWrapperPropertyName }}.Handle({{- message.ParameterModifier -}}message, cancellationToken);
+            var handlerObj = _diCache.Reqs[{{ for.index }}]();
             {{~ end ~}}
+
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::System.Object, {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(ref handlerObj);
+            return handler.Handle({{- message.ParameterModifier -}}message, cancellationToken);
         }
         {{~ end ~}}
 
@@ -862,9 +843,11 @@ namespace {{ MediatorNamespace }}
             {{ end }}
 
             {{~ if ServiceLifetimeIsSingleton ~}}
-            var handlers = _diCacheLazy.Value.Handlers_For_{{ message.IdentifierFullName }};
+            var handlersObj = _diCacheLazy.Value.Nots[{{ for.index }}];
+            var handlers = global::System.Runtime.CompilerServices.Unsafe.As<global::System.Object, global::Mediator.INotificationHandler<{{ message.FullName }}>[]>(ref handlersObj);
             {{~ else ~}}
-            var handlers = _diCache.Handlers_For_{{ message.IdentifierFullName }};
+            var handlersObj = _diCache.Nots[{{ for.index }}]();
+            var handlers = global::System.Runtime.CompilerServices.Unsafe.As<global::System.Object, global::System.Collections.Generic.IEnumerable<global::Mediator.INotificationHandler<{{ message.FullName }}>>>(ref handlersObj);
             {{~ end ~}}
 
             {{~ if ServiceLifetimeIsSingleton ~}}

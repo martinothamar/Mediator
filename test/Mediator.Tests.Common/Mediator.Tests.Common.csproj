@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+    <ProjectReference Include="..\..\src\Mediator.Abstractions\Mediator.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>
