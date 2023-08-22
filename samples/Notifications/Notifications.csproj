@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+    <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+  </ItemGroup>
+
+  <!--<ItemGroup>
+    <PackageReference Include="Mediator.SourceGenerator" Version="2.0.*-*">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Mediator.Abstractions" Version="2.0.*-*" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <!--<CompilerVisibleProperty Include="Mediator_AttachDebugger" />-->
+  </ItemGroup>
+
+</Project>
