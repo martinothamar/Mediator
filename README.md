@@ -61,6 +61,7 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
     - [4.9. Use streaming messages](#49-use-streaming-messages)
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
+  - [7. Versioning](#7-versioning)
 
 ## 2. Benchmarks
 
@@ -510,3 +511,11 @@ This is a work in progress list on the differences between this library and Medi
   * MediatR in combination with `MediatR.Extensions.Microsoft.DependencyInjection` does transient service registration by default, which leads to a lot of allocations. Even if it is configured for singleton lifetime, `IMediator` and `ServiceFactory` services are registered as transient (not configurable).
 * Methods return `ValueTask<T>` instead of `Task<T>`, to allow for fewer allocations (for example if the handler completes synchronously, or using async method builder pooling/`PoolingAsyncValueTaskMethodBuilder<T>`)
 * This library doesn't support generic requests/notifications
+
+## 7. Versioning
+
+For versioning this library I try to follow [semver 2.0](https://semver.org/) as best as I can, meaning
+
+* Major bump for breaking changes
+* Minor bump for new backward compatible features
+* Patch bump for bugfixes
