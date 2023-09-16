@@ -5,13 +5,17 @@ using System.Text;
 
 namespace Mediator.SourceGenerator;
 
-internal sealed partial class MediatorImplementationGenerator
+internal static class MediatorImplementationGenerator
 {
-    internal void Generate(CompilationAnalyzer compilationAnalyzer)
+    internal static void Generate(
+        CompilationModel compilationModel,
+        Action<string, SourceText> addSource,
+        Action<Exception> reportError
+    )
     {
-        if (compilationAnalyzer.HasErrors)
+        if (compilationModel.HasErrors)
         {
-            GenerateFallback(compilationAnalyzer);
+            GenerateFallback(compilationModel, addSource, reportError);
             return;
         }
 
@@ -21,11 +25,10 @@ internal sealed partial class MediatorImplementationGenerator
             var template = Template.Parse(EmbeddedResource.GetContent(file), file);
             //var output = template.Render(compilationAnalyzer, member => member.Name);
 
-            var model = compilationAnalyzer;
+            var model = compilationModel;
             var scriptObject = new ScriptObject();
             MemberRenamerDelegate memberRenamer = member => member.Name;
-            if (model is not null)
-                scriptObject.Import(model, renamer: memberRenamer);
+            scriptObject.Import(model, renamer: memberRenamer);
 
             var context = new TemplateContext();
             context.MemberRenamer = memberRenamer;
@@ -34,27 +37,31 @@ internal sealed partial class MediatorImplementationGenerator
             context.LoopLimitQueryable = 0;
             var output = template.Render(context);
 
-            compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
+            addSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
         }
         catch (Exception ex)
         {
-            compilationAnalyzer.Context.ReportGenericError(ex);
+            reportError(ex);
         }
     }
 
-    private void GenerateFallback(CompilationAnalyzer compilationAnalyzer)
+    private static void GenerateFallback(
+        CompilationModel compilationModel,
+        Action<string, SourceText> addSource,
+        Action<Exception> reportError
+    )
     {
         try
         {
             var file = "resources/MediatorFallback.sbn-cs";
             var template = Template.Parse(EmbeddedResource.GetContent(file), file);
-            var output = template.Render(compilationAnalyzer, member => member.Name);
+            var output = template.Render(compilationModel, member => member.Name);
 
-            compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
+            addSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
         }
         catch (Exception ex)
         {
-            compilationAnalyzer.Context.ReportGenericError(ex);
+            reportError(ex);
         }
     }
 }

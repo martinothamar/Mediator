@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+        <Using Include="System.Runtime.CompilerServices" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="6.6.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="3.1.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.1.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.1.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+        <PackageReference Include="NuGet.ProjectModel" Version="6.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**">
+            <Link>%(RecursiveDir)\resources\%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+
+        <None Include="..\..\samples\SimpleConsole\Program.cs" Link="resources\SimpleConsoleProgram.cs">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" />
+        <ProjectReference Include="..\..\src\Mediator.SourceGenerator.Roslyn41\Mediator.SourceGenerator.Roslyn41.csproj" />
+        <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+    </ItemGroup>
+
+</Project>

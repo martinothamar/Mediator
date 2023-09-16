@@ -29,7 +29,6 @@ public sealed class MediatorGenerator : ISourceGenerator
             (context.SyntaxReceiver as SyntaxReceiver)?.AddMediatorCalls,
             generatorVersion,
             context.ReportDiagnostic,
-            context.AddSource,
             context.CancellationToken
         );
 
@@ -40,8 +39,11 @@ public sealed class MediatorGenerator : ISourceGenerator
 
         CompilationAnalyzer = compilationAnalyzer;
 
-        var mediatorImplementationGenerator = new MediatorImplementationGenerator();
-        mediatorImplementationGenerator.Generate(compilationAnalyzer);
+        var model = compilationAnalyzer.ToModel();
+
+        var report = context.ReportDiagnostic;
+        var reportDiagnostic = (Exception exception) => report.ReportGenericError(exception);
+        MediatorImplementationGenerator.Generate(model, context.AddSource, reportDiagnostic);
     }
 
     public void Initialize(GeneratorInitializationContext context)

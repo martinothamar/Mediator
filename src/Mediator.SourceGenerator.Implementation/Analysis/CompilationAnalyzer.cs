@@ -1,6 +1,5 @@
 using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
 namespace Mediator.SourceGenerator;
@@ -10,7 +9,6 @@ internal readonly record struct CompilationAnalyzerContext(
     IReadOnlyList<InvocationExpressionSyntax>? AddMediatorCalls,
     string GeneratorVersion,
     Action<Diagnostic> ReportDiagnostic,
-    Action<string, SourceText> AddSource,
     CancellationToken CancellationToken
 );
 
@@ -18,6 +16,8 @@ internal sealed class CompilationAnalyzer
 {
     private static readonly SymbolEqualityComparer _symbolComparer = SymbolEqualityComparer.Default;
     private readonly CompilationAnalyzerContext _context;
+    private readonly List<Diagnostic> _diagnostics;
+
     public CompilationAnalyzerContext Context => _context;
 
     private readonly HashSet<RequestMessage> _requestMessages;
@@ -25,7 +25,7 @@ internal sealed class CompilationAnalyzer
     private readonly HashSet<RequestMessageHandler> _requestMessageHandlers;
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
 
-    public ImmutableArray<RequestMessageHandlerWrapper> RequestMessageHandlerWrappers;
+    public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
 
     private INamedTypeSymbol[] _baseHandlerSymbols;
     private INamedTypeSymbol[] _baseMessageSymbols;
@@ -33,65 +33,15 @@ internal sealed class CompilationAnalyzer
     private INamedTypeSymbol? _notificationHandlerInterfaceSymbol;
     private INamedTypeSymbol? _notificationInterfaceSymbol;
 
-    public IEnumerable<RequestMessage> RequestMessages => _requestMessages.Where(r => r.Handler is not null);
+    private bool HasErrors { get; set; }
 
-    public IEnumerable<NotificationMessage> NotificationMessages => _notificationMessages;
-
-    public IEnumerable<RequestMessageHandler> RequestMessageHandlers => _requestMessageHandlers;
-
-    public IEnumerable<NotificationMessageHandler> NotificationMessageHandlers =>
-        _notificationMessageHandlers.Where(h => !h.IsOpenGeneric);
-
-    public IEnumerable<NotificationMessageHandler> OpenGenericNotificationMessageHandlers =>
-        _notificationMessageHandlers.Where(h => h.IsOpenGeneric);
-
-    public bool HasRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Request");
-    public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
-    public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
-
-    public bool HasStreamRequests =>
-        _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
-    public bool HasStreamQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
-    public bool HasStreamCommands =>
-        _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
-
-    public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
-
-    public bool HasAnyStreamRequest => HasStreamRequests || HasStreamQueries || HasStreamCommands;
-
-    public bool HasAnyValueTypeStreamResponse =>
-        _requestMessages.Any(r => r.MessageType.StartsWith("Stream") && r.ResponseIsValueType);
-
-    public bool HasNotifications => _notificationMessages.Any();
-
-    public IEnumerable<RequestMessage> IRequestMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
-    public IEnumerable<RequestMessage> ICommandMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
-    public IEnumerable<RequestMessage> IQueryMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
-
-    public IEnumerable<RequestMessage> IStreamRequestMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest");
-    public IEnumerable<RequestMessage> IStreamQueryMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery");
-    public IEnumerable<RequestMessage> IStreamCommandMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand");
-
-    public IEnumerable<RequestMessage> IMessages =>
-        _requestMessages.Where(r => r.Handler is not null && !r.IsStreaming);
-    public IEnumerable<RequestMessage> IStreamMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
-
-    public bool HasErrors { get; private set; }
-
-    public INamedTypeSymbol? UnitSymbol;
+    private INamedTypeSymbol? UnitSymbol;
 
     public Compilation Compilation => _context.Compilation;
 
     public string MediatorNamespace { get; private set; } = Constants.MediatorLib;
 
-    public string GeneratorVersion =>
+    private string GeneratorVersion =>
         string.IsNullOrWhiteSpace(_context.GeneratorVersion) ? "1.0.0.0" : _context.GeneratorVersion;
 
     private IFieldSymbol? _configuredLifetimeSymbol;
@@ -110,13 +60,13 @@ internal sealed class CompilationAnalyzer
 
     public bool ServiceLifetimeIsTransient => ServiceLifetimeSymbol?.Name == "Transient";
 
-    public bool IsTestRun =>
+    private bool IsTestRun =>
         (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false)
         || (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
 
-    public bool ConfiguredViaAttribute { get; private set; }
+    private bool ConfiguredViaAttribute { get; set; }
 
-    public bool ConfiguredViaConfiguration { get; private set; }
+    private bool ConfiguredViaConfiguration { get; set; }
 
     public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
@@ -127,6 +77,7 @@ internal sealed class CompilationAnalyzer
         _notificationMessageHandlers = new();
         _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
         _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
+        _diagnostics = new List<Diagnostic>();
     }
 
     public void Initialize()
@@ -139,14 +90,14 @@ internal sealed class CompilationAnalyzer
 
             TryLoadDISymbols(out _serviceLifetimeEnumSymbol, out SingletonServiceLifetimeSymbol);
 
-            RequestMessageHandlerWrappers = new RequestMessageHandlerWrapper[]
+            RequestMessageHandlerWrappers = new RequestMessageHandlerWrapperModel[]
             {
-                new RequestMessageHandlerWrapper("Request", this),
-                new RequestMessageHandlerWrapper("StreamRequest", this),
-                new RequestMessageHandlerWrapper("Command", this),
-                new RequestMessageHandlerWrapper("StreamCommand", this),
-                new RequestMessageHandlerWrapper("Query", this),
-                new RequestMessageHandlerWrapper("StreamQuery", this),
+                new RequestMessageHandlerWrapperModel("Request", this),
+                new RequestMessageHandlerWrapperModel("StreamRequest", this),
+                new RequestMessageHandlerWrapperModel("Command", this),
+                new RequestMessageHandlerWrapperModel("StreamCommand", this),
+                new RequestMessageHandlerWrapperModel("Query", this),
+                new RequestMessageHandlerWrapperModel("StreamQuery", this),
             }.ToImmutableArray();
 
             _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
@@ -157,7 +108,8 @@ internal sealed class CompilationAnalyzer
         }
         catch (Exception ex)
         {
-            _context.ReportGenericError(ex);
+            Action<Diagnostic> report = ReportDiagnostic;
+            report.ReportGenericError(ex);
             HasErrors = true;
         }
     }
@@ -303,6 +255,39 @@ internal sealed class CompilationAnalyzer
             _context.ReportGenericError(ex);
             HasErrors = true;
         }
+    }
+
+    public CompilationModel ToModel()
+    {
+        var model = new CompilationModel(
+            _requestMessages
+                .Select(
+                    x =>
+                        new RequestMessageModel(
+                            x.Symbol,
+                            x.ResponseSymbol,
+                            x.MessageType,
+                            x.Handler?.ToModel(),
+                            x.WrapperType
+                        )
+                )
+                .ToImmutableEquatableArray(),
+            _notificationMessages.Select(x => x.ToModel()).ToImmutableEquatableArray(),
+            _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
+            _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
+            RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
+            HasErrors,
+            MediatorNamespace,
+            GeneratorVersion,
+            ServiceLifetime,
+            ServiceLifetimeShort,
+            SingletonServiceLifetime,
+            IsTestRun,
+            ConfiguredViaAttribute,
+            ConfiguredViaConfiguration
+        );
+
+        return model;
     }
 
     private void FindGlobalNamespaces(Queue<INamespaceOrTypeSymbol> queue)
@@ -500,9 +485,10 @@ internal sealed class CompilationAnalyzer
             if (!isStruct && typeSymbol.TypeKind != TypeKind.Class)
                 return;
 
-            for (int i = 0; i < typeSymbol.AllInterfaces.Length; i++)
+            var typeInterfaces = typeSymbol.AllInterfaces;
+            for (int i = 0; i < typeInterfaces.Length; i++)
             {
-                var typeInterfaceSymbol = typeSymbol.AllInterfaces[i];
+                var typeInterfaceSymbol = typeInterfaces[i];
 
                 if (typeInterfaceSymbol.ContainingNamespace.Name != Constants.MediatorLib)
                     continue;
@@ -545,6 +531,7 @@ internal sealed class CompilationAnalyzer
 
                         var isRequest = codeOfInterest == IS_REQUEST_HANDLER;
 
+                        // TODO: invert if
                         if (isRequest)
                         {
                             if (IsOpenGeneric(typeSymbol))
@@ -970,17 +957,15 @@ internal sealed class CompilationAnalyzer
         )
         {
             var variableSymbol = semanticModel.GetSymbolInfo(identifier, cancellationToken).Symbol;
-            if (variableSymbol is null)
-                return null;
-
-            if (variableSymbol is IFieldSymbol fieldSymbol)
-                return TryResolveNamespaceSymbol(fieldSymbol, semanticModel, cancellationToken);
-            else if (variableSymbol is IPropertySymbol propertySymbol)
-                return TryResolveNamespaceSymbol(propertySymbol, semanticModel, cancellationToken);
-            else if (variableSymbol is ILocalSymbol localSymbol)
-                return TryResolveNamespaceSymbol(localSymbol, semanticModel, cancellationToken);
-
-            return null;
+            return variableSymbol switch
+            {
+                null => null,
+                IFieldSymbol fieldSymbol => TryResolveNamespaceSymbol(fieldSymbol, semanticModel, cancellationToken),
+                IPropertySymbol propertySymbol
+                  => TryResolveNamespaceSymbol(propertySymbol, semanticModel, cancellationToken),
+                ILocalSymbol localSymbol => TryResolveNamespaceSymbol(localSymbol, semanticModel, cancellationToken),
+                _ => null
+            };
         }
 
         string? TryResolveNamespaceSymbol(
@@ -1033,14 +1018,14 @@ internal sealed class CompilationAnalyzer
         )
             return lifetimeSymbol;
 
-        if (symbol is IFieldSymbol fieldSymbol)
-            return TryGetServiceLifetimeSymbol(fieldSymbol, semanticModel, cancellationToken);
-        else if (symbol is IPropertySymbol propertySymbol)
-            return TryGetServiceLifetimeSymbol(propertySymbol, semanticModel, cancellationToken);
-        else if (symbol is ILocalSymbol localSymbol)
-            return TryGetServiceLifetimeSymbol(localSymbol, semanticModel, cancellationToken);
-
-        return null;
+        return symbol switch
+        {
+            IFieldSymbol fieldSymbol => TryGetServiceLifetimeSymbol(fieldSymbol, semanticModel, cancellationToken),
+            IPropertySymbol propertySymbol
+              => TryGetServiceLifetimeSymbol(propertySymbol, semanticModel, cancellationToken),
+            ILocalSymbol localSymbol => TryGetServiceLifetimeSymbol(localSymbol, semanticModel, cancellationToken),
+            _ => null
+        };
     }
 
     private IFieldSymbol? TryGetServiceLifetimeSymbol(
@@ -1100,6 +1085,11 @@ internal sealed class CompilationAnalyzer
     }
 
     private delegate Diagnostic ReportDiagnosticDelegate<T>(in CompilationAnalyzerContext context, T state);
+
+    public void ReportDiagnostic(Diagnostic diagnostic)
+    {
+        _diagnostics.Add(diagnostic);
+    }
 
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
     {
