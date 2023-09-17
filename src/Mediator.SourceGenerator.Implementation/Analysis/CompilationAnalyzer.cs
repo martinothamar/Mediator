@@ -315,6 +315,8 @@ internal sealed class CompilationAnalyzer
         if (markerSymbol is null)
             throw new Exception("Can't load marker symbol");
 
+        var assemblyCache = new Dictionary<IModuleSymbol, ImmutableArray<IAssemblySymbol>>(SymbolEqualityComparer.Default);
+        
         foreach (var reference in compilation.References)
         {
             if (compilation.GetAssemblyOrModuleSymbol(reference) is not IAssemblySymbol assemblySymbol)
@@ -324,31 +326,83 @@ internal sealed class CompilationAnalyzer
                 continue;
             if (assemblySymbol.Name.StartsWith("Mediator.SourceGenerator", StringComparison.Ordinal))
                 continue;
-
-            if (!assemblySymbol.Modules.Any(static m => IsMediatorLibReferencedByTheModule(m, 0)))
+                
+            if (!assemblySymbol.Modules.Any(m => IsMediatorLibReferencedByTheModule(m, assemblyCache)))
                 continue;
 
             queue.Enqueue(assemblySymbol.GlobalNamespace);
         }
     }
 
-    private static bool IsMediatorLibReferencedByTheModule(IModuleSymbol module, int depth)
+    private static bool IsMediatorLibReferencedByTheModule(IModuleSymbol module, Dictionary<IModuleSymbol, ImmutableArray<IAssemblySymbol>> assemblyCache)
     {
-        if (module.ReferencedAssemblies.Any(static ra => ra.Name == Constants.MediatorLib))
-            return true;
+        const int maxDepth = 3;
+        
+        // Create a queue for breadth-first traversal.
+        var moduleQueue = new Queue<IModuleSymbol>();
 
-        // Above we've checked for direct dependencies on the Mediator.Abstractions package,
-        // but projects can implement Mediator messages using only a transitive dependency
-        // as well.
-        // Even so, going too deep recursively will severely impact build performance
-        // so for now the depth is limited to 3.
-        // This should be solved properly by changing how codegen works..
-        if (depth > 3)
-            return false;
+        // Create a set to keep track of visited modules.
+        var visited = new HashSet<IModuleSymbol>(SymbolEqualityComparer.Default);
 
-        return module.ReferencedAssemblySymbols.Any(
-            ra => ra.Modules.Any(m => IsMediatorLibReferencedByTheModule(m, depth + 1))
-        );
+        // Enqueue the initial module for processing.
+        moduleQueue.Enqueue(module);
+        visited.Add(module);
+
+        var depth = 0;
+
+        while (moduleQueue.Count > 0)
+        {
+            var count = moduleQueue.Count;
+
+            // Process modules at the current depth level.
+            for (var i = 0; i < count; i++)
+            {
+                var currentModule = moduleQueue.Dequeue();
+
+                // Check if the current module references MediatorLib.
+                if (currentModule.ReferencedAssemblies.Any(ra => ra.Name == Constants.MediatorLib))
+                {
+                    return true;
+                }
+                
+                // Above we've checked for direct dependencies on the Mediator.Abstractions package,
+                // but projects can implement Mediator messages using only a transitive dependency
+                // as well.
+                // Even so, going too deep recursively will severely impact build performance
+                // so for now the max depth is limited to 3.
+                // This should be solved properly by changing how codegen works..
+
+                // Access cached assemblies.
+                if (!assemblyCache.TryGetValue(currentModule, out var assemblies))
+                {
+                    assemblies = currentModule.ReferencedAssemblySymbols;
+                    assemblyCache[currentModule] = assemblies;
+                }
+
+                // Enqueue referenced modules for the next depth level.
+                foreach (var assembly in assemblies)
+                {
+                    foreach (var referencedModule in assembly.Modules)
+                    {
+                        if (!visited.Contains(referencedModule))
+                        {
+                            moduleQueue.Enqueue(referencedModule);
+                            visited.Add(referencedModule);
+                        }
+                    }
+                }
+            }
+
+            depth++;
+
+            // Limit the max depth.
+            if (depth > maxDepth)
+            {
+                break;
+            }
+        }
+
+        return false;
     }
 
     private void PopulateMetadata(Queue<INamespaceOrTypeSymbol> queue)
