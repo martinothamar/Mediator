@@ -12,8 +12,8 @@ internal abstract class MessageHandler<T> : SymbolMetadata<MessageHandler<T>>
 
     public string TypeOfExpression(bool includeTypeParameters = true)
     {
-        var typeName = Symbol.GetTypeSymbolFullName(includeTypeParameters: includeTypeParameters);
-        var genericArguments = string.Empty;
+        string typeName = Symbol.GetTypeSymbolFullName(includeTypeParameters: includeTypeParameters);
+        string genericArguments = string.Empty;
         if (IsOpenGeneric && !includeTypeParameters)
             genericArguments = $"<{new string(',', Symbol.TypeArguments.Length - 1)}>";
         return $"typeof({typeName}{genericArguments})";

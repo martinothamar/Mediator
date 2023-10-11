@@ -102,8 +102,8 @@ public static class Diagnostics
 
         static string GetNextId()
         {
-            var count = _counter++;
-            var id = $"MSG{count.ToString().PadLeft(4, '0')}";
+            long count = _counter++;
+            string id = $"MSG{count.ToString().PadLeft(4, '0')}";
             _ids.Add(id);
 
             return id;
@@ -119,8 +119,8 @@ public static class Diagnostics
         Diagnostic diagnostic;
         if (arg is ISymbol symbolArg)
         {
-            var location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
-            var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
+            Location? location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
+            string symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
             diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, symbolName);
         }
         else
@@ -133,7 +133,7 @@ public static class Diagnostics
 
     private static Diagnostic Report(this CompilationAnalyzerContext context, DiagnosticDescriptor diagnosticDescriptor)
     {
-        var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
+        Diagnostic diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
         context.ReportDiagnostic(diagnostic);
         return diagnostic;
     }
@@ -142,9 +142,9 @@ public static class Diagnostics
 
     internal static Diagnostic ReportGenericError(this CompilationAnalyzerContext context, Exception exception)
     {
-        var error =
+        string error =
             $"{exception.Message}: {exception.StackTrace}{(exception.InnerException is not null ? $"\nInner: {exception.InnerException}" : "")}";
-        var diagnostic = Diagnostic.Create(GenericError, Location.None, error);
+        Diagnostic diagnostic = Diagnostic.Create(GenericError, Location.None, error);
         context.ReportDiagnostic(diagnostic);
         return diagnostic;
     }

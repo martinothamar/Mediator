@@ -17,22 +17,20 @@ internal sealed partial class MediatorImplementationGenerator
 
         try
         {
-            var file = @"resources/Mediator.sbn-cs";
-            var template = Template.Parse(EmbeddedResource.GetContent(file), file);
-            //var output = template.Render(compilationAnalyzer, member => member.Name);
+            string? file = @"resources/Mediator.sbn-cs";
+            Template? template = Template.Parse(EmbeddedResource.GetContent(file), file);
 
-            var model = compilationAnalyzer;
-            var scriptObject = new ScriptObject();
+            CompilationAnalyzer model = compilationAnalyzer;
+            ScriptObject scriptObject = new();
             MemberRenamerDelegate memberRenamer = member => member.Name;
             if (model is not null)
                 scriptObject.Import(model, renamer: memberRenamer);
 
-            var context = new TemplateContext();
-            context.MemberRenamer = memberRenamer;
+            TemplateContext context = new() { MemberRenamer = memberRenamer };
             context.PushGlobal(scriptObject);
             context.LoopLimit = 0;
             context.LoopLimitQueryable = 0;
-            var output = template.Render(context);
+            string? output = template.Render(context);
 
             compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
         }
@@ -46,9 +44,9 @@ internal sealed partial class MediatorImplementationGenerator
     {
         try
         {
-            var file = "resources/MediatorFallback.sbn-cs";
-            var template = Template.Parse(EmbeddedResource.GetContent(file), file);
-            var output = template.Render(compilationAnalyzer, member => member.Name);
+            string? file = "resources/MediatorFallback.sbn-cs";
+            Template? template = Template.Parse(EmbeddedResource.GetContent(file), file);
+            string? output = template.Render(compilationAnalyzer, member => member.Name);
 
             compilationAnalyzer.Context.AddSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
         }

@@ -1,10 +1,4 @@
-﻿using Microsoft.Build.Locator;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.MSBuild;
-using System.Runtime.Loader;
-
-namespace Mediator.SourceGenerator.Tests;
+﻿namespace Mediator.SourceGenerator.Tests;
 
 public class CleanArchitectureSampleTests
 {

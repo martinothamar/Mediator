@@ -6,7 +6,7 @@ internal sealed class SyntaxReceiver : ISyntaxReceiver
 
     public void OnVisitSyntaxNode(SyntaxNode context)
     {
-        if (ShouldVisit(context, out var invocationSyntax))
+        if (ShouldVisit(context, out InvocationExpressionSyntax? invocationSyntax))
             AddMediatorCalls.Add(invocationSyntax!);
     }
 

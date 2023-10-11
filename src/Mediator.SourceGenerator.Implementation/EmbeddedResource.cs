@@ -8,13 +8,13 @@ internal static class EmbeddedResource
 {
     public static string GetContent(string relativePath)
     {
-        var baseName = Assembly.GetExecutingAssembly().GetName().Name;
-        var resourceName = relativePath
+        string baseName = Assembly.GetExecutingAssembly().GetName().Name;
+        string resourceName = relativePath
             .TrimStart('.')
             .Replace(Path.DirectorySeparatorChar, '.')
             .Replace(Path.AltDirectorySeparatorChar, '.');
 
-        var manifestResourceName = Assembly
+        string manifestResourceName = Assembly
             .GetExecutingAssembly()
             .GetManifestResourceNames()
             .FirstOrDefault(x => x!.EndsWith(resourceName, StringComparison.InvariantCulture));
@@ -24,14 +24,14 @@ internal static class EmbeddedResource
                 $"Did not find required resource ending in '{resourceName}' in assembly '{baseName}'."
             );
 
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(manifestResourceName);
+        using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(manifestResourceName);
 
-        if (stream == null)
+        if (stream is null)
             throw new InvalidOperationException(
                 $"Did not find required resource '{manifestResourceName}' in assembly '{baseName}'."
             );
 
-        using var reader = new StreamReader(stream);
+        using StreamReader reader = new(stream);
         return reader.ReadToEnd();
     }
 }

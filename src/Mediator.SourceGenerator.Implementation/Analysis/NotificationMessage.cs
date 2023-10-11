@@ -32,10 +32,10 @@ internal sealed class NotificationMessage : SymbolMetadata<NotificationMessage>
     {
         get
         {
-            var handlerTypeOfExpression = HandlerTypeOfExpression;
-            foreach (var handler in _handlers)
+            string handlerTypeOfExpression = HandlerTypeOfExpression;
+            foreach (NotificationMessageHandler handler in _handlers)
             {
-                var getExpression = $"GetRequiredService<{handler.FullName}>()";
+                string getExpression = $"GetRequiredService<{handler.FullName}>()";
                 yield return $"services.Add(new SD({handlerTypeOfExpression}, {getExpression}, {ServiceLifetime}));";
             }
         }

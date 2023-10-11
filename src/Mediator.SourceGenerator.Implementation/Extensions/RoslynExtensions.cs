@@ -9,7 +9,7 @@ public static class RoslynExtensions
         bool includeReferenceNullability = true
     )
     {
-        var miscOptions = SymbolDisplayMiscellaneousOptions.ExpandNullable;
+        SymbolDisplayMiscellaneousOptions miscOptions = SymbolDisplayMiscellaneousOptions.ExpandNullable;
         if (includeReferenceNullability)
             miscOptions |= SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier;
 
