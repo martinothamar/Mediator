@@ -37,14 +37,12 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(
-            static context =>
-            {
-                var generatorVersion = Versioning.GetVersion();
+        context.RegisterPostInitializationOutput(static context =>
+        {
+            var generatorVersion = Versioning.GetVersion();
 
-                MediatorOptionsGenerator.Generate(context.AddSource, generatorVersion);
-            }
-        );
+            MediatorOptionsGenerator.Generate(context.AddSource, generatorVersion);
+        });
 
         var compilationProvider = context.CompilationProvider;
         var addMediatorCalls = context.SyntaxProvider.CreateSyntaxProvider(
@@ -52,8 +50,10 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             transform: static (ctx, _) => (InvocationExpressionSyntax)ctx.Node
         );
 
-        IncrementalValueProvider<(Compilation Compilation, ImmutableArray<InvocationExpressionSyntax> AddMediatorCalls)> source =
-            compilationProvider.Combine(addMediatorCalls.Collect());
+        IncrementalValueProvider<(
+            Compilation Compilation,
+            ImmutableArray<InvocationExpressionSyntax> AddMediatorCalls
+        )> source = compilationProvider.Combine(addMediatorCalls.Collect());
 
         context.RegisterSourceOutput(
             source,

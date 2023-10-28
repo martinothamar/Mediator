@@ -63,4 +63,5 @@ public abstract class MessageExceptionHandler<TMessage, TResponse, TException> :
 }
 
 public abstract class MessageExceptionHandler<TMessage, TResponse>
-    : MessageExceptionHandler<TMessage, TResponse, Exception> where TMessage : notnull, IMessage { }
+    : MessageExceptionHandler<TMessage, TResponse, Exception>
+    where TMessage : notnull, IMessage { }

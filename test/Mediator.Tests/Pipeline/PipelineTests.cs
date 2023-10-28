@@ -11,12 +11,10 @@ public sealed class PipelineTests
     [Fact]
     public async Task Test_Pipeline()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
+        });
 
         var id = Guid.NewGuid();
 
@@ -32,13 +30,11 @@ public sealed class PipelineTests
     [Fact]
     public async Task Test_Generic_Pipeline()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<GenericPipelineState>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<GenericPipelineState>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
+        });
 
         var request = new SomeRequest(Guid.NewGuid());
         var requestWithoutResponse = new SomeRequestWithoutResponse(Guid.NewGuid());
@@ -75,12 +71,10 @@ public sealed class PipelineTests
     [Fact]
     public async Task Test_Command_Specific_Pipeline()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CommandSpecificPipeline<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CommandSpecificPipeline<,>));
+        });
 
         var id = Guid.NewGuid();
 
@@ -96,14 +90,12 @@ public sealed class PipelineTests
     [Fact]
     public async Task Test_Pipeline_Ordering()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<GenericPipelineState>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
-                services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<GenericPipelineState>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, SomePipeline>();
+        });
 
         var id = Guid.NewGuid();
 

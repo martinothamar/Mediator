@@ -24,9 +24,9 @@ public sealed class StructResponseTests
 
     public sealed class Handler
         : IRequestHandler<Request, Response>,
-          ICommandHandler<Command, Response>,
-          IQueryHandler<Query, Response>,
-          IStreamRequestHandler<Stream, Response>
+            ICommandHandler<Command, Response>,
+            IQueryHandler<Query, Response>,
+            IStreamRequestHandler<Stream, Response>
     {
         public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
             new ValueTask<Response>(new Response(request.Id));

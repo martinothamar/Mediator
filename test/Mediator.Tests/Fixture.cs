@@ -107,9 +107,9 @@ public static class Fixture
 
     private sealed class CustomServiceProviderScope
         : IServiceScope,
-          IServiceProvider,
-          IAsyncDisposable,
-          IServiceScopeFactory
+            IServiceProvider,
+            IAsyncDisposable,
+            IServiceScopeFactory
     {
         public CustomServiceProviderScope(CustomServiceProvider provider, bool isRootScope)
         {

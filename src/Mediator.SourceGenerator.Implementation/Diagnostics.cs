@@ -114,7 +114,8 @@ public static class Diagnostics
         this CompilationAnalyzerContext context,
         DiagnosticDescriptor diagnosticDescriptor,
         T arg
-    ) where T : class
+    )
+        where T : class
     {
         Diagnostic diagnostic;
         if (arg is ISymbol symbolArg)

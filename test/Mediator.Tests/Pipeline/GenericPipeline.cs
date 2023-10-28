@@ -16,7 +16,8 @@ public sealed class GenericPipelineState : IPipelineTestData
         TMessage message,
         CancellationToken cancellationToken,
         MessageHandlerDelegate<TMessage, TResponse> next
-    ) where TMessage : IMessage
+    )
+        where TMessage : IMessage
     {
         LastMsgTimestamp = Stopwatch.GetTimestamp();
 
@@ -29,7 +30,8 @@ public sealed class GenericPipelineState : IPipelineTestData
         TMessage message,
         CancellationToken cancellationToken,
         StreamHandlerDelegate<TMessage, TResponse> next
-    ) where TMessage : IStreamMessage
+    )
+        where TMessage : IStreamMessage
     {
         LastMsgTimestamp = Stopwatch.GetTimestamp();
 
@@ -59,7 +61,8 @@ public sealed class GenericPipeline<TMessage, TResponse> : IPipelineBehavior<TMe
 
 public sealed class GenericStreamPipeline<TMessage, TResponse>
     : IStreamPipelineBehavior<TMessage, TResponse>,
-      IPipelineTestData where TMessage : IStreamMessage
+        IPipelineTestData
+    where TMessage : IStreamMessage
 {
     private readonly GenericPipelineState _state;
 

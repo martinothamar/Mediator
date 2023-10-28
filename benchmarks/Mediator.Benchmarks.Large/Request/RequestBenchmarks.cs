@@ -9,7 +9,7 @@ public sealed record SomeResponse(Guid Id);
 
 public sealed class SomeHandlerClass
     : IRequestHandler<SomeRequest, SomeResponse>,
-      MediatR.IRequestHandler<SomeRequest, SomeResponse>
+        MediatR.IRequestHandler<SomeRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
     private static ValueTask<SomeResponse> _vtResponse => new ValueTask<SomeResponse>(_response);

@@ -14,20 +14,16 @@ await Host.CreateDefaultBuilder()
         (context, logging) =>
         {
             logging.ClearProviders();
-            logging.AddSimpleConsole(
-                options =>
-                {
-                    options.SingleLine = true;
-                }
-            );
+            logging.AddSimpleConsole(options =>
+            {
+                options.SingleLine = true;
+            });
         }
     )
-    .ConfigureServices(
-        services =>
-        {
-            services.AddHostedService<Work>();
-        }
-    )
+    .ConfigureServices(services =>
+    {
+        services.AddHostedService<Work>();
+    })
     .Build()
     .RunAsync();
 

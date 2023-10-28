@@ -11,14 +11,12 @@ public class BasicTests
     [Fact]
     public async Task Test_PostProcessor()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<PostProcessingState>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePostProcessor<,>));
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePostProcessor2<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<PostProcessingState>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePostProcessor<,>));
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePostProcessor2<,>));
+        });
 
         var id = Guid.NewGuid();
         var queryId = Guid.NewGuid();

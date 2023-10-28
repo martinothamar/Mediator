@@ -85,15 +85,13 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("DuplicateHandlersProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
-                Assert.Single(result.Diagnostics);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
+            Assert.Single(result.Diagnostics);
+        });
     }
 
     [Fact]
@@ -102,19 +100,17 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("StructHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
-                Assert.Contains(
-                    result.Diagnostics,
-                    d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
-                );
-                Assert.True(result.Diagnostics.Length == 2);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
+            Assert.Contains(
+                result.Diagnostics,
+                d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
+            );
+            Assert.True(result.Diagnostics.Length == 2);
+        });
     }
 
     [Fact]
@@ -123,16 +119,14 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("MultipleErrorsProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
-                Assert.True(result.Diagnostics.Length == 2);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MultipleHandlersError.Id);
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidHandlerTypeError.Id);
+            Assert.True(result.Diagnostics.Length == 2);
+        });
     }
 
     [Fact]
@@ -168,15 +162,13 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("IntCastLifetime.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
-                Assert.True(result.Diagnostics.Length == 1);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.True(result.Diagnostics.Length == 1);
+        });
     }
 
     [Fact]
@@ -185,15 +177,13 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("ConfigurationConflictProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.ConflictingConfiguration.Id);
-                Assert.True(result.Diagnostics.Length == 1);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.ConflictingConfiguration.Id);
+            Assert.True(result.Diagnostics.Length == 1);
+        });
     }
 
     [Fact]
@@ -245,15 +235,13 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("InvalidVariablesConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
-                Assert.True(result.Diagnostics.Length == 1);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.True(result.Diagnostics.Length == 1);
+        });
     }
 
     [Fact]
@@ -262,14 +250,12 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("UnassignedVariablesConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+        });
     }
 
     [Fact]
@@ -278,14 +264,12 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("UnassignedNamespaceVariableConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+        });
     }
 
     [Fact]
@@ -294,15 +278,13 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("UnassignedLifetimeVariableConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
-            result =>
-            {
-                Assertions.AssertCommon(result);
+        inputCompilation.AssertGen(result =>
+        {
+            Assertions.AssertCommon(result);
 
-                Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
-                Assert.True(result.Diagnostics.Length == 1);
-            }
-        );
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.True(result.Diagnostics.Length == 1);
+        });
     }
 
     [Fact]

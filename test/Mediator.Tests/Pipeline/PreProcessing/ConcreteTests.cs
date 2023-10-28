@@ -11,14 +11,12 @@ public class ConcreteTests
     [Fact]
     public async Task Test_PreProcessor()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<PreProcessingState>();
-                services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePreProcessor>();
-                services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePreProcessor2>();
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<PreProcessingState>();
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePreProcessor>();
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePreProcessor2>();
+        });
 
         var id = Guid.NewGuid();
         var queryId = Guid.NewGuid();

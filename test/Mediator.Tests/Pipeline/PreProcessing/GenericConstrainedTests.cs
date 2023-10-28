@@ -11,14 +11,12 @@ public class GenericConstrainedTests
     [Fact]
     public async Task Test_PreProcessor()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<PreProcessingState>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePreProcessor<,>));
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePreProcessor2<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<PreProcessingState>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePreProcessor<,>));
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(TestMessagePreProcessor2<,>));
+        });
 
         var id = Guid.NewGuid();
         var queryId = Guid.NewGuid();

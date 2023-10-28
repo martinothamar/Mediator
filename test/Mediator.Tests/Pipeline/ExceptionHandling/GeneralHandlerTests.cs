@@ -10,13 +10,11 @@ public class GeneralHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<State>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<State>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
+        });
 
         var id = Guid.NewGuid();
 
@@ -53,7 +51,8 @@ public class GeneralHandlerTests
         }
     }
 
-    public interface ICreateable<TResponse> where TResponse : ICreateable<TResponse>
+    public interface ICreateable<TResponse>
+        where TResponse : ICreateable<TResponse>
     {
         static abstract TResponse Create(Guid id);
     }

@@ -62,15 +62,13 @@ public sealed class OpenConstrainedGenericsTests
         var notification2 = new SomeOtherNotification(Guid.NewGuid());
 
         var handler1 =
-            (SomeGenericConstrainedNotificationHandler<SomeNotification>)sp.GetServices<
-                INotificationHandler<SomeNotification>
-            >()
-                .Single(h => h is SomeGenericConstrainedNotificationHandler<SomeNotification>);
+            (SomeGenericConstrainedNotificationHandler<SomeNotification>)
+                sp.GetServices<INotificationHandler<SomeNotification>>()
+                    .Single(h => h is SomeGenericConstrainedNotificationHandler<SomeNotification>);
         var handler2 =
-            (SomeGenericConstrainedNotificationHandler<SomeOtherNotification>)sp.GetServices<
-                INotificationHandler<SomeOtherNotification>
-            >()
-                .Single(h => h is SomeGenericConstrainedNotificationHandler<SomeOtherNotification>);
+            (SomeGenericConstrainedNotificationHandler<SomeOtherNotification>)
+                sp.GetServices<INotificationHandler<SomeOtherNotification>>()
+                    .Single(h => h is SomeGenericConstrainedNotificationHandler<SomeOtherNotification>);
 
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
@@ -91,9 +89,8 @@ public sealed class OpenConstrainedGenericsTests
 
         await mediator.Publish(notification);
 
-        var handler = (CatchAllPolymorphicNotificationHandler)sp.GetRequiredService<
-            INotificationHandler<SomeNotificationWithoutConcreteHandler>
-        >();
+        var handler = (CatchAllPolymorphicNotificationHandler)
+            sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
         Assert.NotNull(handler);
         Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
     }
@@ -107,9 +104,8 @@ public sealed class OpenConstrainedGenericsTests
 
         await mediator.Publish((object)notification);
 
-        var handler = (CatchAllPolymorphicNotificationHandler)sp.GetRequiredService<
-            INotificationHandler<SomeNotificationWithoutConcreteHandler>
-        >();
+        var handler = (CatchAllPolymorphicNotificationHandler)
+            sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
         Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
         Assert.NotNull(handler);
     }
@@ -117,12 +113,10 @@ public sealed class OpenConstrainedGenericsTests
     [Fact]
     public async Task Test_Constrained_Generic_Argument_Pipeline()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(SomeGenericConstrainedPipeline<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(SomeGenericConstrainedPipeline<,>));
+        });
 
         var request = new SomeRequest(Guid.NewGuid());
         var command = new SomeCommand(Guid.NewGuid());

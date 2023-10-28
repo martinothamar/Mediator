@@ -10,13 +10,11 @@ public class OnlyLoggingHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<State>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<State>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
+        });
 
         var id = Guid.NewGuid();
 

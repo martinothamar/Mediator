@@ -7,7 +7,8 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-public static class CSharpSourceGeneratorVerifier<TSourceGenerator> where TSourceGenerator : ISourceGenerator, new()
+public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
+    where TSourceGenerator : ISourceGenerator, new()
 {
     public class Test : CSharpSourceGeneratorTest<TSourceGenerator, XUnitVerifier>
     {

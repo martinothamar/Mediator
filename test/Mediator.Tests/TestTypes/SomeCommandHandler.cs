@@ -32,7 +32,7 @@ public sealed class SomeStructCommandHandler : ICommandHandler<SomeStructCommand
     internal static readonly ConcurrentBag<Guid> Ids = new();
     internal static readonly ConcurrentBag<long> Addresses = new();
 
-    unsafe public ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
+    public unsafe ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
     {
         Ids.Add(command.Id);
         var addr = *(long*)&command;

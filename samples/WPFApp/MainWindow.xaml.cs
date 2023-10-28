@@ -36,30 +36,28 @@ namespace WPFApp
 
             lvDataBinding.ItemsSource = _items;
 
-            _ = Task.Run(
-                async () =>
+            _ = Task.Run(async () =>
+            {
+                var sp = App.ServiceProvider;
+
+                var mediator = sp.GetRequiredService<IMediator>();
+
+                for (int i = 0; i < 100; i++)
                 {
-                    var sp = App.ServiceProvider;
+                    var ping = new Ping();
+                    var pong = await mediator.Send(ping);
 
-                    var mediator = sp.GetRequiredService<IMediator>();
+                    lvDataBinding.Dispatcher.Invoke(
+                        () =>
+                        {
+                            _items.Enqueue((ping, pong));
+                        },
+                        DispatcherPriority.Render
+                    );
 
-                    for (int i = 0; i < 100; i++)
-                    {
-                        var ping = new Ping();
-                        var pong = await mediator.Send(ping);
-
-                        lvDataBinding.Dispatcher.Invoke(
-                            () =>
-                            {
-                                _items.Enqueue((ping, pong));
-                            },
-                            DispatcherPriority.Render
-                        );
-
-                        await Task.Delay(2000);
-                    }
+                    await Task.Delay(2000);
                 }
-            );
+            });
         }
     }
 

@@ -17,12 +17,14 @@ public sealed class RequestInheritanceTests
 
     public class CreateResponse : BaseResponse
     {
-        public CreateResponse(Guid id) : base(id) { }
+        public CreateResponse(Guid id)
+            : base(id) { }
     }
 
     public class CreateResponseWithN : CreateResponse
     {
-        public CreateResponseWithN(Guid id, int N) : base(id)
+        public CreateResponseWithN(Guid id, int N)
+            : base(id)
         {
             this.N = N;
         }
@@ -39,12 +41,14 @@ public sealed class RequestInheritanceTests
 
     public class CreateRequest : BaseRequest<CreateResponse>
     {
-        public CreateRequest(Guid id) : base(id) { }
+        public CreateRequest(Guid id)
+            : base(id) { }
     }
 
     public class CreateRequestWithN : BaseRequest<CreateResponseWithN>
     {
-        public CreateRequestWithN(Guid id, int N) : base(id)
+        public CreateRequestWithN(Guid id, int N)
+            : base(id)
         {
             this.N = N;
         }
@@ -54,7 +58,7 @@ public sealed class RequestInheritanceTests
 
     public sealed class CreateHandler
         : IRequestHandler<CreateRequest, CreateResponse>,
-          IRequestHandler<CreateRequestWithN, CreateResponseWithN>
+            IRequestHandler<CreateRequestWithN, CreateResponseWithN>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
         internal static readonly ConcurrentBag<Guid> IdsForN = new();

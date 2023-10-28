@@ -237,9 +237,8 @@ internal sealed class CompilationAnalyzer
         else
         {
             _serviceLifetimeEnumSymbol = serviceLifetimeEnumSymbol;
-            SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol
-                .GetMembers()
-                .Single(m => m.Name == "Singleton");
+            SingletonServiceLifetimeSymbol = (IFieldSymbol)
+                _serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
         }
     }
 
@@ -665,8 +664,8 @@ internal sealed class CompilationAnalyzer
                 var baseSymbol = _baseHandlerSymbols[i];
                 if (_symbolComparer.Equals(baseSymbol, originalInterfaceSymbol))
                     return _symbolComparer.Equals(baseSymbol, _notificationHandlerInterfaceSymbol)
-                      ? IS_NOTIFICATION_HANDLER
-                      : IS_REQUEST_HANDLER;
+                        ? IS_NOTIFICATION_HANDLER
+                        : IS_REQUEST_HANDLER;
             }
 
             for (int i = 0; i < _baseMessageSymbols.Length; i++)
@@ -674,8 +673,8 @@ internal sealed class CompilationAnalyzer
                 var baseSymbol = _baseMessageSymbols[i];
                 if (_symbolComparer.Equals(baseSymbol, originalInterfaceSymbol))
                     return _symbolComparer.Equals(baseSymbol, _notificationInterfaceSymbol)
-                      ? IS_NOTIFICATION
-                      : IS_REQUEST;
+                        ? IS_NOTIFICATION
+                        : IS_REQUEST;
             }
 
             return NOT_RELEVANT;
@@ -729,16 +728,13 @@ internal sealed class CompilationAnalyzer
         }
 
         var attrs = compilation.Assembly.GetAttributes();
-        var optionsAttr = attrs.SingleOrDefault(
-            a =>
-            {
-                if (a.AttributeClass is null)
-                    return false;
-                var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
-                return attributeFullName == "Mediator.MediatorOptionsAttribute"
-                    || attributeFullName == "MediatorOptions";
-            }
-        );
+        var optionsAttr = attrs.SingleOrDefault(a =>
+        {
+            if (a.AttributeClass is null)
+                return false;
+            var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
+            return attributeFullName == "Mediator.MediatorOptionsAttribute" || attributeFullName == "MediatorOptions";
+        });
         if (optionsAttr is not null)
             ProcessAttributeConfiguration(optionsAttr, configuredByAddMediator, cancellationToken);
     }
@@ -879,9 +875,8 @@ internal sealed class CompilationAnalyzer
             var attrFieldName = attrArg.NameEquals.Name.ToString();
             if (attrFieldName == "ServiceLifetime")
             {
-                var identifierNameSyntax = (IdentifierNameSyntax)(
-                    (MemberAccessExpressionSyntax)attrArg.Expression
-                ).Name;
+                var identifierNameSyntax = (IdentifierNameSyntax)
+                    ((MemberAccessExpressionSyntax)attrArg.Expression).Name;
                 _configuredLifetimeSymbol = GetServiceLifetimeSymbol(
                     identifierNameSyntax,
                     semanticModel,

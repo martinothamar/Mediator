@@ -1,6 +1,7 @@
 namespace Mediator;
 
-public interface IPipelineBehavior<TMessage, TResponse> where TMessage : notnull, IMessage
+public interface IPipelineBehavior<TMessage, TResponse>
+    where TMessage : notnull, IMessage
 {
     ValueTask<TResponse> Handle(
         TMessage message,
