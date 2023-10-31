@@ -520,7 +520,7 @@ namespace Mediator
             }
         }
 
-                private readonly struct DICache
+        private readonly struct DICache
         {
             private readonly global::System.IServiceProvider _sp;
 
@@ -547,7 +547,6 @@ namespace Mediator
         )
         {
             ThrowIfNull(message, nameof(message));
-            
             return _diCacheLazy.Value.Wrapper_For_StreamPing.Handle(message, cancellationToken);
         }
 
@@ -567,7 +566,6 @@ namespace Mediator
         {
             ThrowInvalidRequest(request, nameof(request));
             return default;
-            
         }
 
         /// <summary>
@@ -585,7 +583,6 @@ namespace Mediator
         {
             ThrowInvalidRequest(request, nameof(request));
             return default;
-            
         }
 
         /// <summary>
@@ -615,7 +612,6 @@ namespace Mediator
                     return default;
                 }
             }
-            
         }
 
         /// <summary>
@@ -634,7 +630,6 @@ namespace Mediator
         {
             ThrowInvalidCommand(command, nameof(command));
             return default;
-            
         }
 
         /// <summary>
@@ -652,7 +647,6 @@ namespace Mediator
         {
             ThrowInvalidCommand(command, nameof(command));
             return default;
-            
         }
 
         /// <summary>
@@ -671,7 +665,6 @@ namespace Mediator
         {
             ThrowInvalidStreamCommand(command, nameof(command));
             return default;
-            
         }
 
         /// <summary>
@@ -690,7 +683,6 @@ namespace Mediator
         {
             ThrowInvalidQuery(query, nameof(query));
             return default;
-            
         }
 
         /// <summary>
@@ -708,7 +700,6 @@ namespace Mediator
         {
             ThrowInvalidQuery(query, nameof(query));
             return default;
-            
         }
 
         /// <summary>
@@ -727,7 +718,6 @@ namespace Mediator
         {
             ThrowInvalidStreamQuery(query, nameof(query));
             return default;
-            
         }
 
         /// <summary>
@@ -746,7 +736,6 @@ namespace Mediator
         {
             ThrowInvalidMessage(message, nameof(message));
             return default;
-            
         }
 
         /// <summary>
@@ -768,7 +757,6 @@ namespace Mediator
                 case global::StreamPing m:
 				{
                     return CreateStream(m, cancellationToken);
-                    
                 }
                 default:
                 {
@@ -776,8 +764,6 @@ namespace Mediator
                     return default;
                 }
             }
-
-            
         }
 
         /// <summary>
@@ -797,7 +783,6 @@ namespace Mediator
         {
             ThrowInvalidNotification(notification, nameof(notification));
             return default;
-            
         }
 
 
@@ -818,7 +803,6 @@ namespace Mediator
         {
             ThrowInvalidNotification(notification, nameof(notification));
             return default;
-            
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]

@@ -314,7 +314,7 @@ namespace {{ MediatorNamespace }}
         }
         {{~ end ~}}
 
-        {{ if IsTestRun }}internal{{ else }}private{{ end }} readonly struct DICache
+    {{ if IsTestRun }}internal{{ else }}private{{ end }} readonly struct DICache
         {
             private readonly global::System.IServiceProvider _sp;
 
@@ -374,7 +374,7 @@ namespace {{ MediatorNamespace }}
         {
             {{- if message.IsClass }}
             ThrowIfNull(message, nameof(message));
-            {{ end }}
+            {{- end }}
             {{~ if ServiceLifetimeIsSingleton ~}}
             return _diCacheLazy.Value.{{ message.HandlerWrapperPropertyName }}.Handle({{- message.ParameterModifier -}}message, cancellationToken);
             {{~ else ~}}
@@ -408,10 +408,7 @@ namespace {{ MediatorNamespace }}
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
-                    else
-                    {
-                        return SendAsync(request, cancellationToken);
-                    }
+                    return SendAsync(request, cancellationToken);
                 }
                 {{~ end ~}}
                 default:
@@ -420,10 +417,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidRequest(request, nameof(request));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -455,10 +452,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidRequest(request, nameof(request));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -491,10 +488,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidStreamRequest(request, nameof(request));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -522,10 +519,7 @@ namespace {{ MediatorNamespace }}
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
-                    else
-                    {
-                        return SendAsync(command, cancellationToken);
-                    }
+                    return SendAsync(command, cancellationToken);
                 }
                 {{~ end ~}}
                 default:
@@ -534,10 +528,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidCommand(command, nameof(command));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -569,10 +563,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidCommand(command, nameof(command));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -605,10 +599,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidStreamCommand(command, nameof(command));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -636,10 +630,7 @@ namespace {{ MediatorNamespace }}
                         var task = Send({{- message.ParameterModifier -}}r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
-                    else
-                    {
-                        return SendAsync(query, cancellationToken);
-                    }
+                    return SendAsync(query, cancellationToken);
                 }
                 {{~ end ~}}
                 default:
@@ -648,10 +639,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidQuery(query, nameof(query));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -683,10 +674,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidQuery(query, nameof(query));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -719,10 +710,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidStreamQuery(query, nameof(query));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -751,10 +742,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidMessage(message, nameof(message));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -780,9 +771,9 @@ namespace {{ MediatorNamespace }}
 					{{- if message.ResponseIsValueType }}
                     var value = CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
 					return AsyncWrapper(value);
-					{{ else }}
+					{{- else }}
                     return CreateStream({{- message.ParameterModifier -}}m, cancellationToken);
-                    {{ end }}
+                    {{- end }}
                 }
                 {{~ end ~}}
                 default:
@@ -802,10 +793,10 @@ namespace {{ MediatorNamespace }}
             }
             {{ end }}
 
-            {{ else }}
+            {{- else }}
             ThrowInvalidStreamMessage(message, nameof(message));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         /// <summary>
@@ -835,10 +826,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidNotification(notification, nameof(notification));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         {{~ for message in NotificationMessages ~}}
@@ -999,10 +990,10 @@ namespace {{ MediatorNamespace }}
                     return default;
                 }
             }
-            {{ else }}
+            {{- else }}
             ThrowInvalidNotification(notification, nameof(notification));
             return default;
-            {{ end }}
+            {{- end }}
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
