@@ -51,6 +51,19 @@ public static class Fixture
         return compilation;
     }
 
+    public static Task VerifyGenerator(string source)
+    {
+        var compilation = CreateLibrary(source);
+
+        var generator = new MediatorGenerator();
+        var driver = CSharpGeneratorDriver.Create(generator);
+
+        var ranDriver = driver.RunGenerators(compilation);
+        var verify = VerifyXunit.Verifier.Verify(ranDriver);
+
+        return verify.ToTask();
+    }
+
     public static Task<string> SourceFromResourceFile(string file) =>
         File.ReadAllTextAsync(Path.Combine("resources", file));
 }
