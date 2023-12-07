@@ -12,9 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="7.0.0" />
+    <PackageReference Include="Verify.DiffPlex" Version="2.3.0" />
+    <PackageReference Include="Verify.SourceGenerators" Version="2.2.0" />
     <PackageReference Include="FluentAssertions" Version="6.6.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="Verify.Xunit" Version="22.1.4" />
+    <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -34,10 +38,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\samples\SimpleConsole\Program.cs" Link="resources\SimpleConsoleProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\samples\SimpleEndToEnd\Program.cs" Link="resources\SimpleEndToEndProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\samples\SimpleStreaming\Program.cs" Link="resources\SimpleStreamingProgram.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Compile Include="..\Mediator.SourceGenerator.Roslyn38.Tests\**\*.cs" Exclude="..\Mediator.SourceGenerator.Roslyn38.Tests\obj\**;..\Mediator.SourceGenerator.Roslyn38.Tests\bin\**;..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**;..\Mediator.SourceGenerator.Roslyn38.Tests\SamplesTests.cs;..\Mediator.SourceGenerator.Roslyn38.Tests\SourceGenVerifier.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
     <None Include="..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**">
+      <Link>%(RecursiveDir)\resources\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Compile Remove="_snapshots\**" />
+    <None Include="..\Mediator.SourceGenerator.Roslyn38.Tests\_snapshots\**">
       <Link>%(RecursiveDir)\resources\%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
