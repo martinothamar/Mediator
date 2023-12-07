@@ -459,7 +459,7 @@ namespace Mediator
         }
 
 
-                private readonly struct DICache
+        private readonly struct DICache
         {
             private readonly global::System.IServiceProvider _sp;
 
@@ -489,7 +489,6 @@ namespace Mediator
         )
         {
             ThrowIfNull(message, nameof(message));
-            
             return _diCache.Wrapper_For_Ping.Handle(message, cancellationToken);
         }
 
@@ -516,10 +515,7 @@ namespace Mediator
                         var task = Send(r, cancellationToken);
                         return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::Pong>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
-                    else
-                    {
-                        return SendAsync(request, cancellationToken);
-                    }
+                    return SendAsync(request, cancellationToken);
                 }
                 default:
                 {
@@ -527,7 +523,6 @@ namespace Mediator
                     return default;
                 }
             }
-            
         }
 
         /// <summary>
@@ -556,7 +551,6 @@ namespace Mediator
                     return default;
                 }
             }
-            
         }
 
         /// <summary>
@@ -575,7 +569,6 @@ namespace Mediator
         {
             ThrowInvalidStreamRequest(request, nameof(request));
             return default;
-            
         }
 
         /// <summary>
@@ -594,7 +587,6 @@ namespace Mediator
         {
             ThrowInvalidCommand(command, nameof(command));
             return default;
-            
         }
 
         /// <summary>
@@ -612,7 +604,6 @@ namespace Mediator
         {
             ThrowInvalidCommand(command, nameof(command));
             return default;
-            
         }
 
         /// <summary>
@@ -631,7 +622,6 @@ namespace Mediator
         {
             ThrowInvalidStreamCommand(command, nameof(command));
             return default;
-            
         }
 
         /// <summary>
@@ -650,7 +640,6 @@ namespace Mediator
         {
             ThrowInvalidQuery(query, nameof(query));
             return default;
-            
         }
 
         /// <summary>
@@ -668,7 +657,6 @@ namespace Mediator
         {
             ThrowInvalidQuery(query, nameof(query));
             return default;
-            
         }
 
         /// <summary>
@@ -687,7 +675,6 @@ namespace Mediator
         {
             ThrowInvalidStreamQuery(query, nameof(query));
             return default;
-            
         }
 
         /// <summary>
@@ -713,7 +700,6 @@ namespace Mediator
                     return default;
                 }
             }
-            
         }
 
         /// <summary>
@@ -732,7 +718,6 @@ namespace Mediator
         {
             ThrowInvalidStreamMessage(message, nameof(message));
             return default;
-            
         }
 
         /// <summary>
@@ -752,7 +737,6 @@ namespace Mediator
         {
             ThrowInvalidNotification(notification, nameof(notification));
             return default;
-            
         }
 
 
@@ -773,7 +757,6 @@ namespace Mediator
         {
             ThrowInvalidNotification(notification, nameof(notification));
             return default;
-            
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
