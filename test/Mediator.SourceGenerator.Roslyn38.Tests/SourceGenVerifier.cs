@@ -2,14 +2,25 @@ using Mediator.SourceGenerator.Tests;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 public static class CSharpSourceGeneratorVerifier<TSourceGenerator> where TSourceGenerator : ISourceGenerator, new()
 {
-    public class Test : CSharpSourceGeneratorTest<TSourceGenerator, XUnitVerifier>
+    public static Task VerifySolution(string source)
+    {
+        var test = new Test
+        {
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck, TestState = { Sources = { source }, },
+        };
+        return test.RunAsync();
+    }
+
+    private class Test : CSharpSourceGeneratorTest<TSourceGenerator, XUnitVerifier>
     {
         public Test()
         {
