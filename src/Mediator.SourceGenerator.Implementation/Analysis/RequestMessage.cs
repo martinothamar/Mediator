@@ -1,4 +1,5 @@
 using Mediator.SourceGenerator.Extensions;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Mediator.SourceGenerator;
 
@@ -13,6 +14,13 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
     public readonly string MessageType;
 
     public bool IsStreaming => MessageType.StartsWith("Stream");
+
+    public string AccessibilityModifier =>
+        Symbol.DeclaredAccessibility switch
+        {
+            Accessibility.Internal => "internal",
+            _ => "public",
+        };
 
     public RequestMessage(
         INamedTypeSymbol symbol,
