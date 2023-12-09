@@ -15,7 +15,8 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator> where TSourc
     {
         var test = new Test
         {
-            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck, TestState = { Sources = { source }, },
+            TestBehaviors = TestBehaviors.SkipGeneratedSourcesCheck,
+            TestState = { Sources = { source }, },
         };
         return test.RunAsync();
     }
