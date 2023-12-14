@@ -5,8 +5,22 @@ namespace InternalMessages.Application;
 
 internal sealed class PingHandler : IRequestHandler<Ping, Pong>
 {
-    public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
+    private readonly IMediator _mediator;
+
+    public PingHandler(IMediator mediator) => _mediator = mediator;
+
+    public async ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
     {
-        return new ValueTask<Pong>(new Pong(request.Id));
+        await _mediator.Publish(new PingPonged(request.Id), cancellationToken);
+        return new Pong(request.Id);
+    }
+}
+
+internal sealed class PingPongedHandler : INotificationHandler<PingPonged>
+{
+    public ValueTask Handle(PingPonged notification, CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"PingPonged: {notification.Id}");
+        return default;
     }
 }

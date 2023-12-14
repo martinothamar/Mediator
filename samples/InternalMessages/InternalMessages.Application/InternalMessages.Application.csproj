@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>InternalMessages.Api</_Parameter1>
-    </AssemblyAttribute>
+    <InternalsVisibleTo Include="InternalMessages.Api"/>
   </ItemGroup>
 
   <ItemGroup>

@@ -24,4 +24,10 @@ internal abstract class SymbolMetadata<T> : IEquatable<T?> where T : SymbolMetad
     public bool IsClass => !IsStruct;
     public bool IsReadOnly => Symbol.IsReadOnly;
     public string ParameterModifier => string.Empty;
+    public string AccessibilityModifier =>
+        Symbol.DeclaredAccessibility switch
+        {
+            Accessibility.Internal => "internal",
+            _ => "public",
+        };
 }
