@@ -6,11 +6,13 @@
 
   <ItemGroup>
     <Using Include="FluentAssertions" />
+    <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Fixie.TestAdapter" Version="3.2.0" />
-    <PackageReference Include="FluentAssertions" Version="6.6.0" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="xunit.assert" Version="2.6.3" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.0.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" PrivateAssets="all" />
@@ -18,7 +20,9 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-    <PackageReference Include="NuGet.ProjectModel" Version="6.1.0" />
+    <PackageReference Include="NuGet.ProjectModel" Version="6.7.0" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.7.0" />
+    <PackageReference Include="NuGet.Packaging" Version="6.7.0" />
   </ItemGroup>
 
   <ItemGroup>

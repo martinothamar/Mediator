@@ -367,7 +367,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
+        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
             {{ message.ParameterModifier -}}{{ message.RequestFullName }} message,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -843,7 +843,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="notification">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
+        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask Publish(
             {{ message.ParameterModifier -}}{{ message.FullName }} notification,
             global::System.Threading.CancellationToken cancellationToken = default
         )
