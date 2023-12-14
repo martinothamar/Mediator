@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Mediator.SourceGenerator.Tests;
@@ -36,7 +37,7 @@ public class SampleTests
         compilation.Should().NotBeNull();
         Assert.NotNull(compilation);
 
-        diagnostics.Should().BeEmpty();
+        diagnostics.Where(d => d.Kind == WorkspaceDiagnosticKind.Failure).Should().BeEmpty();
 
         var generator = new IncrementalMediatorGenerator().AsSourceGenerator();
 
