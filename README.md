@@ -266,7 +266,7 @@ services.AddMediator(options =>
 * `Namespace` - where the `IMediator` implementation is generated
 * `DefaultServiceLifetime` - the DI service lifetime
   * `Singleton` - (default value) everything registered as singletons, minimal allocations
-  * `Transient` - handlers registered as transient, `IMediator`/`Mediator`/`ISender`/`IPublisher` still singleton
+  * `Transient` - mediator and handlers registered as transient
   * `Scoped`    - mediator and handlers registered as scoped
 
 ## 4. Getting started
