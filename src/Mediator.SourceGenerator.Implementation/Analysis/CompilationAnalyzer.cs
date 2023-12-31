@@ -16,7 +16,6 @@ internal sealed class CompilationAnalyzer
 {
     private static readonly SymbolEqualityComparer _symbolComparer = SymbolEqualityComparer.Default;
     private readonly CompilationAnalyzerContext _context;
-    private readonly List<Diagnostic> _diagnostics;
 
     public CompilationAnalyzerContext Context => _context;
 
@@ -77,7 +76,6 @@ internal sealed class CompilationAnalyzer
         _notificationMessageHandlers = new();
         _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
         _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
-        _diagnostics = new List<Diagnostic>();
     }
 
     public void Initialize()
@@ -1086,9 +1084,9 @@ internal sealed class CompilationAnalyzer
 
     private delegate Diagnostic ReportDiagnosticDelegate<T>(in CompilationAnalyzerContext context, T state);
 
-    public void ReportDiagnostic(Diagnostic diagnostic)
+    private void ReportDiagnostic(Diagnostic diagnostic)
     {
-        _diagnostics.Add(diagnostic);
+        _context.ReportDiagnostic(diagnostic);
     }
 
     private void ReportDiagnostic<T>(T state, ReportDiagnosticDelegate<T> del)
