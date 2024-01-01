@@ -10,6 +10,7 @@ internal abstract record SymbolMetadataModel
         FullName = symbol.GetTypeSymbolFullName();
         Kind = symbol.TypeKind;
         IsReadOnly = symbol.IsReadOnly;
+        AccessibilityModifier = symbol.DeclaredAccessibility is Accessibility.Internal ? "internal" : "public";
     }
 
     public string Name { get; }
@@ -23,6 +24,9 @@ internal abstract record SymbolMetadataModel
     public bool IsClass => !IsStruct;
 
     public bool IsReadOnly { get; }
+
+    public string AccessibilityModifier { get; }
+
     public string ParameterModifier => string.Empty;
 
     public override string ToString() => Name;
