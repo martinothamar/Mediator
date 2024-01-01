@@ -88,6 +88,8 @@ internal sealed class CompilationAnalyzer
 
             TryLoadDISymbols(out _serviceLifetimeEnumSymbol, out SingletonServiceLifetimeSymbol);
 
+            TryParseConfiguration();
+
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapperModel[]
             {
                 new RequestMessageHandlerWrapperModel("Request", this),
@@ -101,8 +103,6 @@ internal sealed class CompilationAnalyzer
             _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
 
             TryLoadBaseMessageSymbols(out _baseMessageSymbols, out _notificationInterfaceSymbol);
-
-            TryParseConfiguration();
         }
         catch (Exception ex)
         {
