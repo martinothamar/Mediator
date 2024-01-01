@@ -45,13 +45,13 @@ internal sealed class CompilationAnalyzer
 
     private IFieldSymbol? _configuredLifetimeSymbol;
     private INamedTypeSymbol? _serviceLifetimeEnumSymbol;
-    public IFieldSymbol? ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
-    public IFieldSymbol? SingletonServiceLifetimeSymbol;
+    private IFieldSymbol? ServiceLifetimeSymbol => _configuredLifetimeSymbol ?? SingletonServiceLifetimeSymbol;
+    private IFieldSymbol? SingletonServiceLifetimeSymbol;
 
     public string? ServiceLifetime => ServiceLifetimeSymbol?.GetFieldSymbolFullName();
-    public string? ServiceLifetimeShort => ServiceLifetimeSymbol?.Name;
+    private string? ServiceLifetimeShort => ServiceLifetimeSymbol?.Name;
 
-    public string? SingletonServiceLifetime => SingletonServiceLifetimeSymbol?.GetFieldSymbolFullName();
+    private string? SingletonServiceLifetime => SingletonServiceLifetimeSymbol?.GetFieldSymbolFullName();
 
     public bool ServiceLifetimeIsSingleton => ServiceLifetimeSymbol?.Name == "Singleton";
 
