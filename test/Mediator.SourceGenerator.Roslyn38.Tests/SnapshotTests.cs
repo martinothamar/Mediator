@@ -45,4 +45,24 @@ public sealed class SnapshotTests
 
         await Fixture.VerifyGenerator(source);
     }
+
+    [Fact]
+    public async Task Test_Message_With_Missing_Handler_Should_Diagnostic()
+    {
+        var source = """
+                     using Mediator;
+                     using Microsoft.Extensions.DependencyInjection;
+                     using System;
+
+                     var services = new ServiceCollection();
+
+                     services.AddMediator();
+
+                     public sealed record Ping(Guid Id) : IRequest<Pong>;
+
+                     public sealed record Pong(Guid Id);
+                     """;
+
+        await Fixture.VerifyGenerator(source);
+    }
 }
