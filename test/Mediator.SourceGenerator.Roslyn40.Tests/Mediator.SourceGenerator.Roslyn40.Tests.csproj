@@ -47,6 +47,9 @@
     <None Include="..\..\samples\SimpleStreaming\Program.cs" Link="resources\SimpleStreamingProgram.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\..\samples\SimpleConsoleAOT\Program.cs" Link="resources\SimpleConsoleAOT.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Compile Include="..\Mediator.SourceGenerator.Roslyn38.Tests\**\*.cs" Exclude="..\Mediator.SourceGenerator.Roslyn38.Tests\obj\**;..\Mediator.SourceGenerator.Roslyn38.Tests\bin\**;..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**;..\Mediator.SourceGenerator.Roslyn38.Tests\SamplesTests.cs;..\Mediator.SourceGenerator.Roslyn38.Tests\SourceGenVerifier.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>

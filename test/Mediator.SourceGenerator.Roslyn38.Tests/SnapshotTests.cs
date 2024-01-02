@@ -37,4 +37,12 @@ public sealed class SnapshotTests
 
         await Fixture.VerifyGenerator(source);
     }
+
+    [Fact]
+    public async Task Test_Pipeline_And_AttributeNamespace()
+    {
+        var source = await Fixture.SourceFromResourceFile("SimpleConsoleAOT.cs");
+
+        await Fixture.VerifyGenerator(source);
+    }
 }

@@ -43,6 +43,9 @@
     <None Include="..\..\samples\SimpleStreaming\Program.cs" Link="resources\SimpleStreamingProgram.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="..\..\samples\SimpleConsoleAOT\Program.cs" Link="resources\SimpleConsoleAOT.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Compile Remove="resources\*.cs" />
     <None Include="resources\*.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
