@@ -5,8 +5,8 @@ internal sealed class NotificationMessageHandler : MessageHandler<NotificationMe
     public NotificationMessageHandler(INamedTypeSymbol symbol, CompilationAnalyzer analyzer) : base(symbol, analyzer)
     { }
 
-    public string OpenGenericTypeOfExpression => $"typeof(global::Mediator.INotificationHandler<>)";
-
-    public string OpenGenericServiceRegistrationBlock =>
-        $"services.Add(new SD({OpenGenericTypeOfExpression}, {TypeOfExpression(false)}, {ServiceLifetime}));";
+    public NotificationMessageHandlerModel ToModel()
+    {
+        return new NotificationMessageHandlerModel(Symbol, Analyzer);
+    }
 }

@@ -2,13 +2,18 @@ namespace Mediator.SourceGenerator;
 
 internal sealed class RequestMessageHandler : MessageHandler<RequestMessageHandler>
 {
-    public readonly string MessageType;
-    public readonly RequestMessageHandlerWrapper WrapperType;
+    private readonly string _messageType;
+    private readonly RequestMessageHandlerWrapperModel _wrapperType;
 
     public RequestMessageHandler(INamedTypeSymbol symbol, string messageType, CompilationAnalyzer analyzer)
         : base(symbol, analyzer)
     {
-        MessageType = messageType;
-        WrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);
+        _messageType = messageType;
+        _wrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);
+    }
+
+    public RequestMessageHandlerModel ToModel()
+    {
+        return new RequestMessageHandlerModel(Symbol, _messageType, Analyzer, _wrapperType);
     }
 }

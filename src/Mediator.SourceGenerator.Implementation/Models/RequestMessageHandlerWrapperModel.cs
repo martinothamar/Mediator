@@ -1,33 +1,30 @@
-using Mediator.SourceGenerator.Extensions;
-
 namespace Mediator.SourceGenerator;
 
-internal sealed class RequestMessageHandlerWrapper
+internal sealed record RequestMessageHandlerWrapperModel
 {
-    public readonly string MessageType;
-    private readonly CompilationAnalyzer _analyzer;
-
-    public RequestMessageHandlerWrapper(string messageType, CompilationAnalyzer analyzer)
+    public RequestMessageHandlerWrapperModel(string messageType, CompilationAnalyzer analyzer)
     {
         MessageType = messageType;
-        _analyzer = analyzer;
+        FullNamespace = $"global::{analyzer.MediatorNamespace}";
     }
 
-    public string FullNamespace => $"global::{_analyzer.MediatorNamespace}";
+    public string MessageType { get; }
+
+    public string FullNamespace { get; }
 
     public string HandlerWrapperTypeName(TypeKind type) =>
         $"{MessageType}{(type == TypeKind.Struct ? "Struct" : "Class")}HandlerWrapper";
 
-    public string HandlerWrapperTypeFullName(TypeKind type) => $"{FullNamespace}.{HandlerWrapperTypeName(type)}";
+    private string HandlerWrapperTypeFullName(TypeKind type) => $"{FullNamespace}.{HandlerWrapperTypeName(type)}";
 
-    public string HandlerWrapperTypeNameWithGenericTypeArguments(TypeKind type) =>
+    private string HandlerWrapperTypeNameWithGenericTypeArguments(TypeKind type) =>
         $"{HandlerWrapperTypeName(type)}<TRequest, TResponse>";
 
     public string HandlerWrapperTypeNameWithGenericTypeArguments(
-        INamedTypeSymbol requestSymbol,
-        ITypeSymbol responseSymbol
-    ) =>
-        $"{HandlerWrapperTypeFullName(requestSymbol.TypeKind)}<{requestSymbol.GetTypeSymbolFullName()}, {responseSymbol.GetTypeSymbolFullName()}>";
+        TypeKind requestKind,
+        string requestFullname,
+        string responseFullname
+    ) => $"{HandlerWrapperTypeFullName(requestKind)}<{requestFullname}, {responseFullname}>";
 
     public string HandlerWrapperTypeOfExpression(TypeKind type) => $"typeof({HandlerWrapperTypeFullName(type)}<,>)";
 

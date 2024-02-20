@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Mediator.Benchmarks.SourceGenerator;
 
-[MemoryDiagnoser]
+[MemoryDiagnoser(true)]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 [InProcess]
 //[EventPipeProfiler(EventPipeProfile.CpuSampling)]
@@ -18,12 +18,14 @@ namespace Mediator.Benchmarks.SourceGenerator;
 public class SourceGeneratorBenchmark
 {
     private Compilation _compilation;
+    const string SmallPath =
+        "../../samples/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj";
+    const string LargePath = "../Mediator.Benchmarks.Large/Mediator.Benchmarks.Large.csproj";
 
     private CSharpGeneratorDriver _driver;
     private MSBuildWorkspace _workspace;
 
-    [GlobalSetup]
-    public void Setup()
+    public void Setup(string path)
     {
         var currentDirectory = Directory.GetCurrentDirectory();
         if (currentDirectory.Contains("bin", StringComparison.OrdinalIgnoreCase))
@@ -37,10 +39,7 @@ public class SourceGeneratorBenchmark
             ConsoleLogger.Default.WriteLineError("-------------------------");
         };
 
-        var projectFile = Path.Combine(
-            currentDirectory,
-            "../../samples/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj"
-        );
+        var projectFile = Path.Combine(currentDirectory, path);
         if (!File.Exists(projectFile))
             throw new Exception("Project doesnt exist");
         else
@@ -79,9 +78,47 @@ public class SourceGeneratorBenchmark
         _workspace.Dispose();
     }
 
+    [GlobalSetup(Target = nameof(Compile))]
+    public void SetupSmall() => Setup(SmallPath);
+
     [Benchmark]
     public GeneratorDriver Compile()
     {
-        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out var newCompilation, out var newDiagnostics);
+        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
+    }
+
+    [GlobalSetup(Target = nameof(Cached))]
+    public void SetupCached()
+    {
+        Setup(SmallPath);
+        _driver = (CSharpGeneratorDriver)_driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
+    }
+
+    [Benchmark]
+    public GeneratorDriver Cached()
+    {
+        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
+    }
+
+    [GlobalSetup(Target = nameof(LargeCompile))]
+    public void SetupLarge() => Setup(LargePath);
+
+    [Benchmark]
+    public GeneratorDriver LargeCompile()
+    {
+        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
+    }
+
+    [GlobalSetup(Target = nameof(LargeCached))]
+    public void SetupLargeCached()
+    {
+        Setup(LargePath);
+        _driver = (CSharpGeneratorDriver)_driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
+    }
+
+    [Benchmark]
+    public GeneratorDriver LargeCached()
+    {
+        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
     }
 }

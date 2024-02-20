@@ -149,6 +149,14 @@ public static class Diagnostics
         return diagnostic;
     }
 
+    internal static void ReportGenericError(this Action<Diagnostic> reportError, Exception exception)
+    {
+        var error =
+            $"{exception.Message}: {exception.StackTrace}{(exception.InnerException is not null ? $"\nInner: {exception.InnerException}" : "")}";
+        var diagnostic = Diagnostic.Create(GenericError, Location.None, error);
+        reportError(diagnostic);
+    }
+
     public static readonly DiagnosticDescriptor MultipleHandlersError;
 
     internal static Diagnostic ReportMultipleHandlers(

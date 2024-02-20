@@ -20,10 +20,6 @@ internal abstract class SymbolMetadata<T> : IEquatable<T?> where T : SymbolMetad
 
     public override string ToString() => Symbol.Name;
 
-    public bool IsStruct => Symbol.TypeKind == TypeKind.Struct;
-    public bool IsClass => !IsStruct;
-    public bool IsReadOnly => Symbol.IsReadOnly;
-    public string ParameterModifier => string.Empty;
     public string AccessibilityModifier =>
         Symbol.DeclaredAccessibility switch
         {

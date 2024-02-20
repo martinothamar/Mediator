@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace Mediator.SourceGenerator;
 
@@ -28,7 +28,9 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             compilationProvider.Combine(addMediatorCalls.Collect());
 
         var parsed = source.Select((x, token) => Parse(x.Compilation, x.AddMediatorCalls, token));
-        var errors = parsed.Select((x, _) => x.Diagnostics);
+        var errors = parsed
+            .Select((x, _) => x.Diagnostics)
+            .WithTrackingName(MediatorGeneratorStepName.ReportDiagnostics);
         context.RegisterSourceOutput(
             errors,
             (context, errors) =>
@@ -40,7 +42,7 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             }
         );
 
-        var model = parsed.Select((x, _) => x.Model);
+        var model = parsed.Select((x, _) => x.Model).WithTrackingName(MediatorGeneratorStepName.BuildMediator);
 
         context.RegisterSourceOutput(
             model,
