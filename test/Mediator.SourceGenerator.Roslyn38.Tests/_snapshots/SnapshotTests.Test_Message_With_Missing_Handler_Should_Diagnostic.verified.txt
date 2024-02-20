@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: MSG0005,
+      Title: MediatorGenerator message warning,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (0,0)-(0,0),
+      MessageFormat: MediatorGenerator found message without any registered handler: {0},
+      Message: MediatorGenerator found message without any registered handler: Ping,
+      Category: MediatorGenerator
+    }
+  ]
+}
