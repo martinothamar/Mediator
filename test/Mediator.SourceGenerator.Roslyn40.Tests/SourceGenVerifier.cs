@@ -5,11 +5,13 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-public static class CSharpSourceGeneratorVerifier<TSourceGenerator> where TSourceGenerator : ISourceGenerator, new()
+public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
+    where TSourceGenerator : IIncrementalGenerator, new()
 {
     public static Task VerifySolution(string source)
     {
@@ -21,7 +23,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator> where TSourc
         return test.RunAsync();
     }
 
-    private class Test : CSharpSourceGeneratorTest<TSourceGenerator, XUnitVerifier>
+    private class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, XUnitVerifier>
     {
         public Test()
         {
@@ -56,6 +58,9 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator> where TSourc
         }
 
         public TSourceGenerator SourceGenerator => (TSourceGenerator)GetSourceGenerators().Single();
+
+        protected override IEnumerable<ISourceGenerator> GetSourceGenerators() =>
+            new ISourceGenerator[] { new TSourceGenerator().AsSourceGenerator() };
 
         protected override CompilationOptions CreateCompilationOptions()
         {

@@ -1,7 +1,8 @@
+namespace Mediator.SourceGenerator.Tests;
+
 using System.Threading.Tasks;
 using VerifyXunit;
-
-namespace Mediator.SourceGenerator.Tests;
+using Verifier = CSharpSourceGeneratorVerifier<MediatorGenerator>;
 
 [UsesVerify]
 public sealed class SnapshotTests
@@ -11,6 +12,7 @@ public sealed class SnapshotTests
     {
         var source = await Fixture.SourceFromResourceFile("SimpleConsoleProgram.cs");
 
+        await Verifier.VerifySolution(source);
         await Fixture.VerifyGenerator(source);
     }
 
@@ -19,6 +21,7 @@ public sealed class SnapshotTests
     {
         var source = await Fixture.SourceFromResourceFile("SimpleEndToEndProgram.cs");
 
+        await Verifier.VerifySolution(source);
         await Fixture.VerifyGenerator(source);
     }
 
@@ -27,6 +30,7 @@ public sealed class SnapshotTests
     {
         var source = await Fixture.SourceFromResourceFile("SimpleStreamingProgram.cs");
 
+        await Verifier.VerifySolution(source);
         await Fixture.VerifyGenerator(source);
     }
 
@@ -35,6 +39,7 @@ public sealed class SnapshotTests
     {
         var source = await Fixture.SourceFromResourceFile("MultipleAddMediatorCalls.cs");
 
+        await Verifier.VerifySolution(source);
         await Fixture.VerifyGenerator(source);
     }
 
