@@ -15,11 +15,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
     <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
+    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn41\Mediator.SourceGenerator.Roslyn41.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
     <None Include="$(OutputPath)\Mediator.SourceGenerator.Implementation.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn38.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs" Visible="false" />
     <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn40.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn41.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.1/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

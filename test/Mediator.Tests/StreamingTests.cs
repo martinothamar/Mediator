@@ -9,7 +9,7 @@ namespace Mediator.Tests;
 
 public sealed class StreamingTests
 {
-    public static IEnumerable<IStreamMessage[]> TestMessages = new IStreamMessage[][]
+    public static IEnumerable<object[]> TestMessages = new IStreamMessage[][]
     {
         new IStreamMessage[] { new SomeStreamingRequest(Guid.NewGuid()) },
         new IStreamMessage[] { new SomeStreamingQuery(Guid.NewGuid()) },

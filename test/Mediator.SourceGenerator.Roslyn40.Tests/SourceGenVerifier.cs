@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
     where TSourceGenerator : IIncrementalGenerator, new()
@@ -23,58 +22,52 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
         return test.RunAsync();
     }
 
-    private class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, XUnitVerifier>
+    private class Test : CSharpSourceGeneratorTest<EmptySourceGeneratorProvider, DefaultVerifier>
     {
         public Test()
         {
             var refs = Fixture.AssemblyReferencesForCodegen.Select(a => a.Location).ToImmutableArray();
-
-            var metadataRefs = refs.Select(l => MetadataReference.CreateFromFile(l)).ToImmutableArray();
-
-            this.ReferenceAssemblies = Microsoft.CodeAnalysis.Testing.ReferenceAssemblies.Net.Net60.WithAssemblies(
-                refs
-            );
+            this.ReferenceAssemblies = ReferenceAssemblies.Net.Net80.WithAssemblies(refs);
 
             this.SolutionTransforms.Add(
-                (sln, projectId) =>
+                (solution, projectId) =>
                 {
-                    var compilationOptions = ((CSharpCompilationOptions)sln.GetProject(projectId)!.CompilationOptions!)
-                        .WithOutputKind(OutputKind.ConsoleApplication)
-                        .WithUsings(
-                            "System",
-                            "System.Collections.Generic",
-                            "System.IO",
-                            "System.Linq",
-                            "System.Net.Http",
-                            "System.Threading",
-                            "System.Threading.Tasks"
-                        );
-
-                    sln = sln.AddMetadataReferences(projectId, metadataRefs)
-                        .WithProjectCompilationOptions(projectId, compilationOptions);
-                    return sln;
+                    var compilationOptions = solution.GetProject(projectId)!.CompilationOptions;
+                    compilationOptions = compilationOptions!.WithSpecificDiagnosticOptions(
+                        compilationOptions.SpecificDiagnosticOptions.SetItems(GetNullableWarningsFromCompiler())
+                    );
+                    compilationOptions = ((CSharpCompilationOptions)compilationOptions!).WithUsings(
+                        "System",
+                        "System.Collections.Generic",
+                        "System.IO",
+                        "System.Linq",
+                        "System.Net.Http",
+                        "System.Threading",
+                        "System.Threading.Tasks"
+                    );
+                    solution = solution.AddMetadataReferences(
+                        projectId,
+                        refs.Select(l => MetadataReference.CreateFromFile(l)).ToImmutableArray()
+                    );
+                    solution = solution.WithProjectCompilationOptions(projectId, compilationOptions);
+                    return solution;
                 }
             );
         }
 
-        public TSourceGenerator SourceGenerator => (TSourceGenerator)GetSourceGenerators().Single();
-
-        protected override IEnumerable<ISourceGenerator> GetSourceGenerators() =>
-            new ISourceGenerator[] { new TSourceGenerator().AsSourceGenerator() };
-
-        protected override CompilationOptions CreateCompilationOptions()
+        protected override IEnumerable<Type> GetSourceGenerators()
         {
-            var compilationOptions = base.CreateCompilationOptions();
-            return compilationOptions
-                .WithSpecificDiagnosticOptions(
-                    compilationOptions.SpecificDiagnosticOptions.SetItems(GetNullableWarningsFromCompiler())
-                )
-                .WithOutputKind(OutputKind.ConsoleApplication);
+            yield return new TSourceGenerator().AsSourceGenerator().GetGeneratorType();
         }
 
         public LanguageVersion LanguageVersion { get; set; } = LanguageVersion.Latest;
 
-        private static ImmutableDictionary<string, ReportDiagnostic> GetNullableWarningsFromCompiler()
+        protected override ParseOptions CreateParseOptions()
+        {
+            return ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion);
+        }
+
+        static ImmutableDictionary<string, ReportDiagnostic> GetNullableWarningsFromCompiler()
         {
             string[] args = { "/warnaserror:nullable" };
             var commandLineArguments = CSharpCommandLineParser.Default.Parse(
@@ -82,14 +75,7 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                 baseDirectory: Environment.CurrentDirectory,
                 sdkDirectory: Environment.CurrentDirectory
             );
-            var nullableWarnings = commandLineArguments.CompilationOptions.SpecificDiagnosticOptions;
-
-            return nullableWarnings;
-        }
-
-        protected override ParseOptions CreateParseOptions()
-        {
-            return ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion);
+            return commandLineArguments.CompilationOptions.SpecificDiagnosticOptions;
         }
     }
 }

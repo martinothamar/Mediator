@@ -259,7 +259,9 @@ public class BasicHandlerTests
 
         var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
         Assert.NotNull(commandHandler);
+#pragma warning disable xUnit1031
         mediator.Send(command).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
     }
@@ -275,7 +277,9 @@ public class BasicHandlerTests
         var addr = *(long*)&command;
 
         var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
+#pragma warning disable xUnit1031
         concrete.Send(command).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
     }
@@ -313,7 +317,9 @@ public class BasicHandlerTests
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
 
+#pragma warning disable xUnit1031
         concrete.Publish(notification).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
         //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
     }

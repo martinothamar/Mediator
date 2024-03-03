@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <IsPackable>false</IsPackable>
+    <RestoreAdditionalProjectSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json</RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,19 +17,19 @@
     <PackageReference Include="Verify.DiffPlex" Version="2.3.0" />
     <PackageReference Include="Verify.SourceGenerators" Version="2.2.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="Verify.Xunit" Version="22.1.4" />
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="Verify.Xunit" Version="23.2.2" />
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="3.1.2">
+    <PackageReference Include="coverlet.collector" Version="6.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.4.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.24121.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.0.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
@@ -39,28 +40,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\samples\SimpleConsole\Program.cs" Link="resources\SimpleConsoleProgram.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\samples\SimpleEndToEnd\Program.cs" Link="resources\SimpleEndToEndProgram.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\samples\SimpleStreaming\Program.cs" Link="resources\SimpleStreamingProgram.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\samples\SimpleConsoleAOT\Program.cs" Link="resources\SimpleConsoleAOT.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Compile Include="..\Mediator.SourceGenerator.Roslyn38.Tests\**\*.cs" Exclude="..\Mediator.SourceGenerator.Roslyn38.Tests\obj\**;..\Mediator.SourceGenerator.Roslyn38.Tests\bin\**;..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**;..\Mediator.SourceGenerator.Roslyn38.Tests\SamplesTests.cs;..\Mediator.SourceGenerator.Roslyn38.Tests\SourceGenVerifier.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <None Include="..\Mediator.SourceGenerator.Roslyn38.Tests\resources\**">
-      <Link>%(RecursiveDir)\resources\%(Filename)%(Extension)</Link>
+    <Compile Remove="resources\*.cs" />
+    <None Include="resources\*.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Compile Remove="_snapshots\**" />
-    <None Include="..\Mediator.SourceGenerator.Roslyn38.Tests\_snapshots\**">
-      <Link>%(RecursiveDir)\resources\%(Filename)%(Extension)</Link>
+    <None Include="_snapshots\*.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

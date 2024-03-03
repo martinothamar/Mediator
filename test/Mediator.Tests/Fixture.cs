@@ -66,6 +66,8 @@ public static class Fixture
         {
             if (serviceType == typeof(IServiceProvider))
                 return this;
+            if (serviceType == typeof(IServiceProviderIsService))
+                return null;
 
             if (serviceType.IsConstructedGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
@@ -84,7 +86,7 @@ public static class Fixture
                 ?? _services.FirstOrDefault(s => s.ServiceType.IsAssignableTo(serviceType));
 
             if (descriptor is null)
-                throw new Exception("Service not found");
+                throw new Exception($"Service not found: {serviceType}");
 
             var result =
                 descriptor.ImplementationInstance

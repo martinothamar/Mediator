@@ -15,6 +15,7 @@ public static class Fixture
     public static readonly Assembly[] ImportantAssemblies = new[]
     {
         typeof(object).Assembly,
+        typeof(Console).Assembly,
         typeof(IMessage).Assembly,
         typeof(ServiceLifetime).Assembly,
         typeof(ServiceProvider).Assembly,

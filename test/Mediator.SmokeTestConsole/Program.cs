@@ -58,7 +58,7 @@ public sealed class Work : BackgroundService
                 threads[i] = Task.Run(Thread);
 
             start.SetResult();
-            var values = await Task.WhenAll(threads).ConfigureAwait(false);
+            var values = await Task.WhenAll(threads);
             var states = values.Select(v => v.State).ToArray();
             var firstHandlers = values.Select(v => v.Cache.Wrapper_For_Request).ToArray();
             var firstHandler = firstHandlers[0];
@@ -92,7 +92,7 @@ public sealed class Work : BackgroundService
 
             async Task<(DICache Cache, long State)> Thread()
             {
-                await start.Task.ConfigureAwait(false);
+                await start.Task;
 
                 return mediator._diCacheLazy.ValueInstrumented;
             }
