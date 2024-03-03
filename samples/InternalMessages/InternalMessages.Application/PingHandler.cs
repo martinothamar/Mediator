@@ -1,5 +1,5 @@
-﻿using Mediator;
-using InternalMessages.Domain;
+﻿using InternalMessages.Domain;
+using Mediator;
 
 namespace InternalMessages.Application;
 

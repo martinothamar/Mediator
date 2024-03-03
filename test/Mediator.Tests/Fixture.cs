@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests;
 
@@ -107,9 +107,9 @@ public static class Fixture
 
     private sealed class CustomServiceProviderScope
         : IServiceScope,
-          IServiceProvider,
-          IAsyncDisposable,
-          IServiceScopeFactory
+            IServiceProvider,
+            IAsyncDisposable,
+            IServiceScopeFactory
     {
         public CustomServiceProviderScope(CustomServiceProvider provider, bool isRootScope)
         {

@@ -1,5 +1,5 @@
-using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 
 namespace Mediator.SourceGenerator.Tests;
 

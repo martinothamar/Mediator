@@ -1,12 +1,12 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.SourceGenerator.Tests;
 
@@ -22,8 +22,8 @@ public static class Fixture
     };
 
     public static Assembly[] AssemblyReferencesForCodegen =>
-        AppDomain.CurrentDomain
-            .GetAssemblies()
+        AppDomain
+            .CurrentDomain.GetAssemblies()
             .Concat(ImportantAssemblies)
             .Distinct()
             .Where(a => !a.IsDynamic)

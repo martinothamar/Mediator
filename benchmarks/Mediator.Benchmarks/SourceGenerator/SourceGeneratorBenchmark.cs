@@ -1,10 +1,10 @@
+using System.Reflection;
 using Mediator.SourceGenerator;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Mediator.Benchmarks.SourceGenerator;
 

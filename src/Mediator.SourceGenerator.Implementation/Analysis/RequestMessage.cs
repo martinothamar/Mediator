@@ -7,7 +7,8 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
         ITypeSymbol responseSymbol,
         string messageType,
         CompilationAnalyzer analyzer
-    ) : base(symbol, analyzer)
+    )
+        : base(symbol, analyzer)
     {
         ResponseSymbol = responseSymbol;
         WrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);

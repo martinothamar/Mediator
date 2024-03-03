@@ -1,8 +1,8 @@
-using Mediator.Tests.TestTypes;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
+using Microsoft.Extensions.DependencyInjection;
 using static Mediator.Tests.OpenConstrainedGenericsTests;
 
 namespace Mediator.Tests;
@@ -248,7 +248,7 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    unsafe public void Test_StructCommand_Handler()
+    public unsafe void Test_StructCommand_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
@@ -265,7 +265,7 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    unsafe public void Test_StructCommand_Handler_Concrete()
+    public unsafe void Test_StructCommand_Handler_Concrete()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
@@ -297,7 +297,7 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    unsafe public void Test_Struct_Notification_Handler()
+    public unsafe void Test_Struct_Notification_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
@@ -445,21 +445,16 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Remove_NotificationHandler()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            sc =>
-            {
-                var sds = sc.Where(
-                    static a =>
-                        a.ImplementationFactory is { } implFac
-                        && implFac.Method.IsGenericMethod
-                        && implFac.Method
-                            .GetGenericArguments()
-                            .Any(static b => b.Name == nameof(SomeNotificationHandler))
-                );
-                var sd = Assert.Single(sds);
-                sc.Remove(sd);
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(sc =>
+        {
+            var sds = sc.Where(static a =>
+                a.ImplementationFactory is { } implFac
+                && implFac.Method.IsGenericMethod
+                && implFac.Method.GetGenericArguments().Any(static b => b.Name == nameof(SomeNotificationHandler))
+            );
+            var sd = Assert.Single(sds);
+            sc.Remove(sd);
+        });
 
         var id = Guid.NewGuid();
 

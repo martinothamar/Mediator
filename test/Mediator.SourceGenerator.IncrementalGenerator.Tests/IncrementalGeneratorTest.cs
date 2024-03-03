@@ -1,6 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp;
 using static Mediator.SourceGenerator.IncrementalGenerator.Tests.IncrementalGeneratorHelper;
 
 namespace Mediator.SourceGenerator.IncrementalGenerator.Tests;

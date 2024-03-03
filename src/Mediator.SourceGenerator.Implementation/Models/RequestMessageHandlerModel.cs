@@ -10,7 +10,8 @@ internal sealed record RequestMessageHandlerModel : MessageHandlerModel
         string messageType,
         CompilationAnalyzer analyzer,
         RequestMessageHandlerWrapperModel wrapperType
-    ) : base(symbol, analyzer)
+    )
+        : base(symbol, analyzer)
     {
         MessageType = messageType;
         WrapperType = wrapperType;

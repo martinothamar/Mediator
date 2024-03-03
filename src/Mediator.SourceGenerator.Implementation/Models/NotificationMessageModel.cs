@@ -10,7 +10,8 @@ internal sealed record NotificationMessageModel : SymbolMetadataModel
         INamedTypeSymbol symbol,
         CompilationAnalyzer analyzer,
         HashSet<NotificationMessageHandler> handlers
-    ) : base(symbol)
+    )
+        : base(symbol)
     {
         ServiceLifetime = analyzer.ServiceLifetime;
         _handlers = handlers.Select(x => x.FullName).ToImmutableEquatableArray();

@@ -1,8 +1,8 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 
 [assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Transient)]
 
@@ -14,13 +14,11 @@ namespace Some.Nested.Types
         {
             var services = new ServiceCollection();
 
-            services.AddMediator(
-                options =>
-                {
-                    options.Namespace = "SimpleConsole.Mediator";
-                    options.ServiceLifetime = ServiceLifetime.Transient;
-                }
-            );
+            services.AddMediator(options =>
+            {
+                options.Namespace = "SimpleConsole.Mediator";
+                options.ServiceLifetime = ServiceLifetime.Transient;
+            });
 
             var serviceProvider = services.BuildServiceProvider();
 

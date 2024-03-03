@@ -1,20 +1,18 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Microsoft.Extensions.DependencyInjection" namespace.
 // We override the namespace in the "MediatorOptions" attribute above.
-services.AddMediator(
-    options =>
-    {
-        options.Namespace = null;
-        options.ServiceLifetime = ServiceLifetime.Transient;
-    }
-);
+services.AddMediator(options =>
+{
+    options.Namespace = null;
+    options.ServiceLifetime = ServiceLifetime.Transient;
+});
 
 // Standard handlers are added by default, but we need to add pipeline steps manually.
 // Here are two examples.

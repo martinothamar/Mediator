@@ -1,9 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests;
 
@@ -18,7 +18,8 @@ public sealed class ResponseInheritanceTests
 
     public class CreateResponse : BaseResponse
     {
-        public CreateResponse(Guid id) : base(id) { }
+        public CreateResponse(Guid id)
+            : base(id) { }
     }
 
     public class CreateCommandRequest : ICommand<CreateResponse>
@@ -51,9 +52,9 @@ public sealed class ResponseInheritanceTests
 
     public sealed class CreateHandler
         : ICommandHandler<CreateCommandRequest, CreateResponse>,
-          IRequestHandler<CreateRequestRequest, CreateResponse>,
-          IQueryHandler<CreateQueryRequest, CreateResponse>,
-          IStreamRequestHandler<CreateStreamRequest, CreateResponse>
+            IRequestHandler<CreateRequestRequest, CreateResponse>,
+            IQueryHandler<CreateQueryRequest, CreateResponse>,
+            IStreamRequestHandler<CreateStreamRequest, CreateResponse>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
 

@@ -1,6 +1,6 @@
+using System.Text;
 using Microsoft.CodeAnalysis.Text;
 using Scriban;
-using System.Text;
 
 namespace Mediator.SourceGenerator;
 

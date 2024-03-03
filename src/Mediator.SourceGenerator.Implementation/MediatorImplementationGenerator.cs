@@ -1,7 +1,7 @@
+using System.Text;
 using Microsoft.CodeAnalysis.Text;
 using Scriban;
 using Scriban.Runtime;
-using System.Text;
 
 namespace Mediator.SourceGenerator;
 

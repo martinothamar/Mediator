@@ -6,13 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
-builder.Services.AddMediator(
-    config =>
-    {
-        config.Namespace = "Foo.Generated";
-        config.ServiceLifetime = ServiceLifetime.Scoped;
-    }
-);
+builder.Services.AddMediator(config =>
+{
+    config.Namespace = "Foo.Generated";
+    config.ServiceLifetime = ServiceLifetime.Scoped;
+});
 
 var app = builder.Build();
 

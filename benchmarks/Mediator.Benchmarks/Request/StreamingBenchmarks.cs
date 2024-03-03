@@ -7,7 +7,7 @@ public sealed record SomeStreamRequest(Guid Id) : IStreamRequest<SomeResponse>, 
 
 public sealed class SomeStreamHandlerClass
     : IStreamRequestHandler<SomeStreamRequest, SomeResponse>,
-      MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
+        MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 

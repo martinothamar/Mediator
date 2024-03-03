@@ -1,6 +1,6 @@
+using System.Collections.Immutable;
 using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Collections.Immutable;
 
 namespace Mediator.SourceGenerator;
 
@@ -187,9 +187,8 @@ internal sealed class CompilationAnalyzer
         else
         {
             _serviceLifetimeEnumSymbol = serviceLifetimeEnumSymbol;
-            SingletonServiceLifetimeSymbol = (IFieldSymbol)_serviceLifetimeEnumSymbol
-                .GetMembers()
-                .Single(m => m.Name == "Singleton");
+            SingletonServiceLifetimeSymbol = (IFieldSymbol)
+                _serviceLifetimeEnumSymbol.GetMembers().Single(m => m.Name == "Singleton");
         }
     }
 
@@ -259,16 +258,13 @@ internal sealed class CompilationAnalyzer
     {
         var model = new CompilationModel(
             _requestMessages
-                .Select(
-                    x =>
-                        new RequestMessageModel(
-                            x.Symbol,
-                            x.ResponseSymbol,
-                            x.MessageType,
-                            x.Handler?.ToModel(),
-                            x.WrapperType
-                        )
-                )
+                .Select(x => new RequestMessageModel(
+                    x.Symbol,
+                    x.ResponseSymbol,
+                    x.MessageType,
+                    x.Handler?.ToModel(),
+                    x.WrapperType
+                ))
                 .ToImmutableEquatableArray(),
             _notificationMessages.Select(x => x.ToModel()).ToImmutableEquatableArray(),
             _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
@@ -427,9 +423,8 @@ internal sealed class CompilationAnalyzer
 
         foreach (var notificationMessage in _notificationMessages)
         {
-            var handlerInterface = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1].Construct(
-                notificationMessage.Symbol
-            );
+            var handlerInterface = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1]
+                .Construct(notificationMessage.Symbol);
 
             foreach (var notificationMessageHandler in _notificationMessageHandlers)
             {
@@ -650,8 +645,8 @@ internal sealed class CompilationAnalyzer
                 var baseSymbol = _baseHandlerSymbols[i];
                 if (_symbolComparer.Equals(baseSymbol, originalInterfaceSymbol))
                     return _symbolComparer.Equals(baseSymbol, _notificationHandlerInterfaceSymbol)
-                      ? IS_NOTIFICATION_HANDLER
-                      : IS_REQUEST_HANDLER;
+                        ? IS_NOTIFICATION_HANDLER
+                        : IS_REQUEST_HANDLER;
             }
 
             for (int i = 0; i < _baseMessageSymbols.Length; i++)
@@ -659,8 +654,8 @@ internal sealed class CompilationAnalyzer
                 var baseSymbol = _baseMessageSymbols[i];
                 if (_symbolComparer.Equals(baseSymbol, originalInterfaceSymbol))
                     return _symbolComparer.Equals(baseSymbol, _notificationInterfaceSymbol)
-                      ? IS_NOTIFICATION
-                      : IS_REQUEST;
+                        ? IS_NOTIFICATION
+                        : IS_REQUEST;
             }
 
             return NOT_RELEVANT;
@@ -714,16 +709,13 @@ internal sealed class CompilationAnalyzer
         }
 
         var attrs = compilation.Assembly.GetAttributes();
-        var optionsAttr = attrs.SingleOrDefault(
-            a =>
-            {
-                if (a.AttributeClass is null)
-                    return false;
-                var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
-                return attributeFullName == "Mediator.MediatorOptionsAttribute"
-                    || attributeFullName == "MediatorOptions";
-            }
-        );
+        var optionsAttr = attrs.SingleOrDefault(a =>
+        {
+            if (a.AttributeClass is null)
+                return false;
+            var attributeFullName = a.AttributeClass.GetTypeSymbolFullName(withGlobalPrefix: false);
+            return attributeFullName == "Mediator.MediatorOptionsAttribute" || attributeFullName == "MediatorOptions";
+        });
         if (optionsAttr is not null)
             ProcessAttributeConfiguration(optionsAttr, configuredByAddMediator, cancellationToken);
     }
@@ -864,9 +856,8 @@ internal sealed class CompilationAnalyzer
             var attrFieldName = attrArg.NameEquals.Name.ToString();
             if (attrFieldName == "ServiceLifetime")
             {
-                var identifierNameSyntax = (IdentifierNameSyntax)(
-                    (MemberAccessExpressionSyntax)attrArg.Expression
-                ).Name;
+                var identifierNameSyntax = (IdentifierNameSyntax)
+                    ((MemberAccessExpressionSyntax)attrArg.Expression).Name;
                 _configuredLifetimeSymbol = GetServiceLifetimeSymbol(
                     identifierNameSyntax,
                     semanticModel,
@@ -960,7 +951,7 @@ internal sealed class CompilationAnalyzer
                 null => null,
                 IFieldSymbol fieldSymbol => TryResolveNamespaceSymbol(fieldSymbol, semanticModel, cancellationToken),
                 IPropertySymbol propertySymbol
-                  => TryResolveNamespaceSymbol(propertySymbol, semanticModel, cancellationToken),
+                    => TryResolveNamespaceSymbol(propertySymbol, semanticModel, cancellationToken),
                 ILocalSymbol localSymbol => TryResolveNamespaceSymbol(localSymbol, semanticModel, cancellationToken),
                 _ => null
             };
@@ -1020,7 +1011,7 @@ internal sealed class CompilationAnalyzer
         {
             IFieldSymbol fieldSymbol => TryGetServiceLifetimeSymbol(fieldSymbol, semanticModel, cancellationToken),
             IPropertySymbol propertySymbol
-              => TryGetServiceLifetimeSymbol(propertySymbol, semanticModel, cancellationToken),
+                => TryGetServiceLifetimeSymbol(propertySymbol, semanticModel, cancellationToken),
             ILocalSymbol localSymbol => TryGetServiceLifetimeSymbol(localSymbol, semanticModel, cancellationToken),
             _ => null
         };

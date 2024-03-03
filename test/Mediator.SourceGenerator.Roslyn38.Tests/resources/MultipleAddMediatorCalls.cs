@@ -1,6 +1,6 @@
+using System;
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace Some.Nested.Types
 {

@@ -8,8 +8,8 @@ public sealed record SomeNotification(Guid Id) : INotification, MediatR.INotific
 
 public sealed class SomeHandlerClass
     : INotificationHandler<SomeNotification>,
-      MediatR.INotificationHandler<SomeNotification>,
-      IAsyncMessageHandler<SomeNotification>
+        MediatR.INotificationHandler<SomeNotification>,
+        IAsyncMessageHandler<SomeNotification>
 {
     public ValueTask Handle(SomeNotification notification, CancellationToken cancellationToken) => default;
 
@@ -61,18 +61,16 @@ public class NotificationBenchmarks
             },
             typeof(SomeHandlerClass).Assembly
         );
-        services.AddMessagePipe(
-            opts =>
+        services.AddMessagePipe(opts =>
+        {
+            opts.InstanceLifetime = ServiceLifetime switch
             {
-                opts.InstanceLifetime = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => InstanceLifetime.Singleton,
-                    ServiceLifetime.Scoped => InstanceLifetime.Scoped,
-                    ServiceLifetime.Transient => InstanceLifetime.Transient,
-                    _ => throw new InvalidOperationException(),
-                };
-            }
-        );
+                ServiceLifetime.Singleton => InstanceLifetime.Singleton,
+                ServiceLifetime.Scoped => InstanceLifetime.Scoped,
+                ServiceLifetime.Transient => InstanceLifetime.Transient,
+                _ => throw new InvalidOperationException(),
+            };
+        });
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)

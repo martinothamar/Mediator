@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests.Pipeline.ExceptionHandling;
 
@@ -11,14 +11,12 @@ public class MultipleHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<State>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler2<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<State>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler2<,>));
+        });
 
         var id = Guid.NewGuid();
 
@@ -124,7 +122,8 @@ public class MultipleHandlerTests
         }
     }
 
-    public interface ICreateable<TResponse> where TResponse : ICreateable<TResponse>
+    public interface ICreateable<TResponse>
+        where TResponse : ICreateable<TResponse>
     {
         static abstract TResponse Create(Guid id);
     }

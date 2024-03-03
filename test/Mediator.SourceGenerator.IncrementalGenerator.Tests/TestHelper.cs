@@ -1,13 +1,13 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.SourceGenerator.IncrementalGenerator.Tests;
 
@@ -26,8 +26,8 @@ public static class TestHelper
     };
 
     private static Assembly[] AssemblyReferencesForCodegen =>
-        AppDomain.CurrentDomain
-            .GetAssemblies()
+        AppDomain
+            .CurrentDomain.GetAssemblies()
             .Concat(ImportantAssemblies)
             .Distinct()
             .Where(a => !a.IsDynamic)

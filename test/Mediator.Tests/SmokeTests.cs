@@ -1,6 +1,6 @@
-using Mediator.Tests.TestTypes;
 using System;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
 
 namespace Mediator.Tests;
 

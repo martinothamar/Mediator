@@ -10,7 +10,8 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         string messageType,
         RequestMessageHandlerModel? handler,
         RequestMessageHandlerWrapperModel wrapperType
-    ) : base(symbol)
+    )
+        : base(symbol)
     {
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();

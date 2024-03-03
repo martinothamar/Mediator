@@ -1,8 +1,8 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Some.Nested.Types
 {

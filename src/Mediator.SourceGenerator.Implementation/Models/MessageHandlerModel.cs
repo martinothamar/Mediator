@@ -6,7 +6,8 @@ internal abstract record MessageHandlerModel : SymbolMetadataModel
 {
     private readonly int _typeArgumentsLength;
 
-    protected MessageHandlerModel(INamedTypeSymbol symbol, CompilationAnalyzer analyzer) : base(symbol)
+    protected MessageHandlerModel(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
+        : base(symbol)
     {
         ServiceLifetime = analyzer.ServiceLifetime;
         ServiceRegistrationBlock =

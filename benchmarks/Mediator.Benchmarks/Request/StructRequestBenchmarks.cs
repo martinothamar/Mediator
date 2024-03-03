@@ -24,8 +24,8 @@ public readonly struct SomeStructRequest : IRequest<SomeResponse>, MediatR.IRequ
 
 public sealed class SomeStructHandler
     : IRequestHandler<SomeStructRequest, SomeResponse>,
-      MediatR.IRequestHandler<SomeStructRequest, SomeResponse>,
-      IAsyncRequestHandler<SomeStructRequest, SomeResponse>
+        MediatR.IRequestHandler<SomeStructRequest, SomeResponse>,
+        IAsyncRequestHandler<SomeStructRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
@@ -82,18 +82,16 @@ public class StructRequestBenchmarks
             },
             typeof(SomeHandlerClass).Assembly
         );
-        services.AddMessagePipe(
-            opts =>
+        services.AddMessagePipe(opts =>
+        {
+            opts.InstanceLifetime = ServiceLifetime switch
             {
-                opts.InstanceLifetime = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => InstanceLifetime.Singleton,
-                    ServiceLifetime.Scoped => InstanceLifetime.Scoped,
-                    ServiceLifetime.Transient => InstanceLifetime.Transient,
-                    _ => throw new InvalidOperationException(),
-                };
-            }
-        );
+                ServiceLifetime.Singleton => InstanceLifetime.Singleton,
+                ServiceLifetime.Scoped => InstanceLifetime.Scoped,
+                ServiceLifetime.Transient => InstanceLifetime.Transient,
+                _ => throw new InvalidOperationException(),
+            };
+        });
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)

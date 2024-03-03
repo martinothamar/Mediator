@@ -1,11 +1,11 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using DICache = Mediator.Mediator.DICache;
 using LazyDICache = Mediator.Mediator.FastLazyValue<Mediator.Mediator.DICache>;
 
@@ -14,20 +14,16 @@ await Host.CreateDefaultBuilder()
         (context, logging) =>
         {
             logging.ClearProviders();
-            logging.AddSimpleConsole(
-                options =>
-                {
-                    options.SingleLine = true;
-                }
-            );
+            logging.AddSimpleConsole(options =>
+            {
+                options.SingleLine = true;
+            });
         }
     )
-    .ConfigureServices(
-        services =>
-        {
-            services.AddHostedService<Work>();
-        }
-    )
+    .ConfigureServices(services =>
+    {
+        services.AddHostedService<Work>();
+    })
     .Build()
     .RunAsync();
 

@@ -21,7 +21,7 @@ public sealed class SomeStructNotificationHandler : INotificationHandler<SomeStr
     internal static readonly ConcurrentBag<Guid> Ids = new();
     internal static readonly ConcurrentBag<long> Addresses = new();
 
-    unsafe public ValueTask Handle(SomeStructNotification notification, CancellationToken cancellationToken)
+    public unsafe ValueTask Handle(SomeStructNotification notification, CancellationToken cancellationToken)
     {
         var addr = *(long*)&notification;
         Ids.Add(notification.Id);

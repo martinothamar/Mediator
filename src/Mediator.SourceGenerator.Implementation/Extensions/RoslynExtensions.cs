@@ -16,12 +16,12 @@ public static class RoslynExtensions
         return symbol.ToDisplayString(
             new SymbolDisplayFormat(
                 withGlobalPrefix
-                  ? SymbolDisplayGlobalNamespaceStyle.Included
-                  : SymbolDisplayGlobalNamespaceStyle.Omitted,
+                    ? SymbolDisplayGlobalNamespaceStyle.Included
+                    : SymbolDisplayGlobalNamespaceStyle.Omitted,
                 SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
                 includeTypeParameters
-                  ? SymbolDisplayGenericsOptions.IncludeTypeParameters
-                  : SymbolDisplayGenericsOptions.None,
+                    ? SymbolDisplayGenericsOptions.IncludeTypeParameters
+                    : SymbolDisplayGenericsOptions.None,
                 miscellaneousOptions: miscOptions
             )
         );

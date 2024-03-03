@@ -1,7 +1,7 @@
-using Mediator.Tests.TestTypes;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests.ScopedLifetime;
 

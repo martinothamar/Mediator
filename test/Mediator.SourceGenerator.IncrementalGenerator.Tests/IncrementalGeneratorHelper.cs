@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
-using System.Linq;
 
 namespace Mediator.SourceGenerator.IncrementalGenerator.Tests;
 
@@ -30,7 +30,8 @@ internal static class IncrementalGeneratorHelper
         int outputIndex
     )
     {
-        var actualStepReason = runResult.TrackedSteps[stepName]
+        var actualStepReason = runResult
+            .TrackedSteps[stepName]
             .SelectMany(x => x.Outputs)
             .ElementAt(outputIndex)
             .Reason;

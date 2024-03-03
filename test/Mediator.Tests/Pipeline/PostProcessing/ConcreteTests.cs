@@ -1,8 +1,8 @@
-using Mediator.Tests.TestTypes;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests.Pipeline.PostProcessing;
 
@@ -11,14 +11,12 @@ public class ConcreteTests
     [Fact]
     public async Task Test_PostProcessor()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<PostProcessingState>();
-                services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePostProcessor>();
-                services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePostProcessor2>();
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<PostProcessingState>();
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePostProcessor>();
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>, TestMessagePostProcessor2>();
+        });
 
         var id = Guid.NewGuid();
         var queryId = Guid.NewGuid();

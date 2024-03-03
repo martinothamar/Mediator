@@ -4,7 +4,8 @@ internal sealed class NotificationMessage : SymbolMetadata<NotificationMessage>
 {
     private readonly HashSet<NotificationMessageHandler> _handlers;
 
-    public NotificationMessage(INamedTypeSymbol symbol, CompilationAnalyzer analyzer) : base(symbol, analyzer)
+    public NotificationMessage(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
+        : base(symbol, analyzer)
     {
         _handlers = new();
     }

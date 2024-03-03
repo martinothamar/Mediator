@@ -1,8 +1,8 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Some.Nested.Types
 {
@@ -12,12 +12,10 @@ namespace Some.Nested.Types
         {
             var services = new ServiceCollection();
 
-            services.AddMediator(
-                options =>
-                {
-                    options.Namespace = null;
-                }
-            );
+            services.AddMediator(options =>
+            {
+                options.Namespace = null;
+            });
 
             var serviceProvider = services.BuildServiceProvider();
 

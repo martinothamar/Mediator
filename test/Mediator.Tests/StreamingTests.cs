@@ -1,9 +1,9 @@
-using Mediator.Tests.TestTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
 
 namespace Mediator.Tests;
 
