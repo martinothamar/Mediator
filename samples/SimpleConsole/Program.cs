@@ -10,8 +10,8 @@ var services = new ServiceCollection();
 // We override the namespace in the "MediatorOptions" attribute above.
 services.AddMediator(options =>
 {
-    options.Namespace = null;
-    options.ServiceLifetime = ServiceLifetime.Transient;
+    options.Namespace = "SimpleConsole";
+    options.ServiceLifetime = ServiceLifetime.Singleton;
 });
 
 // Standard handlers are added by default, but we need to add pipeline steps manually.

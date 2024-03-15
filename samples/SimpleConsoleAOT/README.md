@@ -4,53 +4,39 @@ Just like SimpleConsole, but with [NativeAOT](https://github.com/dotnet/runtimel
 
 ### Build and run
 
-```pwsh
-PS C:\code\Mediator\samples\SimpleConsoleAOT> dotnet publish -r win-x64 -c release -o dist
-PS C:\code\Mediator\samples\SimpleConsoleAOT> .\dist\SimpleConsoleAOT.exe
+```sh
+$ dotnet publish -r linux-amd64 -c Release
+$ ./bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT
 1) Running logger handler
 2) Running ping validator
 3) Valid input!
 4) Returning pong!
 5) No error!
 -----------------------------------
-ID: 03a0053a-5411-43d6-9f79-c8c293b5e5fe
-Ping { Id = 03a0053a-5411-43d6-9f79-c8c293b5e5fe }
-Pong { Id = 03a0053a-5411-43d6-9f79-c8c293b5e5fe }
+ID: a6c58809-64ab-4c51-9801-f55cbacca3fe
+Ping { Id = a6c58809-64ab-4c51-9801-f55cbacca3fe }
+Pong { Id = a6c58809-64ab-4c51-9801-f55cbacca3fe }
 ```
 
 ### Comparison
 
-This comparison was done locally on my machine, and was pretty consistent.
-What we expect from AOT is faster startup time.
+Below the SimpleConsoleAOT project is benchmarked against SimpleConsole using [hyperfine](https://github.com/sharkdp/hyperfine).
 
-```pwsh
-PS C:\code\Mediator\samples\SimpleConsole> Measure-Command { .\dist\SimpleConsole.exe }
+```sh
+$ hyperfine './SimpleConsole/bin/Release/net8.0/linux-x64/publish/SimpleConsole' './SimpleCo
+nsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT'
+Benchmark 1: ./SimpleConsole/bin/Release/net8.0/linux-x64/publish/SimpleConsole
+  Time (mean ± σ):     100.0 ms ±  17.0 ms    [User: 32.9 ms, System: 9.1 ms]
+  Range (min … max):    71.6 ms … 136.4 ms    34 runs
 
+Benchmark 2: ./SimpleConsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT
+  Time (mean ± σ):       2.7 ms ±   0.4 ms    [User: 2.5 ms, System: 0.3 ms]
+  Range (min … max):     2.1 ms …   6.1 ms    941 runs
 
-Days              : 0
-Hours             : 0
-Minutes           : 0
-Seconds           : 0
-Milliseconds      : 127
-Ticks             : 1271741
-TotalDays         : 1,4719224537037E-06
-TotalHours        : 3,53261388888889E-05
-TotalMinutes      : 0,00211956833333333
-TotalSeconds      : 0,1271741
-TotalMilliseconds : 127,1741
+  Warning: Command took less than 5 ms to complete. Note that the results might be inaccurate because hyperfine can not calibrate the shell startup time much more precise than this limit. You can try to use the `-N`/`--shell=none` option to disable the shell completely.
+  Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet system without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
 
-PS C:\code\Mediator\samples\SimpleConsoleAOT> Measure-Command { .\dist\SimpleConsoleAOT.exe }
-
-
-Days              : 0
-Hours             : 0
-Minutes           : 0
-Seconds           : 0
-Milliseconds      : 20
-Ticks             : 200063
-TotalDays         : 2,31554398148148E-07
-TotalHours        : 5,55730555555556E-06
-TotalMinutes      : 0,000333438333333333
-TotalSeconds      : 0,0200063
-TotalMilliseconds : 20,0063
+Summary
+  ./SimpleConsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT ran
+   37.34 ± 8.09 times faster than ./SimpleConsole/bin/Release/net8.0/linux-x64/publish/SimpleConsole
 ```
