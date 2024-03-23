@@ -11,20 +11,36 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <DevelopmentDependency>true</DevelopmentDependency>
+
+    <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn41\Mediator.SourceGenerator.Roslyn41.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Implementation.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn40.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn41.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.1/cs" Visible="false" />
+    <Using Include="Microsoft.CodeAnalysis" />
+    <Using Include="Microsoft.CodeAnalysis.CSharp.Syntax" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.Tests" />
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.IncrementalGenerator.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Implementation\resources\**" />
+    <EmbeddedResource Include="Implementation\resources\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotNetVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
+
+    <PackageReference Include="Scriban" Version="5.4.6" IncludeAssets="Build" />
+
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.1.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
