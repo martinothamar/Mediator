@@ -1,9 +1,11 @@
+using System.Threading.Tasks;
+
 namespace Mediator.SourceGenerator.Tests;
 
 public sealed class LifetimeOptionTests
 {
     [Fact]
-    public void Test_No_Args()
+    public async Task Test_No_Args()
     {
         var source =
             @"
@@ -24,7 +26,7 @@ namespace Something
 ";
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {
@@ -36,7 +38,7 @@ namespace Something
     }
 
     [Fact]
-    public void Test_Transient_Lifetime_With_Named_Namespace_Arg()
+    public async Task Test_Transient_Lifetime_With_Named_Namespace_Arg()
     {
         var source =
             @"
@@ -57,7 +59,7 @@ namespace Something
 ";
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {

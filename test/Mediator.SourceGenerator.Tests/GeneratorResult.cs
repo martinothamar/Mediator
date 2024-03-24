@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 namespace Mediator.SourceGenerator.Tests;
 
 public sealed record GeneratorResult(
-    MediatorGenerator Generator,
+    IncrementalMediatorGenerator Generator,
     ImmutableArray<Diagnostic> Diagnostics,
     GeneratorDriverRunResult RunResult,
     Compilation OutputCompilation

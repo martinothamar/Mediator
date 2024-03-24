@@ -1,5 +1,4 @@
 using System;
-using Mediator.Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.MemAllocationTests;
@@ -14,7 +13,9 @@ public class NotificationTests
 
         services.AddMediator();
 
-        using var sp = services.BuildServiceProvider(validateScopes: true);
+        using var sp = services.BuildServiceProvider(
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+        );
         var mediator = sp.GetRequiredService<IMediator>();
 
         var id = Guid.NewGuid();

@@ -7,7 +7,7 @@ namespace Mediator.SourceGenerator.Tests;
 public sealed class ReportingTests
 {
     [Fact]
-    public void Test_Empty_Program()
+    public async Task Test_Empty_Program()
     {
         var inputCompilation = Fixture.CreateLibrary(
             @"
@@ -23,7 +23,7 @@ namespace MyCode
 "
         );
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {
@@ -39,7 +39,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("DeepNamespaceProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("StaticNestedHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("AbstractHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutErrorDiagnostics,
             result =>
             {
@@ -71,21 +71,12 @@ namespace MyCode
     }
 
     [Fact]
-    public async Task Test_Streaming_Program()
-    {
-        var source = await Fixture.SourceFromResourceFile("StreamingProgram.cs");
-        var inputCompilation = Fixture.CreateLibrary(source);
-
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
-    }
-
-    [Fact]
     public async Task Test_Duplicate_Handlers()
     {
         var source = await Fixture.SourceFromResourceFile("DuplicateHandlersProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -100,7 +91,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("StructHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -114,12 +105,21 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_Multiple_AddMediator_Calls()
+    {
+        var source = await Fixture.SourceFromResourceFile("MultipleAddMediatorCalls.cs");
+        var inputCompilation = Fixture.CreateLibrary(source);
+
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
     public async Task Test_Multiple_Errors()
     {
         var source = await Fixture.SourceFromResourceFile("MultipleErrorsProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -135,7 +135,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("NoMessagesProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("NullNamespaceVariable.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -153,7 +153,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("ByteArrayResponseProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("IntCastLifetime.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -177,7 +177,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("ConfigurationConflictProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -192,7 +192,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("ConstVariablesConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(Assertions.CompilesWithoutDiagnostics);
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
@@ -201,7 +201,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("LocalLiteralVariableConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {
@@ -218,7 +218,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("LocalVariablesReferencingConstsConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {
@@ -235,7 +235,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("InvalidVariablesConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -250,7 +250,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("UnassignedVariablesConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -264,7 +264,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("UnassignedNamespaceVariableConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -278,7 +278,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("UnassignedLifetimeVariableConfig.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(result =>
+        await inputCompilation.AssertAndVerify(result =>
         {
             Assertions.AssertCommon(result);
 
@@ -293,7 +293,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("RequestWithoutHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutErrorDiagnostics,
             result =>
             {
@@ -311,7 +311,7 @@ namespace MyCode
         var source = await Fixture.SourceFromResourceFile("NotificationWithoutHandlerProgram.cs");
         var inputCompilation = Fixture.CreateLibrary(source);
 
-        inputCompilation.AssertGen(
+        await inputCompilation.AssertAndVerify(
             Assertions.CompilesWithoutErrorDiagnostics,
             result =>
             {

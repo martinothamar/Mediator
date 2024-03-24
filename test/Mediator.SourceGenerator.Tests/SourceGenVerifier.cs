@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.Testing;
 public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
     where TSourceGenerator : IIncrementalGenerator, new()
 {
-    public static Task VerifySolution(string source)
+    public static Task VerifySolution(string source, OutputKind outputKind = OutputKind.DynamicallyLinkedLibrary)
     {
         var test = new Test
         {
@@ -45,6 +45,9 @@ public static class CSharpSourceGeneratorVerifier<TSourceGenerator>
                         "System.Threading",
                         "System.Threading.Tasks"
                     );
+
+                    compilationOptions = compilationOptions!.WithScriptClassName("Program");
+
                     solution = solution.AddMetadataReferences(
                         projectId,
                         refs.Select(l => MetadataReference.CreateFromFile(l)).ToImmutableArray()

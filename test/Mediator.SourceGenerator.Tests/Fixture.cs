@@ -30,7 +30,22 @@ public static class Fixture
             .Where(a => !a.IsDynamic)
             .ToArray();
 
-    public static Compilation CreateLibrary(params string[] source)
+    public static DirectoryInfo GetSolutionDirectoryInfo()
+    {
+        var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        Assert.NotNull(currentDir);
+        var directory = new DirectoryInfo(currentDir);
+        for (int i = 0; i < 10 && directory is not null && !directory.GetFiles("Mediator.sln").Any(); i++)
+            directory = directory.Parent;
+        if (directory is null)
+            throw new InvalidOperationException("Could not find solution directory");
+        return directory;
+    }
+
+    public static CSharpCompilation CreateLibrary(params string[] source) =>
+        CreateLibrary(source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray());
+
+    public static CSharpCompilation CreateLibrary(params SyntaxTree[] source)
     {
         var references = new List<MetadataReference>();
         var assemblies = AssemblyReferencesForCodegen;
@@ -44,7 +59,7 @@ public static class Fixture
 
         var compilation = CSharpCompilation.Create(
             "compilation",
-            source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray(),
+            source,
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
@@ -52,19 +67,12 @@ public static class Fixture
         return compilation;
     }
 
-    public static Task VerifyGenerator(string source)
+    public static async Task<string> SourceFromResourceFile(string file)
     {
-        var compilation = CreateLibrary(source);
+        var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        Assert.NotNull(currentDir);
+        var resourcesDir = Path.Combine(currentDir, "resources");
 
-        var generator = new MediatorGenerator();
-        var driver = CSharpGeneratorDriver.Create(generator);
-
-        var ranDriver = driver.RunGenerators(compilation);
-        var verify = VerifyXunit.Verifier.Verify(ranDriver);
-
-        return verify.ToTask();
+        return await File.ReadAllTextAsync(Path.Combine(resourcesDir, file));
     }
-
-    public static Task<string> SourceFromResourceFile(string file) =>
-        File.ReadAllTextAsync(Path.Combine("resources", file));
 }

@@ -1,14 +1,19 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using VerifyXunit;
 
 namespace Mediator.SourceGenerator.Tests;
 
 public static class AssertExtensions
 {
-    public static void AssertGen(this Compilation inputCompilation, params Action<GeneratorResult>[] assertionDelegates)
+    public static async Task AssertAndVerify(
+        this Compilation inputCompilation,
+        params Action<GeneratorResult>[] assertionDelegates
+    )
     {
-        var generator = new MediatorGenerator();
+        var generator = new IncrementalMediatorGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
@@ -24,5 +29,7 @@ public static class AssertExtensions
 
         foreach (var assertions in assertionDelegates)
             assertions(result);
+
+        await Verifier.Verify(driver);
     }
 }

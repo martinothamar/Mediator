@@ -21,7 +21,9 @@ public static class Fixture
 
         configureServices?.Invoke(services);
 
-        IServiceProvider sp = services.BuildServiceProvider(validateScopes: true);
+        IServiceProvider sp = services.BuildServiceProvider(
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+        );
 
         var shouldCreateScope = createScope.HasValue ? createScope.Value : CreateServiceScope;
         if (shouldCreateScope)

@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: MSG0002,
+      Title: MediatorGenerator invalid handler,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (0,0)-(0,0),
+      MessageFormat: MediatorGenerator found invalid handler type {0},
+      Message: MediatorGenerator found invalid handler type PingHandler,
+      Category: MediatorGenerator
+    },
+    {
+      Id: MSG0005,
+      Title: MediatorGenerator message warning,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (0,0)-(0,0),
+      MessageFormat: MediatorGenerator found message without any registered handler: {0},
+      Message: MediatorGenerator found message without any registered handler: Ping,
+      Category: MediatorGenerator
+    }
+  ]
+}
