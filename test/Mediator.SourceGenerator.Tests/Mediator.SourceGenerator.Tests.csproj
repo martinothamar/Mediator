@@ -47,9 +47,6 @@
     <None Include="_snapshots\*.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\..\samples\SimpleConsole\Program.cs" Link="resources\SimpleConsoleProgram.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

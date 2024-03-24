@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Mediator.SourceGenerator.IncrementalGenerator.Tests;
+namespace Mediator.SourceGenerator.Tests.Incremental;
 
 internal record IncrementalGeneratorRunReasons(
     IncrementalStepRunReason BuildMediatorStep,

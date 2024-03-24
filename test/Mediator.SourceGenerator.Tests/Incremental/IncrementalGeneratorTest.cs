@@ -1,39 +1,38 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp;
-using static Mediator.SourceGenerator.IncrementalGenerator.Tests.IncrementalGeneratorHelper;
 
-namespace Mediator.SourceGenerator.IncrementalGenerator.Tests;
+namespace Mediator.SourceGenerator.Tests.Incremental;
 
 public class IncrementalGeneratorTest
 {
-    private const string DefaultProgram = "SimpleConsoleProgram.cs";
+    private const string DefaultProgram = "ConsoleProgram.cs";
     private const string StructHandlerProgram = "StructHandlerProgram.cs";
     private const string LocalVariableProgram = "LocalLiteralVariableConfig.cs";
 
     [Fact]
     public async Task Test_Add_Unrelated_Type_Doesnt_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(DefaultProgram);
+        var source = await Fixture.SourceFromResourceFile(DefaultProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
+        TestHelper.AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         var compilation2 = compilation1.AddSyntaxTrees(CSharpSyntaxTree.ParseText("struct MyValue {}"));
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
     }
 
     [Fact]
     public async Task Test_Appending_Unrelated_Type_Doesnt_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(DefaultProgram);
+        var source = await Fixture.SourceFromResourceFile(DefaultProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
         var newTree = syntaxTree.WithRootAndOptions(
@@ -43,19 +42,19 @@ public class IncrementalGeneratorTest
 
         var compilation2 = compilation1.ReplaceSyntaxTree(compilation1.SyntaxTrees.First(), newTree);
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
     }
 
     [Fact]
     public async Task Test_Small_Change_To_Request_Doesnt_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(DefaultProgram);
+        var source = await Fixture.SourceFromResourceFile(DefaultProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
+        TestHelper.AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         // only change body, don't change the name or request type
         var compilation2 = TestHelper.ReplaceMemberDeclaration(
@@ -64,19 +63,19 @@ public class IncrementalGeneratorTest
             "public sealed record Ping(Guid Id) : IRequest<Pong> { }"
         );
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
     }
 
     [Fact]
     public async Task Test_Modify_Handler_Does_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(DefaultProgram);
+        var source = await Fixture.SourceFromResourceFile(DefaultProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
+        TestHelper.AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         // change handler name
         var newHandler =
@@ -90,19 +89,19 @@ public class IncrementalGeneratorTest
         var compilation2 = TestHelper.ReplaceMemberDeclaration(compilation1, "PingHandler", newHandler);
 
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
     }
 
     [Fact]
     public async Task Test_Fixing_Handler_Does_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(StructHandlerProgram);
+        var source = await Fixture.SourceFromResourceFile(StructHandlerProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
+        TestHelper.AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         // change handler type from struct to class
         var newHandler =
@@ -116,44 +115,44 @@ public class IncrementalGeneratorTest
         var compilation2 = TestHelper.ReplaceMemberDeclaration(compilation1, "PingHandler", newHandler);
 
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Modified);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Modified);
     }
 
     [Fact]
     public async Task Test_Changing_Lifetime_Does_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(LocalVariableProgram);
+        var source = await Fixture.SourceFromResourceFile(LocalVariableProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
+        TestHelper.AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         // change lifetime via a variable
         var newHandler = "var lifetime = ServiceLifetime.Singleton;";
         var compilation2 = TestHelper.ReplaceLocalDeclaration(compilation1, "lifetime", newHandler);
 
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
     }
 
     [Fact]
     public async Task Test_Changing_Namespace_Does_Regenerate()
     {
-        var source = await TestHelper.SourceFromResourceFile(LocalVariableProgram);
+        var source = await Fixture.SourceFromResourceFile(LocalVariableProgram);
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.CreateLibrary(syntaxTree);
+        var compilation1 = Fixture.CreateLibrary(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
+        TestHelper.AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         // change namespace via a variable
         var newHandler = "var ns = \"SomeOtherNamespace\";";
         var compilation2 = TestHelper.ReplaceLocalDeclaration(compilation1, "ns", newHandler);
 
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
+        TestHelper.AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
     }
 }

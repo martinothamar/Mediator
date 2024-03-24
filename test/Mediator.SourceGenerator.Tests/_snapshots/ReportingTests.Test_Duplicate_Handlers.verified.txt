@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: MSG0001,
+      Title: MediatorGenerator multiple handlers,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (0,0)-(0,0),
+      MessageFormat: MediatorGenerator found multiple handlers of message type {0},
+      Message: MediatorGenerator found multiple handlers of message type DuplicatePingHandler,
+      Category: MediatorGenerator
+    }
+  ]
+}

@@ -1,61 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator.SourceGenerator.IncrementalGenerator.Tests;
+namespace Mediator.SourceGenerator.Tests.Incremental;
 
-public static class TestHelper
+internal static class TestHelper
 {
     private static readonly GeneratorDriverOptions EnableIncrementalTrackingDriverOptions =
         new(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
 
-    private static readonly Assembly[] ImportantAssemblies = new[]
-    {
-        typeof(object).Assembly,
-        typeof(IMessage).Assembly,
-        typeof(ServiceLifetime).Assembly,
-        typeof(ServiceProvider).Assembly,
-        typeof(MulticastDelegate).Assembly
-    };
-
-    private static Assembly[] AssemblyReferencesForCodegen =>
-        AppDomain
-            .CurrentDomain.GetAssemblies()
-            .Concat(ImportantAssemblies)
-            .Distinct()
-            .Where(a => !a.IsDynamic)
-            .ToArray();
-
-    public static CSharpCompilation CreateLibrary(params SyntaxTree[] source)
-    {
-        var references = new List<MetadataReference>();
-        var assemblies = AssemblyReferencesForCodegen;
-        foreach (Assembly assembly in assemblies)
-        {
-            if (!assembly.IsDynamic)
-            {
-                references.Add(MetadataReference.CreateFromFile(assembly.Location));
-            }
-        }
-
-        var compilation = CSharpCompilation.Create(
-            "compilation",
-            source.Select(s => s).ToArray(),
-            references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-        );
-
-        return compilation;
-    }
-
-    public static GeneratorDriver GenerateTracked(Compilation compilation)
+    internal static GeneratorDriver GenerateTracked(Compilation compilation)
     {
         var generator = new IncrementalMediatorGenerator();
 
@@ -66,10 +22,7 @@ public static class TestHelper
         return driver.RunGenerators(compilation);
     }
 
-    public static Task<string> SourceFromResourceFile(string file) =>
-        File.ReadAllTextAsync(Path.Combine("resources", file));
-
-    public static CSharpCompilation ReplaceMemberDeclaration(
+    internal static CSharpCompilation ReplaceMemberDeclaration(
         CSharpCompilation compilation,
         string memberName,
         string newMember
@@ -89,7 +42,7 @@ public static class TestHelper
         return compilation.ReplaceSyntaxTree(compilation.SyntaxTrees.First(), newTree);
     }
 
-    public static CSharpCompilation ReplaceLocalDeclaration(
+    internal static CSharpCompilation ReplaceLocalDeclaration(
         CSharpCompilation compilation,
         string variableName,
         string newDeclaration
@@ -108,5 +61,37 @@ public static class TestHelper
         var newTree = syntaxTree.WithRootAndOptions(newRoot, syntaxTree.Options);
 
         return compilation.ReplaceSyntaxTree(compilation.SyntaxTrees.First(), newTree);
+    }
+
+    internal static void AssertRunReasons(
+        GeneratorDriver driver,
+        IncrementalGeneratorRunReasons reasons,
+        int outputIndex = 0
+    )
+    {
+        var runResult = driver.GetRunResult().Results[0];
+
+        AssertRunReason(
+            runResult,
+            MediatorGeneratorStepName.ReportDiagnostics,
+            reasons.ReportDiagnosticsStep,
+            outputIndex
+        );
+        AssertRunReason(runResult, MediatorGeneratorStepName.BuildMediator, reasons.BuildMediatorStep, outputIndex);
+    }
+
+    private static void AssertRunReason(
+        GeneratorRunResult runResult,
+        string stepName,
+        IncrementalStepRunReason expectedStepReason,
+        int outputIndex
+    )
+    {
+        var actualStepReason = runResult
+            .TrackedSteps[stepName]
+            .SelectMany(x => x.Outputs)
+            .ElementAt(outputIndex)
+            .Reason;
+        actualStepReason.Should().Be(expectedStepReason, $"step {stepName} of mediator at index {outputIndex}");
     }
 }

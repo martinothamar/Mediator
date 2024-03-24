@@ -274,7 +274,7 @@ services.AddMediator(options =>
 In this section we will get started with Mediator and go through a sample
 illustrating the various ways the Mediator pattern can be used in an application.
 
-See the full runnable sample code in the [SimpleEndToEnd sample](/samples/SimpleEndToEnd/).
+See the full runnable sample code in the [Showcase sample](/samples/Showcase/).
 
 ### 4.1. Add package
 
