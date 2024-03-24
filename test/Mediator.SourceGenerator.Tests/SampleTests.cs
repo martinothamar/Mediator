@@ -53,27 +53,27 @@ public sealed class SampleTests
 
     [Fact]
     public async Task Test_ASPNET_Core_CleanArchitecture_Sample() =>
-        await Test("ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj");
+        await Test("apps/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj");
 
     [Fact]
     public async Task Test_InternalMessages_Sample() =>
-        await Test("InternalMessages/InternalMessages.Api/InternalMessages.Api.csproj");
+        await Test("apps/InternalMessages/InternalMessages.Api/InternalMessages.Api.csproj");
 
     [Fact]
     public async Task Test_ASPNET_Core_Indirect_Sample() =>
-        await Test("ASPNET_Core_Indirect/AspNetCoreIndirect.Application/AspNetCoreIndirect.Application.csproj");
+        await Test("apps/ASPNET_Core_Indirect/AspNetCoreIndirect.Application/AspNetCoreIndirect.Application.csproj");
 
     [Fact]
-    public async Task Test_Console() => await Test("Console/Console.csproj");
+    public async Task Test_Console() => await Test("basic/Console/Console.csproj");
 
     [Fact]
-    public async Task Test_ConsoleAOT() => await Test("ConsoleAOT/ConsoleAOT.csproj");
+    public async Task Test_ConsoleAOT() => await Test("basic/ConsoleAOT/ConsoleAOT.csproj");
 
     [Fact]
-    public async Task Test_Notifications() => await Test("Notifications/Notifications.csproj");
+    public async Task Test_Notifications() => await Test("basic/Notifications/Notifications.csproj");
 
     [Fact]
-    public async Task Test_Streaming() => await Test("Streaming/Streaming.csproj");
+    public async Task Test_Streaming() => await Test("basic/Streaming/Streaming.csproj");
 
     [Fact]
     public async Task Test_Showcase() => await Test("Showcase/Showcase.csproj");

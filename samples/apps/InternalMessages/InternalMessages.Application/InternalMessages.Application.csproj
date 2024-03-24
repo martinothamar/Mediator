@@ -8,11 +8,14 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="InternalMessages.Api"/>
-    <InternalsVisibleTo Include="InternalMessages.Application"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
+    <ProjectReference Include="..\InternalMessages.Domain\InternalMessages.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
 
 
