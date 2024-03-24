@@ -1,4 +1,3 @@
-using MediatR;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -48,19 +47,11 @@ public class NotificationBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(
-            opts =>
-            {
-                _ = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => opts.AsSingleton(),
-                    ServiceLifetime.Scoped => opts.AsScoped(),
-                    ServiceLifetime.Transient => opts.AsTransient(),
-                    _ => throw new InvalidOperationException(),
-                };
-            },
-            typeof(SomeHandlerClass).Assembly
-        );
+        services.AddMediatR(opts =>
+        {
+            opts.Lifetime = ServiceLifetime;
+            opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
+        });
         services.AddMessagePipe(opts =>
         {
             opts.InstanceLifetime = ServiceLifetime switch
