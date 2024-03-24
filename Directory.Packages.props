@@ -21,7 +21,7 @@
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
 
     <!-- Roslyn / MSBuild -->
-    <PackageVersion Include="Microsoft.Build.Locator" Version="1.6.1" />
+    <PackageVersion Include="Microsoft.Build.Locator" Version="1.7.8" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.1.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
@@ -52,11 +52,10 @@
     <PackageVersion Include="xunit" Version="2.7.0" />
     <PackageVersion Include="xunit.assert" Version="2.7.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.1" />
-    <PackageVersion Include="JetBrains.DotMemoryUnit" Version="3.1.20200127.214830" />
-    <PackageVersion Include="Verify.Xunit" Version="23.2.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="JetBrains.DotMemoryUnit" Version="3.2.20220510" />
+    <PackageVersion Include="Verify.Xunit" Version="23.5.2" />
     <PackageVersion Include="Verify.DiffPlex" Version="2.3.0" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.2.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.24121.1" />
   </ItemGroup>
 </Project>
