@@ -91,7 +91,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreIndirect.Implemen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications", "samples\basic\Notifications\Notifications.csproj", "{78D25AC1-4DDD-4049-8B26-D287931905E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFac_DI", "samples\use-cases\AutoFac_DI\AutoFac_DI.csproj", "{FEF7708E-D94E-49D0-8B0F-3A60A4008F53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autofac_DI", "samples\use-cases\Autofac_DI\Autofac_DI.csproj", "{FEF7708E-D94E-49D0-8B0F-3A60A4008F53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InternalMessages", "InternalMessages", "{D7662382-63B6-4E3D-A6CE-8EC19E473265}"
 EndProject

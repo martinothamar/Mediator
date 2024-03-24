@@ -1,35 +1,33 @@
-## SimpleConsoleAOT
+## ConsoleAOT
 
-Just like SimpleConsole, but with [NativeAOT](https://github.com/dotnet/runtimelab/tree/feature/NativeAOT) enabled.
+Just like Console, but with [NativeAOT](https://github.com/dotnet/runtimelab/tree/feature/NativeAOT) enabled.
 
 ### Build and run
 
-```sh
-$ dotnet publish -r linux-amd64 -c Release
-$ ./bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT
+```console
+$ dotnet run
 1) Running logger handler
 2) Running ping validator
 3) Valid input!
 4) Returning pong!
 5) No error!
 -----------------------------------
-ID: a6c58809-64ab-4c51-9801-f55cbacca3fe
-Ping { Id = a6c58809-64ab-4c51-9801-f55cbacca3fe }
-Pong { Id = a6c58809-64ab-4c51-9801-f55cbacca3fe }
+ID: 2dded749-c651-49d3-b7b9-5669ce953c52
+Ping { Id = 2dded749-c651-49d3-b7b9-5669ce953c52 }
+Pong { Id = 2dded749-c651-49d3-b7b9-5669ce953c52 }
 ```
 
 ### Comparison
 
-Below the SimpleConsoleAOT project is benchmarked against SimpleConsole using [hyperfine](https://github.com/sharkdp/hyperfine).
+Below the ConsoleAOT project is benchmarked against Console using [hyperfine](https://github.com/sharkdp/hyperfine).
 
-```sh
-$ hyperfine './SimpleConsole/bin/Release/net8.0/linux-x64/publish/SimpleConsole' './SimpleCo
-nsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT'
-Benchmark 1: ./SimpleConsole/bin/Release/net8.0/linux-x64/publish/SimpleConsole
+```console
+$ hyperfine './Console/bin/Release/net8.0/linux-x64/publish/Console' './ConsoleAOT/bin/Release/net8.0/linux-x64/publish/ConsoleAOT'
+Benchmark 1: ./Console/bin/Release/net8.0/linux-x64/publish/Console
   Time (mean ± σ):     100.0 ms ±  17.0 ms    [User: 32.9 ms, System: 9.1 ms]
   Range (min … max):    71.6 ms … 136.4 ms    34 runs
 
-Benchmark 2: ./SimpleConsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT
+Benchmark 2: ./ConsoleAOT/bin/Release/net8.0/linux-x64/publish/ConsoleAOT
   Time (mean ± σ):       2.7 ms ±   0.4 ms    [User: 2.5 ms, System: 0.3 ms]
   Range (min … max):     2.1 ms …   6.1 ms    941 runs
 
@@ -37,6 +35,6 @@ Benchmark 2: ./SimpleConsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConso
   Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet system without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
 
 Summary
-  ./SimpleConsoleAOT/bin/Release/net8.0/linux-x64/publish/SimpleConsoleAOT ran
-   37.34 ± 8.09 times faster than ./SimpleConsole/bin/Release/net8.0/linux-x64/publish/SimpleConsole
+  ./ConsoleAOT/bin/Release/net8.0/linux-x64/publish/ConsoleAOT ran
+   37.34 ± 8.09 times faster than ./Console/bin/Release/net8.0/linux-x64/publish/Console
 ```

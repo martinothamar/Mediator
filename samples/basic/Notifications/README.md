@@ -4,13 +4,14 @@ Simple showcase of using notifications and various notification-handlers.
 
 ### Build and run
 
-```pwsh
+```console
 $ dotnet run
 Publishing!
 -----------------------------------
-CatchAllNotificationHandler - e9c1302b-0eab-4193-8445-ab70a93265d6
-ConcreteNotificationHandler - e9c1302b-0eab-4193-8445-ab70a93265d6
-GenericNotificationHandler`1 - e9c1302b-0eab-4193-8445-ab70a93265d6
+CatchAllNotificationHandler - 360412c0-e7cf-452c-97f3-0e4be166b26c
+ConcreteNotificationHandler - 360412c0-e7cf-452c-97f3-0e4be166b26c
+GenericNotificationHandler`1 - 360412c0-e7cf-452c-97f3-0e4be166b26c
 -----------------------------------
 Finished publishing!
 ```
+

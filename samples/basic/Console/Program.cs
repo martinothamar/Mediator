@@ -7,11 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Microsoft.Extensions.DependencyInjection" namespace.
-// We override the namespace in the "MediatorOptions" attribute above.
+// We override the namespace in the "MediatorOptions" object.
 services.AddMediator(options =>
 {
     options.Namespace = "SimpleConsole";
-    options.ServiceLifetime = ServiceLifetime.Singleton;
 });
 
 // Standard handlers are added by default, but we need to add pipeline steps manually.
