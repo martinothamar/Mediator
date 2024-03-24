@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using JetBrains.dotMemoryUnit;
 using JetBrains.dotMemoryUnit.Kernel;
-using Mediator.Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
@@ -36,7 +35,9 @@ public class RequestTests
 
         services.AddMediator();
 
-        await using var sp = services.BuildServiceProvider(validateScopes: true);
+        await using var sp = services.BuildServiceProvider(
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+        );
         var mediator = sp.GetRequiredService<Mediator>();
 
         var id = Guid.NewGuid();
@@ -77,7 +78,9 @@ public class RequestTests
 
         services.AddMediator();
 
-        using var sp = services.BuildServiceProvider(validateScopes: true);
+        using var sp = services.BuildServiceProvider(
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+        );
         var mediator = sp.GetRequiredService<IMediator>();
 
         var id = Guid.NewGuid();

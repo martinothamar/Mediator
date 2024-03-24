@@ -1,6 +1,6 @@
 using System;
 
-namespace Mediator.Tests.Common;
+namespace Mediator.MemAllocationTests;
 
 public static class Allocations
 {

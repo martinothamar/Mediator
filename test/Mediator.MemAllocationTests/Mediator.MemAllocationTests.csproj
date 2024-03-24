@@ -32,7 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
-    <ProjectReference Include="..\Mediator.Tests.Common\Mediator.Tests.Common.csproj" />
   </ItemGroup>
 
 </Project>

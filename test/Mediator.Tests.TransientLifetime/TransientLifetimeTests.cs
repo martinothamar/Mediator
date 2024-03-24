@@ -39,7 +39,11 @@ public sealed class TransientLifetimeTests
 
         services.AddMediator();
 
-        await using (var sp = services.BuildServiceProvider(validateScopes: true))
+        await using (
+            var sp = services.BuildServiceProvider(
+                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+            )
+        )
         {
             await using (var scope = sp.CreateAsyncScope())
             {
@@ -74,7 +78,11 @@ public sealed class TransientLifetimeTests
 
         services.AddMediator();
 
-        await using (var sp = services.BuildServiceProvider(validateScopes: true))
+        await using (
+            var sp = services.BuildServiceProvider(
+                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+            )
+        )
         {
             var mediator = sp.GetRequiredService<IMediator>();
 
