@@ -1,11 +1,11 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using DICache = Mediator.Mediator.DICache;
 using LazyDICache = Mediator.Mediator.FastLazyValue<Mediator.Mediator.DICache>;
 
@@ -14,20 +14,16 @@ await Host.CreateDefaultBuilder()
         (context, logging) =>
         {
             logging.ClearProviders();
-            logging.AddSimpleConsole(
-                options =>
-                {
-                    options.SingleLine = true;
-                }
-            );
+            logging.AddSimpleConsole(options =>
+            {
+                options.SingleLine = true;
+            });
         }
     )
-    .ConfigureServices(
-        services =>
-        {
-            services.AddHostedService<Work>();
-        }
-    )
+    .ConfigureServices(services =>
+    {
+        services.AddHostedService<Work>();
+    })
     .Build()
     .RunAsync();
 
@@ -62,7 +58,7 @@ public sealed class Work : BackgroundService
                 threads[i] = Task.Run(Thread);
 
             start.SetResult();
-            var values = await Task.WhenAll(threads).ConfigureAwait(false);
+            var values = await Task.WhenAll(threads);
             var states = values.Select(v => v.State).ToArray();
             var firstHandlers = values.Select(v => v.Cache.Wrapper_For_Request).ToArray();
             var firstHandler = firstHandlers[0];
@@ -96,7 +92,7 @@ public sealed class Work : BackgroundService
 
             async Task<(DICache Cache, long State)> Thread()
             {
-                await start.Task.ConfigureAwait(false);
+                await start.Task;
 
                 return mediator._diCacheLazy.ValueInstrumented;
             }

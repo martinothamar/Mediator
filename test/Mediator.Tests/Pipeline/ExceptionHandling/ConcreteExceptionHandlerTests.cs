@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests.Pipeline.ExceptionHandling;
 
@@ -10,13 +10,11 @@ public class ConcreteExceptionHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            services =>
-            {
-                services.AddSingleton<State>();
-                services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<State>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ExceptionHandler<,>));
+        });
 
         var id = Guid.NewGuid();
 
@@ -56,7 +54,8 @@ public class ConcreteExceptionHandlerTests
         }
     }
 
-    public interface ICreateable<TResponse> where TResponse : ICreateable<TResponse>
+    public interface ICreateable<TResponse>
+        where TResponse : ICreateable<TResponse>
     {
         static abstract TResponse Create(Guid id);
     }

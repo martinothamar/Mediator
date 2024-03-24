@@ -1,6 +1,7 @@
 namespace Mediator;
 
-public interface IStreamPipelineBehavior<TMessage, TResponse> where TMessage : IStreamMessage
+public interface IStreamPipelineBehavior<TMessage, TResponse>
+    where TMessage : IStreamMessage
 {
     IAsyncEnumerable<TResponse> Handle(
         TMessage message,

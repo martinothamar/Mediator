@@ -1,0 +1,62 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Benchmarking -->
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
+
+    <!-- Other libs -->
+    <PackageVersion Include="MediatR" Version="12.2.0" />
+    <PackageVersion Include="MessagePipe" Version="1.7.4" />
+
+    <!-- BCL -->
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotNetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(DotNetVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(DotNetVersion)" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(DotNetVersion)" />
+    <PackageVersion Include="System.Collections.Immutable" Version="$(DotNetVersion)" />
+    <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
+
+    <!-- Roslyn / MSBuild -->
+    <PackageVersion Include="Microsoft.Build.Locator" Version="1.6.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
+    <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
+
+    <!-- Templating -->
+    <PackageVersion Include="Scriban" Version="5.4.6" />
+
+    <!-- Build -->
+    <GlobalPackageReference Include="CSharpier.MsBuild" Version="0.27.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </GlobalPackageReference>
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.4.255" />
+    <PackageVersion Include="DotNet.ReproducibleBuilds" Version="1.1.1" />
+
+    <!-- NuGet -->
+    <PackageVersion Include="NuGet.ProjectModel" Version="6.9.1" />
+    <PackageVersion Include="NuGet.Frameworks" Version="6.9.1" />
+    <PackageVersion Include="NuGet.Packaging" Version="6.9.1" />
+
+    <!-- Testing -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageVersion Include="Fixie.TestAdapter" Version="3.2.0" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="xunit" Version="2.7.0" />
+    <PackageVersion Include="xunit.assert" Version="2.7.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.7" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.1" />
+    <PackageVersion Include="JetBrains.DotMemoryUnit" Version="3.1.20200127.214830" />
+    <PackageVersion Include="Verify.Xunit" Version="23.2.2" />
+    <PackageVersion Include="Verify.DiffPlex" Version="2.3.0" />
+    <PackageVersion Include="Verify.SourceGenerators" Version="2.2.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.2-beta1.24121.1" />
+  </ItemGroup>
+</Project>

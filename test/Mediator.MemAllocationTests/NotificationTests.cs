@@ -1,6 +1,6 @@
+using System;
 using Mediator.Tests.Common;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace Mediator.MemAllocationTests;
 
@@ -27,7 +27,6 @@ public class NotificationTests
         mediator.Publish(notification); // Everything returns sync
         var afterBytes = Allocations.GetCurrentThreadAllocatedBytes();
 
-        // TODO: why 40? benchmarkdotnet reports 0 alloc for this case
-        Assert.Equal(40, afterBytes - beforeBytes);
+        Assert.Equal(0, afterBytes - beforeBytes);
     }
 }

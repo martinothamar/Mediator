@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests;
 
@@ -66,6 +66,8 @@ public static class Fixture
         {
             if (serviceType == typeof(IServiceProvider))
                 return this;
+            if (serviceType == typeof(IServiceProviderIsService))
+                return null;
 
             if (serviceType.IsConstructedGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
@@ -84,7 +86,7 @@ public static class Fixture
                 ?? _services.FirstOrDefault(s => s.ServiceType.IsAssignableTo(serviceType));
 
             if (descriptor is null)
-                throw new Exception("Service not found");
+                throw new Exception($"Service not found: {serviceType}");
 
             var result =
                 descriptor.ImplementationInstance
@@ -107,9 +109,9 @@ public static class Fixture
 
     private sealed class CustomServiceProviderScope
         : IServiceScope,
-          IServiceProvider,
-          IAsyncDisposable,
-          IServiceScopeFactory
+            IServiceProvider,
+            IAsyncDisposable,
+            IServiceScopeFactory
     {
         public CustomServiceProviderScope(CustomServiceProvider provider, bool isRootScope)
         {

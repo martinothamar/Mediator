@@ -25,15 +25,12 @@ public class GetWeatherForecastHandler : ApplicationHandler<GetWeatherForecast, 
     {
         IReadOnlyList<WeatherForecast> result = Enumerable
             .Range(1, request.Count)
-            .Select(
-                index =>
-                    new WeatherForecast
-                    {
-                        Date = DateTime.Now.AddDays(index),
-                        TemperatureC = Random.Shared.Next(-20, 55),
-                        Summary = _summaries[Random.Shared.Next(_summaries.Length)]
-                    }
-            )
+            .Select(index => new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = _summaries[Random.Shared.Next(_summaries.Length)]
+            })
             .ToArray();
 
         return ValueTask.FromResult(result);

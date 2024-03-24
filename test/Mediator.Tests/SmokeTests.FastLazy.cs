@@ -31,7 +31,7 @@ public partial class SmokeTests
         }
 
         start.SetResult();
-        var values = await Task.WhenAll(threads).ConfigureAwait(false);
+        var values = await Task.WhenAll(threads);
         var states = values.Select(v => v.State).ToArray();
 
         Assert.DoesNotContain(LazyDICache.INVALID, states);
@@ -44,7 +44,7 @@ public partial class SmokeTests
 
         async Task<(DICache Cache, long State)> Thread()
         {
-            await start.Task.ConfigureAwait(false);
+            await start.Task;
 
             return concrete._diCacheLazy.ValueInstrumented;
         }

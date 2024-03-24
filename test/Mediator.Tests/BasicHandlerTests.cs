@@ -1,8 +1,8 @@
-using Mediator.Tests.TestTypes;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
+using Microsoft.Extensions.DependencyInjection;
 using static Mediator.Tests.OpenConstrainedGenericsTests;
 
 namespace Mediator.Tests;
@@ -248,7 +248,7 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    unsafe public void Test_StructCommand_Handler()
+    public unsafe void Test_StructCommand_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
@@ -259,13 +259,15 @@ public class BasicHandlerTests
 
         var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
         Assert.NotNull(commandHandler);
+#pragma warning disable xUnit1031
         mediator.Send(command).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
     }
 
     [Fact]
-    unsafe public void Test_StructCommand_Handler_Concrete()
+    public unsafe void Test_StructCommand_Handler_Concrete()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
@@ -275,7 +277,9 @@ public class BasicHandlerTests
         var addr = *(long*)&command;
 
         var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
+#pragma warning disable xUnit1031
         concrete.Send(command).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
     }
@@ -297,7 +301,7 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    unsafe public void Test_Struct_Notification_Handler()
+    public unsafe void Test_Struct_Notification_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
@@ -313,7 +317,9 @@ public class BasicHandlerTests
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
 
+#pragma warning disable xUnit1031
         concrete.Publish(notification).GetAwaiter().GetResult();
+#pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
         //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
     }
@@ -445,21 +451,16 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Remove_NotificationHandler()
     {
-        var (sp, mediator) = Fixture.GetMediator(
-            sc =>
-            {
-                var sds = sc.Where(
-                    static a =>
-                        a.ImplementationFactory is { } implFac
-                        && implFac.Method.IsGenericMethod
-                        && implFac.Method
-                            .GetGenericArguments()
-                            .Any(static b => b.Name == nameof(SomeNotificationHandler))
-                );
-                var sd = Assert.Single(sds);
-                sc.Remove(sd);
-            }
-        );
+        var (sp, mediator) = Fixture.GetMediator(sc =>
+        {
+            var sds = sc.Where(static a =>
+                a.ImplementationFactory is { } implFac
+                && implFac.Method.IsGenericMethod
+                && implFac.Method.GetGenericArguments().Any(static b => b.Name == nameof(SomeNotificationHandler))
+            );
+            var sd = Assert.Single(sds);
+            sc.Remove(sd);
+        });
 
         var id = Guid.NewGuid();
 

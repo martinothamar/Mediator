@@ -1,13 +1,15 @@
 using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator")]
-
 var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Mediator" namespace by default.
 // We override the namespace in the "MediatorOptions" attribute above.
-services.AddMediator();
+services.AddMediator(options =>
+{
+    options.Namespace = "SimpleConsoleAOT";
+    options.ServiceLifetime = ServiceLifetime.Singleton;
+});
 
 // Standard handlers are added by default, but we need to add pipeline steps manually.
 // Here are two examples.

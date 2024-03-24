@@ -11,20 +11,40 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <DevelopmentDependency>true</DevelopmentDependency>
+
+    <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn38\Mediator.SourceGenerator.Roslyn38.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <ProjectReference Include="..\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" IncludeAssets="none" PrivateAssets="none" ExcludeAssets="all" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Implementation.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn38.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs" Visible="false" />
-    <None Include="$(OutputPath)\Mediator.SourceGenerator.Roslyn40.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0/cs" Visible="false" />
+    <Using Include="Microsoft.CodeAnalysis" />
+    <Using Include="Microsoft.CodeAnalysis.CSharp.Syntax" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotNetVersion)" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.Tests" />
+    <InternalsVisibleTo Include="Mediator.SourceGenerator.IncrementalGenerator.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Implementation\resources\**" />
+    <EmbeddedResource Include="Implementation\resources\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+
+    <PackageReference Include="Scriban" IncludeAssets="Build" />
+
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CSharp" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,8 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Mediator\Mediator.csproj" />
-    <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator.Implementation\Mediator.SourceGenerator.Implementation.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator.Roslyn40\Mediator.SourceGenerator.Roslyn40.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\AspNetCoreSample.Domain\AspNetCoreSample.Domain.csproj" />
   </ItemGroup>
 

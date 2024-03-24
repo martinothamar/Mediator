@@ -1,7 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using AspNetCoreSample.Domain;
 using FluentValidation;
 using Mediator;
-using System.Diagnostics.CodeAnalysis;
 
 namespace AspNetCoreSample.Application;
 

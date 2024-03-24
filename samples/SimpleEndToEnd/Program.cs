@@ -1,9 +1,9 @@
-using Mediator;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 

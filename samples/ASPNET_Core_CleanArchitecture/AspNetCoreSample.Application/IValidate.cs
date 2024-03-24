@@ -1,5 +1,5 @@
-using Mediator;
 using System.Diagnostics.CodeAnalysis;
+using Mediator;
 
 namespace AspNetCoreSample.Application;
 

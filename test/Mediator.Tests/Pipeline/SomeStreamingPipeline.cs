@@ -1,7 +1,7 @@
-using Mediator.Tests.TestTypes;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Mediator.Tests.TestTypes;
 
 namespace Mediator.Tests.Pipeline;
 

@@ -1,4 +1,3 @@
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.Request;
@@ -7,7 +6,7 @@ public sealed record SomeStreamRequest(Guid Id) : IStreamRequest<SomeResponse>, 
 
 public sealed class SomeStreamHandlerClass
     : IStreamRequestHandler<SomeStreamRequest, SomeResponse>,
-      MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
+        MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
@@ -54,19 +53,11 @@ public class StreamingBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(
-            opts =>
-            {
-                _ = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => opts.AsSingleton(),
-                    ServiceLifetime.Scoped => opts.AsScoped(),
-                    ServiceLifetime.Transient => opts.AsTransient(),
-                    _ => throw new InvalidOperationException(),
-                };
-            },
-            typeof(SomeHandlerClass).Assembly
-        );
+        services.AddMediatR(opts =>
+        {
+            opts.Lifetime = ServiceLifetime;
+            opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
+        });
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)

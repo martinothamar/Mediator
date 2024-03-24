@@ -30,23 +30,23 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '6.0.x'
-        include-prerelease: true
+        dotnet-version: '8.0.x'
+        include-prerelease: false
 
     - name: Restore dependencies
-      run: dotnet restore Mediator.sln
+      run: dotnet restore
 
     - name: Build
-      run: dotnet build Mediator.sln --no-restore -c Release
+      run: dotnet build --no-restore -c Release
 
     - name: Test
-      run: dotnet test Mediator.sln --no-build --verbosity normal -c Release -f net6.0
+      run: dotnet test --no-restore --verbosity normal -c Release
 
     - name: Pack
       if: ${{ success() && !github.base_ref }}
       run: |
-        dotnet pack src/Mediator/Mediator.csproj --no-build --verbosity normal -c Release -o artifacts/ && \
-        dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-build --verbosity normal -c Release -o artifacts/
+        dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
+        dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
     - name: Push to NuGet
       if: ${{ success() && !github.base_ref }}

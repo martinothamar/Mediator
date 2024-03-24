@@ -1,6 +1,6 @@
-using Mediator.Tests.TestTypes;
 using System;
 using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
 
 namespace Mediator.Tests;
 
@@ -33,16 +33,16 @@ public partial class SmokeTests
         }
 
         start.SetResult();
-        await Task.WhenAll(threads).ConfigureAwait(false);
+        await Task.WhenAll(threads);
 
         async Task Thread()
         {
-            await start.Task.ConfigureAwait(false);
+            await start.Task;
 
             const int count = 1000;
             for (int i = 0; i < count; i++)
             {
-                var response = await concrete.Send(message).ConfigureAwait(false);
+                var response = await concrete.Send(message);
                 Assert.Equal(id, response.Id);
             }
         }

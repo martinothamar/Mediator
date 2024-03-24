@@ -1,4 +1,3 @@
-using MediatR;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,8 +9,8 @@ public sealed record SomeResponse(Guid Id);
 
 public sealed class SomeHandlerClass
     : IRequestHandler<SomeRequest, SomeResponse>,
-      MediatR.IRequestHandler<SomeRequest, SomeResponse>,
-      IAsyncRequestHandler<SomeRequest, SomeResponse>
+        MediatR.IRequestHandler<SomeRequest, SomeResponse>,
+        IAsyncRequestHandler<SomeRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
 
@@ -53,31 +52,21 @@ public class RequestBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(
-            opts =>
+        services.AddMediatR(opts =>
+        {
+            opts.Lifetime = ServiceLifetime;
+            opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
+        });
+        services.AddMessagePipe(opts =>
+        {
+            opts.InstanceLifetime = ServiceLifetime switch
             {
-                _ = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => opts.AsSingleton(),
-                    ServiceLifetime.Scoped => opts.AsScoped(),
-                    ServiceLifetime.Transient => opts.AsTransient(),
-                    _ => throw new InvalidOperationException(),
-                };
-            },
-            typeof(SomeHandlerClass).Assembly
-        );
-        services.AddMessagePipe(
-            opts =>
-            {
-                opts.InstanceLifetime = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => InstanceLifetime.Singleton,
-                    ServiceLifetime.Scoped => InstanceLifetime.Scoped,
-                    ServiceLifetime.Transient => InstanceLifetime.Transient,
-                    _ => throw new InvalidOperationException(),
-                };
-            }
-        );
+                ServiceLifetime.Singleton => InstanceLifetime.Singleton,
+                ServiceLifetime.Scoped => InstanceLifetime.Scoped,
+                ServiceLifetime.Transient => InstanceLifetime.Transient,
+                _ => throw new InvalidOperationException(),
+            };
+        });
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)

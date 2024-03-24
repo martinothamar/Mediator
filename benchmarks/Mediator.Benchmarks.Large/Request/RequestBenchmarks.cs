@@ -1,4 +1,3 @@
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.Request;
@@ -9,7 +8,7 @@ public sealed record SomeResponse(Guid Id);
 
 public sealed class SomeHandlerClass
     : IRequestHandler<SomeRequest, SomeResponse>,
-      MediatR.IRequestHandler<SomeRequest, SomeResponse>
+        MediatR.IRequestHandler<SomeRequest, SomeResponse>
 {
     private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
     private static ValueTask<SomeResponse> _vtResponse => new ValueTask<SomeResponse>(_response);
@@ -47,19 +46,11 @@ public class RequestBenchmarks
     {
         var services = new ServiceCollection();
         services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
-        services.AddMediatR(
-            opts =>
-            {
-                _ = ServiceLifetime switch
-                {
-                    ServiceLifetime.Singleton => opts.AsSingleton(),
-                    ServiceLifetime.Scoped => opts.AsScoped(),
-                    ServiceLifetime.Transient => opts.AsTransient(),
-                    _ => throw new InvalidOperationException(),
-                };
-            },
-            typeof(SomeHandlerClass).Assembly
-        );
+        services.AddMediatR(opts =>
+        {
+            opts.Lifetime = ServiceLifetime;
+            opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
+        });
 
         _serviceProvider = services.BuildServiceProvider();
         if (ServiceLifetime == ServiceLifetime.Scoped)
