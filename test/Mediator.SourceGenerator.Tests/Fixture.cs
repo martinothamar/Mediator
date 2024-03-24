@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
-using VerifyXunit;
 
 namespace Mediator.SourceGenerator.Tests;
 
@@ -34,11 +32,11 @@ public static class Fixture
 
     public static DirectoryInfo GetSolutionDirectoryInfo()
     {
-        var directory = new DirectoryInfo(Directory.GetCurrentDirectory()) ?? throw new InvalidOperationException();
+        var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        Assert.NotNull(currentDir);
+        var directory = new DirectoryInfo(currentDir);
         for (int i = 0; i < 10 && directory is not null && !directory.GetFiles("Mediator.sln").Any(); i++)
-        {
             directory = directory.Parent;
-        }
         if (directory is null)
             throw new InvalidOperationException("Could not find solution directory");
         return directory;
@@ -61,25 +59,12 @@ public static class Fixture
 
         var compilation = CSharpCompilation.Create(
             "compilation",
-            source.Select(s => s).ToArray(),
+            source,
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
         return compilation;
-    }
-
-    public static Task VerifyGenerator(string source)
-    {
-        var compilation = CreateLibrary(source);
-
-        var generator = new IncrementalMediatorGenerator();
-        var driver = CSharpGeneratorDriver.Create(generator);
-
-        var ranDriver = driver.RunGenerators(compilation);
-        var verify = Verifier.Verify(ranDriver);
-
-        return verify.ToTask();
     }
 
     public static async Task<string> SourceFromResourceFile(string file)
