@@ -60,18 +60,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(
-                typeof(global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong>),
-                sp =>
-                {
-                    return new global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong>(
-                        sp.GetRequiredService<global::PingHandler>(),
-                        sp.GetServices<global::Mediator.IStreamPipelineBehavior<global::StreamPing, global::Pong>>()
-                    );
-                },
-                global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
-            ));
 
 
 
@@ -84,6 +72,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
 
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            static global::System.Func<global::System.IServiceProvider, T> GetRequiredService<T>() where T : notnull => sp => sp.GetRequiredService<T>();
         }
     }
 }
@@ -528,7 +518,11 @@ namespace Mediator
         {
             private readonly global::System.IServiceProvider _sp;
 
-            public readonly global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong> Wrapper_For_StreamPing;
+            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[] Handlers_For_TestCode_RoundSucceededActually;
+            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[] Handlers_For_TestCode_RoundSucceeded;
+            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[] Handlers_For_TestCode_RoundResulted;
+            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[] Handlers_For_TestCode_RoundCreated;
+            public readonly global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[] Handlers_For_TestCode_DomainEvent;
 
             public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
 
@@ -537,29 +531,18 @@ namespace Mediator
                 _sp = sp;
 
 
-                Wrapper_For_StreamPing = sp.GetRequiredService<global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong>>();
 
+                Handlers_For_TestCode_RoundSucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>>().ToArray();
+                Handlers_For_TestCode_RoundSucceeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>>().ToArray();
+                Handlers_For_TestCode_RoundResulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>>().ToArray();
+                Handlers_For_TestCode_RoundCreated = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>>().ToArray();
+                Handlers_For_TestCode_DomainEvent = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>>().ToArray();
 
 
                 InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
             }
         }
 
-        /// <summary>
-        /// Send a message of type global::StreamPing.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// </summary>
-        /// <param name="message">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Collections.Generic.IAsyncEnumerable<global::Pong> CreateStream(
-            global::StreamPing message,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(message, nameof(message));
-            return _diCacheLazy.Value.Wrapper_For_StreamPing.Handle(message, cancellationToken);
-        }
 
         /// <summary>
         /// Send request.
@@ -610,19 +593,8 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
-            {
-                case global::StreamPing r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::Pong>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                default:
-                {
-                    ThrowInvalidStreamRequest(request, nameof(request));
-                    return default;
-                }
-            }
+            ThrowInvalidStreamRequest(request, nameof(request));
+            return default;
         }
 
         /// <summary>
@@ -763,18 +735,8 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (message)
-            {
-                case global::StreamPing m:
-				{
-                    return CreateStream(m, cancellationToken);
-                }
-                default:
-                {
-                    ThrowInvalidStreamMessage(message, nameof(message));
-                    return default;
-                }
-            }
+            ThrowInvalidStreamMessage(message, nameof(message));
+            return default;
         }
 
         /// <summary>
@@ -792,10 +754,196 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowInvalidNotification(notification, nameof(notification));
-            return default;
+            switch (notification)
+            {
+                case global::TestCode.RoundSucceededActually n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundSucceeded n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundResulted n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundCreated n: return Publish(n, cancellationToken);
+                case global::TestCode.DomainEvent n: return Publish(n, cancellationToken);
+                default:
+                {
+                    ThrowInvalidNotification(notification, nameof(notification));
+                    return default;
+                }
+            }
         }
 
+        /// <summary>
+        /// Send a notification of type global::TestCode.RoundSucceededActually.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.RoundSucceededActually notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+            
+
+            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundSucceededActually;
+
+            if (handlers.Length == 0)
+            {
+                return default;
+            }
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundSucceededActually>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundSucceededActually>(handler, handler.Handle);
+                execs[i] = exec;
+            }
+            return publisher.Publish(execs, notification, cancellationToken);
+
+        }
+        /// <summary>
+        /// Send a notification of type global::TestCode.RoundSucceeded.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.RoundSucceeded notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+            
+
+            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundSucceeded;
+
+            if (handlers.Length == 0)
+            {
+                return default;
+            }
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundSucceeded>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundSucceeded>(handler, handler.Handle);
+                execs[i] = exec;
+            }
+            return publisher.Publish(execs, notification, cancellationToken);
+
+        }
+        /// <summary>
+        /// Send a notification of type global::TestCode.RoundResulted.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.RoundResulted notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+            
+
+            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundResulted;
+
+            if (handlers.Length == 0)
+            {
+                return default;
+            }
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundResulted>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundResulted>(handler, handler.Handle);
+                execs[i] = exec;
+            }
+            return publisher.Publish(execs, notification, cancellationToken);
+
+        }
+        /// <summary>
+        /// Send a notification of type global::TestCode.RoundCreated.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.RoundCreated notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+            
+
+            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundCreated;
+
+            if (handlers.Length == 0)
+            {
+                return default;
+            }
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundCreated>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::TestCode.RoundCreated>(handler, handler.Handle);
+                execs[i] = exec;
+            }
+            return publisher.Publish(execs, notification, cancellationToken);
+
+        }
+        /// <summary>
+        /// Send a notification of type global::TestCode.DomainEvent.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.DomainEvent notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+            
+
+            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_DomainEvent;
+
+            if (handlers.Length == 0)
+            {
+                return default;
+            }
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::TestCode.DomainEvent>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::TestCode.DomainEvent>(handler, handler.Handle);
+                execs[i] = exec;
+            }
+            return publisher.Publish(execs, notification, cancellationToken);
+
+        }
 
         /// <summary>
         /// Publish notification.
@@ -812,8 +960,19 @@ namespace Mediator
         )
             where TNotification : global::Mediator.INotification
         {
-            ThrowInvalidNotification(notification, nameof(notification));
-            return default;
+            switch (notification)
+            {
+                case global::TestCode.RoundSucceededActually n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundSucceeded n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundResulted n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundCreated n: return Publish(n, cancellationToken);
+                case global::TestCode.DomainEvent n: return Publish(n, cancellationToken);
+                default:
+                {
+                    ThrowInvalidNotification(notification, nameof(notification));
+                    return default;
+                }
+            }
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]

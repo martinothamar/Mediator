@@ -76,6 +76,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
 
+
+            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             services.AddSingleton<Dummy>();
 
             return services;
@@ -526,11 +530,18 @@ namespace SimpleConsole
 
             public readonly global::SimpleConsole.RequestClassHandlerWrapper<global::Ping, global::Pong> Wrapper_For_Ping;
 
+            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
+
                 Wrapper_For_Ping = sp.GetRequiredService<global::SimpleConsole.RequestClassHandlerWrapper<global::Ping, global::Pong>>();
+
+
+
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
             }
         }
 

@@ -13,6 +13,7 @@ internal record CompilationModel
         ImmutableEquatableArray<RequestMessageHandlerModel> requestMessageHandlers,
         ImmutableEquatableArray<NotificationMessageHandlerModel> notificationMessageHandlers,
         ImmutableEquatableArray<RequestMessageHandlerWrapperModel> requestMessageHandlerWrappers,
+        NotificationPublisherTypeModel notificationPublisherType,
         bool hasErrors,
         string mediatorNamespace,
         string generatorVersion,
@@ -28,6 +29,7 @@ internal record CompilationModel
         _notificationMessages = notificationMessages;
         _requestMessageHandlers = requestMessageHandlers;
         _notificationMessageHandlers = notificationMessageHandlers;
+        NotificationPublisherType = notificationPublisherType;
         RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
         HasErrors = hasErrors;
         MediatorNamespace = mediatorNamespace;
@@ -47,6 +49,8 @@ internal record CompilationModel
     public IEnumerable<NotificationMessageModel> NotificationMessages => _notificationMessages;
 
     public IEnumerable<RequestMessageHandlerModel> RequestMessageHandlers => _requestMessageHandlers;
+
+    public NotificationPublisherTypeModel NotificationPublisherType { get; }
 
     public bool HasErrors { get; }
 

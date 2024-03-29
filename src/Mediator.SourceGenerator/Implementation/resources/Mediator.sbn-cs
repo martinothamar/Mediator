@@ -94,6 +94,14 @@ namespace Microsoft.Extensions.DependencyInjection
             {{ handler.OpenGenericServiceRegistrationBlock }}
             {{~ end ~}}
 
+            {{~ if ServiceLifetimeIsScoped || ServiceLifetimeIsTransient ~}}
+            services.Add(new SD(typeof({{ NotificationPublisherType.FullName }}), typeof({{ NotificationPublisherType.FullName }}), {{ ServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ ServiceLifetime }}));
+            {{ else }}
+            services.Add(new SD(typeof({{ NotificationPublisherType.FullName }}), typeof({{ NotificationPublisherType.FullName }}), {{ SingletonServiceLifetime }}));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
+
             services.AddSingleton<Dummy>();
 
             return services;
@@ -342,17 +350,34 @@ namespace {{ MediatorNamespace }}
             {{~ end ~}}
             {{~ end ~}}
 
+            {{~ if ServiceLifetimeIsSingleton ~}}
+            public readonly {{ NotificationPublisherType.FullName }} InternalNotificationPublisherImpl;
+            {{~ else ~}}
+            public {{ NotificationPublisherType.FullName }} InternalNotificationPublisherImpl
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                get => _sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+            }
+            {{~ end ~}}
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
                 {{~ if ServiceLifetimeIsSingleton ~}}
+
                 {{~ for message in RequestMessages ~}}
                 {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>();
                 {{~ end ~}}
+
                 {{~ for message in NotificationMessages ~}}
                 Handlers_For_{{ message.IdentifierFullName }} = sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>().ToArray();
                 {{~ end ~}}
+
+                {{~ end ~}}
+
+                {{~ if ServiceLifetimeIsSingleton ~}}
+                InternalNotificationPublisherImpl = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
                 {{~ end ~}}
             }
         }
@@ -863,101 +888,50 @@ namespace {{ MediatorNamespace }}
             {
                 return default;
             }
-            else if (handlers.Length == 1)
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<{{ message.FullName }}>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
             {
-                return handlers[0].Handle(notification, cancellationToken);
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<{{ message.FullName }}>(handler, handler.Handle);
+                execs[i] = exec;
             }
+            return publisher.Publish(execs, notification, cancellationToken);
 
-            return Publish(notification, handlers, cancellationToken);
-
-            async global::System.Threading.Tasks.ValueTask Publish({{ message.FullName }} notification, global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
-            }
             {{~ else ~}}
+            var publisher = _diCache.InternalNotificationPublisherImpl;
             if (handlers is global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlersArray)
             {
                 if (handlersArray.Length == 0)
                 {
                     return default;
                 }
-                else if (handlersArray.Length == 1)
+                var execs = new global::Mediator.NotificationHandlerExecutor<{{ message.FullName }}>[handlersArray.Length];
+                for (int i = 0; i < handlersArray.Length; i++)
                 {
-                    return handlersArray[0].Handle(notification, cancellationToken);
+                    var handler = handlersArray[i];
+                    var exec = new global::Mediator.NotificationHandlerExecutor<{{ message.FullName }}>(handler, handler.Handle);
+                    execs[i] = exec;
                 }
-
-                return PublishArr(notification, handlersArray, cancellationToken);
+                return publisher.Publish(execs, notification, cancellationToken);
             }
             else
             {
-                int count = 0;
+                var count = 0;
                 if (handlers == null || (count = _getServicesLength(handlers)) == 0)
                 {
                     return default;
                 }
-                else if (count == 1)
-                {
-                    return handlers.First().Handle(notification, cancellationToken);
-                }
-
-                return Publish(notification, handlers, cancellationToken);
-            }
-
-            async global::System.Threading.Tasks.ValueTask Publish({{ message.FullName }} notification, global::System.Collections.Generic.IEnumerable<global::Mediator.INotificationHandler<{{ message.FullName }}>> handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
+                var execs = new global::Mediator.NotificationHandlerExecutor<{{ message.FullName }}>[count];
+                count = 0;
                 foreach (var handler in handlers)
                 {
-                    try
-                    {
-                        await handler.Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
+                    var exec = new global::Mediator.NotificationHandlerExecutor<{{ message.FullName }}>(handler, handler.Handle);
+                    execs[count++] = exec;
                 }
-
-                MaybeThrowAggregateException(exceptions);
-            }
-            async global::System.Threading.Tasks.ValueTask PublishArr({{ message.FullName }} notification, global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
+                return publisher.Publish(execs, notification, cancellationToken);
             }
             {{~ end ~}}
         }

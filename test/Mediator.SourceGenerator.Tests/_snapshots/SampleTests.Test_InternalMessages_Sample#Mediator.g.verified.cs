@@ -78,6 +78,10 @@ namespace Microsoft.Extensions.DependencyInjection
                         services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>), GetRequiredService<global::InternalMessages.Application.PingPongedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
 
+
+            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             services.AddSingleton<Dummy>();
 
             return services;
@@ -531,12 +535,19 @@ namespace Mediator
             public readonly global::Mediator.RequestClassHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong> Wrapper_For_InternalMessages_Domain_Ping;
             public readonly global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>[] Handlers_For_InternalMessages_Domain_PingPonged;
 
+            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
+
                 Wrapper_For_InternalMessages_Domain_Ping = sp.GetRequiredService<global::Mediator.RequestClassHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>>();
+
                 Handlers_For_InternalMessages_Domain_PingPonged = sp.GetServices<global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>>().ToArray();
+
+
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
             }
         }
 
@@ -832,33 +843,18 @@ namespace Mediator
             {
                 return default;
             }
-            else if (handlers.Length == 1)
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::InternalMessages.Domain.PingPonged>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
             {
-                return handlers[0].Handle(notification, cancellationToken);
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::InternalMessages.Domain.PingPonged>(handler, handler.Handle);
+                execs[i] = exec;
             }
+            return publisher.Publish(execs, notification, cancellationToken);
 
-            return Publish(notification, handlers, cancellationToken);
-
-            async global::System.Threading.Tasks.ValueTask Publish(global::InternalMessages.Domain.PingPonged notification, global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
-            }
         }
 
         /// <summary>

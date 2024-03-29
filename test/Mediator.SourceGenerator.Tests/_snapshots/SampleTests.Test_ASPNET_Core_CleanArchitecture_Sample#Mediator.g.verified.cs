@@ -88,6 +88,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
 
+
+            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             services.AddSingleton<Dummy>();
 
             return services;
@@ -539,12 +543,19 @@ namespace Mediator
             public readonly global::Mediator.CommandClassHandlerWrapper<global::AspNetCoreSample.Application.AddTodoItem, global::AspNetCoreSample.Domain.TodoItem> Wrapper_For_AspNetCoreSample_Application_AddTodoItem;
             public readonly global::Mediator.QueryClassHandlerWrapper<global::AspNetCoreSample.Application.GetTodoItems, global::System.Collections.Generic.IEnumerable<global::AspNetCoreSample.Domain.TodoItem>> Wrapper_For_AspNetCoreSample_Application_GetTodoItems;
 
+            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
+
                 Wrapper_For_AspNetCoreSample_Application_AddTodoItem = sp.GetRequiredService<global::Mediator.CommandClassHandlerWrapper<global::AspNetCoreSample.Application.AddTodoItem, global::AspNetCoreSample.Domain.TodoItem>>();
                 Wrapper_For_AspNetCoreSample_Application_GetTodoItems = sp.GetRequiredService<global::Mediator.QueryClassHandlerWrapper<global::AspNetCoreSample.Application.GetTodoItems, global::System.Collections.Generic.IEnumerable<global::AspNetCoreSample.Domain.TodoItem>>>();
+
+
+
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
             }
         }
 

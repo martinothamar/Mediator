@@ -82,6 +82,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.Add(new SD(typeof(global::Mediator.INotificationHandler<>), typeof(global::GenericNotificationHandler<>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+
+            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             services.AddSingleton<Dummy>();
 
             return services;
@@ -536,13 +540,20 @@ namespace Mediator
             public readonly global::Mediator.INotificationHandler<global::ErrorMessage>[] Handlers_For_ErrorMessage;
             public readonly global::Mediator.INotificationHandler<global::SuccessfulMessage>[] Handlers_For_SuccessfulMessage;
 
+            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
+
                 Wrapper_For_Ping = sp.GetRequiredService<global::Mediator.RequestClassHandlerWrapper<global::Ping, global::Pong>>();
+
                 Handlers_For_ErrorMessage = sp.GetServices<global::Mediator.INotificationHandler<global::ErrorMessage>>().ToArray();
                 Handlers_For_SuccessfulMessage = sp.GetServices<global::Mediator.INotificationHandler<global::SuccessfulMessage>>().ToArray();
+
+
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
             }
         }
 
@@ -839,33 +850,18 @@ namespace Mediator
             {
                 return default;
             }
-            else if (handlers.Length == 1)
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::ErrorMessage>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
             {
-                return handlers[0].Handle(notification, cancellationToken);
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::ErrorMessage>(handler, handler.Handle);
+                execs[i] = exec;
             }
+            return publisher.Publish(execs, notification, cancellationToken);
 
-            return Publish(notification, handlers, cancellationToken);
-
-            async global::System.Threading.Tasks.ValueTask Publish(global::ErrorMessage notification, global::Mediator.INotificationHandler<global::ErrorMessage>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
-            }
         }
         /// <summary>
         /// Send a notification of type global::SuccessfulMessage.
@@ -889,33 +885,18 @@ namespace Mediator
             {
                 return default;
             }
-            else if (handlers.Length == 1)
+
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+
+            var execs = new global::Mediator.NotificationHandlerExecutor<global::SuccessfulMessage>[handlers.Length];
+            for (int i = 0; i < handlers.Length; i++)
             {
-                return handlers[0].Handle(notification, cancellationToken);
+                var handler = handlers[i];
+                var exec = new global::Mediator.NotificationHandlerExecutor<global::SuccessfulMessage>(handler, handler.Handle);
+                execs[i] = exec;
             }
+            return publisher.Publish(execs, notification, cancellationToken);
 
-            return Publish(notification, handlers, cancellationToken);
-
-            async global::System.Threading.Tasks.ValueTask Publish(global::SuccessfulMessage notification, global::Mediator.INotificationHandler<global::SuccessfulMessage>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
-            }
         }
 
         /// <summary>

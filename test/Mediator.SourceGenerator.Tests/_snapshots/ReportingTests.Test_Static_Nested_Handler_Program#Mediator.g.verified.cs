@@ -76,6 +76,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
 
+
+            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             services.AddSingleton<Dummy>();
 
             return services;
@@ -526,11 +530,18 @@ namespace Mediator
 
             public readonly global::Mediator.RequestClassHandlerWrapper<global::Some.Nested.Types.Program.Ping, global::Some.Nested.Types.Program.Pong> Wrapper_For_Some_Nested_Types_Program_Ping;
 
+            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
+
                 Wrapper_For_Some_Nested_Types_Program_Ping = sp.GetRequiredService<global::Mediator.RequestClassHandlerWrapper<global::Some.Nested.Types.Program.Ping, global::Some.Nested.Types.Program.Pong>>();
+
+
+
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
             }
         }
 

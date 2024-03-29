@@ -63,6 +63,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
 
+            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            
             services.AddSingleton<Dummy>();
 
             return services;
@@ -452,9 +455,16 @@ namespace SimpleConsole.Mediator
             private readonly global::System.IServiceProvider _sp;
 
 
+            public global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl
+            {
+                [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+                get => _sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+            }
+
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
+
 
             }
         }

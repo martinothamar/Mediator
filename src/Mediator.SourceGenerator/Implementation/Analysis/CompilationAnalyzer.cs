@@ -29,8 +29,11 @@ internal sealed class CompilationAnalyzer
     private INamedTypeSymbol[] _baseHandlerSymbols;
     private INamedTypeSymbol[] _baseMessageSymbols;
 
+    private INamedTypeSymbol? _notificationPublisherInterfaceSymbol;
     private INamedTypeSymbol? _notificationHandlerInterfaceSymbol;
     private INamedTypeSymbol? _notificationInterfaceSymbol;
+
+    private INamedTypeSymbol? _notificationPublisherImplementationSymbol;
 
     private bool HasErrors { get; set; }
 
@@ -100,8 +103,6 @@ internal sealed class CompilationAnalyzer
                 new RequestMessageHandlerWrapperModel("StreamQuery", this),
             }.ToImmutableArray();
 
-            _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
-
             TryLoadBaseMessageSymbols(out _baseMessageSymbols, out _notificationInterfaceSymbol);
         }
         catch (Exception ex)
@@ -166,6 +167,15 @@ internal sealed class CompilationAnalyzer
         {
             _baseHandlerSymbols = baseHandlerSymbols.Select(s => s.Symbol!).ToArray();
         }
+
+        _notificationHandlerInterfaceSymbol = _baseHandlerSymbols[_baseHandlerSymbols.Length - 1];
+
+        _notificationPublisherInterfaceSymbol = _context
+            .Compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.INotificationPublisher")
+            ?.OriginalDefinition;
+        _notificationPublisherImplementationSymbol = _context
+            .Compilation.GetTypeByMetadataName($"{Constants.MediatorLib}.ForeachAwaitPublisher")
+            ?.OriginalDefinition;
     }
 
     private void TryLoadDISymbols(
@@ -254,10 +264,30 @@ internal sealed class CompilationAnalyzer
         }
     }
 
+    private sealed class InheritanceComparer : IComparer<INamedTypeSymbol>
+    {
+        public int Compare(INamedTypeSymbol x, INamedTypeSymbol y)
+        {
+            while (x.BaseType is not null)
+            {
+                if (x.BaseType.ContainingNamespace.Name == "System" && x.BaseType.Name == "Object")
+                    break;
+
+                if (SymbolEqualityComparer.Default.Equals(x.BaseType, y))
+                    return -1;
+                x = x.BaseType;
+            }
+
+            return x.GetTypeSymbolFullName().CompareTo(y.GetTypeSymbolFullName());
+        }
+    }
+
     public CompilationModel ToModel()
     {
+        var comparer = new InheritanceComparer();
         var model = new CompilationModel(
             _requestMessages
+                .OrderBy(m => m.Symbol, comparer)
                 .Select(x => new RequestMessageModel(
                     x.Symbol,
                     x.ResponseSymbol,
@@ -266,10 +296,11 @@ internal sealed class CompilationAnalyzer
                     x.WrapperType
                 ))
                 .ToImmutableEquatableArray(),
-            _notificationMessages.Select(x => x.ToModel()).ToImmutableEquatableArray(),
+            _notificationMessages.OrderBy(m => m.Symbol, comparer).Select(x => x.ToModel()).ToImmutableEquatableArray(),
             _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
             _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
             RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
+            new NotificationPublisherTypeModel(_notificationPublisherImplementationSymbol!.GetTypeSymbolFullName()),
             HasErrors,
             MediatorNamespace,
             GeneratorVersion,
@@ -923,6 +954,38 @@ internal sealed class CompilationAnalyzer
             else if (assignment.Right is IdentifierNameSyntax identifier)
             {
                 _configuredLifetimeSymbol = GetServiceLifetimeSymbol(identifier, semanticModel, cancellationToken);
+            }
+            else
+            {
+                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                return false;
+            }
+        }
+        else if (opt == "NotificationPublisherType")
+        {
+            if (assignment.Right is TypeOfExpressionSyntax identifier)
+            {
+                var typeSymbol = semanticModel.GetTypeInfo(identifier.Type, cancellationToken).Type;
+                if (typeSymbol is null)
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return false;
+                }
+
+                if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return false;
+                }
+
+                // Check if namedTypeSymbol is assignable to handler
+                if (!Context.Compilation.HasImplicitConversion(namedTypeSymbol, _notificationPublisherInterfaceSymbol))
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return false;
+                }
+
+                _notificationPublisherImplementationSymbol = namedTypeSymbol;
             }
             else
             {

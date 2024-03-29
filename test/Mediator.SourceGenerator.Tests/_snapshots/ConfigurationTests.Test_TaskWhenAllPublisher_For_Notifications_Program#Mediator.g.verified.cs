@@ -60,25 +60,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(
-                typeof(global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong>),
-                sp =>
-                {
-                    return new global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong>(
-                        sp.GetRequiredService<global::PingHandler>(),
-                        sp.GetServices<global::Mediator.IStreamPipelineBehavior<global::StreamPing, global::Pong>>()
-                    );
-                },
-                global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
-            ));
 
 
 
 
 
-            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.TaskWhenAllPublisher), typeof(global::Mediator.TaskWhenAllPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.TaskWhenAllPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             services.AddSingleton<Dummy>();
 
@@ -528,38 +516,21 @@ namespace Mediator
         {
             private readonly global::System.IServiceProvider _sp;
 
-            public readonly global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong> Wrapper_For_StreamPing;
 
-            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+            public readonly global::Mediator.TaskWhenAllPublisher InternalNotificationPublisherImpl;
 
             public DICache(global::System.IServiceProvider sp)
             {
                 _sp = sp;
 
 
-                Wrapper_For_StreamPing = sp.GetRequiredService<global::Mediator.StreamRequestClassHandlerWrapper<global::StreamPing, global::Pong>>();
 
 
 
-                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.TaskWhenAllPublisher>();
             }
         }
 
-        /// <summary>
-        /// Send a message of type global::StreamPing.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// </summary>
-        /// <param name="message">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Collections.Generic.IAsyncEnumerable<global::Pong> CreateStream(
-            global::StreamPing message,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(message, nameof(message));
-            return _diCacheLazy.Value.Wrapper_For_StreamPing.Handle(message, cancellationToken);
-        }
 
         /// <summary>
         /// Send request.
@@ -610,19 +581,8 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
-            {
-                case global::StreamPing r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::Pong>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                default:
-                {
-                    ThrowInvalidStreamRequest(request, nameof(request));
-                    return default;
-                }
-            }
+            ThrowInvalidStreamRequest(request, nameof(request));
+            return default;
         }
 
         /// <summary>
@@ -763,18 +723,8 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (message)
-            {
-                case global::StreamPing m:
-				{
-                    return CreateStream(m, cancellationToken);
-                }
-                default:
-                {
-                    ThrowInvalidStreamMessage(message, nameof(message));
-                    return default;
-                }
-            }
+            ThrowInvalidStreamMessage(message, nameof(message));
+            return default;
         }
 
         /// <summary>
