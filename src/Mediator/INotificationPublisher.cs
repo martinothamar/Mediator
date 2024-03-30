@@ -203,7 +203,7 @@ public readonly struct NotificationHandlers<TNotification>
 
             var instances = (object[])_handlers._handlerInstances;
             var next = _index + 1;
-            if (next < instances.Length - 1)
+            if (next < instances.Length)
             {
                 _index = next;
                 return true;
