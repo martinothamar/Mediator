@@ -850,17 +850,32 @@ namespace Mediator
             {
                 return default;
             }
-
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+            if (handlers.Length == 1)
+            {
+                var ha = handlers[0];
+                global::System.Func<global::System.Object, global::ErrorMessage, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
+                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::ErrorMessage>>(i).Handle(n, ct);
+                return publisher.Publish(
+                    new global::Mediator.NotificationHandlers<global::ErrorMessage>(ha, f),
+                    notification,
+                    cancellationToken
+                );
+            }
 
-            var execs = new global::Mediator.NotificationHandlerExecutor<global::ErrorMessage>[handlers.Length];
+            var instances = new global::System.Object[handlers.Length];
+            var functions = new global::System.Func<global::System.Object, global::ErrorMessage, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
             for (int i = 0; i < handlers.Length; i++)
             {
                 var handler = handlers[i];
-                var exec = new global::Mediator.NotificationHandlerExecutor<global::ErrorMessage>(handler, handler.Handle);
-                execs[i] = exec;
+                instances[i] = handler;
+                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::ErrorMessage>>(i).Handle(n, ct);
             }
-            return publisher.Publish(execs, notification, cancellationToken);
+            return publisher.Publish(
+                new global::Mediator.NotificationHandlers<global::ErrorMessage>(instances, functions),
+                notification,
+                cancellationToken
+            );
 
         }
         /// <summary>
@@ -885,17 +900,32 @@ namespace Mediator
             {
                 return default;
             }
-
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+            if (handlers.Length == 1)
+            {
+                var ha = handlers[0];
+                global::System.Func<global::System.Object, global::SuccessfulMessage, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
+                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::SuccessfulMessage>>(i).Handle(n, ct);
+                return publisher.Publish(
+                    new global::Mediator.NotificationHandlers<global::SuccessfulMessage>(ha, f),
+                    notification,
+                    cancellationToken
+                );
+            }
 
-            var execs = new global::Mediator.NotificationHandlerExecutor<global::SuccessfulMessage>[handlers.Length];
+            var instances = new global::System.Object[handlers.Length];
+            var functions = new global::System.Func<global::System.Object, global::SuccessfulMessage, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
             for (int i = 0; i < handlers.Length; i++)
             {
                 var handler = handlers[i];
-                var exec = new global::Mediator.NotificationHandlerExecutor<global::SuccessfulMessage>(handler, handler.Handle);
-                execs[i] = exec;
+                instances[i] = handler;
+                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::SuccessfulMessage>>(i).Handle(n, ct);
             }
-            return publisher.Publish(execs, notification, cancellationToken);
+            return publisher.Publish(
+                new global::Mediator.NotificationHandlers<global::SuccessfulMessage>(instances, functions),
+                notification,
+                cancellationToken
+            );
 
         }
 
