@@ -21,6 +21,7 @@ public sealed class SomeHandlerClass
 }
 
 [MemoryDiagnoser]
+// [DotMemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 [RankColumn]
 //[EventPipeProfiler(EventPipeProfile.CpuSampling)]

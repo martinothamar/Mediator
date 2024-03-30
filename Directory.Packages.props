@@ -6,6 +6,7 @@
     <!-- Benchmarking -->
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
+    <PackageVersion Include="JetBrains.Profiler.SelfApi" Version="2.5.0" />
 
     <!-- Other libs -->
     <PackageVersion Include="MediatR" Version="12.2.0" />

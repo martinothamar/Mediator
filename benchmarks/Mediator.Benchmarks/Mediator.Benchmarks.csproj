@@ -37,6 +37,7 @@
     <PackageReference Include="NuGet.ProjectModel" />
     <PackageReference Include="NuGet.Frameworks" />
     <PackageReference Include="NuGet.Packaging" />
+    <PackageReference Include="JetBrains.Profiler.SelfApi" />
   </ItemGroup>
 
   <ItemGroup>
