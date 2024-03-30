@@ -21,7 +21,7 @@ public sealed class SomeHandlerClass
 }
 
 [MemoryDiagnoser]
-// [DotMemoryDiagnoser]
+[DotMemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 [RankColumn]
 //[EventPipeProfiler(EventPipeProfile.CpuSampling)]
@@ -99,27 +99,27 @@ public class NotificationBenchmarks
         return _mediatr.Publish(_notification, CancellationToken.None);
     }
 
-    [Benchmark]
-    public ValueTask SendNotification_IMediator()
-    {
-        return _mediator.Publish(_notification, CancellationToken.None);
-    }
+    // [Benchmark]
+    // public ValueTask SendNotification_IMediator()
+    // {
+    //     return _mediator.Publish(_notification, CancellationToken.None);
+    // }
 
-    [Benchmark]
-    public ValueTask SendNotification_Mediator()
-    {
-        return _concreteMediator.Publish(_notification, CancellationToken.None);
-    }
+    // [Benchmark]
+    // public ValueTask SendNotification_Mediator()
+    // {
+    //     return _concreteMediator.Publish(_notification, CancellationToken.None);
+    // }
 
-    [Benchmark]
-    public ValueTask SendNotification_MessagePipe()
-    {
-        return _messagePipePublisher.PublishAsync(_notification, CancellationToken.None);
-    }
+    // [Benchmark]
+    // public ValueTask SendNotification_MessagePipe()
+    // {
+    //     return _messagePipePublisher.PublishAsync(_notification, CancellationToken.None);
+    // }
 
-    [Benchmark(Baseline = true)]
-    public ValueTask SendNotification_Baseline()
-    {
-        return _handler.Handle(_notification, CancellationToken.None);
-    }
+    // [Benchmark(Baseline = true)]
+    // public ValueTask SendNotification_Baseline()
+    // {
+    //     return _handler.Handle(_notification, CancellationToken.None);
+    // }
 }

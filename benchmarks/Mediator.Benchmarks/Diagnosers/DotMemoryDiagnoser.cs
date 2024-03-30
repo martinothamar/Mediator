@@ -44,6 +44,8 @@ internal sealed class DotMemoryDiagnoser : IDiagnoser
     private readonly Uri? nugetUrl;
     private readonly string? toolsDownloadFolder;
 
+    private DotMemoryToolBase? tool;
+
     public DotMemoryDiagnoser(Uri? nugetUrl = null, string? toolsDownloadFolder = null)
     {
         this.nugetUrl = nugetUrl;
@@ -69,7 +71,8 @@ internal sealed class DotMemoryDiagnoser : IDiagnoser
         var logger = parameters.Config.GetCompositeLogger();
         if (isInProcess)
             throw new Exception("Inprocess not supported");
-        DotMemoryToolBase tool = new ExternalDotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
+
+        tool ??= new ExternalDotMemoryTool(logger, nugetUrl, downloadTo: toolsDownloadFolder);
 
         // var runtimeMoniker = job.Environment.Runtime.RuntimeMoniker;
         // if (!IsSupported(runtimeMoniker))
@@ -176,6 +179,8 @@ internal abstract class DotMemoryToolBase
     protected abstract void SaveData();
     protected abstract void Detach();
 
+    protected abstract void Snapshot(DiagnoserActionParameters parameters);
+
     public string Start(DiagnoserActionParameters parameters)
     {
         string snapshotFile = GetFilePath(parameters, "snapshots", DateTime.Now, "dmw", ".0000".Length);
@@ -225,6 +230,17 @@ internal abstract class DotMemoryToolBase
 
     public void Stop(DiagnoserActionParameters parameters)
     {
+        try
+        {
+            logger.WriteLineInfo("Taking DotMemory snapshot...");
+            Snapshot(parameters);
+            logger.WriteLineInfo("DotMemory snapshot is successfully taken");
+        }
+        catch (Exception e)
+        {
+            logger.WriteLineError(e.ToString());
+        }
+
         if (!AttachOnly)
         {
             try
@@ -334,6 +350,9 @@ file sealed class Progress : IProgress<double>
 file sealed class ExternalDotMemoryTool : DotMemoryToolBase
 {
     private static readonly TimeSpan AttachTimeout = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan SnapshotTimeout = TimeSpan.FromSeconds(10);
+    private Process? process;
+    private TaskCompletionSource<bool>? snapshotTask;
 
     public ExternalDotMemoryTool(
         ILogger logger,
@@ -363,11 +382,12 @@ file sealed class ExternalDotMemoryTool : DotMemoryToolBase
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true
+            RedirectStandardError = true,
+            RedirectStandardInput = true,
         };
 
         var attachWaitingTask = new TaskCompletionSource<bool>();
-        var process = new Process { StartInfo = processStartInfo };
+        this.process = new Process { StartInfo = processStartInfo };
         try
         {
             process.OutputDataReceived += (_, args) =>
@@ -375,16 +395,19 @@ file sealed class ExternalDotMemoryTool : DotMemoryToolBase
                 string? content = args.Data;
                 if (content != null)
                 {
-                    logger.WriteLineInfo("[DotMemory] " + content);
-                    if (content.Contains("##DotMemory[\"started\""))
+                    logger.WriteLineInfo("[dotMemory] " + content);
+                    if (content.Contains("##dotMemory[\"connected\""))
                         attachWaitingTask.TrySetResult(true);
+
+                    if (content.Contains("##dotMemory[\"snapshot-saved\""))
+                        snapshotTask?.TrySetResult(true);
                 }
             };
             process.ErrorDataReceived += (_, args) =>
             {
                 string? content = args.Data;
                 if (content != null)
-                    logger.WriteLineError("[DotMemory] " + args.Data);
+                    logger.WriteLineError("[dotMemory] " + args.Data);
             };
             process.Exited += (_, _) =>
             {
@@ -402,10 +425,27 @@ file sealed class ExternalDotMemoryTool : DotMemoryToolBase
 
         if (!attachWaitingTask.Task.Wait(AttachTimeout))
             throw new Exception(
-                $"Failed to attach DotMemory to the target process (timeout: {AttachTimeout.TotalSeconds} sec"
+                $"Failed to attach DotMemory to the target process (timeout: {AttachTimeout.TotalSeconds} sec)"
             );
         if (!attachWaitingTask.Task.Result)
             throw new Exception($"Failed to attach DotMemory to the target process (ExitCode={process.ExitCode})");
+    }
+
+    protected override void Snapshot(DiagnoserActionParameters parameters)
+    {
+        if (process is null)
+            throw new InvalidOperationException("Process is not attached");
+
+        int pid = parameters.Process.Id;
+
+        snapshotTask = new TaskCompletionSource<bool>();
+
+        // ##dotMemory["get-snapshot", {pid:50267}]
+        process.StandardInput.WriteLine($"##dotMemory[\"get-snapshot\", {{pid:{pid}}}]");
+        process.StandardInput.Flush();
+
+        if (!snapshotTask.Task.Wait(SnapshotTimeout))
+            throw new Exception($"Failed to create DotMemory snapshot (timeout: {SnapshotTimeout.TotalSeconds} sec)");
     }
 
     protected override void StartCollectingData() { }
