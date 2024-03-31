@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
     <PackageId>Mediator.Abstractions</PackageId>
     <IsPackable>true</IsPackable>
     <Description>
@@ -17,6 +17,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="PolySharp" Condition="'$(TargetFramework)' == 'netstandard2.0'">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
