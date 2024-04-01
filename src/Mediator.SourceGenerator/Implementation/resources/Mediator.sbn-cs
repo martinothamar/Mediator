@@ -889,98 +889,19 @@ namespace {{ MediatorNamespace }}
                 return default;
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            if (handlers.Length == 1)
-            {
-                var ha = handlers[0];
-                global::System.Func<global::System.Object, {{ message.FullName }}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>>(i).Handle(n, ct);
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<{{ message.FullName }}>(ha, f),
-                    notification,
-                    cancellationToken
-                );
-            }
-
-            var instances = new global::System.Object[handlers.Length];
-            var functions = new global::System.Func<global::System.Object, {{ message.FullName }}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var handler = handlers[i];
-                instances[i] = handler;
-                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>>(i).Handle(n, ct);
-            }
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(instances, functions),
+                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(handlers),
                 notification,
                 cancellationToken
             );
 
             {{~ else ~}}
             var publisher = _diCache.InternalNotificationPublisherImpl;
-            if (handlers is global::Mediator.INotificationHandler<{{ message.FullName }}>[] handlersArray)
-            {
-                if (handlersArray.Length == 0)
-                {
-                    return default;
-                }
-                if (handlersArray.Length == 1)
-                {
-                    var ha = handlersArray[0];
-                    global::System.Func<global::System.Object, {{ message.FullName }}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                        (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>>(i).Handle(n, ct);
-                    return publisher.Publish(
-                        new global::Mediator.NotificationHandlers<{{ message.FullName }}>(ha, f),
-                        notification,
-                        cancellationToken
-                    );
-                }
-                var instances = new global::System.Object[handlersArray.Length];
-                var functions = new global::System.Func<global::System.Object, {{ message.FullName }}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlersArray.Length];
-                for (int i = 0; i < handlersArray.Length; i++)
-                {
-                    var handler = handlersArray[i];
-                    instances[i] = handler;
-                    functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>>(i).Handle(n, ct);
-                }
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<{{ message.FullName }}>(instances, functions),
-                    notification,
-                    cancellationToken
-                );
-            }
-            else
-            {
-                var count = 0;
-                if (handlers == null || (count = _getServicesLength(handlers)) == 0)
-                {
-                    return default;
-                }
-                if (count == 1)
-                {
-                    var ha = handlers.First();
-                    global::System.Func<global::System.Object, {{ message.FullName }}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                        (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>>(i).Handle(n, ct);
-                    return publisher.Publish(
-                        new global::Mediator.NotificationHandlers<{{ message.FullName }}>(ha, f),
-                        notification,
-                        cancellationToken
-                    );
-                }
-                var instances = new global::System.Object[count];
-                var functions = new global::System.Func<global::System.Object, {{ message.FullName }}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[count];
-                count = 0;
-                foreach (var handler in handlers)
-                {
-                    instances[count] = handler;
-                    functions[count] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>>(i).Handle(n, ct);
-                    count++;
-                }
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<{{ message.FullName }}>(instances, functions),
-                    notification,
-                    cancellationToken
-                );
-            }
+            return publisher.Publish(
+                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(handlers),
+                notification,
+                cancellationToken
+            );
             {{~ end ~}}
         }
         {{~ end ~}}

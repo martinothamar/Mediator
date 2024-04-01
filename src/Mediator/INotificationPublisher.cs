@@ -14,7 +14,7 @@ public sealed class ForeachAwaitPublisher : INotificationPublisher
         where TNotification : INotification
     {
         if (handlers.IsSingleHandler(out var handler))
-            return handler.Method(handler.Instance, notification, cancellationToken);
+            return handler.Handle(notification, cancellationToken);
 
         return Publish(handlers, notification, cancellationToken);
 
@@ -29,7 +29,7 @@ public sealed class ForeachAwaitPublisher : INotificationPublisher
             {
                 try
                 {
-                    await handler.Method(handler.Instance, notification, cancellationToken);
+                    await handler.Handle(notification, cancellationToken);
                 }
                 catch (Exception ex)
                 {
@@ -53,27 +53,48 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
         where TNotification : INotification
     {
         if (handlers.IsSingleHandler(out var singleHandler))
-            return singleHandler.Method(singleHandler.Instance, notification, cancellationToken);
+            return singleHandler.Handle(notification, cancellationToken);
 
-        ValueTask[]? tasks = null;
-        var count = 0;
-
-        foreach (var handler in handlers)
+        if (handlers.IsArray(out var handlersArray))
         {
-            var task = handler.Method(handler.Instance, notification, cancellationToken);
-            if (task.IsCompletedSuccessfully)
-                continue;
+            ValueTask[]? tasks = null;
+            var count = 0;
 
-            tasks ??= new ValueTask[handlers.Length];
-            tasks[count++] = task;
+            foreach (var handler in handlersArray)
+            {
+                var task = handler.Handle(notification, cancellationToken);
+                if (task.IsCompletedSuccessfully)
+                    continue;
+
+                tasks ??= new ValueTask[handlersArray.Length];
+                tasks[count++] = task;
+            }
+
+            if (tasks is null)
+                return default;
+
+            return AwaitTaskArray(tasks, count);
+        }
+        else
+        {
+            List<ValueTask>? tasks = null;
+            foreach (var handler in handlers)
+            {
+                var task = handler.Handle(notification, cancellationToken);
+                if (task.IsCompletedSuccessfully)
+                    continue;
+
+                tasks ??= new List<ValueTask>(1);
+                tasks.Add(task);
+            }
+
+            if (tasks is null)
+                return default;
+
+            return AwaitTaskList(tasks);
         }
 
-        if (tasks is null)
-            return default;
-
-        return AwaitTasks(tasks, count);
-
-        static async ValueTask AwaitTasks(ValueTask[] tasks, int count)
+        static async ValueTask AwaitTaskArray(ValueTask[] tasks, int count)
         {
             List<Exception>? exceptions = null;
             for (int i = 0; i < count; i++)
@@ -92,74 +113,68 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
             if (exceptions is not null)
                 ThrowHelper.ThrowAggregateException(exceptions);
         }
+
+        static async ValueTask AwaitTaskList(List<ValueTask> tasks)
+        {
+            List<Exception>? exceptions = null;
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                try
+                {
+                    await tasks[i];
+                }
+                catch (Exception ex)
+                {
+                    exceptions ??= new List<Exception>(1);
+                    exceptions.Add(ex);
+                }
+            }
+
+            if (exceptions is not null)
+                ThrowHelper.ThrowAggregateException(exceptions);
+        }
     }
-}
-
-public readonly struct NotificationHandler<TNotification>(
-    object handlerInstance,
-    Func<object, TNotification, CancellationToken, ValueTask> handlerMethod
-)
-    where TNotification : INotification
-{
-    public readonly object Instance { get; } = handlerInstance;
-
-    public readonly Func<object, TNotification, CancellationToken, ValueTask> Method { get; } = handlerMethod;
 }
 
 public readonly struct NotificationHandlers<TNotification>
     where TNotification : INotification
 {
-    private readonly object _handlerInstances;
-    private readonly object _handlerMethods;
+    private readonly IEnumerable<INotificationHandler<TNotification>> _handlers;
+    private readonly bool _isArray;
 
-    public readonly int Length => _handlerInstances is object[] instances ? instances.Length : 1;
-
-    /// <summary>
-    /// Constructs a new instance of <see cref="NotificationHandlers{TNotification}"/>.
-    /// Should _NOT_ be used by user code, only by the generated code in the Mediator implementation.
-    /// </summary>
-    /// <param name="handlerInstance"></param>
-    /// <param name="handlerMethod"></param>
-    public NotificationHandlers(
-        object handlerInstance,
-        Func<object, TNotification, CancellationToken, ValueTask> handlerMethod
-    )
+    internal readonly bool IsArray([MaybeNullWhen(false)] out INotificationHandler<TNotification>[] handlers)
     {
-        _handlerInstances = handlerInstance;
-        _handlerMethods = handlerMethod;
-    }
-
-    /// <summary>
-    /// Constructs a new instance of <see cref="NotificationHandlers{TNotification}"/>.
-    /// Should _NOT_ be used by user code, only by the generated code in the Mediator implementation.
-    /// </summary>
-    /// <param name="handlerInstances"></param>
-    /// <param name="handlerMethods"></param>
-    public NotificationHandlers(
-        object[] handlerInstances,
-        Func<object, TNotification, CancellationToken, ValueTask>[] handlerMethods
-    )
-    {
-        if (handlerInstances.Length != handlerMethods.Length)
-            ThrowHelper.ThrowInvalidOperationException("Handler instances and methods must have the same length.");
-
-        _handlerInstances = handlerInstances;
-        _handlerMethods = handlerMethods;
-    }
-
-    public readonly bool IsSingleHandler([MaybeNullWhen(false)] out NotificationHandler<TNotification> handler)
-    {
-        if (_handlerInstances is not object[] instances)
+        if (_isArray)
         {
-            Debug.Assert(_handlerMethods is Func<object, TNotification, CancellationToken, ValueTask>);
-            handler = new NotificationHandler<TNotification>(
-                _handlerInstances,
-                Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>>(_handlerMethods)
-            );
+            Debug.Assert(_handlers is INotificationHandler<TNotification>[]);
+            handlers = Unsafe.As<INotificationHandler<TNotification>[]>(_handlers);
             return true;
         }
 
-        Debug.Assert(_handlerMethods is Func<object, TNotification, CancellationToken, ValueTask>[]);
+        handlers = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Constructs a new instance of <see cref="NotificationHandlers{TNotification}"/>.
+    /// Should _NOT_ be used by user code, only by the generated code in the Mediator implementation.
+    /// </summary>
+    /// <param name="handlers"></param>
+    public NotificationHandlers(IEnumerable<INotificationHandler<TNotification>> handlers)
+    {
+        _handlers = handlers;
+        if (handlers is INotificationHandler<TNotification>[])
+            _isArray = true;
+    }
+
+    public readonly bool IsSingleHandler([MaybeNullWhen(false)] out INotificationHandler<TNotification> handler)
+    {
+        if (IsArray(out var handlers) && handlers.Length == 1)
+        {
+            handler = handlers[0];
+            return true;
+        }
+
         handler = default;
         return false;
     }
@@ -168,81 +183,53 @@ public readonly struct NotificationHandlers<TNotification>
 
     public struct Enumerator
     {
-        private int _index;
         private readonly NotificationHandlers<TNotification> _handlers;
+        private IEnumerator<INotificationHandler<TNotification>>? _enumerator;
+        private int _index;
 
         internal Enumerator(in NotificationHandlers<TNotification> handlers)
         {
-            _index = -2;
+            _index = -1;
             _handlers = handlers;
         }
 
-        public readonly NotificationHandler<TNotification> Current
+        public readonly INotificationHandler<TNotification> Current
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                switch (_index)
+                switch (_handlers.IsArray(out var handlers))
                 {
-                    case -2:
-                        ThrowHelper.ThrowInvalidOperationException("Enumeration not started.");
-                        return default;
-                    case -1:
-                        Debug.Assert(
-                            _handlers._handlerMethods is Func<object, TNotification, CancellationToken, ValueTask>
-                        );
-                        return new NotificationHandler<TNotification>(
-                            _handlers._handlerInstances,
-                            Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>>(
-                                _handlers._handlerMethods
-                            )
-                        );
-                    default:
-                        Debug.Assert(_index >= 0);
-                        Debug.Assert(_handlers._handlerInstances is object[]);
-                        Debug.Assert(
-                            _handlers._handlerMethods is Func<object, TNotification, CancellationToken, ValueTask>[]
-                        );
-                        return new NotificationHandler<TNotification>(
-                            Unsafe.As<object[]>(_handlers._handlerInstances)[_index],
-                            Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>[]>(
-                                _handlers._handlerMethods
-                            )[_index]
-                        );
+                    case true:
+                        return handlers[_index];
+                    case false:
+                        Debug.Assert(_enumerator is not null);
+                        return _enumerator!.Current;
                 }
             }
         }
 
         public bool MoveNext()
         {
-            if (_index == -2)
+            switch (_handlers.IsArray(out var handlers))
             {
-                if (_handlers.IsSingleHandler(out _))
-                {
-                    _index = -1;
-                    return true;
-                }
-                else
-                {
-                    _index = 0;
-                    return true;
-                }
-            }
-            else if (_index == -1)
-            {
-                return false;
-            }
+                case true:
+                    if ((uint)_index + 1 < (uint)handlers.Length)
+                    {
+                        _index++;
+                        return true;
+                    }
 
-            Debug.Assert(_index >= 0);
-            Debug.Assert(_handlers._handlerInstances is object[]);
-            var instances = Unsafe.As<object[]>(_handlers._handlerInstances);
-            var next = _index + 1;
-            if (next < instances.Length)
-            {
-                _index = next;
-                return true;
+                    return false;
+                case false:
+                    if (_index == -1)
+                    {
+                        _enumerator = _handlers._handlers.GetEnumerator();
+                        _index++;
+                    }
+                    Debug.Assert(_enumerator is not null);
+                    return _enumerator!.MoveNext();
             }
-
-            return false;
         }
     }
 }

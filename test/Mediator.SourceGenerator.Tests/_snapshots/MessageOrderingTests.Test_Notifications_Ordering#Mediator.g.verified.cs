@@ -792,28 +792,8 @@ namespace Mediator
                 return default;
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            if (handlers.Length == 1)
-            {
-                var ha = handlers[0];
-                global::System.Func<global::System.Object, global::TestCode.RoundSucceededActually, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>>(i).Handle(n, ct);
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceededActually>(ha, f),
-                    notification,
-                    cancellationToken
-                );
-            }
-
-            var instances = new global::System.Object[handlers.Length];
-            var functions = new global::System.Func<global::System.Object, global::TestCode.RoundSucceededActually, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var handler = handlers[i];
-                instances[i] = handler;
-                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>>(i).Handle(n, ct);
-            }
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceededActually>(instances, functions),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceededActually>(handlers),
                 notification,
                 cancellationToken
             );
@@ -842,28 +822,8 @@ namespace Mediator
                 return default;
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            if (handlers.Length == 1)
-            {
-                var ha = handlers[0];
-                global::System.Func<global::System.Object, global::TestCode.RoundSucceeded, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>>(i).Handle(n, ct);
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceeded>(ha, f),
-                    notification,
-                    cancellationToken
-                );
-            }
-
-            var instances = new global::System.Object[handlers.Length];
-            var functions = new global::System.Func<global::System.Object, global::TestCode.RoundSucceeded, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var handler = handlers[i];
-                instances[i] = handler;
-                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>>(i).Handle(n, ct);
-            }
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceeded>(instances, functions),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceeded>(handlers),
                 notification,
                 cancellationToken
             );
@@ -892,28 +852,8 @@ namespace Mediator
                 return default;
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            if (handlers.Length == 1)
-            {
-                var ha = handlers[0];
-                global::System.Func<global::System.Object, global::TestCode.RoundResulted, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>>(i).Handle(n, ct);
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<global::TestCode.RoundResulted>(ha, f),
-                    notification,
-                    cancellationToken
-                );
-            }
-
-            var instances = new global::System.Object[handlers.Length];
-            var functions = new global::System.Func<global::System.Object, global::TestCode.RoundResulted, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var handler = handlers[i];
-                instances[i] = handler;
-                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>>(i).Handle(n, ct);
-            }
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundResulted>(instances, functions),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundResulted>(handlers),
                 notification,
                 cancellationToken
             );
@@ -942,28 +882,8 @@ namespace Mediator
                 return default;
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            if (handlers.Length == 1)
-            {
-                var ha = handlers[0];
-                global::System.Func<global::System.Object, global::TestCode.RoundCreated, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>>(i).Handle(n, ct);
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<global::TestCode.RoundCreated>(ha, f),
-                    notification,
-                    cancellationToken
-                );
-            }
-
-            var instances = new global::System.Object[handlers.Length];
-            var functions = new global::System.Func<global::System.Object, global::TestCode.RoundCreated, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var handler = handlers[i];
-                instances[i] = handler;
-                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>>(i).Handle(n, ct);
-            }
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundCreated>(instances, functions),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundCreated>(handlers),
                 notification,
                 cancellationToken
             );
@@ -992,28 +912,8 @@ namespace Mediator
                 return default;
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            if (handlers.Length == 1)
-            {
-                var ha = handlers[0];
-                global::System.Func<global::System.Object, global::TestCode.DomainEvent, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask> f =
-                    (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>>(i).Handle(n, ct);
-                return publisher.Publish(
-                    new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent>(ha, f),
-                    notification,
-                    cancellationToken
-                );
-            }
-
-            var instances = new global::System.Object[handlers.Length];
-            var functions = new global::System.Func<global::System.Object, global::TestCode.DomainEvent, global::System.Threading.CancellationToken, global::System.Threading.Tasks.ValueTask>[handlers.Length];
-            for (int i = 0; i < handlers.Length; i++)
-            {
-                var handler = handlers[i];
-                instances[i] = handler;
-                functions[i] = (i, n, ct) => global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>>(i).Handle(n, ct);
-            }
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent>(instances, functions),
+                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent>(handlers),
                 notification,
                 cancellationToken
             );
