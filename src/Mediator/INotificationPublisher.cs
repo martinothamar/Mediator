@@ -157,14 +157,14 @@ public readonly struct NotificationHandlers<TNotification>
 
     /// <summary>
     /// Constructs a new instance of <see cref="NotificationHandlers{TNotification}"/>.
-    /// Should _NOT_ be used by user code, only by the generated code in the Mediator implementation.
+    /// Do _NOT_ invoke this manually, is only supposed to be used by the source generator.
     /// </summary>
     /// <param name="handlers"></param>
-    public NotificationHandlers(IEnumerable<INotificationHandler<TNotification>> handlers)
+    /// <param name="isArray"></param>
+    public NotificationHandlers(IEnumerable<INotificationHandler<TNotification>> handlers, bool isArray)
     {
         _handlers = handlers;
-        if (handlers is INotificationHandler<TNotification>[])
-            _isArray = true;
+        _isArray = isArray;
     }
 
     public readonly bool IsSingleHandler([MaybeNullWhen(false)] out INotificationHandler<TNotification> handler)

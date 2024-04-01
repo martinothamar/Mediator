@@ -32,8 +32,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddMediator(services, null);
         }
 
-        internal sealed class Dummy { }
-
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
@@ -102,7 +100,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
 
-            services.AddSingleton<Dummy>();
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.IContainerProbe), typeof(global::{{ MediatorNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.IContainerProbe), typeof(global::{{ MediatorNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
+
+            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.ContainerMetadata), typeof(global::{{ MediatorNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
 
             return services;
 
@@ -175,6 +176,30 @@ namespace {{ MediatorNamespace }}
     }
     {{~ end ~}}
 
+    internal interface IContainerProbe { }
+    internal sealed class ContainerProbe0 : IContainerProbe { }
+    internal sealed class ContainerProbe1 : IContainerProbe { }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class ContainerMetadata
+    {
+        public readonly bool ServicesUnderlyingTypeIsArray;
+
+        public ContainerMetadata(global::System.IServiceProvider sp)
+        {
+            {{~ if ServiceLifetimeIsScoped ~}}
+            using (var scope = sp.CreateScope())
+            {
+                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::{{ MediatorNamespace }}.IContainerProbe>() is global::{{ MediatorNamespace }}.IContainerProbe[];
+            }
+            {{~ else ~}}
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ MediatorNamespace }}.IContainerProbe>() is global::{{ MediatorNamespace }}.IContainerProbe[];
+            {{~ end ~}}
+        }
+    }
+
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -186,6 +211,8 @@ namespace {{ MediatorNamespace }}
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
+        private readonly global::{{ MediatorNamespace }}.ContainerMetadata _containerMetadata;
+
         {{~ if ServiceLifetimeIsSingleton ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<DICache> _diCacheLazy;
         {{~ else ~}}
@@ -197,26 +224,18 @@ namespace {{ MediatorNamespace }}
         /// </summary>
         public static global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = {{ ServiceLifetime }};
 
-        private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
-
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)
         {
             _sp = sp;
+            _containerMetadata = sp.GetRequiredService<global::{{ MediatorNamespace }}.ContainerMetadata>();
             {{~ if ServiceLifetimeIsSingleton ~}}
-            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp));
+            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp, _containerMetadata));
             {{~ else ~}}
-            _diCache = new DICache(_sp);
+            _diCache = new DICache(_sp, _containerMetadata);
             {{~ end ~}}
-
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> fastGetLength = s => ((object[])s).Length;
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> slowGetLength = s => s.Count();
-
-            var dummy = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>();
-            _getServicesLength = dummy.GetType() == typeof(global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[])
-                 ? fastGetLength : slowGetLength;
         }
 
         {{~ if ServiceLifetimeIsSingleton ~}}
@@ -360,7 +379,7 @@ namespace {{ MediatorNamespace }}
             }
             {{~ end ~}}
 
-            public DICache(global::System.IServiceProvider sp)
+            public DICache(global::System.IServiceProvider sp, global::{{ MediatorNamespace }}.ContainerMetadata containerMetadata)
             {
                 _sp = sp;
 
@@ -371,7 +390,19 @@ namespace {{ MediatorNamespace }}
                 {{~ end ~}}
 
                 {{~ for message in NotificationMessages ~}}
-                Handlers_For_{{ message.IdentifierFullName }} = sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>().ToArray();
+                var handlers_For_{{ message.IdentifierFullName }} = sp.GetServices<global::Mediator.INotificationHandler<{{ message.FullName }}>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_{{ message.IdentifierFullName }} is global::Mediator.INotificationHandler<{{ message.FullName }}>[]);
+                    Handlers_For_{{ message.IdentifierFullName }} = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>[]>(
+                        handlers_For_{{ message.IdentifierFullName }}
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_{{ message.IdentifierFullName }} is not global::Mediator.INotificationHandler<{{ message.FullName }}>[]);
+                    Handlers_For_{{ message.IdentifierFullName }} = handlers_For_{{ message.IdentifierFullName }}.ToArray();
+                }
                 {{~ end ~}}
 
                 {{~ end ~}}
@@ -890,15 +921,27 @@ namespace {{ MediatorNamespace }}
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(handlers),
+                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(handlers, isArray: true),
                 notification,
                 cancellationToken
             );
-
             {{~ else ~}}
+            var isArray = _containerMetadata.ServicesUnderlyingTypeIsArray;
+            if (isArray)
+            {
+                global::System.Diagnostics.Debug.Assert(handlers is global::Mediator.INotificationHandler<{{ message.FullName }}>[]);
+                if (global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<{{ message.FullName }}>[]>(handlers).Length == 0)
+                {
+                    return default;
+                }
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(handlers is not global::Mediator.INotificationHandler<{{ message.FullName }}>[]);
+            }
             var publisher = _diCache.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(handlers),
+                new global::Mediator.NotificationHandlers<{{ message.FullName }}>(handlers, isArray),
                 notification,
                 cancellationToken
             );

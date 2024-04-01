@@ -39,7 +39,10 @@ public static class Fixture
     )
     {
         var services = new ServiceCollection();
-        services.AddSingleton<IServiceScopeFactory, CustomServiceProviderScope>();
+        services.AddSingleton<IServiceScopeFactory, CustomServiceProviderScope>(sp => new CustomServiceProviderScope(
+            (CustomServiceProvider)sp,
+            true
+        ));
 
         services.AddMediator();
 

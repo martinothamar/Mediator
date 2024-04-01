@@ -33,8 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddMediator(services, null);
         }
 
-        internal sealed class Dummy { }
-
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
@@ -68,7 +66,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.AddSingleton<Dummy>();
+            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            services.Add(new SD(typeof(global::Mediator.ContainerMetadata), typeof(global::Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -417,6 +418,23 @@ namespace Mediator
             _rootHandler(request, cancellationToken);
     }
 
+    internal interface IContainerProbe { }
+    internal sealed class ContainerProbe0 : IContainerProbe { }
+    internal sealed class ContainerProbe1 : IContainerProbe { }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class ContainerMetadata
+    {
+        public readonly bool ServicesUnderlyingTypeIsArray;
+
+        public ContainerMetadata(global::System.IServiceProvider sp)
+        {
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+        }
+    }
+
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -428,6 +446,8 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
+        private readonly global::Mediator.ContainerMetadata _containerMetadata;
+
         private FastLazyValue<DICache> _diCacheLazy;
 
         /// <summary>
@@ -435,22 +455,14 @@ namespace Mediator
         /// </summary>
         public static global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
 
-        private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
-
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)
         {
             _sp = sp;
-            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp));
-
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> fastGetLength = s => ((object[])s).Length;
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> slowGetLength = s => s.Count();
-
-            var dummy = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>();
-            _getServicesLength = dummy.GetType() == typeof(global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[])
-                 ? fastGetLength : slowGetLength;
+            _containerMetadata = sp.GetRequiredService<global::Mediator.ContainerMetadata>();
+            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp, _containerMetadata));
         }
 
         private struct FastLazyValue<T>
@@ -526,17 +538,77 @@ namespace Mediator
 
             public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
 
-            public DICache(global::System.IServiceProvider sp)
+            public DICache(global::System.IServiceProvider sp, global::Mediator.ContainerMetadata containerMetadata)
             {
                 _sp = sp;
 
 
 
-                Handlers_For_TestCode_RoundSucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>>().ToArray();
-                Handlers_For_TestCode_RoundSucceeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>>().ToArray();
-                Handlers_For_TestCode_RoundResulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>>().ToArray();
-                Handlers_For_TestCode_RoundCreated = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>>().ToArray();
-                Handlers_For_TestCode_DomainEvent = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>>().ToArray();
+                var handlers_For_TestCode_RoundSucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceededActually is global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[]);
+                    Handlers_For_TestCode_RoundSucceededActually = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[]>(
+                        handlers_For_TestCode_RoundSucceededActually
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceededActually is not global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[]);
+                    Handlers_For_TestCode_RoundSucceededActually = handlers_For_TestCode_RoundSucceededActually.ToArray();
+                }
+                var handlers_For_TestCode_RoundSucceeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceeded is global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[]);
+                    Handlers_For_TestCode_RoundSucceeded = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[]>(
+                        handlers_For_TestCode_RoundSucceeded
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceeded is not global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[]);
+                    Handlers_For_TestCode_RoundSucceeded = handlers_For_TestCode_RoundSucceeded.ToArray();
+                }
+                var handlers_For_TestCode_RoundResulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundResulted is global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[]);
+                    Handlers_For_TestCode_RoundResulted = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[]>(
+                        handlers_For_TestCode_RoundResulted
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundResulted is not global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[]);
+                    Handlers_For_TestCode_RoundResulted = handlers_For_TestCode_RoundResulted.ToArray();
+                }
+                var handlers_For_TestCode_RoundCreated = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundCreated is global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[]);
+                    Handlers_For_TestCode_RoundCreated = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[]>(
+                        handlers_For_TestCode_RoundCreated
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundCreated is not global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[]);
+                    Handlers_For_TestCode_RoundCreated = handlers_For_TestCode_RoundCreated.ToArray();
+                }
+                var handlers_For_TestCode_DomainEvent = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent is global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[]);
+                    Handlers_For_TestCode_DomainEvent = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[]>(
+                        handlers_For_TestCode_DomainEvent
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent is not global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[]);
+                    Handlers_For_TestCode_DomainEvent = handlers_For_TestCode_DomainEvent.ToArray();
+                }
 
 
                 InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
@@ -793,11 +865,10 @@ namespace Mediator
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceededActually>(handlers),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceededActually>(handlers, isArray: true),
                 notification,
                 cancellationToken
             );
-
         }
         /// <summary>
         /// Send a notification of type global::TestCode.RoundSucceeded.
@@ -823,11 +894,10 @@ namespace Mediator
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceeded>(handlers),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceeded>(handlers, isArray: true),
                 notification,
                 cancellationToken
             );
-
         }
         /// <summary>
         /// Send a notification of type global::TestCode.RoundResulted.
@@ -853,11 +923,10 @@ namespace Mediator
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundResulted>(handlers),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundResulted>(handlers, isArray: true),
                 notification,
                 cancellationToken
             );
-
         }
         /// <summary>
         /// Send a notification of type global::TestCode.RoundCreated.
@@ -883,11 +952,10 @@ namespace Mediator
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundCreated>(handlers),
+                new global::Mediator.NotificationHandlers<global::TestCode.RoundCreated>(handlers, isArray: true),
                 notification,
                 cancellationToken
             );
-
         }
         /// <summary>
         /// Send a notification of type global::TestCode.DomainEvent.
@@ -913,11 +981,10 @@ namespace Mediator
             }
             var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
             return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent>(handlers),
+                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent>(handlers, isArray: true),
                 notification,
                 cancellationToken
             );
-
         }
 
         /// <summary>

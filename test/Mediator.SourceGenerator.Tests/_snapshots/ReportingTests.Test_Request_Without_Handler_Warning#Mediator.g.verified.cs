@@ -33,8 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddMediator(services, null);
         }
 
-        internal sealed class Dummy { }
-
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
@@ -68,7 +66,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.AddSingleton<Dummy>();
+            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            services.Add(new SD(typeof(global::Mediator.ContainerMetadata), typeof(global::Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -415,6 +416,23 @@ namespace Mediator
             _rootHandler(request, cancellationToken);
     }
 
+    internal interface IContainerProbe { }
+    internal sealed class ContainerProbe0 : IContainerProbe { }
+    internal sealed class ContainerProbe1 : IContainerProbe { }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class ContainerMetadata
+    {
+        public readonly bool ServicesUnderlyingTypeIsArray;
+
+        public ContainerMetadata(global::System.IServiceProvider sp)
+        {
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+        }
+    }
+
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -426,6 +444,8 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
+        private readonly global::Mediator.ContainerMetadata _containerMetadata;
+
         private FastLazyValue<DICache> _diCacheLazy;
 
         /// <summary>
@@ -433,22 +453,14 @@ namespace Mediator
         /// </summary>
         public static global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
 
-        private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
-
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)
         {
             _sp = sp;
-            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp));
-
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> fastGetLength = s => ((object[])s).Length;
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> slowGetLength = s => s.Count();
-
-            var dummy = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>();
-            _getServicesLength = dummy.GetType() == typeof(global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[])
-                 ? fastGetLength : slowGetLength;
+            _containerMetadata = sp.GetRequiredService<global::Mediator.ContainerMetadata>();
+            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp, _containerMetadata));
         }
 
         private struct FastLazyValue<T>
@@ -519,7 +531,7 @@ namespace Mediator
 
             public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
 
-            public DICache(global::System.IServiceProvider sp)
+            public DICache(global::System.IServiceProvider sp, global::Mediator.ContainerMetadata containerMetadata)
             {
                 _sp = sp;
 
