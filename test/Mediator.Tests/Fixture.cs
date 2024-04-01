@@ -30,6 +30,12 @@ public static class Fixture
             sp = sp.CreateScope().ServiceProvider;
 
         var mediator = sp.GetRequiredService<IMediator>();
+        var publisher = sp.GetRequiredService<INotificationPublisher>();
+#if TASKWHENALLPUBLISHER
+        Assert.IsType<TaskWhenAllPublisher>(publisher);
+#else
+        Assert.IsType<ForeachAwaitPublisher>(publisher);
+#endif
         return (sp, mediator!);
     }
 

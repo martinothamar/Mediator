@@ -902,6 +902,34 @@ internal sealed class CompilationAnalyzer
                 if (!string.IsNullOrWhiteSpace(namespaceArg))
                     MediatorNamespace = namespaceArg!;
             }
+            else if (attrFieldName == "NotificationPublisherType")
+            {
+                if (attrArg.Expression is not TypeOfExpressionSyntax identifier)
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return;
+                }
+                var typeSymbol = semanticModel.GetTypeInfo(identifier.Type, cancellationToken).Type;
+                if (typeSymbol is null)
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return;
+                }
+
+                if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return;
+                }
+
+                if (!Context.Compilation.HasImplicitConversion(namedTypeSymbol, _notificationPublisherInterfaceSymbol))
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return;
+                }
+
+                _notificationPublisherImplementationSymbol = namedTypeSymbol;
+            }
         }
 
         ConfiguredViaAttribute = true;

@@ -36,11 +36,26 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: Build Debug - TaskWhenAllNotificationPublisher
+      run: dotnet build --no-restore -p:ExtraDefineConstants=TASKWHENALLPUBLISHER
+
+    - name: Test Debug - TaskWhenAllNotificationPublisher
+      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
+
+    - name: Clean Debug
+      run: dotnet clean
+
+    - name: Build Debug
+      run: dotnet build --no-restore
+
+    - name: Test Debug
+      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
+
+    - name: Build Release
       run: dotnet build --no-restore -c Release
 
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal -c Release
+    - name: Test Release
+      run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
 
     - name: Pack
       if: ${{ success() && !github.base_ref }}

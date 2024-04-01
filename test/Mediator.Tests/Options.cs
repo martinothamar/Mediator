@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 #if TASKWHENALLPUBLISHER
 [assembly: MediatorOptions(
-    ServiceLifetime = ServiceLifetime.Scoped,
+    ServiceLifetime = ServiceLifetime.Singleton,
     NotificationPublisherType = typeof(TaskWhenAllPublisher)
 )]
 #else
-[assembly: MediatorOptions(ServiceLifetime = ServiceLifetime.Scoped)]
+[assembly: MediatorOptions(ServiceLifetime = ServiceLifetime.Singleton)]
 #endif

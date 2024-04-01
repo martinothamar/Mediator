@@ -10,4 +10,9 @@ build:
     dotnet build Mediator.sln
 
 test:
-    dotnet test Mediator.sln
+    dotnet clean
+    dotnet build -p:ExtraDefineConstants=TASKWHENALLPUBLISHER
+    dotnet test --no-build --logger "console;verbosity=detailed"
+    dotnet clean
+    dotnet build
+    dotnet test --no-build --logger "console;verbosity=detailed"
