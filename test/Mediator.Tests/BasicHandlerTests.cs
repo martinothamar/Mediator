@@ -304,14 +304,13 @@ public class BasicHandlerTests
     }
 
     [Fact]
-    public unsafe void Test_Struct_Notification_Handler()
+    public async Task Test_Struct_Notification_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
         var notification = new SomeStructNotification(id);
-        var addr = *(long*)&notification;
 
         var handlers = sp.GetServices<INotificationHandler<SomeStructNotification>>();
         Assert.True(handlers.Count() == 2);
@@ -320,13 +319,10 @@ public class BasicHandlerTests
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
 
-#pragma warning disable xUnit1031
-        concrete.Publish(notification).GetAwaiter().GetResult();
-#pragma warning restore xUnit1031
+        await concrete.Publish(notification);
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
         if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
             Assert.Equal(1, notificationHandler.InstanceIds.GetValueOrDefault(id, 0));
-        //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
     }
 
     [Fact]

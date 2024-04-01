@@ -4,6 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace Mediator;
 
+/// <summary>
+/// Implements a notification publisher that publishes notifications to multiple handlers using a foreach loop with async/await.
+/// Tries to be efficient by avoiding unnecessary allocations and async state machines,
+/// the optimal case being a single handler which completes synchronously.
+/// </summary>
 public sealed class ForeachAwaitPublisher : INotificationPublisher
 {
     public ValueTask Publish<TNotification>(
@@ -43,6 +48,11 @@ public sealed class ForeachAwaitPublisher : INotificationPublisher
     }
 }
 
+/// <summary>
+/// Implements a notification publisher that uses the Task.WhenAll pattern to handle multiple notification handlers.
+/// Tries to be efficient by avoiding unnecessary allocations and async state machines,
+/// the optimal case being a single handler or a collection of handlers that all complete synchronously.
+/// </summary>
 public sealed class TaskWhenAllPublisher : INotificationPublisher
 {
     public ValueTask Publish<TNotification>(
@@ -136,12 +146,22 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
     }
 }
 
+/// <summary>
+/// Represents a collection of notification handlers for a specific notification type.
+/// Contains convenience methods for implementing the <see cref="INotificationPublisher"/> in an efficient way.
+/// </summary>
+/// <typeparam name="TNotification">The type of notification.</typeparam>
 public readonly struct NotificationHandlers<TNotification>
     where TNotification : INotification
 {
     private readonly IEnumerable<INotificationHandler<TNotification>> _handlers;
     private readonly bool _isArray;
 
+    /// <summary>
+    /// Checks if the handlers are stored as an array and retrieves them if so.
+    /// </summary>
+    /// <param name="handlers">The array of notification handlers, if stored as an array.</param>
+    /// <returns><c>true</c> if the handlers are stored as an array; otherwise, <c>false</c>.</returns>
     internal readonly bool IsArray([MaybeNullWhen(false)] out INotificationHandler<TNotification>[] handlers)
     {
         if (_isArray)
@@ -167,6 +187,12 @@ public readonly struct NotificationHandlers<TNotification>
         _isArray = isArray;
     }
 
+    /// <summary>
+    /// Checks wether there is exactly 1 single handler in the collection.
+    /// NOTE: if the underlying collection is not an array, this will return false.
+    /// </summary>
+    /// <param name="handler">The single handler, if there's a exactly 1 handler present</param>
+    /// <returns><c>true</c> if there is a single handler; otherwise, <c>false</c>.</returns>
     public readonly bool IsSingleHandler([MaybeNullWhen(false)] out INotificationHandler<TNotification> handler)
     {
         if (IsArray(out var handlers) && handlers.Length == 1)
@@ -234,8 +260,23 @@ public readonly struct NotificationHandlers<TNotification>
     }
 }
 
+/// <summary>
+/// Represents a notification publisher that is responsible for invoking handlers for a given notification.
+/// This is called by the source generated Mediator implementation when <see cref="IPublisher.Publish{TNotification}(TNotification, CancellationToken)"/> is called.
+/// Built in implementations are <see cref="ForeachAwaitPublisher"/> and <see cref="TaskWhenAllPublisher"/>.
+/// Configure the desired implementation in the generator options.
+/// </summary>
 public interface INotificationPublisher
 {
+    /// <summary>
+    /// Receives a notification and a collection of handlers for that notification.
+    /// The implementor is responsible for invoking each handler in the collection (and how to do it).
+    /// </summary>
+    /// <typeparam name="TNotification">The type of the notification.</typeparam>
+    /// <param name="handlers">The collection of handlers for the notification.</param>
+    /// <param name="notification">The notification to be published.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A <see cref="ValueTask"/> representing the asynchronous operation.</returns>
     ValueTask Publish<TNotification>(
         NotificationHandlers<TNotification> handlers,
         TNotification notification,
