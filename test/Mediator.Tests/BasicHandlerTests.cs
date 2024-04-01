@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mediator.Tests.TestTypes;
@@ -295,6 +296,8 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(1, notificationHandler.InstanceIds.GetValueOrDefault(id, 0));
 
         var handlers = sp.GetServices<INotificationHandler<SomeNotification>>();
         Assert.True(handlers.Distinct().Count() == handlers.Count());
@@ -321,6 +324,8 @@ public class BasicHandlerTests
         concrete.Publish(notification).GetAwaiter().GetResult();
 #pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(1, notificationHandler.InstanceIds.GetValueOrDefault(id, 0));
         //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
     }
 
@@ -335,6 +340,8 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish<INotification>(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(1, notificationHandler.InstanceIds.GetValueOrDefault(id, 0));
 
         var handlers = sp.GetServices<INotificationHandler<SomeNotification>>();
         Assert.True(handlers.Distinct().Count() == handlers.Count());
@@ -355,6 +362,8 @@ public class BasicHandlerTests
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish(null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Publish((SomeNotification)null!));
         Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(0, notificationHandler.InstanceIds.GetValueOrDefault(id, 0));
     }
 
     [Fact]
@@ -386,7 +395,11 @@ public class BasicHandlerTests
         await mediator.Publish(new SomeNotification(id));
         await mediator.Publish((object)new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(2, handler1.InstanceIds.GetValueOrDefault(id, 0));
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(2, handler2.InstanceIds.GetValueOrDefault(id, 0));
     }
 
     [Fact]
@@ -402,7 +415,11 @@ public class BasicHandlerTests
         Assert.NotNull(handler2);
         await mediator.Publish((object)new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(1, handler1.InstanceIds.GetValueOrDefault(id, 0));
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(1, handler2.InstanceIds.GetValueOrDefault(id, 0));
     }
 
     [Fact]
@@ -471,6 +488,10 @@ public class BasicHandlerTests
         await mediator.Publish(new SomeNotification(id));
         await mediator.Publish((object)new SomeNotification(id));
         Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(0, handler1.InstanceIds.GetValueOrDefault(id, 0));
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
+        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
+            Assert.Equal(2, handler2.InstanceIds.GetValueOrDefault(id, 0));
     }
 }
