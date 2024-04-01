@@ -38,7 +38,7 @@ public sealed class ForeachAwaitPublisher : INotificationPublisher
                 }
             }
             if (exceptions is not null)
-                throw new AggregateException(exceptions);
+                ThrowHelper.ThrowAggregateException(exceptions);
         }
     }
 }
@@ -90,7 +90,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
             }
 
             if (exceptions is not null)
-                throw new AggregateException(exceptions);
+                ThrowHelper.ThrowAggregateException(exceptions);
         }
     }
 }
@@ -114,6 +114,12 @@ public readonly struct NotificationHandlers<TNotification>
 
     public readonly int Length => _handlerInstances is object[] instances ? instances.Length : 1;
 
+    /// <summary>
+    /// Constructs a new instance of <see cref="NotificationHandlers{TNotification}"/>.
+    /// Should _NOT_ be used by user code, only by the generated code in the Mediator implementation.
+    /// </summary>
+    /// <param name="handlerInstance"></param>
+    /// <param name="handlerMethod"></param>
     public NotificationHandlers(
         object handlerInstance,
         Func<object, TNotification, CancellationToken, ValueTask> handlerMethod
@@ -123,13 +129,19 @@ public readonly struct NotificationHandlers<TNotification>
         _handlerMethods = handlerMethod;
     }
 
+    /// <summary>
+    /// Constructs a new instance of <see cref="NotificationHandlers{TNotification}"/>.
+    /// Should _NOT_ be used by user code, only by the generated code in the Mediator implementation.
+    /// </summary>
+    /// <param name="handlerInstances"></param>
+    /// <param name="handlerMethods"></param>
     public NotificationHandlers(
         object[] handlerInstances,
         Func<object, TNotification, CancellationToken, ValueTask>[] handlerMethods
     )
     {
         if (handlerInstances.Length != handlerMethods.Length)
-            throw new InvalidOperationException("Handler instances and methods must have the same length.");
+            ThrowHelper.ThrowInvalidOperationException("Handler instances and methods must have the same length.");
 
         _handlerInstances = handlerInstances;
         _handlerMethods = handlerMethods;
@@ -165,23 +177,40 @@ public readonly struct NotificationHandlers<TNotification>
             _handlers = handlers;
         }
 
-        public readonly NotificationHandler<TNotification> Current =>
-            _index switch
+        public readonly NotificationHandler<TNotification> Current
+        {
+            get
             {
-                -2 => throw new InvalidOperationException("Enumeration not started."),
-                -1
-                    => new NotificationHandler<TNotification>(
-                        _handlers._handlerInstances,
-                        Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>>(_handlers._handlerMethods)
-                    ),
-                _
-                    => new NotificationHandler<TNotification>(
-                        Unsafe.As<object[]>(_handlers._handlerInstances)[_index],
-                        Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>[]>(
-                            _handlers._handlerMethods
-                        )[_index]
-                    )
-            };
+                switch (_index)
+                {
+                    case -2:
+                        ThrowHelper.ThrowInvalidOperationException("Enumeration not started.");
+                        return default;
+                    case -1:
+                        Debug.Assert(
+                            _handlers._handlerMethods is Func<object, TNotification, CancellationToken, ValueTask>
+                        );
+                        return new NotificationHandler<TNotification>(
+                            _handlers._handlerInstances,
+                            Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>>(
+                                _handlers._handlerMethods
+                            )
+                        );
+                    default:
+                        Debug.Assert(_index >= 0);
+                        Debug.Assert(_handlers._handlerInstances is object[]);
+                        Debug.Assert(
+                            _handlers._handlerMethods is Func<object, TNotification, CancellationToken, ValueTask>[]
+                        );
+                        return new NotificationHandler<TNotification>(
+                            Unsafe.As<object[]>(_handlers._handlerInstances)[_index],
+                            Unsafe.As<Func<object, TNotification, CancellationToken, ValueTask>[]>(
+                                _handlers._handlerMethods
+                            )[_index]
+                        );
+                }
+            }
+        }
 
         public bool MoveNext()
         {
