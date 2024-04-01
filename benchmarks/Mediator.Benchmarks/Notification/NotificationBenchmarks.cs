@@ -1,5 +1,3 @@
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Reports;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.Notification;
@@ -13,8 +11,6 @@ public sealed class SingleHandler
         MediatR.INotificationHandler<SingleHandlerNotification>
 {
     public ValueTask Handle(SingleHandlerNotification notification, CancellationToken cancellationToken) => default;
-
-    public ValueTask HandleAsync(SingleHandlerNotification message, CancellationToken cancellationToken) => default;
 
     Task MediatR.INotificationHandler<SingleHandlerNotification>.Handle(
         SingleHandlerNotification notification,
@@ -60,6 +56,47 @@ public sealed class MultiHandler2
     ) => Task.CompletedTask;
 }
 
+public sealed record MultiHandlersAsyncNotification(Guid Id) : INotification, MediatR.INotification;
+
+public sealed class MultiHandlerAsync0
+    : INotificationHandler<MultiHandlersAsyncNotification>,
+        MediatR.INotificationHandler<MultiHandlersAsyncNotification>
+{
+    public async ValueTask Handle(MultiHandlersAsyncNotification notification, CancellationToken cancellationToken) =>
+        await Task.Yield();
+
+    async Task MediatR.INotificationHandler<MultiHandlersAsyncNotification>.Handle(
+        MultiHandlersAsyncNotification notification,
+        CancellationToken cancellationToken
+    ) => await Task.Yield();
+}
+
+public sealed class MultiHandlerAsync1
+    : INotificationHandler<MultiHandlersAsyncNotification>,
+        MediatR.INotificationHandler<MultiHandlersAsyncNotification>
+{
+    public async ValueTask Handle(MultiHandlersAsyncNotification notification, CancellationToken cancellationToken) =>
+        await Task.Yield();
+
+    async Task MediatR.INotificationHandler<MultiHandlersAsyncNotification>.Handle(
+        MultiHandlersAsyncNotification notification,
+        CancellationToken cancellationToken
+    ) => await Task.Yield();
+}
+
+public sealed class MultiHandlerAsync2
+    : INotificationHandler<MultiHandlersAsyncNotification>,
+        MediatR.INotificationHandler<MultiHandlersAsyncNotification>
+{
+    public async ValueTask Handle(MultiHandlersAsyncNotification notification, CancellationToken cancellationToken) =>
+        await Task.Yield();
+
+    async Task MediatR.INotificationHandler<MultiHandlersAsyncNotification>.Handle(
+        MultiHandlersAsyncNotification notification,
+        CancellationToken cancellationToken
+    ) => await Task.Yield();
+}
+
 [ConfigSource]
 public class NotificationBenchmarks
 {
@@ -81,14 +118,19 @@ public class NotificationBenchmarks
     private MultiHandler1 _multiHandler1;
     private MultiHandler2 _multiHandler2;
     private MultiHandlersNotification _multiHandlersNotification;
+    private MultiHandlerAsync0 _multiHandlerAsync0;
+    private MultiHandlerAsync1 _multiHandlerAsync1;
+    private MultiHandlerAsync2 _multiHandlerAsync2;
+    private MultiHandlersAsyncNotification _multiHandlersAsyncNotification;
 
     [Params(MediatorConfig.Lifetime)]
     public ServiceLifetime ServiceLifetime { get; set; } = MediatorConfig.Lifetime;
 
     public enum ScenarioType
     {
-        SingleHandler,
-        MultipleHandlers,
+        SingleHandlerSync,
+        MultipleHandlersSync,
+        MultipleHandlersAsync
     }
 
     [ParamsAllValues]
@@ -125,6 +167,11 @@ public class NotificationBenchmarks
         _multiHandler1 = _serviceProvider.GetRequiredService<MultiHandler1>();
         _multiHandler2 = _serviceProvider.GetRequiredService<MultiHandler2>();
         _multiHandlersNotification = new(Guid.NewGuid());
+
+        _multiHandlerAsync0 = _serviceProvider.GetRequiredService<MultiHandlerAsync0>();
+        _multiHandlerAsync1 = _serviceProvider.GetRequiredService<MultiHandlerAsync1>();
+        _multiHandlerAsync2 = _serviceProvider.GetRequiredService<MultiHandlerAsync2>();
+        _multiHandlersAsyncNotification = new(Guid.NewGuid());
     }
 
     [GlobalCleanup]
@@ -141,8 +188,10 @@ public class NotificationBenchmarks
     {
         return Scenario switch
         {
-            ScenarioType.SingleHandler => _mediatr.Publish(_singleHandlerNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlers => _mediatr.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.SingleHandlerSync => _mediatr.Publish(_singleHandlerNotification, CancellationToken.None),
+            ScenarioType.MultipleHandlersSync => _mediatr.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.MultipleHandlersAsync
+                => _mediatr.Publish(_multiHandlersAsyncNotification, CancellationToken.None),
         };
     }
 
@@ -151,8 +200,10 @@ public class NotificationBenchmarks
     {
         return Scenario switch
         {
-            ScenarioType.SingleHandler => _mediator.Publish(_singleHandlerNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlers => _mediator.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.SingleHandlerSync => _mediator.Publish(_singleHandlerNotification, CancellationToken.None),
+            ScenarioType.MultipleHandlersSync => _mediator.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.MultipleHandlersAsync
+                => _mediator.Publish(_multiHandlersAsyncNotification, CancellationToken.None),
         };
     }
 
@@ -161,25 +212,38 @@ public class NotificationBenchmarks
     {
         return Scenario switch
         {
-            ScenarioType.SingleHandler => _concreteMediator.Publish(_singleHandlerNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlers
+            ScenarioType.SingleHandlerSync
+                => _concreteMediator.Publish(_singleHandlerNotification, CancellationToken.None),
+            ScenarioType.MultipleHandlersSync
                 => _concreteMediator.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.MultipleHandlersAsync
+                => _concreteMediator.Publish(_multiHandlersAsyncNotification, CancellationToken.None),
         };
     }
 
     [Benchmark(Baseline = true)]
-    public async ValueTask Publish_Notification_Baseline()
+    public ValueTask Publish_Notification_Baseline()
     {
         switch (Scenario)
         {
-            case ScenarioType.SingleHandler:
-                await _singleHandler.Handle(_singleHandlerNotification, CancellationToken.None);
-                break;
-            case ScenarioType.MultipleHandlers:
-                await _multiHandler0.Handle(_multiHandlersNotification, CancellationToken.None);
-                await _multiHandler1.Handle(_multiHandlersNotification, CancellationToken.None);
-                await _multiHandler2.Handle(_multiHandlersNotification, CancellationToken.None);
-                break;
+            case ScenarioType.SingleHandlerSync:
+                return _singleHandler.Handle(_singleHandlerNotification, CancellationToken.None);
+            case ScenarioType.MultipleHandlersSync:
+                _multiHandler0.Handle(_multiHandlersNotification, CancellationToken.None).GetAwaiter().GetResult();
+                _multiHandler1.Handle(_multiHandlersNotification, CancellationToken.None).GetAwaiter().GetResult();
+                _multiHandler2.Handle(_multiHandlersNotification, CancellationToken.None).GetAwaiter().GetResult();
+                return default;
+            case ScenarioType.MultipleHandlersAsync:
+                return AwaitMultipleHandlersAsync();
+        }
+
+        return default;
+
+        async ValueTask AwaitMultipleHandlersAsync()
+        {
+            await _multiHandlerAsync0.Handle(_multiHandlersAsyncNotification, CancellationToken.None);
+            await _multiHandlerAsync1.Handle(_multiHandlersAsyncNotification, CancellationToken.None);
+            await _multiHandlerAsync2.Handle(_multiHandlersAsyncNotification, CancellationToken.None);
         }
     }
 }
