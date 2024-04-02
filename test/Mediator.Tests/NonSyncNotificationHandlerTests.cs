@@ -56,14 +56,8 @@ public class NonSyncNotificationHandlerTests
         var timestampBefore = Stopwatch.GetTimestamp();
         await mediator.Publish(new SomeNonSyncNotification(id));
         var timestampAfter = Stopwatch.GetTimestamp();
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-        {
-            var handler1Data = handler1.InstanceIds.GetValueOrDefault(id, default);
-            var handler2Data = handler2.InstanceIds.GetValueOrDefault(id, default);
-            Assert.Equal(1, handler1Data.Count);
-            Assert.Equal(1, handler2Data.Count);
-            Assert.True(handler1Data.Timestamp > timestampBefore && handler1Data.Timestamp < timestampAfter);
-            Assert.True(handler2Data.Timestamp > timestampBefore && handler2Data.Timestamp < timestampAfter);
-        }
+
+        AssertInstanceIdCount(1, handler1.InstanceIds, id, timestampBefore, timestampAfter);
+        AssertInstanceIdCount(1, handler2.InstanceIds, id, timestampBefore, timestampAfter);
     }
 }

@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Mediator.Tests.TestTypes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator.Tests.TransientLifetime;
+namespace Mediator.Tests;
 
 public sealed class TransientLifetimeTests
 {
-    [Fact]
+    [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Transient ? "Only tested for Transient lifetime" : null)]
     public void Test_Generated_Code_Lifetime()
     {
         Assert.Equal(ServiceLifetime.Transient, Mediator.ServiceLifetime);
     }
 
-    [Fact]
+    [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Transient ? "Only tested for Transient lifetime" : null)]
     public async Task Test_Returns_Different_Handler_Instance_Every_Time()
     {
         using var _ = await TransientTestRequestHandler.LeaseForTesting();
@@ -30,7 +30,7 @@ public sealed class TransientLifetimeTests
         Assert.NotEqual(handler1, handler2);
     }
 
-    [Fact]
+    [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Transient ? "Only tested for Transient lifetime" : null)]
     public async Task Test_Disposes_Handler_Correctly_In_Scope()
     {
         using var _ = await TransientTestRequestHandler.LeaseForTesting();
@@ -69,7 +69,7 @@ public sealed class TransientLifetimeTests
         Assert.All(TransientTestRequestHandler.CreatedHandlers, h => Assert.True(h.Disposed));
     }
 
-    [Fact]
+    [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Transient ? "Only tested for Transient lifetime" : null)]
     public async Task Test_Disposes_Handler_Correctly_Root_Scope()
     {
         using var _ = await TransientTestRequestHandler.LeaseForTesting();

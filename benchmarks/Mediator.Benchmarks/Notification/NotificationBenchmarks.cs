@@ -1,3 +1,5 @@
+using BenchmarkDotNet.Columns;
+using BenchmarkDotNet.Reports;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.Notification;
@@ -104,7 +106,35 @@ public class NotificationBenchmarks
     {
         public IConfig Config { get; }
 
-        public ConfigSourceAttribute() => Config = new SimpleConfig();
+        public ConfigSourceAttribute()
+        {
+            Config = ManualConfig
+                .CreateEmpty()
+                .AddJob(
+                    Job.Default.WithArguments(
+                        [new MsBuildArgument("/p:ExtraDefineConstants=Mediator_Publisher_ForeachAwait")]
+                    )
+                        .WithCustomBuildConfiguration("ForeachAwaitPublisher")
+                        .WithEnvironmentVariable("NotificationPublisherName", "ForeachAwaitPublisher")
+                        .WithId("ForeachAwaitPublisher")
+                )
+                .AddJob(
+                    Job.Default.WithArguments(
+                        [new MsBuildArgument("/p:ExtraDefineConstants=Mediator_Publisher_TaskWhenAll")]
+                    )
+                        .WithCustomBuildConfiguration("TaskWhenAllPublisher")
+                        .WithEnvironmentVariable("NotificationPublisherName", "TaskWhenAllPublisher")
+                        .WithId("TaskWhenAllPublisher")
+                )
+                .AddColumn(new CustomColumn("ServiceLifetime", (s, c) => Mediator.ServiceLifetime.ToString()))
+                .AddColumn(new CustomColumn("NotificationPublisher", (s, c) => c.Job.Id))
+                .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
+                .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
+                .WithSummaryStyle(SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend))
+                .AddColumn(RankColumn.Arabic)
+                .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared))
+                .AddDiagnoser(MemoryDiagnoser.Default);
+        }
     }
 
     private IServiceProvider _serviceProvider;
@@ -123,14 +153,17 @@ public class NotificationBenchmarks
     private MultiHandlerAsync2 _multiHandlerAsync2;
     private MultiHandlersAsyncNotification _multiHandlersAsyncNotification;
 
-    [Params(MediatorConfig.Lifetime)]
-    public ServiceLifetime ServiceLifetime { get; set; } = MediatorConfig.Lifetime;
+    // [Params(Mediator.ServiceLifetime)]
+    // public ServiceLifetime ServiceLifetime { get; set; }
+
+    // [Params(Mediator.NotificationPublisherName)]
+    // public string NotificationPublisherType { get; set; }
 
     public enum ScenarioType
     {
         SingleHandlerSync,
-        MultipleHandlersSync,
-        MultipleHandlersAsync
+        MultiHandlersSync,
+        MultiHandlersAsync
     }
 
     [ParamsAllValues]
@@ -139,22 +172,34 @@ public class NotificationBenchmarks
     [GlobalSetup]
     public void Setup()
     {
+        ConsoleLogger.Default.WriteLineError("--------------------------------------");
+        ConsoleLogger.Default.WriteLineError("Mediator config:");
+        ConsoleLogger.Default.WriteLineError($"  - Lifetime = {Mediator.ServiceLifetime}");
+        ConsoleLogger.Default.WriteLineError($"  - Publisher= {Mediator.NotificationPublisherName}");
+        ConsoleLogger.Default.WriteLineError("--------------------------------------");
+
+        var envPublisher = Environment.GetEnvironmentVariable("NotificationPublisherName");
+        if (envPublisher != Mediator.NotificationPublisherName)
+            throw new InvalidOperationException(
+                $"Invalid publisher: {Mediator.NotificationPublisherName}. Expected: {envPublisher}"
+            );
+
         var services = new ServiceCollection();
-        services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
+        services.AddMediator();
         services.AddMediatR(opts =>
         {
-            opts.Lifetime = ServiceLifetime;
+            opts.Lifetime = Mediator.ServiceLifetime;
             opts.RegisterServicesFromAssembly(typeof(SingleHandler).Assembly);
         });
 
         _serviceProvider = services.BuildServiceProvider();
-        if (ServiceLifetime == ServiceLifetime.Scoped)
-        {
 #pragma warning disable CS0162 // Unreachable code detected
+        if (Mediator.ServiceLifetime == ServiceLifetime.Scoped)
+        {
             _serviceScope = _serviceProvider.CreateScope();
-#pragma warning restore CS0162 // Unreachable code detected
             _serviceProvider = _serviceScope.ServiceProvider;
         }
+#pragma warning restore CS0162 // Unreachable code detected
 
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
@@ -189,8 +234,8 @@ public class NotificationBenchmarks
         return Scenario switch
         {
             ScenarioType.SingleHandlerSync => _mediatr.Publish(_singleHandlerNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlersSync => _mediatr.Publish(_multiHandlersNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlersAsync
+            ScenarioType.MultiHandlersSync => _mediatr.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.MultiHandlersAsync
                 => _mediatr.Publish(_multiHandlersAsyncNotification, CancellationToken.None),
         };
     }
@@ -201,8 +246,8 @@ public class NotificationBenchmarks
         return Scenario switch
         {
             ScenarioType.SingleHandlerSync => _mediator.Publish(_singleHandlerNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlersSync => _mediator.Publish(_multiHandlersNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlersAsync
+            ScenarioType.MultiHandlersSync => _mediator.Publish(_multiHandlersNotification, CancellationToken.None),
+            ScenarioType.MultiHandlersAsync
                 => _mediator.Publish(_multiHandlersAsyncNotification, CancellationToken.None),
         };
     }
@@ -214,9 +259,9 @@ public class NotificationBenchmarks
         {
             ScenarioType.SingleHandlerSync
                 => _concreteMediator.Publish(_singleHandlerNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlersSync
+            ScenarioType.MultiHandlersSync
                 => _concreteMediator.Publish(_multiHandlersNotification, CancellationToken.None),
-            ScenarioType.MultipleHandlersAsync
+            ScenarioType.MultiHandlersAsync
                 => _concreteMediator.Publish(_multiHandlersAsyncNotification, CancellationToken.None),
         };
     }
@@ -228,12 +273,12 @@ public class NotificationBenchmarks
         {
             case ScenarioType.SingleHandlerSync:
                 return _singleHandler.Handle(_singleHandlerNotification, CancellationToken.None);
-            case ScenarioType.MultipleHandlersSync:
+            case ScenarioType.MultiHandlersSync:
                 _multiHandler0.Handle(_multiHandlersNotification, CancellationToken.None).GetAwaiter().GetResult();
                 _multiHandler1.Handle(_multiHandlersNotification, CancellationToken.None).GetAwaiter().GetResult();
                 _multiHandler2.Handle(_multiHandlersNotification, CancellationToken.None).GetAwaiter().GetResult();
                 return default;
-            case ScenarioType.MultipleHandlersAsync:
+            case ScenarioType.MultiHandlersAsync:
                 return AwaitMultipleHandlersAsync();
         }
 

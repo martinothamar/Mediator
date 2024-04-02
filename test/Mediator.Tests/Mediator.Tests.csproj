@@ -13,10 +13,6 @@
     <NoWarn>$(NoWarn);MSG0005</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <DefineConstants Condition="'$(ExtraDefineConstants)' != ''">$(DefineConstants);$(ExtraDefineConstants)</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
     <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
@@ -46,6 +42,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\common\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
 
 </Project>

@@ -66,9 +66,7 @@ public sealed class AbstractNotificationHandlerTests
         Assert.NotNull(handler2);
         Assert.Contains(id, ConcreteNotificationHandler.Ids);
         Assert.Contains(id, ConcreteNotificationHandler2.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler1.InstanceIds.GetValueOrDefault(id, 0));
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler2.InstanceIds.GetValueOrDefault(id, 0));
+        AssertInstanceIdCount(1, handler1.InstanceIds, id);
+        AssertInstanceIdCount(1, handler2.InstanceIds, id);
     }
 }

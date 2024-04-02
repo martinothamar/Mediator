@@ -1,9 +1,11 @@
+#if Mediator_Lifetime_Scoped
+
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-[assembly: TestFramework("Mediator.Tests.ScopedLifetime.Framework", "Mediator.Tests.ScopedLifetime")]
+[assembly: TestFramework("Mediator.Tests.Framework", "Mediator.Tests")]
 
-namespace Mediator.Tests.ScopedLifetime;
+namespace Mediator.Tests;
 
 public class Framework : XunitTestFramework
 {
@@ -19,3 +21,5 @@ public class Framework : XunitTestFramework
         base.Dispose();
     }
 }
+
+#endif

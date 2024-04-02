@@ -16,8 +16,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lifetime: [Mediator_Lifetime_Singleton, Mediator_Lifetime_Scoped, Mediator_Lifetime_Transient]
+        publisher: [Mediator_Publisher_ForeachAwait, Mediator_Publisher_TaskWhenAll]
 
     steps:
     - uses: actions/checkout@v2
@@ -36,33 +39,41 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build Debug - TaskWhenAllNotificationPublisher
-      run: dotnet build --no-restore -p:ExtraDefineConstants=TASKWHENALLPUBLISHER
+    - name: Build
+      run: dotnet build --no-restore -p:ExtraDefineConstants=\"${{ matrix.lifetime }}%3B${{ matrix.publisher }}\"
 
-    - name: Test Debug - TaskWhenAllNotificationPublisher
+    - name: Test
       run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
 
-    - name: Clean Debug
-      run: dotnet clean
+  publish:
+    needs: build
+    if: ${{ !github.base_ref }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+    - uses: dotnet/nbgv@master
+      with:
+        setAllVars: true
 
-    - name: Build Debug
-      run: dotnet build --no-restore
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        include-prerelease: false
 
-    - name: Test Debug
-      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
+    - name: Restore dependencies
+      run: dotnet restore
 
-    - name: Build Release
+    - name: Build
       run: dotnet build --no-restore -c Release
 
-    - name: Test Release
-      run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
-
     - name: Pack
-      if: ${{ success() && !github.base_ref }}
       run: |
         dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
         dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
     - name: Push to NuGet
-      if: ${{ success() && !github.base_ref }}
+      if: ${{ success() }}
       run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}

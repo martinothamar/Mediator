@@ -449,7 +449,12 @@ namespace Mediator2
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
         /// </summary>
-        public static global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient;
+        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient;
+
+        /// <summary>
+        /// The name of the notification publisher service that was configured.
+        /// </summary>
+        public const string NotificationPublisherName = "ForeachAwaitPublisher";
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.

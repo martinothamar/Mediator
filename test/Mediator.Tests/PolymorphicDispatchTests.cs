@@ -44,17 +44,14 @@ public sealed class PolymorphicDispatchTests
 
         await mediator.Publish(notification1);
         Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler.InstanceIds.GetValueOrDefault(notification1.Id, 0));
+        AssertInstanceIdCount(1, handler.InstanceIds, notification1.Id);
 
         await mediator.Publish(notification2);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler.InstanceIds.GetValueOrDefault(notification2.Id, 0));
+        AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
 
         await mediator.Publish(notification1);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(2, handler.InstanceIds.GetValueOrDefault(notification1.Id, 0));
+        AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
 
     [Fact]
@@ -70,16 +67,13 @@ public sealed class PolymorphicDispatchTests
 
         await mediator.Publish((object)notification1);
         Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler.InstanceIds.GetValueOrDefault(notification1.Id, 0));
+        AssertInstanceIdCount(1, handler.InstanceIds, notification1.Id);
 
         await mediator.Publish((object)notification2);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler.InstanceIds.GetValueOrDefault(notification2.Id, 0));
+        AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
 
         await mediator.Publish(notification1);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(2, handler.InstanceIds.GetValueOrDefault(notification1.Id, 0));
+        AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
 }

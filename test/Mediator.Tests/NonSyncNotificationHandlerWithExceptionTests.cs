@@ -72,15 +72,9 @@ public class NonSyncNotificationHandlerWithExceptionTests
         Assert.True(innerEx is Exception);
         Assert.Equal("marker0", innerEx.Message);
         SomeNonSyncNotificationHandler0.ShouldThrow = false;
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-        {
-            var handler1Data = handler1.InstanceIds.GetValueOrDefault(id, default);
-            var handler2Data = handler2.InstanceIds.GetValueOrDefault(id, default);
-            Assert.Equal(1, handler1Data.Count);
-            Assert.Equal(1, handler2Data.Count);
-            Assert.True(handler1Data.Timestamp > timestampBefore && handler1Data.Timestamp < timestampAfter);
-            Assert.True(handler2Data.Timestamp > timestampBefore && handler2Data.Timestamp < timestampAfter);
-        }
+
+        AssertInstanceIdCount(1, handler1.InstanceIds, id, timestampBefore, timestampAfter);
+        AssertInstanceIdCount(1, handler2.InstanceIds, id, timestampBefore, timestampAfter);
     }
 
     [Fact]
@@ -106,14 +100,8 @@ public class NonSyncNotificationHandlerWithExceptionTests
         Assert.True(innerEx is Exception);
         Assert.Equal("marker1", innerEx.Message);
         SomeNonSyncNotificationHandler1.ShouldThrow = false;
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-        {
-            var handler1Data = handler1.InstanceIds.GetValueOrDefault(id, default);
-            var handler2Data = handler2.InstanceIds.GetValueOrDefault(id, default);
-            Assert.Equal(1, handler1Data.Count);
-            Assert.Equal(1, handler2Data.Count);
-            Assert.True(handler1Data.Timestamp > timestampBefore && handler1Data.Timestamp < timestampAfter);
-            Assert.True(handler2Data.Timestamp > timestampBefore && handler2Data.Timestamp < timestampAfter);
-        }
+
+        AssertInstanceIdCount(1, handler1.InstanceIds, id, timestampBefore, timestampAfter);
+        AssertInstanceIdCount(1, handler2.InstanceIds, id, timestampBefore, timestampAfter);
     }
 }

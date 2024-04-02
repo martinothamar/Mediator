@@ -300,7 +300,10 @@ internal sealed class CompilationAnalyzer
             _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
             _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
             RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
-            new NotificationPublisherTypeModel(_notificationPublisherImplementationSymbol!.GetTypeSymbolFullName()),
+            new NotificationPublisherTypeModel(
+                _notificationPublisherImplementationSymbol!.GetTypeSymbolFullName(),
+                _notificationPublisherImplementationSymbol!.Name
+            ),
             HasErrors,
             MediatorNamespace,
             GeneratorVersion,

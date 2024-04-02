@@ -3,4 +3,8 @@
   <PropertyGroup>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants Condition="'$(ExtraDefineConstants)' != ''">$(DefineConstants);$(ExtraDefineConstants)</DefineConstants>
+  </PropertyGroup>
 </Project>

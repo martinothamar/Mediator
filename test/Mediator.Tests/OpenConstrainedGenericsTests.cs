@@ -101,8 +101,7 @@ public sealed class OpenConstrainedGenericsTests
             sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
         Assert.NotNull(handler);
         Assert.Contains(id, CatchAllPolymorphicNotificationHandler.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler.InstanceIds.GetValueOrDefault(id, 0));
+        AssertInstanceIdCount(1, handler.InstanceIds, id);
     }
 
     [Fact]
@@ -119,8 +118,7 @@ public sealed class OpenConstrainedGenericsTests
             sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
         Assert.NotNull(handler);
         Assert.Contains(id, CatchAllPolymorphicNotificationHandler.Ids);
-        if (Mediator.ServiceLifetime != ServiceLifetime.Transient)
-            Assert.Equal(1, handler.InstanceIds.GetValueOrDefault(id, 0));
+        AssertInstanceIdCount(1, handler.InstanceIds, id);
     }
 
     [Fact]
