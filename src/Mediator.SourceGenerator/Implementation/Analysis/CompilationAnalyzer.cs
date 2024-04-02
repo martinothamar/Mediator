@@ -270,7 +270,7 @@ internal sealed class CompilationAnalyzer
         {
             while (x.BaseType is not null)
             {
-                if (x.BaseType.ContainingNamespace.Name == "System" && x.BaseType.Name == "Object")
+                if (x.BaseType.SpecialType == SpecialType.System_Object)
                     break;
 
                 if (SymbolEqualityComparer.Default.Equals(x.BaseType, y))

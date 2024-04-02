@@ -188,7 +188,7 @@ public readonly struct NotificationHandlers<TNotification>
     }
 
     /// <summary>
-    /// Checks wether there is exactly 1 single handler in the collection.
+    /// Checks whether there is exactly 1 single handler in the collection.
     /// NOTE: if the underlying collection is not an array, this will return false.
     /// </summary>
     /// <param name="handler">The single handler, if there's a exactly 1 handler present</param>

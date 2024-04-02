@@ -1,3 +1,3 @@
 namespace Mediator.SourceGenerator;
 
-internal sealed record NotificationPublisherTypeModel(string FullName);
+internal readonly record struct NotificationPublisherTypeModel(string FullName);
