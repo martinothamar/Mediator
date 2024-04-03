@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        lifetime: [Mediator_Lifetime_Singleton, Mediator_Lifetime_Scoped, Mediator_Lifetime_Transient]
-        publisher: [Mediator_Publisher_ForeachAwait, Mediator_Publisher_TaskWhenAll]
+        lifetime: [Singleton, Scoped, Transient]
+        publisher: [ForeachAwait, TaskWhenAll]
 
     steps:
     - uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore -p:ExtraDefineConstants=\"${{ matrix.lifetime }}%3B${{ matrix.publisher }}\"
+      run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}\"
 
     - name: Test
       run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
