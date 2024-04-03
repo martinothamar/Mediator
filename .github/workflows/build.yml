@@ -40,7 +40,7 @@ jobs:
 
     - uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}\.nuget\packages
+        path: ${{ github.workspace }}/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
         restore-keys: |
           ${{ runner.os }}-nuget-
@@ -76,7 +76,7 @@ jobs:
 
     - uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}\.nuget\packages
+        path: ${{ github.workspace }}/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
         restore-keys: |
           ${{ runner.os }}-nuget-
@@ -97,4 +97,4 @@ jobs:
 
     - name: Push to NuGet
       if: ${{ success() && github.event_name != 'pull_request' }}
-      run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json # --api-key ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
