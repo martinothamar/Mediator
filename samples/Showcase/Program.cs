@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator;
@@ -7,7 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddMediator();
+services.AddMediator(options =>
+{
+    options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
+});
 
 // Ordering of pipeline behavior registrations matter!
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggerHandler<,>));
@@ -137,5 +141,27 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
     public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
     {
         return default;
+    }
+}
+
+public sealed class FireAndForgetNotificationPublisher : INotificationPublisher
+{
+    public async ValueTask Publish<TNotification>(
+        NotificationHandlers<TNotification> handlers,
+        TNotification notification,
+        CancellationToken cancellationToken
+    )
+        where TNotification : INotification
+    {
+        try
+        {
+            await Task.WhenAll(handlers.Select(handler => handler.Handle(notification, cancellationToken).AsTask()));
+        }
+        catch (Exception ex)
+        {
+            // Notifications should be fire-and-forget, we just need to log it!
+            // This way we don't have to worry about exceptions bubbling up when publishing notifications
+            Console.Error.WriteLine(ex);
+        }
     }
 }

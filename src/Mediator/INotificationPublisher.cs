@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Mediator;
 
@@ -9,7 +11,7 @@ namespace Mediator;
 /// Contains convenience methods for implementing the <see cref="INotificationPublisher"/> in an efficient way.
 /// </summary>
 /// <typeparam name="TNotification">The type of notification.</typeparam>
-public readonly struct NotificationHandlers<TNotification>
+public readonly struct NotificationHandlers<TNotification> : IEnumerable<INotificationHandler<TNotification>>
     where TNotification : INotification
 {
     private readonly IEnumerable<INotificationHandler<TNotification>> _handlers;
@@ -20,7 +22,7 @@ public readonly struct NotificationHandlers<TNotification>
     /// </summary>
     /// <param name="handlers">The array of notification handlers, if stored as an array.</param>
     /// <returns><c>true</c> if the handlers are stored as an array; otherwise, <c>false</c>.</returns>
-    internal readonly bool IsArray([MaybeNullWhen(false)] out INotificationHandler<TNotification>[] handlers)
+    public readonly bool IsArray([MaybeNullWhen(false)] out INotificationHandler<TNotification>[] handlers)
     {
         if (_isArray)
         {
@@ -55,6 +57,7 @@ public readonly struct NotificationHandlers<TNotification>
     {
         if (IsArray(out var handlers) && handlers.Length == 1)
         {
+            // MemoryMarshal.GetArrayDataReference(handlers);
             handler = handlers[0];
             return true;
         }
@@ -65,55 +68,87 @@ public readonly struct NotificationHandlers<TNotification>
 
     public readonly Enumerator GetEnumerator() => new Enumerator(in this);
 
-    public struct Enumerator
+    IEnumerator<INotificationHandler<TNotification>> IEnumerable<INotificationHandler<TNotification>>.GetEnumerator() =>
+        new Enumerator(in this);
+
+    IEnumerator IEnumerable.GetEnumerator() => new Enumerator(in this);
+
+    public struct Enumerator : IEnumerator<INotificationHandler<TNotification>>
     {
         private readonly NotificationHandlers<TNotification> _handlers;
         private IEnumerator<INotificationHandler<TNotification>>? _enumerator;
         private int _index;
+        private INotificationHandler<TNotification>? _current;
 
         internal Enumerator(in NotificationHandlers<TNotification> handlers)
         {
-            _index = -1;
             _handlers = handlers;
+            _enumerator = null;
+            _index = 0;
+            _current = null;
         }
 
-        public readonly INotificationHandler<TNotification> Current
+        public readonly INotificationHandler<TNotification> Current => _current!;
+
+        readonly object? IEnumerator.Current
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                switch (_handlers.IsArray(out var handlers))
+                if (
+                    (_handlers.IsArray(out var array) && (_index == 0 || _index == array.Length + 1))
+                    || _enumerator is null
+                )
                 {
-                    case true:
-                        return handlers[_index];
-                    case false:
-                        Debug.Assert(_enumerator is not null);
-                        return _enumerator!.Current;
+                    ThrowHelper.ThrowInvalidOperationException(
+                        "Enumeration has either not started or has already finished."
+                    );
                 }
+                return Current;
             }
         }
+
+        public readonly void Dispose() { }
 
         public bool MoveNext()
         {
             switch (_handlers.IsArray(out var handlers))
             {
                 case true:
-                    if ((uint)_index + 1 < (uint)handlers.Length)
+                    if ((uint)_index < (uint)handlers.Length)
                     {
+                        _current = handlers[_index];
                         _index++;
                         return true;
                     }
 
-                    return false;
+                    return MoveNextRare(handlers);
                 case false:
-                    if (_index == -1)
-                    {
-                        _enumerator = _handlers._handlers.GetEnumerator();
-                        _index++;
-                    }
-                    Debug.Assert(_enumerator is not null);
-                    return _enumerator!.MoveNext();
+                    return MoveNextInnerEnumerator();
             }
+        }
+
+        private bool MoveNextRare(INotificationHandler<TNotification>[] handlers)
+        {
+            _index = handlers.Length + 1;
+            _current = null;
+            return false;
+        }
+
+        private bool MoveNextInnerEnumerator()
+        {
+            if (_index == 0)
+                _enumerator = _handlers._handlers.GetEnumerator();
+            _index++;
+            Debug.Assert(_enumerator is not null);
+            var result = _enumerator!.MoveNext();
+            _current = result ? _enumerator.Current : null;
+            return result;
+        }
+
+        public void Reset()
+        {
+            _enumerator = null;
+            _index = 0;
         }
     }
 }

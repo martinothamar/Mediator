@@ -25,7 +25,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
                 var task1 = handlersArray[1].Handle(notification, cancellationToken);
                 if (task0.IsCompletedSuccessfully && task1.IsCompletedSuccessfully)
                     return default;
-                return AwaitTasks(task0, task1);
+                return AwaitTasks(task0.AsTask(), task1.AsTask());
             }
             if (handlersArray.Length == 3)
             {
@@ -34,7 +34,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
                 var task2 = handlersArray[2].Handle(notification, cancellationToken);
                 if (task0.IsCompletedSuccessfully && task1.IsCompletedSuccessfully && task2.IsCompletedSuccessfully)
                     return default;
-                return AwaitTasks(task0, task1, task2);
+                return AwaitTasks(task0.AsTask(), task1.AsTask(), task2.AsTask());
             }
             if (handlersArray.Length == 4)
             {
@@ -49,10 +49,10 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
                     && task3.IsCompletedSuccessfully
                 )
                     return default;
-                return AwaitTasks(task0, task1, task2, task3);
+                return AwaitTasks(task0.AsTask(), task1.AsTask(), task2.AsTask(), task3.AsTask());
             }
 
-            ValueTask[]? tasks = null;
+            Task[]? tasks = null;
             var count = 0;
 
             foreach (var handler in handlersArray)
@@ -61,8 +61,8 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
                 if (task.IsCompletedSuccessfully)
                     continue;
 
-                tasks ??= new ValueTask[handlersArray.Length];
-                tasks[count++] = task;
+                tasks ??= new Task[handlersArray.Length];
+                tasks[count++] = task.AsTask();
             }
 
             if (tasks is null)
@@ -72,25 +72,35 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
         }
         else
         {
-            List<ValueTask>? tasks = null;
-            foreach (var handler in handlers)
-            {
-                var task = handler.Handle(notification, cancellationToken);
-                if (task.IsCompletedSuccessfully)
-                    continue;
-
-                tasks ??= new List<ValueTask>(1);
-                tasks.Add(task);
-            }
-
-            if (tasks is null)
-                return default;
-
-            return AwaitTaskList(tasks);
+            return PublishNonArray(handlers, notification, cancellationToken);
         }
     }
 
-    static async ValueTask AwaitTasks(ValueTask task0, ValueTask task1)
+    static ValueTask PublishNonArray<TNotification>(
+        NotificationHandlers<TNotification> handlers,
+        TNotification notification,
+        CancellationToken cancellationToken
+    )
+        where TNotification : INotification
+    {
+        List<Task>? tasks = null;
+        foreach (var handler in handlers)
+        {
+            var task = handler.Handle(notification, cancellationToken);
+            if (task.IsCompletedSuccessfully)
+                continue;
+
+            tasks ??= new List<Task>(1);
+            tasks.Add(task.AsTask());
+        }
+
+        if (tasks is null)
+            return default;
+
+        return AwaitTaskList(tasks);
+    }
+
+    static async ValueTask AwaitTasks(Task task0, Task task1)
     {
         List<Exception>? exceptions = null;
 
@@ -117,7 +127,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
             ThrowHelper.ThrowAggregateException(exceptions);
     }
 
-    static async ValueTask AwaitTasks(ValueTask task0, ValueTask task1, ValueTask task2)
+    static async ValueTask AwaitTasks(Task task0, Task task1, Task task2)
     {
         List<Exception>? exceptions = null;
 
@@ -153,7 +163,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
             ThrowHelper.ThrowAggregateException(exceptions);
     }
 
-    static async ValueTask AwaitTasks(ValueTask task0, ValueTask task1, ValueTask task2, ValueTask task3)
+    static async ValueTask AwaitTasks(Task task0, Task task1, Task task2, Task task3)
     {
         List<Exception>? exceptions = null;
 
@@ -198,7 +208,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
             ThrowHelper.ThrowAggregateException(exceptions);
     }
 
-    static async ValueTask AwaitTaskArray(ValueTask[] tasks, int count)
+    static async ValueTask AwaitTaskArray(Task[] tasks, int count)
     {
         List<Exception>? exceptions = null;
         for (int i = 0; i < count; i++)
@@ -218,7 +228,7 @@ public sealed class TaskWhenAllPublisher : INotificationPublisher
             ThrowHelper.ThrowAggregateException(exceptions);
     }
 
-    static async ValueTask AwaitTaskList(List<ValueTask> tasks)
+    static async ValueTask AwaitTaskList(List<Task> tasks)
     {
         List<Exception>? exceptions = null;
         for (int i = 0; i < tasks.Count; i++)

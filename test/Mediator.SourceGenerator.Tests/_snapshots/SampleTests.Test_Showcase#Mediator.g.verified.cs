@@ -81,8 +81,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.INotificationHandler<>), typeof(global::GenericNotificationHandler<>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
 
-            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::FireAndForgetNotificationPublisher), typeof(global::FireAndForgetNotificationPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::FireAndForgetNotificationPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -476,7 +476,7 @@ namespace Mediator
         /// <summary>
         /// The name of the notification publisher service that was configured.
         /// </summary>
-        public const string NotificationPublisherName = "ForeachAwaitPublisher";
+        public const string NotificationPublisherName = "FireAndForgetNotificationPublisher";
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -557,7 +557,7 @@ namespace Mediator
             public readonly global::Mediator.INotificationHandler<global::ErrorMessage>[] Handlers_For_ErrorMessage;
             public readonly global::Mediator.INotificationHandler<global::SuccessfulMessage>[] Handlers_For_SuccessfulMessage;
 
-            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
+            public readonly global::FireAndForgetNotificationPublisher InternalNotificationPublisherImpl;
 
             public DICache(global::System.IServiceProvider sp, global::Mediator.ContainerMetadata containerMetadata)
             {
@@ -594,7 +594,7 @@ namespace Mediator
                 }
 
 
-                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::FireAndForgetNotificationPublisher>();
             }
         }
 
