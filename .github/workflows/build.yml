@@ -56,7 +56,6 @@ jobs:
 
   publish:
     needs: build
-    if: ${{ !github.base_ref }}
     runs-on: ubuntu-latest
 
     env:
@@ -88,11 +87,14 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
 
+    - name: Test
+      run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
+
     - name: Pack
       run: |
         dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
         dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
     - name: Push to NuGet
-      if: ${{ success() }}
-      run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+      if: ${{ success() && github.event_name != 'pull_request' }}
+      run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json # --api-key ${{secrets.NUGET_API_KEY}}
