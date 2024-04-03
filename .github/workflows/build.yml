@@ -22,6 +22,8 @@ jobs:
         lifetime: [Singleton, Scoped, Transient]
         publisher: [ForeachAwait, TaskWhenAll]
 
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
     - uses: actions/checkout@v2
       with:
@@ -35,6 +37,13 @@ jobs:
       with:
         dotnet-version: '8.0.x'
         include-prerelease: false
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}\.nuget\packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
     - name: Restore dependencies
       run: dotnet restore
@@ -49,6 +58,9 @@ jobs:
     needs: build
     if: ${{ !github.base_ref }}
     runs-on: ubuntu-latest
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
     - uses: actions/checkout@v2
       with:
@@ -62,6 +74,13 @@ jobs:
       with:
         dotnet-version: '8.0.x'
         include-prerelease: false
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}\.nuget\packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
     - name: Restore dependencies
       run: dotnet restore
