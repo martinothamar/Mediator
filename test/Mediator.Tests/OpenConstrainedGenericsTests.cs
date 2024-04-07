@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,11 +16,15 @@ public sealed class OpenConstrainedGenericsTests
     public sealed class CatchAllPolymorphicNotificationHandler : INotificationHandler<INotification>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
+        internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
         public ValueTask Handle(INotification notification, CancellationToken cancellationToken)
         {
             if (notification is SomeNotificationWithoutConcreteHandler n)
+            {
                 Ids.Add(n.Id);
+                InstanceIds.AddOrUpdate(n.Id, 1, (_, count) => count + 1);
+            }
             return default;
         }
     }
@@ -28,10 +33,12 @@ public sealed class OpenConstrainedGenericsTests
         where TNotification : ISomeNotification
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
+        internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
         public ValueTask Handle(TNotification notification, CancellationToken cancellationToken)
         {
             Ids.Add(notification.Id);
+            InstanceIds.AddOrUpdate(notification.Id, 1, (_, count) => count + 1);
             return default;
         }
     }
@@ -85,14 +92,16 @@ public sealed class OpenConstrainedGenericsTests
     {
         var (sp, mediator) = Fixture.GetMediator();
 
-        var notification = new SomeNotificationWithoutConcreteHandler(Guid.NewGuid());
+        var id = Guid.NewGuid();
+        var notification = new SomeNotificationWithoutConcreteHandler(id);
 
         await mediator.Publish(notification);
 
         var handler = (CatchAllPolymorphicNotificationHandler)
             sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
         Assert.NotNull(handler);
-        Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
+        Assert.Contains(id, CatchAllPolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler.InstanceIds, id);
     }
 
     [Fact]
@@ -100,14 +109,16 @@ public sealed class OpenConstrainedGenericsTests
     {
         var (sp, mediator) = Fixture.GetMediator();
 
-        var notification = new SomeNotificationWithoutConcreteHandler(Guid.NewGuid());
+        var id = Guid.NewGuid();
+        var notification = new SomeNotificationWithoutConcreteHandler(id);
 
         await mediator.Publish((object)notification);
 
         var handler = (CatchAllPolymorphicNotificationHandler)
             sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
-        Assert.Contains(notification.Id, CatchAllPolymorphicNotificationHandler.Ids);
         Assert.NotNull(handler);
+        Assert.Contains(id, CatchAllPolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler.InstanceIds, id);
     }
 
     [Fact]

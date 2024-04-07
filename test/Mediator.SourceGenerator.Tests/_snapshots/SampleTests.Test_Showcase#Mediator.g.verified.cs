@@ -33,8 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddMediator(services, null);
         }
 
-        internal sealed class Dummy { }
-
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
@@ -82,7 +80,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.Add(new SD(typeof(global::Mediator.INotificationHandler<>), typeof(global::GenericNotificationHandler<>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.AddSingleton<Dummy>();
+
+            services.Add(new SD(typeof(global::FireAndForgetNotificationPublisher), typeof(global::FireAndForgetNotificationPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::FireAndForgetNotificationPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            services.Add(new SD(typeof(global::Mediator.ContainerMetadata), typeof(global::Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -431,6 +436,23 @@ namespace Mediator
             _rootHandler(request, cancellationToken);
     }
 
+    internal interface IContainerProbe { }
+    internal sealed class ContainerProbe0 : IContainerProbe { }
+    internal sealed class ContainerProbe1 : IContainerProbe { }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class ContainerMetadata
+    {
+        public readonly bool ServicesUnderlyingTypeIsArray;
+
+        public ContainerMetadata(global::System.IServiceProvider sp)
+        {
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+        }
+    }
+
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -442,14 +464,19 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         private readonly global::System.IServiceProvider _sp;
+        private readonly global::Mediator.ContainerMetadata _containerMetadata;
+
         private FastLazyValue<DICache> _diCacheLazy;
 
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
         /// </summary>
-        public static global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; } = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
+        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
 
-        private readonly global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> _getServicesLength;
+        /// <summary>
+        /// The name of the notification publisher service that was configured.
+        /// </summary>
+        public const string NotificationPublisherName = "FireAndForgetNotificationPublisher";
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -457,14 +484,8 @@ namespace Mediator
         public Mediator(global::System.IServiceProvider sp)
         {
             _sp = sp;
-            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp));
-
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> fastGetLength = s => ((object[])s).Length;
-            global::System.Func<global::System.Collections.Generic.IEnumerable<object>, int> slowGetLength = s => s.Count();
-
-            var dummy = sp.GetServices<global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy>();
-            _getServicesLength = dummy.GetType() == typeof(global::Microsoft.Extensions.DependencyInjection.MediatorDependencyInjectionExtensions.Dummy[])
-                 ? fastGetLength : slowGetLength;
+            _containerMetadata = sp.GetRequiredService<global::Mediator.ContainerMetadata>();
+            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp, _containerMetadata));
         }
 
         private struct FastLazyValue<T>
@@ -536,13 +557,44 @@ namespace Mediator
             public readonly global::Mediator.INotificationHandler<global::ErrorMessage>[] Handlers_For_ErrorMessage;
             public readonly global::Mediator.INotificationHandler<global::SuccessfulMessage>[] Handlers_For_SuccessfulMessage;
 
-            public DICache(global::System.IServiceProvider sp)
+            public readonly global::FireAndForgetNotificationPublisher InternalNotificationPublisherImpl;
+
+            public DICache(global::System.IServiceProvider sp, global::Mediator.ContainerMetadata containerMetadata)
             {
                 _sp = sp;
 
+
                 Wrapper_For_Ping = sp.GetRequiredService<global::Mediator.RequestClassHandlerWrapper<global::Ping, global::Pong>>();
-                Handlers_For_ErrorMessage = sp.GetServices<global::Mediator.INotificationHandler<global::ErrorMessage>>().ToArray();
-                Handlers_For_SuccessfulMessage = sp.GetServices<global::Mediator.INotificationHandler<global::SuccessfulMessage>>().ToArray();
+
+                var handlers_For_ErrorMessage = sp.GetServices<global::Mediator.INotificationHandler<global::ErrorMessage>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_ErrorMessage is global::Mediator.INotificationHandler<global::ErrorMessage>[]);
+                    Handlers_For_ErrorMessage = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::ErrorMessage>[]>(
+                        handlers_For_ErrorMessage
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_ErrorMessage is not global::Mediator.INotificationHandler<global::ErrorMessage>[]);
+                    Handlers_For_ErrorMessage = handlers_For_ErrorMessage.ToArray();
+                }
+                var handlers_For_SuccessfulMessage = sp.GetServices<global::Mediator.INotificationHandler<global::SuccessfulMessage>>();
+                if (containerMetadata.ServicesUnderlyingTypeIsArray)
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_SuccessfulMessage is global::Mediator.INotificationHandler<global::SuccessfulMessage>[]);
+                    Handlers_For_SuccessfulMessage = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::SuccessfulMessage>[]>(
+                        handlers_For_SuccessfulMessage
+                    );
+                }
+                else
+                {
+                    global::System.Diagnostics.Debug.Assert(handlers_For_SuccessfulMessage is not global::Mediator.INotificationHandler<global::SuccessfulMessage>[]);
+                    Handlers_For_SuccessfulMessage = handlers_For_SuccessfulMessage.ToArray();
+                }
+
+
+                InternalNotificationPublisherImpl = sp.GetRequiredService<global::FireAndForgetNotificationPublisher>();
             }
         }
 
@@ -839,33 +891,12 @@ namespace Mediator
             {
                 return default;
             }
-            else if (handlers.Length == 1)
-            {
-                return handlers[0].Handle(notification, cancellationToken);
-            }
-
-            return Publish(notification, handlers, cancellationToken);
-
-            async global::System.Threading.Tasks.ValueTask Publish(global::ErrorMessage notification, global::Mediator.INotificationHandler<global::ErrorMessage>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
-            }
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+            return publisher.Publish(
+                new global::Mediator.NotificationHandlers<global::ErrorMessage>(handlers, isArray: true),
+                notification,
+                cancellationToken
+            );
         }
         /// <summary>
         /// Send a notification of type global::SuccessfulMessage.
@@ -889,33 +920,12 @@ namespace Mediator
             {
                 return default;
             }
-            else if (handlers.Length == 1)
-            {
-                return handlers[0].Handle(notification, cancellationToken);
-            }
-
-            return Publish(notification, handlers, cancellationToken);
-
-            async global::System.Threading.Tasks.ValueTask Publish(global::SuccessfulMessage notification, global::Mediator.INotificationHandler<global::SuccessfulMessage>[] handlers, global::System.Threading.CancellationToken cancellationToken)
-            {
-                // We don't allocate the list if no task throws
-                global::System.Collections.Generic.List<global::System.Exception>? exceptions = null;
-
-                for (int i = 0; i < handlers.Length; i++)
-                {
-                    try
-                    {
-                        await handlers[i].Handle(notification, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (global::System.Exception ex)
-                    {
-                        exceptions ??= new global::System.Collections.Generic.List<global::System.Exception>();
-                        exceptions.Add(ex);
-                    }
-                }
-
-                MaybeThrowAggregateException(exceptions);
-            }
+            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
+            return publisher.Publish(
+                new global::Mediator.NotificationHandlers<global::SuccessfulMessage>(handlers, isArray: true),
+                notification,
+                cancellationToken
+            );
         }
 
         /// <summary>

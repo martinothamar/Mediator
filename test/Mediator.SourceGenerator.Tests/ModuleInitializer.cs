@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using DiffEngine;
 using Microsoft.Build.Locator;
 using VerifyTests;
 using VerifyXunit;
@@ -16,6 +17,8 @@ public static class ModuleInitializer
     public static void Init()
     {
         _instance ??= MSBuildLocator.RegisterDefaults();
+
+        DiffRunner.Disabled = true;
 
         Verifier.DerivePathInfo(
             (file, _, type, method) => new(Path.Join(Path.GetDirectoryName(file), "_snapshots"), type.Name, method.Name)

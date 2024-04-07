@@ -1,3 +1,5 @@
+#if Mediator_Lifetime_Singleton || (!Mediator_Lifetime_Transient && !Mediator_Lifetime_Scoped)
+
 using System.Linq;
 using System.Threading.Tasks;
 using DICache = Mediator.Mediator.DICache;
@@ -50,3 +52,5 @@ public partial class SmokeTests
         }
     }
 }
+
+#endif

@@ -16,9 +16,14 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lifetime: [Singleton, Scoped, Transient]
+        publisher: [ForeachAwait, TaskWhenAll]
 
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
     - uses: actions/checkout@v2
       with:
@@ -33,6 +38,49 @@ jobs:
         dotnet-version: '8.0.x'
         include-prerelease: false
 
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}\"
+
+    - name: Test
+      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+    - uses: dotnet/nbgv@master
+      with:
+        setAllVars: true
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        include-prerelease: false
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
     - name: Restore dependencies
       run: dotnet restore
 
@@ -40,14 +88,13 @@ jobs:
       run: dotnet build --no-restore -c Release
 
     - name: Test
-      run: dotnet test --no-restore --verbosity normal -c Release
+      run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
 
     - name: Pack
-      if: ${{ success() && !github.base_ref }}
       run: |
         dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
         dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
     - name: Push to NuGet
-      if: ${{ success() && !github.base_ref }}
+      if: ${{ success() && github.event_name != 'pull_request' }}
       run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}

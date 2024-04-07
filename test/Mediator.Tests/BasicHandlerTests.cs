@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Mediator.Tests.TestTypes;
@@ -295,20 +296,20 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+        AssertInstanceIdCount(1, notificationHandler.InstanceIds, id);
 
         var handlers = sp.GetServices<INotificationHandler<SomeNotification>>();
         Assert.True(handlers.Distinct().Count() == handlers.Count());
     }
 
     [Fact]
-    public unsafe void Test_Struct_Notification_Handler()
+    public async Task Test_Struct_Notification_Handler()
     {
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
         var notification = new SomeStructNotification(id);
-        var addr = *(long*)&notification;
 
         var handlers = sp.GetServices<INotificationHandler<SomeStructNotification>>();
         Assert.True(handlers.Count() == 2);
@@ -317,11 +318,9 @@ public class BasicHandlerTests
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
 
-#pragma warning disable xUnit1031
-        concrete.Publish(notification).GetAwaiter().GetResult();
-#pragma warning restore xUnit1031
+        await concrete.Publish(notification);
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
-        //Assert.Contains(addr, SomeStructNotificationHandler.Addresses);
+        AssertInstanceIdCount(1, notificationHandler.InstanceIds, id);
     }
 
     [Fact]
@@ -335,6 +334,7 @@ public class BasicHandlerTests
         Assert.NotNull(notificationHandler);
         await mediator.Publish<INotification>(new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
+        AssertInstanceIdCount(1, notificationHandler.InstanceIds, id);
 
         var handlers = sp.GetServices<INotificationHandler<SomeNotification>>();
         Assert.True(handlers.Distinct().Count() == handlers.Count());
@@ -355,6 +355,7 @@ public class BasicHandlerTests
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish(null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Publish((SomeNotification)null!));
         Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
+        AssertInstanceIdCount(0, notificationHandler.InstanceIds, id);
     }
 
     [Fact]
@@ -387,6 +388,8 @@ public class BasicHandlerTests
         await mediator.Publish((object)new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
+        AssertInstanceIdCount(2, handler1.InstanceIds, id);
+        AssertInstanceIdCount(2, handler2.InstanceIds, id);
     }
 
     [Fact]
@@ -403,6 +406,8 @@ public class BasicHandlerTests
         await mediator.Publish((object)new SomeNotification(id));
         Assert.Contains(id, SomeNotificationHandler.Ids);
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler1.InstanceIds, id);
+        AssertInstanceIdCount(1, handler2.InstanceIds, id);
     }
 
     [Fact]
@@ -472,5 +477,7 @@ public class BasicHandlerTests
         await mediator.Publish((object)new SomeNotification(id));
         Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
+        AssertInstanceIdCount(0, handler1.InstanceIds, id);
+        AssertInstanceIdCount(2, handler2.InstanceIds, id);
     }
 }

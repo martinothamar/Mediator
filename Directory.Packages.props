@@ -10,6 +10,7 @@
     <!-- Other libs -->
     <PackageVersion Include="MediatR" Version="12.2.0" />
     <PackageVersion Include="MessagePipe" Version="1.7.4" />
+    <PackageVersion Include="PolySharp" Version="1.14.1" />
 
     <!-- BCL -->
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />
@@ -18,6 +19,8 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(DotNetVersion)" />
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(DotNetVersion)" />
     <PackageVersion Include="System.Collections.Immutable" Version="$(DotNetVersion)" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(DotNetVersion)" />
+    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
 
     <!-- Roslyn / MSBuild -->

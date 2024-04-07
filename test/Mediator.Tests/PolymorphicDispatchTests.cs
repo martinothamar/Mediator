@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,10 +21,12 @@ public sealed class PolymorphicDispatchTests
     public sealed class SomePolymorphicNotificationHandler : INotificationHandler<IPolymorphicDispatchNotification>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
+        internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
         public ValueTask Handle(IPolymorphicDispatchNotification notification, CancellationToken cancellationToken)
         {
             Ids.Add(notification.Id);
+            InstanceIds.AddOrUpdate(notification.Id, 1, (_, count) => count + 1);
             return default;
         }
     }
@@ -41,9 +44,14 @@ public sealed class PolymorphicDispatchTests
 
         await mediator.Publish(notification1);
         Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler.InstanceIds, notification1.Id);
 
         await mediator.Publish(notification2);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
+
+        await mediator.Publish(notification1);
+        AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
 
     [Fact]
@@ -59,8 +67,13 @@ public sealed class PolymorphicDispatchTests
 
         await mediator.Publish((object)notification1);
         Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler.InstanceIds, notification1.Id);
 
         await mediator.Publish((object)notification2);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
+
+        await mediator.Publish(notification1);
+        AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
 }

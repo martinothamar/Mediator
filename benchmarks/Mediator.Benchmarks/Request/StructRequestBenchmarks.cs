@@ -60,22 +60,22 @@ public class StructRequestBenchmarks
     private SomeStructHandler _handler;
     private SomeStructRequest _request;
 
-    [Params(MediatorConfig.Lifetime)]
-    public ServiceLifetime ServiceLifetime { get; set; } = MediatorConfig.Lifetime;
+    [Params(Mediator.ServiceLifetime)]
+    public ServiceLifetime ServiceLifetime { get; set; }
 
     [GlobalSetup]
     public void Setup()
     {
         var services = new ServiceCollection();
-        services.AddMediator(opts => opts.ServiceLifetime = ServiceLifetime);
+        services.AddMediator();
         services.AddMediatR(opts =>
         {
-            opts.Lifetime = ServiceLifetime;
+            opts.Lifetime = Mediator.ServiceLifetime;
             opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
         });
         services.AddMessagePipe(opts =>
         {
-            opts.InstanceLifetime = ServiceLifetime switch
+            opts.InstanceLifetime = Mediator.ServiceLifetime switch
             {
                 ServiceLifetime.Singleton => InstanceLifetime.Singleton,
                 ServiceLifetime.Scoped => InstanceLifetime.Scoped,
@@ -85,13 +85,13 @@ public class StructRequestBenchmarks
         });
 
         _serviceProvider = services.BuildServiceProvider();
-        if (ServiceLifetime == ServiceLifetime.Scoped)
-        {
 #pragma warning disable CS0162 // Unreachable code detected
+        if (Mediator.ServiceLifetime == ServiceLifetime.Scoped)
+        {
             _serviceScope = _serviceProvider.CreateScope();
-#pragma warning restore CS0162 // Unreachable code detected
             _serviceProvider = _serviceScope.ServiceProvider;
         }
+#pragma warning restore CS0162 // Unreachable code detected
 
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();

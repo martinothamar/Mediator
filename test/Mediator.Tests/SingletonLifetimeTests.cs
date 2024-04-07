@@ -4,7 +4,7 @@ namespace Mediator.Tests;
 
 public class SingletonLifetimeTests
 {
-    [Fact]
+    [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Singleton ? "Only tested for Singleton lifetime" : null)]
     public void Test_Generated_Code_Lifetime()
     {
         var (_, mediator) = Fixture.GetMediator();

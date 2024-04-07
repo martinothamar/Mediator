@@ -58,7 +58,8 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
     - [4.6. Use notifications](#46-use-notifications)
     - [4.7. Polymorphic dispatch with notification handlers](#47-polymorphic-dispatch-with-notification-handlers)
     - [4.8. Notification handlers also support open generics](#48-notification-handlers-also-support-open-generics)
-    - [4.9. Use streaming messages](#49-use-streaming-messages)
+    - [4.9. Notification publishers](#49-notification-publishers)
+    - [4.10. Use streaming messages](#410-use-streaming-messages)
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
   - [7. Versioning](#7-versioning)
@@ -451,8 +452,50 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
 }
 ```
 
+### 4.9. Notification publishers
 
-### 4.9. Use streaming messages
+Notification publishers are responsible for dispatching notifications to a collection of handlers.
+There are two built in implementations:
+
+* `ForeachAwaitPublisher` - the default, dispatches the notifications to handlers in order 1-by-1
+* `TaskWhenAllPublisher` - dispatches notifications in parallel
+
+Both of these try to be efficient by handling a number of special cases (early exit on sync completion, single-handler, array of handlers).
+Below we implement a custom one by simply using `Task.WhenAll`.
+
+```csharp
+services.AddMediator(options =>
+{
+    options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
+});
+
+public sealed class FireAndForgetNotificationPublisher : INotificationPublisher
+{
+    public async ValueTask Publish<TNotification>(
+        NotificationHandlers<TNotification> handlers,
+        TNotification notification,
+        CancellationToken cancellationToken
+    )
+        where TNotification : INotification
+    {
+        try
+        {
+            await Task.WhenAll(handlers.Select(handler => handler.Handle(notification, cancellationToken).AsTask()));
+        }
+        catch (Exception ex)
+        {
+            // Notifications should be fire-and-forget, we just need to log it!
+            // This way we don't have to worry about exceptions bubbling up when publishing notifications
+            Console.Error.WriteLine(ex);
+
+            // NOTE: not necessarily saying this is a good idea!
+        }
+    }
+}
+```
+
+
+### 4.10. Use streaming messages
 
 Since version 1.* of this library there is support for streaming using `IAsyncEnumerable`.
 

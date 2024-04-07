@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Tests;
 
+#pragma warning disable CS0162 // Unreachable code detected
+
 public static class Fixture
 {
     public static bool CreateServiceScope;
@@ -30,6 +32,15 @@ public static class Fixture
             sp = sp.CreateScope().ServiceProvider;
 
         var mediator = sp.GetRequiredService<IMediator>();
+        var publisher = sp.GetRequiredService<INotificationPublisher>();
+
+        if (Mediator.NotificationPublisherName == nameof(TaskWhenAllPublisher))
+            Assert.IsType<TaskWhenAllPublisher>(publisher);
+        else if (Mediator.NotificationPublisherName == nameof(ForeachAwaitPublisher))
+            Assert.IsType<ForeachAwaitPublisher>(publisher);
+        else
+            Assert.IsType<ForeachAwaitPublisher>(publisher);
+
         return (sp, mediator!);
     }
 
@@ -39,7 +50,10 @@ public static class Fixture
     )
     {
         var services = new ServiceCollection();
-        services.AddSingleton<IServiceScopeFactory, CustomServiceProviderScope>();
+        services.AddSingleton<IServiceScopeFactory, CustomServiceProviderScope>(sp => new CustomServiceProviderScope(
+            (CustomServiceProvider)sp,
+            true
+        ));
 
         services.AddMediator();
 
@@ -145,3 +159,5 @@ public static class Fixture
         }
     }
 }
+
+#pragma warning restore CS0162 // Unreachable code detected

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ public sealed class AbstractNotificationHandlerTests
     public sealed class ConcreteNotificationHandler : AbstractNotificationHandler
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
+        internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
         public override ValueTask Handle(
             NotificationWithAbstractHandler notification,
@@ -28,6 +30,7 @@ public sealed class AbstractNotificationHandlerTests
         )
         {
             Ids.Add(notification.Id);
+            InstanceIds.AddOrUpdate(notification.Id, 1, (_, count) => count + 1);
             return default;
         }
     }
@@ -35,6 +38,7 @@ public sealed class AbstractNotificationHandlerTests
     public sealed class ConcreteNotificationHandler2 : AbstractNotificationHandler
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
+        internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
         public override ValueTask Handle(
             NotificationWithAbstractHandler notification,
@@ -42,6 +46,7 @@ public sealed class AbstractNotificationHandlerTests
         )
         {
             Ids.Add(notification.Id);
+            InstanceIds.AddOrUpdate(notification.Id, 1, (_, count) => count + 1);
             return default;
         }
     }
@@ -61,5 +66,7 @@ public sealed class AbstractNotificationHandlerTests
         Assert.NotNull(handler2);
         Assert.Contains(id, ConcreteNotificationHandler.Ids);
         Assert.Contains(id, ConcreteNotificationHandler2.Ids);
+        AssertInstanceIdCount(1, handler1.InstanceIds, id);
+        AssertInstanceIdCount(1, handler2.InstanceIds, id);
     }
 }

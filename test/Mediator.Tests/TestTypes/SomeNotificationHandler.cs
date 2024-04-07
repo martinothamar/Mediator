@@ -8,10 +8,12 @@ namespace Mediator.Tests.TestTypes;
 public sealed class SomeNotificationHandler : INotificationHandler<SomeNotification>
 {
     internal static readonly ConcurrentBag<Guid> Ids = new();
+    internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
     public ValueTask Handle(SomeNotification notification, CancellationToken cancellationToken)
     {
         Ids.Add(notification.Id);
+        InstanceIds.AddOrUpdate(notification.Id, 1, (_, count) => count + 1);
         return default;
     }
 }
@@ -19,12 +21,12 @@ public sealed class SomeNotificationHandler : INotificationHandler<SomeNotificat
 public sealed class SomeStructNotificationHandler : INotificationHandler<SomeStructNotification>
 {
     internal static readonly ConcurrentBag<Guid> Ids = new();
-    internal static readonly ConcurrentBag<long> Addresses = new();
+    internal readonly ConcurrentDictionary<Guid, int> InstanceIds = new();
 
     public unsafe ValueTask Handle(SomeStructNotification notification, CancellationToken cancellationToken)
     {
-        var addr = *(long*)&notification;
         Ids.Add(notification.Id);
+        InstanceIds.AddOrUpdate(notification.Id, 1, (_, count) => count + 1);
         return default;
     }
 }

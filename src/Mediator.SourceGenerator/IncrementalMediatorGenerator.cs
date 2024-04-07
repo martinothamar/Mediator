@@ -6,6 +6,7 @@ namespace Mediator.SourceGenerator;
 public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
 {
     internal CompilationAnalyzer? CompilationAnalyzer;
+    internal CompilationModel? CompilationModel;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -77,7 +78,10 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
         compilationAnalyzer.Initialize();
         compilationAnalyzer.Analyze();
 
+        var compilationModel = compilationAnalyzer.ToModel();
+
         CompilationAnalyzer = compilationAnalyzer;
-        return (diagnostics.ToImmutableEquatableArray(), compilationAnalyzer.ToModel());
+        CompilationModel = compilationModel;
+        return (diagnostics.ToImmutableEquatableArray(), compilationModel);
     }
 }
