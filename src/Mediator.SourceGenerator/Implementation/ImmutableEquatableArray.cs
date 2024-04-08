@@ -23,6 +23,8 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
     public T this[int index] => _values[index];
     public int Count => _values.Length;
 
+    public ImmutableEquatableArray(T[] values) => _values = values;
+
     public ImmutableEquatableArray(IEnumerable<T> values) => _values = values.ToArray();
 
     public bool Equals(ImmutableEquatableArray<T>? other) =>
