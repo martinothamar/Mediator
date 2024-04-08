@@ -7,6 +7,18 @@ internal record CompilationModel
     private readonly ImmutableEquatableArray<RequestMessageHandlerModel> _requestMessageHandlers;
     private readonly ImmutableEquatableArray<NotificationMessageHandlerModel> _notificationMessageHandlers;
 
+    public CompilationModel(string mediatorNamespace, string generatorVersion)
+    {
+        HasErrors = true;
+        MediatorNamespace = mediatorNamespace;
+        GeneratorVersion = generatorVersion;
+        _requestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        _notificationMessages = ImmutableEquatableArray<NotificationMessageModel>.Empty;
+        _requestMessageHandlers = ImmutableEquatableArray<RequestMessageHandlerModel>.Empty;
+        _notificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
+        RequestMessageHandlerWrappers = ImmutableEquatableArray<RequestMessageHandlerWrapperModel>.Empty;
+    }
+
     public CompilationModel(
         ImmutableEquatableArray<RequestMessageModel> requestMessages,
         ImmutableEquatableArray<NotificationMessageModel> notificationMessages,

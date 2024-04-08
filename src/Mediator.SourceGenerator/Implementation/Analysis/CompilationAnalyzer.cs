@@ -284,38 +284,54 @@ internal sealed class CompilationAnalyzer
 
     public CompilationModel ToModel()
     {
-        var comparer = new InheritanceComparer();
-        var model = new CompilationModel(
-            _requestMessages
-                .OrderBy(m => m.Symbol, comparer)
-                .Select(x => new RequestMessageModel(
-                    x.Symbol,
-                    x.ResponseSymbol,
-                    x.MessageType,
-                    x.Handler?.ToModel(),
-                    x.WrapperType
-                ))
-                .ToImmutableEquatableArray(),
-            _notificationMessages.OrderBy(m => m.Symbol, comparer).Select(x => x.ToModel()).ToImmutableEquatableArray(),
-            _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
-            _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
-            RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
-            new NotificationPublisherTypeModel(
-                _notificationPublisherImplementationSymbol!.GetTypeSymbolFullName(),
-                _notificationPublisherImplementationSymbol!.Name
-            ),
-            HasErrors,
-            MediatorNamespace,
-            GeneratorVersion,
-            ServiceLifetime,
-            ServiceLifetimeShort,
-            SingletonServiceLifetime,
-            IsTestRun,
-            ConfiguredViaAttribute,
-            ConfiguredViaConfiguration
-        );
+        if (HasErrors)
+            return new CompilationModel(MediatorNamespace, GeneratorVersion);
 
-        return model;
+        try
+        {
+            var comparer = new InheritanceComparer();
+            var model = new CompilationModel(
+                _requestMessages
+                    .OrderBy(m => m.Symbol, comparer)
+                    .Select(x => new RequestMessageModel(
+                        x.Symbol,
+                        x.ResponseSymbol,
+                        x.MessageType,
+                        x.Handler?.ToModel(),
+                        x.WrapperType
+                    ))
+                    .ToImmutableEquatableArray(),
+                _notificationMessages
+                    .OrderBy(m => m.Symbol, comparer)
+                    .Select(x => x.ToModel())
+                    .ToImmutableEquatableArray(),
+                _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
+                _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
+                RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
+                new NotificationPublisherTypeModel(
+                    _notificationPublisherImplementationSymbol!.GetTypeSymbolFullName(),
+                    _notificationPublisherImplementationSymbol!.Name
+                ),
+                HasErrors,
+                MediatorNamespace,
+                GeneratorVersion,
+                ServiceLifetime,
+                ServiceLifetimeShort,
+                SingletonServiceLifetime,
+                IsTestRun,
+                ConfiguredViaAttribute,
+                ConfiguredViaConfiguration
+            );
+
+            return model;
+        }
+        catch (Exception ex)
+        {
+            _context.ReportGenericError(ex);
+            HasErrors = true;
+
+            return new CompilationModel(MediatorNamespace, GeneratorVersion);
+        }
     }
 
     private void FindGlobalNamespaces(Queue<INamespaceOrTypeSymbol> queue)
