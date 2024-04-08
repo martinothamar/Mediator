@@ -1,4 +1,6 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -264,22 +266,35 @@ internal sealed class CompilationAnalyzer
         }
     }
 
-    private sealed class InheritanceComparer : IComparer<INamedTypeSymbol>
+    private static ImmutableEquatableArray<TModel> ToModelsSortedByInheritanceDepth<TSource, TModel>(
+        HashSet<TSource> source,
+        Func<TSource, TModel> selector
+    )
+        where TSource : SymbolMetadata<TSource>
+        where TModel : SymbolMetadataModel, IEquatable<TModel>
     {
-        public int Compare(INamedTypeSymbol x, INamedTypeSymbol y)
+        var analysis = new (TSource Message, int Depth)[source.Count];
+        int i = 0;
+        foreach (var message in source)
         {
-            while (x.BaseType is not null)
+            var baseType = message.Symbol.BaseType;
+            int depth = 0;
+            while (baseType is not null && baseType.SpecialType != SpecialType.System_Object)
             {
-                if (x.BaseType.SpecialType == SpecialType.System_Object)
-                    break;
-
-                if (SymbolEqualityComparer.Default.Equals(x.BaseType, y))
-                    return -1;
-                x = x.BaseType;
+                depth++;
+                baseType = baseType.BaseType;
             }
 
-            return x.GetTypeSymbolFullName().CompareTo(y.GetTypeSymbolFullName());
+            Debug.Assert(i < source.Count);
+            analysis[i++] = (message, depth);
         }
+
+        Array.Sort(analysis, (x, y) => y.Depth.CompareTo(x.Depth));
+        var models = new TModel[source.Count];
+        for (i = 0; i < source.Count; i++)
+            models[i] = selector(analysis[i].Message);
+
+        return new ImmutableEquatableArray<TModel>(models);
     }
 
     public CompilationModel ToModel()
@@ -289,28 +304,27 @@ internal sealed class CompilationAnalyzer
 
         try
         {
-            var comparer = new InheritanceComparer();
+            if (_notificationPublisherImplementationSymbol is null)
+                throw new Exception("Unexpected state: NotificationPublisherImplementationSymbol is null");
+
             var model = new CompilationModel(
-                _requestMessages
-                    .OrderBy(m => m.Symbol, comparer)
-                    .Select(x => new RequestMessageModel(
-                        x.Symbol,
-                        x.ResponseSymbol,
-                        x.MessageType,
-                        x.Handler?.ToModel(),
-                        x.WrapperType
-                    ))
-                    .ToImmutableEquatableArray(),
-                _notificationMessages
-                    .OrderBy(m => m.Symbol, comparer)
-                    .Select(x => x.ToModel())
-                    .ToImmutableEquatableArray(),
+                ToModelsSortedByInheritanceDepth(
+                    _requestMessages,
+                    m => new RequestMessageModel(
+                        m.Symbol,
+                        m.ResponseSymbol,
+                        m.MessageType,
+                        m.Handler?.ToModel(),
+                        m.WrapperType
+                    )
+                ),
+                ToModelsSortedByInheritanceDepth(_notificationMessages, m => m.ToModel()),
                 _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
                 _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
                 RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
                 new NotificationPublisherTypeModel(
-                    _notificationPublisherImplementationSymbol!.GetTypeSymbolFullName(),
-                    _notificationPublisherImplementationSymbol!.Name
+                    _notificationPublisherImplementationSymbol.GetTypeSymbolFullName(),
+                    _notificationPublisherImplementationSymbol.Name
                 ),
                 HasErrors,
                 MediatorNamespace,
