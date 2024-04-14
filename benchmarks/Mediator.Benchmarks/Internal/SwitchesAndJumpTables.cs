@@ -205,6 +205,63 @@ public class SwitchesAndJumpTables
 
     [Benchmark]
     [ArgumentsSource(nameof(Messages))]
+    public ValueTask SwitchGetType(ISwitchMessage message)
+    {
+        if (message.GetType() == typeof(SwitchMessage1)) return Handle1(Unsafe.As<SwitchMessage1>(message));
+        else if (message.GetType() == typeof(SwitchMessage2)) return Handle2(Unsafe.As<SwitchMessage2>(message));
+        else if (message.GetType() == typeof(SwitchMessage3)) return Handle3(Unsafe.As<SwitchMessage3>(message));
+        else if (message.GetType() == typeof(SwitchMessage4)) return Handle4(Unsafe.As<SwitchMessage4>(message));
+        else if (message.GetType() == typeof(SwitchMessage5)) return Handle5(Unsafe.As<SwitchMessage5>(message));
+        else if (message.GetType() == typeof(SwitchMessage6)) return Handle6(Unsafe.As<SwitchMessage6>(message));
+        else if (message.GetType() == typeof(SwitchMessage7)) return Handle7(Unsafe.As<SwitchMessage7>(message));
+        else if (message.GetType() == typeof(SwitchMessage8)) return Handle8(Unsafe.As<SwitchMessage8>(message));
+        else if (message.GetType() == typeof(SwitchMessage9)) return Handle9(Unsafe.As<SwitchMessage9>(message));
+        else if (message.GetType() == typeof(SwitchMessage10)) return Handle10(Unsafe.As<SwitchMessage10>(message));
+        else if (message.GetType() == typeof(SwitchMessage11)) return Handle11(Unsafe.As<SwitchMessage11>(message));
+        else if (message.GetType() == typeof(SwitchMessage12)) return Handle12(Unsafe.As<SwitchMessage12>(message));
+        else if (message.GetType() == typeof(SwitchMessage13)) return Handle13(Unsafe.As<SwitchMessage13>(message));
+        else if (message.GetType() == typeof(SwitchMessage14)) return Handle14(Unsafe.As<SwitchMessage14>(message));
+        else if (message.GetType() == typeof(SwitchMessage15)) return Handle15(Unsafe.As<SwitchMessage15>(message));
+        else if (message.GetType() == typeof(SwitchMessage16)) return Handle16(Unsafe.As<SwitchMessage16>(message));
+        else if (message.GetType() == typeof(SwitchMessage17)) return Handle17(Unsafe.As<SwitchMessage17>(message));
+        else if (message.GetType() == typeof(SwitchMessage18)) return Handle18(Unsafe.As<SwitchMessage18>(message));
+        else if (message.GetType() == typeof(SwitchMessage19)) return Handle19(Unsafe.As<SwitchMessage19>(message));
+        else if (message.GetType() == typeof(SwitchMessage20)) return Handle20(Unsafe.As<SwitchMessage20>(message));
+        else if (message.GetType() == typeof(SwitchMessage21)) return Handle21(Unsafe.As<SwitchMessage21>(message));
+        else if (message.GetType() == typeof(SwitchMessage22)) return Handle22(Unsafe.As<SwitchMessage22>(message));
+        else if (message.GetType() == typeof(SwitchMessage23)) return Handle23(Unsafe.As<SwitchMessage23>(message));
+        else if (message.GetType() == typeof(SwitchMessage24)) return Handle24(Unsafe.As<SwitchMessage24>(message));
+        else if (message.GetType() == typeof(SwitchMessage25)) return Handle25(Unsafe.As<SwitchMessage25>(message));
+        else if (message.GetType() == typeof(SwitchMessage26)) return Handle26(Unsafe.As<SwitchMessage26>(message));
+        else if (message.GetType() == typeof(SwitchMessage27)) return Handle27(Unsafe.As<SwitchMessage27>(message));
+        else if (message.GetType() == typeof(SwitchMessage28)) return Handle28(Unsafe.As<SwitchMessage28>(message));
+        else if (message.GetType() == typeof(SwitchMessage29)) return Handle29(Unsafe.As<SwitchMessage29>(message));
+        else if (message.GetType() == typeof(SwitchMessage30)) return Handle30(Unsafe.As<SwitchMessage30>(message));
+        else if (message.GetType() == typeof(SwitchMessage31)) return Handle31(Unsafe.As<SwitchMessage31>(message));
+        else if (message.GetType() == typeof(SwitchMessage32)) return Handle32(Unsafe.As<SwitchMessage32>(message));
+        else if (message.GetType() == typeof(SwitchMessage33)) return Handle33(Unsafe.As<SwitchMessage33>(message));
+        else if (message.GetType() == typeof(SwitchMessage34)) return Handle34(Unsafe.As<SwitchMessage34>(message));
+        else if (message.GetType() == typeof(SwitchMessage35)) return Handle35(Unsafe.As<SwitchMessage35>(message));
+        else if (message.GetType() == typeof(SwitchMessage36)) return Handle36(Unsafe.As<SwitchMessage36>(message));
+        else if (message.GetType() == typeof(SwitchMessage37)) return Handle37(Unsafe.As<SwitchMessage37>(message));
+        else if (message.GetType() == typeof(SwitchMessage38)) return Handle38(Unsafe.As<SwitchMessage38>(message));
+        else if (message.GetType() == typeof(SwitchMessage39)) return Handle39(Unsafe.As<SwitchMessage39>(message));
+        else if (message.GetType() == typeof(SwitchMessage40)) return Handle40(Unsafe.As<SwitchMessage40>(message));
+        else if (message.GetType() == typeof(SwitchMessage41)) return Handle41(Unsafe.As<SwitchMessage41>(message));
+        else if (message.GetType() == typeof(SwitchMessage42)) return Handle42(Unsafe.As<SwitchMessage42>(message));
+        else if (message.GetType() == typeof(SwitchMessage43)) return Handle43(Unsafe.As<SwitchMessage43>(message));
+        else if (message.GetType() == typeof(SwitchMessage44)) return Handle44(Unsafe.As<SwitchMessage44>(message));
+        else if (message.GetType() == typeof(SwitchMessage45)) return Handle45(Unsafe.As<SwitchMessage45>(message));
+        else if (message.GetType() == typeof(SwitchMessage46)) return Handle46(Unsafe.As<SwitchMessage46>(message));
+        else if (message.GetType() == typeof(SwitchMessage47)) return Handle47(Unsafe.As<SwitchMessage47>(message));
+        else if (message.GetType() == typeof(SwitchMessage48)) return Handle48(Unsafe.As<SwitchMessage48>(message));
+        else if (message.GetType() == typeof(SwitchMessage49)) return Handle49(Unsafe.As<SwitchMessage49>(message));
+        else if (message.GetType() == typeof(SwitchMessage50)) return Handle50(Unsafe.As<SwitchMessage50>(message));
+        return default;
+    }
+
+    [Benchmark]
+    [ArgumentsSource(nameof(Messages))]
     public ValueTask SwitchCode(ISwitchMessage message)
     {
         switch (message.TypeCode)
