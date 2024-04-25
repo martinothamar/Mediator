@@ -454,6 +454,9 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
 
 ### 4.9. Notification publishers
 
+> [!IMPORTANT]  
+> This API is currently in the latest 3.0 previews, not available in stable.
+
 Notification publishers are responsible for dispatching notifications to a collection of handlers.
 There are two built in implementations:
 
