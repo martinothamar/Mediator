@@ -256,16 +256,16 @@ There are two ways to configure Mediator. Configuration values are needed during
 services.AddMediator(options =>
 {
     options.Namespace = "SimpleConsole.Mediator";
-    options.DefaultServiceLifetime = ServiceLifetime.Transient;
+    options.ServiceLifetime = ServiceLifetime.Transient;
 });
 
 // or
 
-[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", DefaultServiceLifetime = ServiceLifetime.Transient)]
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Transient)]
 ```
 
 * `Namespace` - where the `IMediator` implementation is generated
-* `DefaultServiceLifetime` - the DI service lifetime
+* `ServiceLifetime` - the DI service lifetime
   * `Singleton` - (default value) everything registered as singletons, minimal allocations
   * `Transient` - mediator and handlers registered as transient
   * `Scoped`    - mediator and handlers registered as scoped
