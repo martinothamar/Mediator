@@ -102,19 +102,6 @@ public class ComparisonBenchmarks
         }
     }
 
-    // private sealed class Config : ManualConfig
-    // {
-    //     public Config()
-    //     {
-    //         this.SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
-    //         this.AddDiagnoser(MemoryDiagnoser.Default);
-    //         this.AddColumn(RankColumn.Arabic);
-    //         this.AddColumn(CategoriesColumn.Default);
-    //         this.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByCategory);
-    //         this.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared);
-    //     }
-    // }
-
     private IServiceProvider _serviceProvider;
     private IServiceScope _serviceScope;
     private IMediator _mediator;
