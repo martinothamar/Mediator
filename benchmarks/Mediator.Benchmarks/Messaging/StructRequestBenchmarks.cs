@@ -20,7 +20,7 @@ public readonly struct StructRequest : IRequest<Response>, MediatR.IRequest<Resp
     }
 }
 
-public sealed class SomeStructHandler
+public sealed class StructHandler
     : IRequestHandler<StructRequest, Response>,
         MediatR.IRequestHandler<StructRequest, Response>
 {
@@ -37,34 +37,63 @@ public sealed class SomeStructHandler
     ) => _tResponse;
 }
 
-[Config(typeof(Config))]
+[ConfigSource]
 public class StructRequestBenchmarks
 {
+    private sealed class ConfigSourceAttribute : Attribute, IConfigSource
+    {
+        public IConfig Config { get; }
+
+        public ConfigSourceAttribute()
+        {
+            var lifetimes = Enum.GetValues<ServiceLifetime>();
+            bool[] includeManyMessagesOptions = [false, true];
+            var jobs =
+                from lifetime in lifetimes
+                from includeManyMessages in includeManyMessagesOptions
+                select Job
+                    .Default.WithArguments(
+                        [
+                            new MsBuildArgument(
+                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                    + (includeManyMessages ? $"%3BMediator_Test_Many_Messages" : "")
+                            )
+                        ]
+                    )
+                    .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
+                    .WithEnvironmentVariable("IncludeManyMessages", $"{includeManyMessages}")
+                    .WithCustomBuildConfiguration($"{lifetime}/{includeManyMessages}")
+                    .WithId($"{lifetime}/{includeManyMessages}");
+
+            Config = ManualConfig
+                .CreateEmpty()
+                .AddJob(jobs.ToArray())
+                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
+                .AddColumn(
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[1] == "True" ? "Large" : "Small")
+                )
+                .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
+                .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
+                .WithSummaryStyle(SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend))
+                .AddColumn(RankColumn.Arabic)
+                .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared))
+                .AddDiagnoser(MemoryDiagnoser.Default);
+        }
+    }
+
     private IServiceProvider _serviceProvider;
     private IServiceScope _serviceScope;
     private IMediator _mediator;
     private Mediator _concreteMediator;
     private MediatR.IMediator _mediatr;
-    private SomeStructHandler _handler;
+    private StructHandler _handler;
     private StructRequest _request;
-
-    private sealed class Config : ManualConfig
-    {
-        public Config()
-        {
-            this.SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
-            this.AddDiagnoser(MemoryDiagnoser.Default);
-            this.AddColumn(RankColumn.Arabic);
-            this.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared);
-        }
-    }
-
-    [Params(Mediator.ServiceLifetime)]
-    public ServiceLifetime ServiceLifetime { get; set; }
 
     [GlobalSetup]
     public void Setup()
     {
+        Fixture.Setup();
+
         var services = new ServiceCollection();
         services.AddMediator();
         services.AddMediatR(opts =>
@@ -85,7 +114,7 @@ public class StructRequestBenchmarks
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
         _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-        _handler = _serviceProvider.GetRequiredService<SomeStructHandler>();
+        _handler = _serviceProvider.GetRequiredService<StructHandler>();
         _request = new(Guid.NewGuid());
     }
 

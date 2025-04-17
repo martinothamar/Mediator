@@ -56,9 +56,65 @@ public sealed class Handler
     ) => Task.CompletedTask;
 }
 
-[Config(typeof(Config))]
+[ConfigSource]
 public class ComparisonBenchmarks
 {
+    private sealed class ConfigSourceAttribute : Attribute, IConfigSource
+    {
+        public IConfig Config { get; }
+
+        public ConfigSourceAttribute()
+        {
+            var lifetimes = Enum.GetValues<ServiceLifetime>();
+            bool[] includeManyMessagesOptions = [false, true];
+            var jobs =
+                from lifetime in lifetimes
+                from includeManyMessages in includeManyMessagesOptions
+                select Job
+                    .Default.WithArguments(
+                        [
+                            new MsBuildArgument(
+                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                    + (includeManyMessages ? $"%3BMediator_Test_Many_Messages" : "")
+                            )
+                        ]
+                    )
+                    .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
+                    .WithEnvironmentVariable("IncludeManyMessages", $"{includeManyMessages}")
+                    .WithCustomBuildConfiguration($"{lifetime}/{includeManyMessages}")
+                    .WithId($"{lifetime}/{includeManyMessages}");
+
+            Config = ManualConfig
+                .CreateEmpty()
+                .AddJob(jobs.ToArray())
+                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
+                .AddColumn(
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[1] == "True" ? "Large" : "Small")
+                )
+                .AddColumn(CategoriesColumn.Default)
+                .AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByCategory)
+                .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
+                .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
+                .WithSummaryStyle(SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend))
+                .AddColumn(RankColumn.Arabic)
+                .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared))
+                .AddDiagnoser(MemoryDiagnoser.Default);
+        }
+    }
+
+    // private sealed class Config : ManualConfig
+    // {
+    //     public Config()
+    //     {
+    //         this.SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
+    //         this.AddDiagnoser(MemoryDiagnoser.Default);
+    //         this.AddColumn(RankColumn.Arabic);
+    //         this.AddColumn(CategoriesColumn.Default);
+    //         this.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByCategory);
+    //         this.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared);
+    //     }
+    // }
+
     private IServiceProvider _serviceProvider;
     private IServiceScope _serviceScope;
     private IMediator _mediator;
@@ -71,25 +127,11 @@ public class ComparisonBenchmarks
     private Notification _notification;
     private object _notificationObj;
 
-    private sealed class Config : ManualConfig
-    {
-        public Config()
-        {
-            this.SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
-            this.AddDiagnoser(MemoryDiagnoser.Default);
-            this.AddColumn(RankColumn.Arabic);
-            this.AddColumn(CategoriesColumn.Default);
-            this.AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByCategory);
-            this.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared);
-        }
-    }
-
-    [Params(Mediator.ServiceLifetime)]
-    public ServiceLifetime ServiceLifetime { get; set; }
-
     [GlobalSetup]
     public void Setup()
     {
+        Fixture.Setup();
+
         var services = new ServiceCollection();
         services.AddMediator();
         services.AddMediatR(opts =>

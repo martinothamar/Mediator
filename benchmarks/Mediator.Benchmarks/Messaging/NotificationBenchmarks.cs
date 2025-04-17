@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Mediator.Benchmarks.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.Notifications;
@@ -135,7 +136,9 @@ public class NotificationBenchmarks
                 .AddJob(jobs.ToArray())
                 .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
                 .AddColumn(new CustomColumn("NotificationPublisher", (_, c) => c.Job.Id.Split('/')[1]))
-                .AddColumn(new CustomColumn("Large project", (_, c) => c.Job.Id.Split('/')[2]))
+                .AddColumn(
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[2] == "True" ? "Large" : "Small")
+                )
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
                 .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
                 .WithSummaryStyle(SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend))
@@ -174,44 +177,7 @@ public class NotificationBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        var envIncludeManyMessages = Environment.GetEnvironmentVariable("IncludeManyMessages");
-        ConsoleLogger.Default.WriteLineError("--------------------------------------");
-        ConsoleLogger.Default.WriteLineError("Mediator config:");
-        ConsoleLogger.Default.WriteLineError($"  - Lifetime       = {Mediator.ServiceLifetime}");
-        ConsoleLogger.Default.WriteLineError($"  - Publisher      = {Mediator.NotificationPublisherName}");
-        ConsoleLogger.Default.WriteLineError($"  - Total messages = {Mediator.TotalMessages}");
-        ConsoleLogger.Default.WriteLineError("--------------------------------------");
-
-        if (envIncludeManyMessages is not "True" and not "False")
-            throw new InvalidOperationException(
-                $"Invalid IncludeManyMessages: {envIncludeManyMessages}. Expected: True or False"
-            );
-
-        if (envIncludeManyMessages == "True")
-        {
-            if (Mediator.TotalMessages <= 100)
-                throw new InvalidOperationException(
-                    $"Unexpected messages count: {Mediator.TotalMessages}. Expected: more than 100"
-                );
-        }
-        else
-        {
-            if (Mediator.TotalMessages >= 100)
-                throw new InvalidOperationException(
-                    $"Unexpected messages count: {Mediator.TotalMessages}. Expected: less than 100"
-                );
-        }
-
-        var envLifetime = Environment.GetEnvironmentVariable("ServiceLifetime");
-        if (envLifetime != Mediator.ServiceLifetime.ToString())
-            throw new InvalidOperationException(
-                $"Invalid lifetime: {Mediator.ServiceLifetime}. Expected: {envLifetime}"
-            );
-        var envPublisher = Environment.GetEnvironmentVariable("NotificationPublisherName");
-        if (envPublisher != Mediator.NotificationPublisherName)
-            throw new InvalidOperationException(
-                $"Invalid publisher: {Mediator.NotificationPublisherName}. Expected: {envPublisher}"
-            );
+        Fixture.Setup();
 
         var services = new ServiceCollection();
         services.AddMediator();
