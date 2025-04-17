@@ -13,7 +13,7 @@ public class ConfigurationOutput
     }
 
     [Fact]
-    public void MyTest()
+    public void Test()
     {
         var (sp, _) = Fixture.GetMediator();
 
@@ -25,7 +25,10 @@ public class ConfigurationOutput
         output.WriteLine("------------------------------------------------------------------------------");
         output.WriteLine("Mediator configuration:");
         output.WriteLine($" ServiceLifetime: {Mediator.ServiceLifetime}");
-        output.WriteLine($" NotificationPublisherType: {publisher.GetType().FullName}");
+        output.WriteLine(
+            $" NotificationPublisherType: {publisher.GetType().FullName} ({Mediator.NotificationPublisherName})"
+        );
+        output.WriteLine($" Message count: {Mediator.TotalMessages}");
         output.WriteLine("------------------------------------------------------------------------------");
         output.WriteLine("");
     }

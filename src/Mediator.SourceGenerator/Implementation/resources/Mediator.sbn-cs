@@ -230,6 +230,11 @@ namespace {{ MediatorNamespace }}
         public const string NotificationPublisherName = "{{ NotificationPublisherType.Name }}";
 
         /// <summary>
+        /// The total number of Mediator messages that were discovered.
+        /// </summary>
+        public const int TotalMessages = {{ TotalMessages }};
+
+        /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)

@@ -479,6 +479,11 @@ namespace Mediator
         public const string NotificationPublisherName = "FireAndForgetNotificationPublisher";
 
         /// <summary>
+        /// The total number of Mediator messages that were discovered.
+        /// </summary>
+        public const int TotalMessages = 3;
+
+        /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)

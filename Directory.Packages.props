@@ -4,12 +4,11 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Benchmarking -->
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.12" />
-    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.12" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.14.0" />
 
     <!-- Other libs -->
-    <PackageVersion Include="MediatR" Version="12.2.0" />
-    <PackageVersion Include="MessagePipe" Version="1.7.4" />
+    <PackageVersion Include="MediatR" Version="12.5.0" />
     <PackageVersion Include="PolySharp" Version="1.14.1" />
 
     <!-- BCL -->

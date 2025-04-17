@@ -24,6 +24,8 @@
     <Using Include="BenchmarkDotNet.Jobs" />
     <Using Include="BenchmarkDotNet.Diagnosers" />
     <Using Include="BenchmarkDotNet.Loggers" />
+    <Using Include="BenchmarkDotNet.Columns" />
+    <Using Include="BenchmarkDotNet.Reports" />
     <Using Include="BenchmarkDotNet.Diagnostics.Windows.Configs" />
   </ItemGroup>
 
@@ -31,7 +33,6 @@
     <PackageReference Include="BenchmarkDotNet" />
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" />
     <PackageReference Include="MediatR" />
-    <PackageReference Include="MessagePipe" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Build.Locator" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />

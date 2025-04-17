@@ -1,8 +1,8 @@
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Reports;
+using System.Runtime.CompilerServices;
+using Mediator.Benchmarks.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator.Benchmarks.Notification;
+namespace Mediator.Benchmarks.Notifications;
 
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
@@ -108,26 +108,37 @@ public class NotificationBenchmarks
 
         public ConfigSourceAttribute()
         {
+            var lifetimes = Enum.GetValues<ServiceLifetime>();
+            string[] publishers = ["ForeachAwait", "TaskWhenAll"];
+            bool[] includeManyMessagesOptions = [false, true];
+            var jobs =
+                from lifetime in lifetimes
+                from publisher in publishers
+                from includeManyMessages in includeManyMessagesOptions
+                select Job
+                    .Default.WithArguments(
+                        [
+                            new MsBuildArgument(
+                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                    + $"%3BMediator_Publisher_{publisher}"
+                                    + (includeManyMessages ? $"%3BMediator_Large_Project" : "")
+                            )
+                        ]
+                    )
+                    .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
+                    .WithEnvironmentVariable("NotificationPublisherName", $"{publisher}Publisher")
+                    .WithEnvironmentVariable("IncludeManyMessages", $"{includeManyMessages}")
+                    .WithCustomBuildConfiguration($"{lifetime}/{publisher}/{includeManyMessages}")
+                    .WithId($"{lifetime}/{publisher}/{includeManyMessages}");
+
             Config = ManualConfig
                 .CreateEmpty()
-                .AddJob(
-                    Job.Default.WithArguments(
-                        [new MsBuildArgument("/p:ExtraDefineConstants=Mediator_Publisher_ForeachAwait")]
-                    )
-                        .WithCustomBuildConfiguration("ForeachAwaitPublisher")
-                        .WithEnvironmentVariable("NotificationPublisherName", "ForeachAwaitPublisher")
-                        .WithId("ForeachAwaitPublisher")
+                .AddJob(jobs.ToArray())
+                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
+                .AddColumn(new CustomColumn("NotificationPublisher", (_, c) => c.Job.Id.Split('/')[1]))
+                .AddColumn(
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[2] == "True" ? "Large" : "Small")
                 )
-                .AddJob(
-                    Job.Default.WithArguments(
-                        [new MsBuildArgument("/p:ExtraDefineConstants=Mediator_Publisher_TaskWhenAll")]
-                    )
-                        .WithCustomBuildConfiguration("TaskWhenAllPublisher")
-                        .WithEnvironmentVariable("NotificationPublisherName", "TaskWhenAllPublisher")
-                        .WithId("TaskWhenAllPublisher")
-                )
-                .AddColumn(new CustomColumn("ServiceLifetime", (s, c) => Mediator.ServiceLifetime.ToString()))
-                .AddColumn(new CustomColumn("NotificationPublisher", (s, c) => c.Job.Id))
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
                 .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
                 .WithSummaryStyle(SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend))
@@ -166,17 +177,7 @@ public class NotificationBenchmarks
     [GlobalSetup]
     public void Setup()
     {
-        ConsoleLogger.Default.WriteLineError("--------------------------------------");
-        ConsoleLogger.Default.WriteLineError("Mediator config:");
-        ConsoleLogger.Default.WriteLineError($"  - Lifetime = {Mediator.ServiceLifetime}");
-        ConsoleLogger.Default.WriteLineError($"  - Publisher= {Mediator.NotificationPublisherName}");
-        ConsoleLogger.Default.WriteLineError("--------------------------------------");
-
-        var envPublisher = Environment.GetEnvironmentVariable("NotificationPublisherName");
-        if (envPublisher != Mediator.NotificationPublisherName)
-            throw new InvalidOperationException(
-                $"Invalid publisher: {Mediator.NotificationPublisherName}. Expected: {envPublisher}"
-            );
+        Fixture.Setup();
 
         var services = new ServiceCollection();
         services.AddMediator();

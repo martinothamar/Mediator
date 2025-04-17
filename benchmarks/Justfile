@@ -1,0 +1,8 @@
+alias b := bench
+alias bq := bench-quick
+
+bench:
+    dotnet run -c Release --project Mediator.Benchmarks/
+
+bench-quick:
+    dotnet run -c Release --project Mediator.Benchmarks/ -- --warmupCount 8 --iterationCount 8 --iterationTime 50
