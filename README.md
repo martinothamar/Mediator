@@ -253,7 +253,7 @@ There are two ways to configure Mediator. Configuration values are needed during
 * Options configuration delegate in `AddMediator` function.
 
 ```csharp
-services.AddMediator(options =>
+services.AddMediator((MediatorOptions options) =>
 {
     options.Namespace = "SimpleConsole.Mediator";
     options.ServiceLifetime = ServiceLifetime.Transient;
@@ -467,7 +467,7 @@ Both of these try to be efficient by handling a number of special cases (early e
 Below we implement a custom one by simply using `Task.WhenAll`.
 
 ```csharp
-services.AddMediator(options =>
+services.AddMediator((MediatorOptions options) =>
 {
     options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
 });
