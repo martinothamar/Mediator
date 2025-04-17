@@ -1,5 +1,3 @@
-using BenchmarkDotNet.Columns;
-using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace Mediator.Benchmarks;

@@ -1,40 +1,35 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator.Benchmarks.Request;
+namespace Mediator.Benchmarks.Messaging;
 
-public sealed record SomeStreamRequest(Guid Id) : IStreamRequest<SomeResponse>, MediatR.IStreamRequest<SomeResponse>;
+public sealed record StreamRequest(Guid Id) : IStreamRequest<Response>, MediatR.IStreamRequest<Response>;
 
-public sealed class SomeStreamHandlerClass
-    : IStreamRequestHandler<SomeStreamRequest, SomeResponse>,
-        MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>
+public sealed class StreamRequestHandler
+    : IStreamRequestHandler<StreamRequest, Response>,
+        MediatR.IStreamRequestHandler<StreamRequest, Response>
 {
-    private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
+    private static readonly Response _response = new Response(Guid.NewGuid());
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    async IAsyncEnumerable<SomeResponse> _enumerate()
+    async IAsyncEnumerable<Response> _enumerate()
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 3; i++)
         {
             yield return _response;
         }
     }
 
-    public IAsyncEnumerable<SomeResponse> Handle(SomeStreamRequest request, CancellationToken cancellationToken) =>
+    public IAsyncEnumerable<Response> Handle(StreamRequest request, CancellationToken cancellationToken) =>
         _enumerate();
 
-    IAsyncEnumerable<SomeResponse> MediatR.IStreamRequestHandler<SomeStreamRequest, SomeResponse>.Handle(
-        SomeStreamRequest request,
+    IAsyncEnumerable<Response> MediatR.IStreamRequestHandler<StreamRequest, Response>.Handle(
+        StreamRequest request,
         CancellationToken cancellationToken
     ) => _enumerate();
 }
 
-[MemoryDiagnoser]
-[Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
-[RankColumn]
-//[EventPipeProfiler(EventPipeProfile.CpuSampling)]
-//[DisassemblyDiagnoser]
-//[InliningDiagnoser(logFailuresOnly: true, allowedNamespaces: new[] { "Mediator" })]
+[Config(typeof(Config))]
 public class StreamingBenchmarks
 {
     private IServiceProvider _serviceProvider;
@@ -42,8 +37,19 @@ public class StreamingBenchmarks
     private IMediator _mediator;
     private Mediator _concreteMediator;
     private MediatR.IMediator _mediatr;
-    private SomeStreamHandlerClass _handler;
-    private SomeStreamRequest _request;
+    private StreamRequestHandler _handler;
+    private StreamRequest _request;
+
+    private sealed class Config : ManualConfig
+    {
+        public Config()
+        {
+            this.SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
+            this.AddDiagnoser(MemoryDiagnoser.Default);
+            this.AddColumn(RankColumn.Arabic);
+            this.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared);
+        }
+    }
 
     [Params(Mediator.ServiceLifetime)]
     public ServiceLifetime ServiceLifetime { get; set; }
@@ -56,7 +62,7 @@ public class StreamingBenchmarks
         services.AddMediatR(opts =>
         {
             opts.Lifetime = Mediator.ServiceLifetime;
-            opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
+            opts.RegisterServicesFromAssembly(typeof(StreamRequestHandler).Assembly);
         });
 
         _serviceProvider = services.BuildServiceProvider();
@@ -71,7 +77,7 @@ public class StreamingBenchmarks
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
         _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-        _handler = _serviceProvider.GetRequiredService<SomeStreamHandlerClass>();
+        _handler = _serviceProvider.GetRequiredService<StreamRequestHandler>();
         _request = new(Guid.NewGuid());
     }
 

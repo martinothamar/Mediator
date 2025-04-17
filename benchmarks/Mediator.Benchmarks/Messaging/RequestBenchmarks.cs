@@ -1,33 +1,27 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Mediator.Benchmarks.Request;
+namespace Mediator.Benchmarks.Messaging;
 
-public sealed record SomeRequest(Guid Id) : IRequest<SomeResponse>, MediatR.IRequest<SomeResponse>;
+public sealed record Request(Guid Id) : IRequest<Response>, MediatR.IRequest<Response>;
 
-public sealed record SomeResponse(Guid Id);
+public sealed record Response(Guid Id);
 
-public sealed class SomeHandlerClass
-    : IRequestHandler<SomeRequest, SomeResponse>,
-        MediatR.IRequestHandler<SomeRequest, SomeResponse>
+public sealed class RequestHandler : IRequestHandler<Request, Response>, MediatR.IRequestHandler<Request, Response>
 {
-    private static readonly SomeResponse _response = new SomeResponse(Guid.NewGuid());
-    private static ValueTask<SomeResponse> _vtResponse => new ValueTask<SomeResponse>(_response);
-    private static readonly Task<SomeResponse> _tResponse = Task.FromResult(_response);
+    private static readonly Response _response = new Response(Guid.NewGuid());
 
-    public ValueTask<SomeResponse> Handle(SomeRequest request, CancellationToken cancellationToken) => _vtResponse;
+    private static readonly Task<Response> _tResponse = Task.FromResult(_response);
 
-    Task<SomeResponse> MediatR.IRequestHandler<SomeRequest, SomeResponse>.Handle(
-        SomeRequest request,
+    public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+        new ValueTask<Response>(_response);
+
+    Task<Response> MediatR.IRequestHandler<Request, Response>.Handle(
+        Request request,
         CancellationToken cancellationToken
     ) => _tResponse;
 }
 
-[MemoryDiagnoser]
-[Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
-[RankColumn]
-//[EventPipeProfiler(EventPipeProfile.CpuSampling)]
-//[DisassemblyDiagnoser]
-//[InliningDiagnoser(logFailuresOnly: true, allowedNamespaces: new[] { "Mediator" })]
+[Config(typeof(Config))]
 public class RequestBenchmarks
 {
     private IServiceProvider _serviceProvider;
@@ -35,8 +29,19 @@ public class RequestBenchmarks
     private IMediator _mediator;
     private Mediator _concreteMediator;
     private MediatR.IMediator _mediatr;
-    private SomeHandlerClass _handler;
-    private SomeRequest _request;
+    private RequestHandler _handler;
+    private Request _request;
+
+    private sealed class Config : ManualConfig
+    {
+        public Config()
+        {
+            this.SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
+            this.AddDiagnoser(MemoryDiagnoser.Default);
+            this.AddColumn(RankColumn.Arabic);
+            this.Orderer = new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared);
+        }
+    }
 
     [Params(Mediator.ServiceLifetime)]
     public ServiceLifetime ServiceLifetime { get; set; }
@@ -49,7 +54,7 @@ public class RequestBenchmarks
         services.AddMediatR(opts =>
         {
             opts.Lifetime = Mediator.ServiceLifetime;
-            opts.RegisterServicesFromAssembly(typeof(SomeHandlerClass).Assembly);
+            opts.RegisterServicesFromAssembly(typeof(RequestHandler).Assembly);
         });
 
         _serviceProvider = services.BuildServiceProvider();
@@ -64,7 +69,7 @@ public class RequestBenchmarks
         _mediator = _serviceProvider.GetRequiredService<IMediator>();
         _concreteMediator = _serviceProvider.GetRequiredService<Mediator>();
         _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-        _handler = _serviceProvider.GetRequiredService<SomeHandlerClass>();
+        _handler = _serviceProvider.GetRequiredService<RequestHandler>();
         _request = new(Guid.NewGuid());
     }
 
@@ -78,25 +83,25 @@ public class RequestBenchmarks
     }
 
     [Benchmark]
-    public ValueTask<SomeResponse> SendRequest_IMediator()
+    public Task<Response> SendRequest_MediatR()
+    {
+        return _mediatr.Send(_request, CancellationToken.None);
+    }
+
+    [Benchmark]
+    public ValueTask<Response> SendRequest_IMediator()
     {
         return _mediator.Send(_request, CancellationToken.None);
     }
 
     [Benchmark]
-    public ValueTask<SomeResponse> SendRequest_Mediator()
+    public ValueTask<Response> SendRequest_Mediator()
     {
         return _concreteMediator.Send(_request, CancellationToken.None);
     }
 
-    [Benchmark]
-    public Task<SomeResponse> SendRequest_MediatR()
-    {
-        return _mediatr.Send(_request, CancellationToken.None);
-    }
-
     [Benchmark(Baseline = true)]
-    public ValueTask<SomeResponse> SendRequest_Baseline()
+    public ValueTask<Response> SendRequest_Baseline()
     {
         return _handler.Handle(_request, CancellationToken.None);
     }

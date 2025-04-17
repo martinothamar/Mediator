@@ -60,6 +60,8 @@ internal record CompilationModel
 
     public IEnumerable<NotificationMessageModel> NotificationMessages => _notificationMessages;
 
+    public int TotalMessages => _requestMessages.Count + _notificationMessages.Count;
+
     public IEnumerable<RequestMessageHandlerModel> RequestMessageHandlers => _requestMessageHandlers;
 
     public NotificationPublisherTypeModel NotificationPublisherType { get; }

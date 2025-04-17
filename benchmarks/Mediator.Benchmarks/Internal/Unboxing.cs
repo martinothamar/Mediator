@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Mediator.Benchmarks.Notification;
+using Mediator.Benchmarks.Notifications;
 
 namespace Mediator.Benchmarks.Internal;
 
