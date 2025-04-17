@@ -21,6 +21,7 @@ jobs:
       matrix:
         lifetime: [Singleton, Scoped, Transient]
         publisher: [ForeachAwait, TaskWhenAll]
+        size: [Default, Large]
 
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -48,11 +49,14 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}\"
+    - name: Clean
+      run: dotnet clean -v m
 
-    - name: Test
-      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed"
+    - name: Build Mediator.Tests
+      run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}%3BMediator_${{matrix.size}}_Project\" -v m ./test/Mediator.Tests/
+
+    - name: Test Mediator.Tests
+      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
 
   publish:
     needs: build
@@ -83,6 +87,9 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
+
+    - name: Clean
+      run: dotnet clean -v m
 
     - name: Build
       run: dotnet build --no-restore -c Release

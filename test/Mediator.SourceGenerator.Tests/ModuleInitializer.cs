@@ -26,5 +26,6 @@ public static class ModuleInitializer
 
         VerifySourceGenerators.Initialize();
         VerifyDiffPlex.Initialize(VerifyTests.DiffPlex.OutputType.Compact);
+        VerifierSettings.AutoVerify(includeBuildServer: false);
     }
 }

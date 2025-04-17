@@ -8,7 +8,7 @@ void Main()
 	const int n = 100;
 
 	var output = new StringBuilder();
-	output.AppendLine("#if Mediator_Test_Many_Messages");
+	output.AppendLine("#if Mediator_Large_Project");
 	output.AppendLine();
 	output.AppendLine("using Mediator;");
 	output.AppendLine("using System.Collections.Generic;");

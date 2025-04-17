@@ -48,7 +48,7 @@ public class StreamingBenchmarks
                         [
                             new MsBuildArgument(
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + (includeManyMessages ? $"%3BMediator_Test_Many_Messages" : "")
+                                    + (includeManyMessages ? $"%3BMediator_Large_Project" : "")
                             )
                         ]
                     )

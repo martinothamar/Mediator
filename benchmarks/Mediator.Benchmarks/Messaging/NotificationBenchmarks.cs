@@ -121,7 +121,7 @@ public class NotificationBenchmarks
                             new MsBuildArgument(
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
                                     + $"%3BMediator_Publisher_{publisher}"
-                                    + (includeManyMessages ? $"%3BMediator_Test_Many_Messages" : "")
+                                    + (includeManyMessages ? $"%3BMediator_Large_Project" : "")
                             )
                         ]
                     )

@@ -1,4 +1,4 @@
-#if Mediator_Test_Many_Messages
+#if Mediator_Large_Project
 
 using Mediator;
 using System.Collections.Generic;
