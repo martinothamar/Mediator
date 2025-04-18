@@ -675,7 +675,7 @@ namespace Mediator
                 default:
                 {
                     ThrowInvalidRequest(request, nameof(request));
-                    return default;
+                    return default!;
                 }
             }
         }
@@ -695,7 +695,7 @@ namespace Mediator
         )
         {
             ThrowInvalidStreamRequest(request, nameof(request));
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -730,7 +730,7 @@ namespace Mediator
         )
         {
             ThrowInvalidCommand(command, nameof(command));
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -748,7 +748,7 @@ namespace Mediator
         )
         {
             ThrowInvalidStreamCommand(command, nameof(command));
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -783,7 +783,7 @@ namespace Mediator
         )
         {
             ThrowInvalidQuery(query, nameof(query));
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -801,7 +801,7 @@ namespace Mediator
         )
         {
             ThrowInvalidStreamQuery(query, nameof(query));
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -824,7 +824,7 @@ namespace Mediator
                 default:
                 {
                     ThrowInvalidMessage(message, nameof(message));
-                    return default;
+                    return default!;
                 }
             }
         }
@@ -844,7 +844,7 @@ namespace Mediator
         )
         {
             ThrowInvalidStreamMessage(message, nameof(message));
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -960,11 +960,15 @@ namespace Mediator
             }
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowMissingHandler(object msg) =>
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidMessage<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -975,7 +979,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidRequest<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -986,7 +992,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidCommand<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -997,7 +1005,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidQuery<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -1008,7 +1018,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidStreamMessage<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -1019,7 +1031,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidStreamRequest<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -1030,7 +1044,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidStreamCommand<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -1041,7 +1057,9 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidStreamQuery<T>(T? msg, string? paramName = null)
         {
             if (msg == null)
@@ -1052,11 +1070,15 @@ namespace Mediator
                 ThrowMissingHandler(msg);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowArgumentNull(string? paramName) =>
             throw new global::System.ArgumentNullException(paramName);
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowInvalidMessage<T>(T msg) =>
             throw new global::Mediator.InvalidMessageException(msg);
 
@@ -1074,7 +1096,9 @@ namespace Mediator
                 ThrowInvalidMessage(argument);
         }
 
+#if NETSTANDARD2_1_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
+#endif
         private static void ThrowAggregateException(global::System.Collections.Generic.List<global::System.Exception> exceptions) =>
             throw new global::System.AggregateException(exceptions);
 
