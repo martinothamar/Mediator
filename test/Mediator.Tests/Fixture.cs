@@ -102,7 +102,25 @@ public static class Fixture
                 ?? _services.FirstOrDefault(s => s.ServiceType.IsAssignableTo(serviceType));
 
             if (descriptor is null)
+            {
+                if (serviceType.IsGenericType)
+                {
+                    descriptor = _services.FirstOrDefault(s =>
+                        s.ServiceType.IsGenericType
+                        && !s.ServiceType.IsConstructedGenericType
+                        && s.ServiceType == serviceType.GetGenericTypeDefinition()
+                        && s.ImplementationType is not null
+                    );
+                    if (descriptor is not null)
+                    {
+                        var genericType = descriptor.ImplementationType!.MakeGenericType(
+                            serviceType.GenericTypeArguments
+                        );
+                        return ActivatorUtilities.CreateInstance(this, genericType);
+                    }
+                }
                 throw new Exception($"Service not found: {serviceType}");
+            }
 
             var result =
                 descriptor.ImplementationInstance

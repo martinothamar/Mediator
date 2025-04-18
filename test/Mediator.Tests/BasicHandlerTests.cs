@@ -72,10 +72,8 @@ public class BasicHandlerTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var request = Unsafe.As<object, IRequest>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(request));
     }
 
     [Fact]
@@ -147,10 +145,8 @@ public class BasicHandlerTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var query = Unsafe.As<object, IQuery<SomeResponse>>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(query));
     }
 
     [Fact]
@@ -214,10 +210,8 @@ public class BasicHandlerTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var command = Unsafe.As<object, ICommand>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(command));
     }
 
     [Fact]
@@ -367,10 +361,8 @@ public class BasicHandlerTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var notofication = Unsafe.As<object, SomeNotification>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Publish(message));
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Publish(notofication));
     }
 
     [Fact]

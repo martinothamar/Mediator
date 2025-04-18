@@ -27,7 +27,5 @@ internal abstract record SymbolMetadataModel
 
     public string AccessibilityModifier { get; }
 
-    public string ParameterModifier => string.Empty;
-
     public override string ToString() => Name;
 }

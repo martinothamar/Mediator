@@ -1,13 +1,13 @@
-alias c := clean
 alias b := build
+alias c := clean
 alias t := test
+
+build:
+    dotnet build Mediator.sln
 
 clean:
     git clean -fxd
     dotnet build-server shutdown
-
-build:
-    dotnet build Mediator.sln
 
 _test constants:
     dotnet clean -v q

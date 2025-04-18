@@ -32,7 +32,7 @@
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
 
     <!-- Templating -->
-    <PackageVersion Include="Scriban" Version="5.4.6" />
+    <PackageVersion Include="Scriban" Version="6.2.0" />
 
     <!-- Build -->
     <GlobalPackageReference Include="CSharpier.MsBuild" Version="0.27.3">
