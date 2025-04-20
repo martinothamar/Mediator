@@ -81,7 +81,10 @@ if __name__ == '__main__':
 
     print(df.to_markdown(index=False))
 
-    df = df.replace('', pd.NA)
+    # Get average mean improvement in percentage for all non-empty and non-na rows
+    df = df.dropna(subset=['Mean Main', 'Mean PR'])
+    df = df[df['Mean Main'] != '']
+    df = df[df['Mean PR'] != '']
     avg_mean_impr_perc = (((df['Mean Main'] - df['Mean PR']) / df['Mean Main']) * 100).mean()
     print()
     print(f"Average mean improvement: {avg_mean_impr_perc:.2f} %")
