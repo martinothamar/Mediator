@@ -12,31 +12,19 @@ internal sealed record RequestMessageHandlerWrapperModel
 
     public string FullNamespace { get; }
 
-    public string HandlerWrapperTypeName(TypeKind type) =>
-        $"{MessageType}{(type == TypeKind.Struct ? "Struct" : "Class")}HandlerWrapper";
+    public string HandlerWrapperTypeNameImpl() => $"{MessageType}HandlerWrapper";
 
-    private string HandlerWrapperTypeFullName(TypeKind type) => $"{FullNamespace}.{HandlerWrapperTypeName(type)}";
+    private string HandlerWrapperTypeFullName() => $"{FullNamespace}.{HandlerWrapperTypeNameImpl()}";
 
-    private string HandlerWrapperTypeNameWithGenericTypeArguments(TypeKind type) =>
-        $"{HandlerWrapperTypeName(type)}<TRequest, TResponse>";
+    public string HandlerWrapperTypeNameWithGenericTypeArguments(string requestFullname, string responseFullname) =>
+        $"{HandlerWrapperTypeFullName()}<{requestFullname}, {responseFullname}>";
 
-    public string HandlerWrapperTypeNameWithGenericTypeArguments(
-        TypeKind requestKind,
-        string requestFullname,
-        string responseFullname
-    ) => $"{HandlerWrapperTypeFullName(requestKind)}<{requestFullname}, {responseFullname}>";
+    public string HandlerWrapperTypeOfExpression() => $"typeof({HandlerWrapperTypeFullName()}<,>)";
 
-    public string HandlerWrapperTypeOfExpression(TypeKind type) => $"typeof({HandlerWrapperTypeFullName(type)}<,>)";
+    public string HandlerWrapperTypeNameWithGenericTypeParameters =>
+        $"{HandlerWrapperTypeNameImpl()}<TRequest, TResponse>";
 
-    public string ClassHandlerWrapperTypeNameWithGenericTypeArguments =>
-        HandlerWrapperTypeNameWithGenericTypeArguments(TypeKind.Class);
-
-    public string StructHandlerWrapperTypeNameWithGenericTypeArguments =>
-        HandlerWrapperTypeNameWithGenericTypeArguments(TypeKind.Struct);
-
-    public string ClassHandlerWrapperTypeName => HandlerWrapperTypeName(TypeKind.Class);
-
-    public string StructHandlerWrapperTypeName => HandlerWrapperTypeName(TypeKind.Struct);
+    public string HandlerWrapperTypeName => HandlerWrapperTypeNameImpl();
 
     public bool IsStreaming => MessageType.StartsWith("Stream");
 
@@ -54,4 +42,11 @@ internal sealed record RequestMessageHandlerWrapperModel
         IsStreaming
             ? "global::System.Collections.Generic.IAsyncEnumerable<TResponse>"
             : "global::System.Threading.Tasks.ValueTask<TResponse>";
+
+    public string ReturnTypeNameWhenObject =>
+        IsStreaming
+            ? "global::System.Collections.Generic.IAsyncEnumerable<object?>"
+            : "global::System.Threading.Tasks.ValueTask<object?>";
+
+    public string HandlerBase => IsStreaming ? "IStreamMessageHandlerBase" : "IMessageHandlerBase";
 }

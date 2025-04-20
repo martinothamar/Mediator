@@ -50,11 +50,27 @@ public sealed class ResponseInheritanceTests
         public CreateStreamRequest(Guid id) => Id = id;
     }
 
+    public class CreateStreamQuery : IStreamQuery<CreateResponse>
+    {
+        public Guid Id { get; }
+
+        public CreateStreamQuery(Guid id) => Id = id;
+    }
+
+    public class CreateStreamCommand : IStreamCommand<CreateResponse>
+    {
+        public Guid Id { get; }
+
+        public CreateStreamCommand(Guid id) => Id = id;
+    }
+
     public sealed class CreateHandler
         : ICommandHandler<CreateCommandRequest, CreateResponse>,
             IRequestHandler<CreateRequestRequest, CreateResponse>,
             IQueryHandler<CreateQueryRequest, CreateResponse>,
-            IStreamRequestHandler<CreateStreamRequest, CreateResponse>
+            IStreamRequestHandler<CreateStreamRequest, CreateResponse>,
+            IStreamQueryHandler<CreateStreamQuery, CreateResponse>,
+            IStreamCommandHandler<CreateStreamCommand, CreateResponse>
     {
         internal static readonly ConcurrentBag<Guid> Ids = new();
 
@@ -81,6 +97,46 @@ public sealed class ResponseInheritanceTests
 
         public async IAsyncEnumerable<CreateResponse> Handle(
             CreateStreamRequest query,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    await Task.Delay(100, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    yield break;
+                }
+
+                yield return new CreateResponse(query.Id);
+            }
+        }
+
+        public async IAsyncEnumerable<CreateResponse> Handle(
+            CreateStreamQuery query,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    await Task.Delay(100, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    yield break;
+                }
+
+                yield return new CreateResponse(query.Id);
+            }
+        }
+
+        public async IAsyncEnumerable<CreateResponse> Handle(
+            CreateStreamCommand query,
             [EnumeratorCancellation] CancellationToken cancellationToken
         )
         {
@@ -146,6 +202,40 @@ public sealed class ResponseInheritanceTests
         Assert.Equal(3, counter);
     }
 
+    [Fact]
+    public async Task Test_Streaming_Queries()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+
+        var id = Guid.NewGuid();
+
+        int counter = 0;
+        await foreach (var response in RunQueryStream(mediator, new CreateStreamQuery(id)))
+        {
+            Assert.Equal(id, response.Id);
+            counter++;
+        }
+
+        Assert.Equal(3, counter);
+    }
+
+    [Fact]
+    public async Task Test_Streaming_Commands()
+    {
+        var (_, mediator) = Fixture.GetMediator();
+
+        var id = Guid.NewGuid();
+
+        int counter = 0;
+        await foreach (var response in RunCommandStream(mediator, new CreateStreamCommand(id)))
+        {
+            Assert.Equal(id, response.Id);
+            counter++;
+        }
+
+        Assert.Equal(3, counter);
+    }
+
     private async Task<BaseResponse> RunCommand<TCommand>(IMediator mediator, TCommand command)
         where TCommand : class, ICommand<BaseResponse>
     {
@@ -168,6 +258,24 @@ public sealed class ResponseInheritanceTests
         where TRequest : class, IStreamRequest<BaseResponse>
     {
         await foreach (var response in mediator.CreateStream<BaseResponse>(request))
+        {
+            yield return response;
+        }
+    }
+
+    private async IAsyncEnumerable<BaseResponse> RunQueryStream<TQuery>(IMediator mediator, TQuery query)
+        where TQuery : class, IStreamQuery<BaseResponse>
+    {
+        await foreach (var response in mediator.CreateStream<BaseResponse>(query))
+        {
+            yield return response;
+        }
+    }
+
+    private async IAsyncEnumerable<BaseResponse> RunCommandStream<TCommand>(IMediator mediator, TCommand command)
+        where TCommand : class, IStreamCommand<BaseResponse>
+    {
+        await foreach (var response in mediator.CreateStream<BaseResponse>(command))
         {
             yield return response;
         }

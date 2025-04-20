@@ -78,11 +78,27 @@ internal record CompilationModel
     public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
     public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
 
+    private const int ManyMessagesTreshold = 16;
+
+    public bool HasManyRequests =>
+        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "Request") > ManyMessagesTreshold;
+    public bool HasManyCommands =>
+        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "Command") > ManyMessagesTreshold;
+    public bool HasManyQueries =>
+        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "Query") > ManyMessagesTreshold;
+
     public bool HasStreamRequests =>
         _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
     public bool HasStreamQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
     public bool HasStreamCommands =>
         _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
+
+    public bool HasManyStreamRequests =>
+        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "StreamRequest") > ManyMessagesTreshold;
+    public bool HasManyStreamQueries =>
+        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "StreamQuery") > ManyMessagesTreshold;
+    public bool HasManyStreamCommands =>
+        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "StreamCommand") > ManyMessagesTreshold;
 
     public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
 
@@ -92,6 +108,7 @@ internal record CompilationModel
         _requestMessages.Any(r => r.MessageType.StartsWith("Stream") && r.ResponseIsValueType);
 
     public bool HasNotifications => _notificationMessages.Any();
+    public bool HasManyNotifications => _notificationMessages.Count() > ManyMessagesTreshold;
 
     public IEnumerable<RequestMessageModel> IRequestMessages =>
         _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
@@ -122,6 +139,9 @@ internal record CompilationModel
     public string? SingletonServiceLifetime { get; }
 
     public bool ServiceLifetimeIsSingleton => ServiceLifetimeShort == "Singleton";
+
+    public string ContainerMetadataField =>
+        ServiceLifetimeIsSingleton ? "_containerMetadata.Value" : "_containerMetadata";
 
     public bool ServiceLifetimeIsScoped => ServiceLifetimeShort == "Scoped";
 

@@ -633,6 +633,20 @@ internal sealed class CompilationAnalyzer
                         }
                         else
                         {
+                            // If the type is the `NotificationHandlerWrapper` that is generated, we don't want to add it to the list
+                            // It is specially registered to DI and invoked by the internals of the Mediator
+                            if (
+                                typeSymbol
+                                    .GetAttributes()
+                                    .Any(a =>
+                                        a.AttributeClass?.Name == "GeneratedCodeAttribute"
+                                        && a.ConstructorArguments.FirstOrDefault().Value is string name
+                                        && name == "Mediator.SourceGenerator"
+                                    )
+                            )
+                            {
+                                return true;
+                            }
                             _notificationMessageHandlers.Add(new NotificationMessageHandler(typeSymbol, this));
                         }
                     }

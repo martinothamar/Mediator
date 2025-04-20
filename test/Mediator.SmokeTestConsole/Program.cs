@@ -6,8 +6,8 @@ using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using DICache = Mediator.Mediator.DICache;
-using LazyDICache = Mediator.Mediator.FastLazyValue<Mediator.Mediator.DICache>;
+using ContainerMetadata = Mediator.ContainerMetadata;
+using LazyContainerMetadata = Mediator.Mediator.FastLazyValue<Mediator.ContainerMetadata, Mediator.Mediator>;
 
 await Host.CreateDefaultBuilder()
     .ConfigureLogging(
@@ -32,7 +32,7 @@ public sealed class Work : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var concurrency = Environment.ProcessorCount;
-        var threads = new Task<(DICache Cache, long State)>[concurrency];
+        var threads = new Task<(ContainerMetadata Cache, long State)>[concurrency];
 
         var services = new ServiceCollection();
         services.AddMediator();
@@ -70,33 +70,32 @@ public sealed class Work : BackgroundService
             var hasInvalidHandler =
                 firstHandlers.Any(h => !ReferenceEquals(h, firstHandler))
                 || lastHandlers.Any(h => !ReferenceEquals(h, lastHandler));
-            var hasInvalid = states.Any(s => s == LazyDICache.INVALID);
-            var wasUninitCount = states.Count(s => s == LazyDICache.UNINIT);
-            var wasInitingCount = states.Count(s => s == LazyDICache.INITING);
-            var wasInitedCount = states.Count(s => s == LazyDICache.INITD);
-            var wasCachedCount = states.Count(s => s == LazyDICache.CACHED);
-
-            Console.WriteLine(
-                $"Ran smoketest iteration {++iteration} - "
-                    + $"{nameof(hasInvalidHandler)}={hasInvalidHandler}"
-                    + $", {nameof(hasInvalid)}={hasInvalid}"
-                    + $", {nameof(wasUninitCount)}={wasUninitCount}"
-                    + $", {nameof(wasInitingCount)}={wasInitingCount}"
-                    + $", {nameof(wasInitedCount)}={wasInitedCount}"
-                    + $", {nameof(wasCachedCount)}={wasCachedCount}"
-            );
+            var hasInvalid = states.Any(s => s == LazyContainerMetadata.INVALID);
+            var wasUninitCount = states.Count(s => s == LazyContainerMetadata.UNINIT);
+            var wasInitingCount = states.Count(s => s == LazyContainerMetadata.INITING);
+            var wasInitedCount = states.Count(s => s == LazyContainerMetadata.INITD);
+            var wasCachedCount = states.Count(s => s == LazyContainerMetadata.CACHED);
 
             if (hasInvalidHandler || hasInvalid || wasUninitCount != 1)
             {
+                Console.WriteLine(
+                    $"Ran smoketest iteration {++iteration} - "
+                        + $"{nameof(hasInvalidHandler)}={hasInvalidHandler}"
+                        + $", {nameof(hasInvalid)}={hasInvalid}"
+                        + $", {nameof(wasUninitCount)}={wasUninitCount}"
+                        + $", {nameof(wasInitingCount)}={wasInitingCount}"
+                        + $", {nameof(wasInitedCount)}={wasInitedCount}"
+                        + $", {nameof(wasCachedCount)}={wasCachedCount}"
+                );
                 Console.WriteLine("Error condition, exiting...");
                 break;
             }
 
-            async Task<(DICache Cache, long State)> Thread()
+            async Task<(ContainerMetadata Cache, long State)> Thread()
             {
                 await start.Task;
 
-                return mediator._diCacheLazy.ValueInstrumented;
+                return mediator._containerMetadata.ValueInstrumented;
             }
         }
 

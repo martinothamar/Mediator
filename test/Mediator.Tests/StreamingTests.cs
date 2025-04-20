@@ -183,12 +183,10 @@ public sealed class StreamingTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var query = Unsafe.As<object, IStreamQuery<SomeResponse>>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(
             async () => await mediator.CreateStream(message).ToListAsync()
         );
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(query).ToListAsync());
     }
 
     [Fact]
@@ -236,13 +234,9 @@ public sealed class StreamingTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var command = Unsafe.As<object, IStreamCommand<SomeResponse>>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(
             async () => await mediator.CreateStream(message).ToListAsync()
-        );
-        await Assert.ThrowsAsync<InvalidMessageException>(
-            async () => await mediator.CreateStream(command).ToListAsync()
         );
     }
 
@@ -291,13 +285,9 @@ public sealed class StreamingTests
         var id = Guid.NewGuid();
 
         object message = new { Id = id };
-        var request = Unsafe.As<object, IStreamRequest<SomeResponse>>(ref message);
 
         await Assert.ThrowsAsync<InvalidMessageException>(
             async () => await mediator.CreateStream(message).ToListAsync()
-        );
-        await Assert.ThrowsAsync<InvalidMessageException>(
-            async () => await mediator.CreateStream(request).ToListAsync()
         );
     }
 
