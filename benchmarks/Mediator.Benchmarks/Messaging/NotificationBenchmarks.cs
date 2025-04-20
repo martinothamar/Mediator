@@ -110,26 +110,26 @@ public class NotificationBenchmarks
         {
             var lifetimes = Enum.GetValues<ServiceLifetime>();
             string[] publishers = ["ForeachAwait", "TaskWhenAll"];
-            bool[] includeManyMessagesOptions = [false, true];
+            bool[] largeProjectOptions = [false, true];
             var jobs =
                 from lifetime in lifetimes
                 from publisher in publishers
-                from includeManyMessages in includeManyMessagesOptions
+                from largeProject in largeProjectOptions
                 select Job
                     .Default.WithArguments(
                         [
                             new MsBuildArgument(
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
                                     + $"%3BMediator_Publisher_{publisher}"
-                                    + (includeManyMessages ? $"%3BMediator_Large_Project" : "")
+                                    + (largeProject ? $"%3BMediator_Large_Project" : "")
                             )
                         ]
                     )
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("NotificationPublisherName", $"{publisher}Publisher")
-                    .WithEnvironmentVariable("IncludeManyMessages", $"{includeManyMessages}")
-                    .WithCustomBuildConfiguration($"{lifetime}/{publisher}/{includeManyMessages}")
-                    .WithId($"{lifetime}/{publisher}/{includeManyMessages}");
+                    .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
+                    .WithCustomBuildConfiguration($"{lifetime}/{publisher}/{largeProject}")
+                    .WithId($"{lifetime}/{publisher}/{largeProject}");
 
             Config = ManualConfig
                 .CreateEmpty()

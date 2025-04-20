@@ -47,23 +47,23 @@ public class StructRequestBenchmarks
         public ConfigSourceAttribute()
         {
             var lifetimes = Enum.GetValues<ServiceLifetime>();
-            bool[] includeManyMessagesOptions = [false, true];
+            bool[] largeProjectOptions = [false, true];
             var jobs =
                 from lifetime in lifetimes
-                from includeManyMessages in includeManyMessagesOptions
+                from largeProject in largeProjectOptions
                 select Job
                     .Default.WithArguments(
                         [
                             new MsBuildArgument(
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + (includeManyMessages ? $"%3BMediator_Large_Project" : "")
+                                    + (largeProject ? $"%3BMediator_Large_Project" : "")
                             )
                         ]
                     )
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
-                    .WithEnvironmentVariable("IncludeManyMessages", $"{includeManyMessages}")
-                    .WithCustomBuildConfiguration($"{lifetime}/{includeManyMessages}")
-                    .WithId($"{lifetime}/{includeManyMessages}");
+                    .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
+                    .WithCustomBuildConfiguration($"{lifetime}/{largeProject}")
+                    .WithId($"{lifetime}/{largeProject}");
 
             Config = ManualConfig
                 .CreateEmpty()
