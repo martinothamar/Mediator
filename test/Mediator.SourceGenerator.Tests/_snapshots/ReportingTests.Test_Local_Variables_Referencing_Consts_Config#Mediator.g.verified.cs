@@ -684,8 +684,8 @@ namespace SomeNamespace
     /// Can be used directly for high performance scenarios.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    // [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    // [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;

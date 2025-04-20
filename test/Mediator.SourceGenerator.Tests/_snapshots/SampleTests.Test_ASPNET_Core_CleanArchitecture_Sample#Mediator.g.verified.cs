@@ -739,14 +739,34 @@ namespace Mediator
     /// Can be used directly for high performance scenarios.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    // [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    // [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
         private FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
-        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher => _containerMetadata.Value.NotificationPublisher;
-        internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.Value.ServicesUnderlyingTypeIsArray;
+        private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
+        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = _containerMetadata.Value.NotificationPublisher;
+                return _notificationPublisher!;
+            }
+        }
+        private bool? _servicesUnderlyingTypeIsArray;
+        internal bool ServicesUnderlyingTypeIsArray
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_servicesUnderlyingTypeIsArray == null)
+                    _servicesUnderlyingTypeIsArray = _containerMetadata.Value.ServicesUnderlyingTypeIsArray;
+                return _servicesUnderlyingTypeIsArray!.Value;
+            }
+        }
 
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.

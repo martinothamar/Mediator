@@ -414,46 +414,32 @@ namespace {{ MediatorNamespace }}
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyRequests ~}}
         {{~ for message in IRequestMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
-        {{~ end ~}}
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyCommands ~}}
         {{~ for message in ICommandMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
-        {{~ end ~}}
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyQueries ~}}
         {{~ for message in IQueryMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
-        {{~ end ~}}
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyStreamRequests ~}}
         {{~ for message in IStreamRequestMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
-        {{~ end ~}}
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyStreamCommands ~}}
         {{~ for message in IStreamCommandMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
-        {{~ end ~}}
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyStreamQueries ~}}
         {{~ for message in IStreamQueryMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
-        {{~ end ~}}
 
-        {{~ if ServiceLifetimeIsSingleton || !HasManyNotifications ~}}
         {{~ for message in NotificationMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
-        {{~ end ~}}
         {{~ end ~}}
 
         {{~ if ServiceLifetimeIsSingleton ~}}
@@ -513,46 +499,32 @@ namespace {{ MediatorNamespace }}
             {{~ end ~}}
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyRequests ~}}
             {{~ for message in IRequestMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
-            {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyCommands ~}}
             {{~ for message in ICommandMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
-            {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyQueries ~}}
             {{~ for message in IQueryMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
-            {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyStreamRequests ~}}
             {{~ for message in IStreamRequestMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
-            {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyStreamCommands ~}}
             {{~ for message in IStreamCommandMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
-            {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyStreamQueries ~}}
             {{~ for message in IStreamQueryMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
-            {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyNotifications ~}}
             {{~ for message in NotificationMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
-            {{~ end ~}}
             {{~ end ~}}
         }
     }
@@ -563,14 +535,35 @@ namespace {{ MediatorNamespace }}
     /// Can be used directly for high performance scenarios.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    // [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    // [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
         {{~ if ServiceLifetimeIsSingleton ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ MediatorNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher => {{ ContainerMetadataField }}.NotificationPublisher;
+        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = {{ ContainerMetadataField }}.NotificationPublisher;
+                return _notificationPublisher!;
+            }
+        }
+        private bool? _servicesUnderlyingTypeIsArray;
+        internal bool ServicesUnderlyingTypeIsArray
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_servicesUnderlyingTypeIsArray == null)
+                    _servicesUnderlyingTypeIsArray = {{ ContainerMetadataField }}.ServicesUnderlyingTypeIsArray;
+                return _servicesUnderlyingTypeIsArray!.Value;
+            }
+        }
         {{~ else ~}}
         private global::{{ MediatorNamespace }}.ContainerMetadata? _containerMetadataStorage;
         private global::{{ MediatorNamespace }}.ContainerMetadata _containerMetadata
@@ -598,8 +591,8 @@ namespace {{ MediatorNamespace }}
                 return _notificationPublisher!;
             }
         }
-        {{~ end ~}}
         internal bool ServicesUnderlyingTypeIsArray => {{ ContainerMetadataField }}.ServicesUnderlyingTypeIsArray;
+        {{~ end ~}}
 
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
@@ -824,16 +817,7 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(request, nameof(request));
             {{~ end ~}}
-            {{~ if HasManyRequests ~}}
-            var handlerObj = GetRequestHandler(request);
-            global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.IRequestHandlerBase<{{ message.ResponseFullName }}>
-            );
-            ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IRequestHandlerBase<{{ message.ResponseFullName }}>>(ref handlerObj);
-            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
-            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in ICommandMessages ~}}
@@ -855,16 +839,7 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(command, nameof(command));
             {{~ end ~}}
-            {{~ if HasManyCommands ~}}
-            var handlerObj = GetCommandHandler(command);
-            global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.ICommandHandlerBase<{{ message.ResponseFullName }}>
-            );
-            ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.ICommandHandlerBase<{{ message.ResponseFullName }}>>(ref handlerObj);
-            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
-            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IQueryMessages ~}}
@@ -886,16 +861,7 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(query, nameof(query));
             {{~ end ~}}
-            {{~ if HasManyQueries ~}}
-            var handlerObj = GetQueryHandler(query);
-            global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.IQueryHandlerBase<{{ message.ResponseFullName }}>
-            );
-            ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IQueryHandlerBase<{{ message.ResponseFullName }}>>(ref handlerObj);
-            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
-            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IStreamRequestMessages ~}}
@@ -917,16 +883,7 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(request, nameof(request));
             {{~ end ~}}
-            {{~ if HasManyStreamRequests ~}}
-            var handlerObj = GetStreamRequestHandler(request);
-            global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.IStreamRequestHandlerBase<{{ message.ResponseFullName }}>
-            );
-            ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IStreamRequestHandlerBase<{{ message.ResponseFullName }}>>(ref handlerObj);
-            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
-            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IStreamCommandMessages ~}}
@@ -948,16 +905,7 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(command, nameof(command));
             {{~ end ~}}
-            {{~ if HasManyStreamCommands ~}}
-            var handlerObj = GetStreamCommandHandler(command);
-            global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.IStreamCommandHandlerBase<{{ message.ResponseFullName }}>
-            );
-            ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IStreamCommandHandlerBase<{{ message.ResponseFullName }}>>(ref handlerObj);
-            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
-            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IStreamQueryMessages ~}}
@@ -979,16 +927,7 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(query, nameof(query));
             {{~ end ~}}
-            {{~ if HasManyStreamQueries ~}}
-            var handlerObj = GetStreamQueryHandler(query);
-            global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.IStreamQueryHandlerBase<{{ message.ResponseFullName }}>
-            );
-            ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IStreamQueryHandlerBase<{{ message.ResponseFullName }}>>(ref handlerObj);
-            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
-            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
 
