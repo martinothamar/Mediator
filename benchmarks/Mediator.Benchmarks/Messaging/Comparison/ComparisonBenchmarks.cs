@@ -66,23 +66,23 @@ public class ComparisonBenchmarks
         public ConfigSourceAttribute()
         {
             var lifetimes = Enum.GetValues<ServiceLifetime>();
-            bool[] includeManyMessagesOptions = [false, true];
+            bool[] largeProjectOptions = [false, true];
             var jobs =
                 from lifetime in lifetimes
-                from includeManyMessages in includeManyMessagesOptions
+                from largeProject in largeProjectOptions
                 select Job
                     .Default.WithArguments(
                         [
                             new MsBuildArgument(
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + (includeManyMessages ? $"%3BMediator_Large_Project" : "")
+                                    + (largeProject ? $"%3BMediator_Large_Project" : "")
                             )
                         ]
                     )
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
-                    .WithEnvironmentVariable("IncludeManyMessages", $"{includeManyMessages}")
-                    .WithCustomBuildConfiguration($"{lifetime}/{includeManyMessages}")
-                    .WithId($"{lifetime}/{includeManyMessages}");
+                    .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
+                    .WithCustomBuildConfiguration($"{lifetime}/{largeProject}")
+                    .WithId($"{lifetime}/{largeProject}");
 
             Config = ManualConfig
                 .CreateEmpty()
@@ -103,6 +103,7 @@ public class ComparisonBenchmarks
     }
 
     private IServiceProvider _serviceProvider;
+    private IServiceProvider _rootServiceProvider;
     private IServiceScope _serviceScope;
     private IMediator _mediator;
     private Mediator _concreteMediator;
@@ -128,6 +129,7 @@ public class ComparisonBenchmarks
         });
 
         _serviceProvider = services.BuildServiceProvider();
+        _rootServiceProvider = _serviceProvider;
 #pragma warning disable CS0162 // Unreachable code detected
         if (Mediator.ServiceLifetime == ServiceLifetime.Scoped)
         {
@@ -154,6 +156,60 @@ public class ComparisonBenchmarks
             _serviceScope.Dispose();
         else
             (_serviceProvider as IDisposable)?.Dispose();
+    }
+
+    // Initialization
+
+    [Benchmark(Baseline = true)]
+    [BenchmarkCategory("Initialization")]
+    public MediatR.IMediator Initialization_MediatR()
+    {
+#if Mediator_Lifetime_Scoped
+        using var scope = _rootServiceProvider.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
+#else
+        return _rootServiceProvider.GetRequiredService<MediatR.IMediator>();
+#endif
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("Initialization")]
+    public IMediator Initialization_IMediator()
+    {
+#if Mediator_Lifetime_Scoped
+        using var scope = _rootServiceProvider.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<IMediator>();
+#else
+        return _rootServiceProvider.GetRequiredService<IMediator>();
+#endif
+    }
+
+    // ColdStart (mostly makes sense for transient and scoped registration)
+
+    [Benchmark(Baseline = true)]
+    [BenchmarkCategory("ColdStart")]
+    public Task<Response> ColdStart_MediatR()
+    {
+#if Mediator_Lifetime_Scoped
+        using var scope = _rootServiceProvider.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
+#else
+        var mediator = _rootServiceProvider.GetRequiredService<MediatR.IMediator>();
+#endif
+        return mediator.Send(_request, CancellationToken.None);
+    }
+
+    [Benchmark]
+    [BenchmarkCategory("ColdStart")]
+    public ValueTask<Response> ColdStart_IMediator()
+    {
+#if Mediator_Lifetime_Scoped
+        using var scope = _rootServiceProvider.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+#else
+        var mediator = _rootServiceProvider.GetRequiredService<IMediator>();
+#endif
+        return mediator.Send(_request, CancellationToken.None);
     }
 
     // Normal requests

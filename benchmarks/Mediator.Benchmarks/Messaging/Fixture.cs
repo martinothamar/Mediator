@@ -11,13 +11,13 @@ internal static class Fixture
         ConsoleLogger.Default.WriteLineError($"  - Total messages = {Mediator.TotalMessages}");
         ConsoleLogger.Default.WriteLineError("--------------------------------------");
 
-        var envIncludeManyMessages = Environment.GetEnvironmentVariable("IncludeManyMessages");
-        if (envIncludeManyMessages is not "True" and not "False")
+        var envIsLargeProject = Environment.GetEnvironmentVariable("IsLargeProject");
+        if (envIsLargeProject is not "True" and not "False")
             throw new InvalidOperationException(
-                $"Invalid IncludeManyMessages: {envIncludeManyMessages}. Expected: True or False"
+                $"Invalid IsLargeProject: {envIsLargeProject}. Expected: True or False"
             );
 
-        if (envIncludeManyMessages == "True")
+        if (envIsLargeProject == "True")
         {
             if (Mediator.TotalMessages <= 100)
                 throw new InvalidOperationException(
