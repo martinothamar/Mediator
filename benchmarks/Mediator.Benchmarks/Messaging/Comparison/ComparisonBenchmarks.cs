@@ -69,8 +69,8 @@ public class ComparisonBenchmarks
             bool[] largeProjectOptions = [false, true];
 
             // Local override
-            lifetimes = [ServiceLifetime.Singleton];
-            largeProjectOptions = [false, true];
+            // lifetimes = [ServiceLifetime.Singleton];
+            // largeProjectOptions = [false, true];
 
             var jobs =
                 from lifetime in lifetimes
