@@ -94,7 +94,7 @@ Benchmark category descriptions
 * `Request` - publish a single request
 * `StreamRequest` - stream a single request which yields 3 responses without delay
 
-See [benchmarks code](/benchmarks/README.md) for more detailed benchmarking.
+See [benchmarks code](/benchmarks/README.md) for more detailed benchmarking, including varying lifetimes and project sizes.
 
 ![Requests benchmark](/img/benchmarks.png "Benchmarks")
 

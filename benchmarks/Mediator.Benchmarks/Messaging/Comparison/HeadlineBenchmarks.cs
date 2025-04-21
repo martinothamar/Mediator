@@ -34,14 +34,19 @@ public class HeadlineBenchmarks
             Config = ManualConfig
                 .CreateEmpty()
                 .AddJob(jobs.ToArray())
-                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
-                .AddColumn(
-                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[1] == "True" ? "Large" : "Small")
-                )
                 .AddColumn(CategoriesColumn.Default)
                 .AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByCategory)
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
-                .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
+                .HideColumns(
+                    Column.Arguments,
+                    Column.EnvironmentVariables,
+                    Column.BuildConfiguration,
+                    Column.Job,
+                    Column.RatioSD,
+                    Column.Rank,
+                    Column.Gen0,
+                    Column.Categories
+                )
                 .WithSummaryStyle(SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend))
                 .AddColumn(RankColumn.Arabic)
                 .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared))
