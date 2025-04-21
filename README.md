@@ -33,7 +33,7 @@ In particular, source generators in this library is used to
   * You can use both `IMediator` and `Mediator`, the latter allows for better performance
 * Generate diagnostics related messages and message handlers
 
-Packages:
+NuGet packages:
 
 ```pwsh
 dotnet add package Mediator.SourceGenerator --version 3.0.*-*
@@ -94,7 +94,7 @@ Benchmark category descriptions
 * `Request` - publish a single request
 * `StreamRequest` - stream a single request which yields 3 responses without delay
 
-See [benchmarks code](/benchmarks/README.md) for more detailed benchmarking, including varying lifetimes and project sizes.
+See the [benchmarks/ folder](/benchmarks/README.md) for more detailed information, including varying lifetimes and project sizes.
 
 ![Requests benchmark](/img/benchmarks.png "Benchmarks")
 
