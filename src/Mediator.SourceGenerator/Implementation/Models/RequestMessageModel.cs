@@ -18,51 +18,33 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         ResponseFullNameWithoutReferenceNullability = responseSymbol.GetTypeSymbolFullName(
             includeReferenceNullability: false
         );
-        WrapperType = wrapperType;
         MessageType = messageType;
         Handler = handler;
 
-        IdentifierFullName = symbol
+        var fullHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.TypeName}";
+        HandlerWrapperTypeNameWithGenericTypeArguments =
+            $"{fullHandlerWrapperTypeName}<{FullName}, {ResponseFullName}>";
+
+        var identifierFullName = symbol
             .GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false)
             .Replace("global::", "")
             .Replace('.', '_');
+        var isStreaming = MessageType.StartsWith("Stream", StringComparison.Ordinal);
 
-        HandlerWrapperTypeNameWithGenericTypeArguments = WrapperType.HandlerWrapperTypeNameWithGenericTypeArguments(
-            RequestFullName,
-            ResponseFullName
-        );
+        HandlerWrapperPropertyName = $"Wrapper_For_{identifierFullName}";
+        MethodName = isStreaming ? "CreateStream" : "Send";
+        ReturnType = isStreaming
+            ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
+            : $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
     }
 
-    public RequestMessageHandlerWrapperModel WrapperType { get; }
-
     public string MessageType { get; }
-
     public RequestMessageHandlerModel? Handler { get; }
-
-    public string RequestFullName => FullName;
     public bool ResponseIsValueType { get; }
     public string ResponseFullName { get; }
     public string ResponseFullNameWithoutReferenceNullability { get; }
-
     public string HandlerWrapperTypeNameWithGenericTypeArguments { get; }
-
-    public string IdentifierFullName { get; }
-
-    public bool IsStreaming => MessageType.StartsWith("Stream");
-
-    public string PipelineHandlerType =>
-        IsStreaming
-            ? $"global::Mediator.IStreamPipelineBehavior<{RequestFullName}, {ResponseFullName}>"
-            : $"global::Mediator.IPipelineBehavior<{RequestFullName}, {ResponseFullName}>";
-
-    public string HandlerWrapperPropertyName => $"Wrapper_For_{IdentifierFullName}";
-
-    public string SyncMethodName => IsStreaming ? "CreateStream" : "Send";
-    public string AsyncMethodName => IsStreaming ? "CreateStream" : "Send";
-
-    public string SyncReturnType => ResponseFullName;
-    public string AsyncReturnType =>
-        IsStreaming
-            ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
-            : $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
+    public string HandlerWrapperPropertyName { get; }
+    public string MethodName { get; }
+    public string ReturnType { get; }
 }

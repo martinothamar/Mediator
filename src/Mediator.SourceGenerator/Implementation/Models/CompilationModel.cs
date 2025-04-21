@@ -1,28 +1,44 @@
 ﻿namespace Mediator.SourceGenerator;
 
-internal record CompilationModel
+internal sealed record CompilationModel
 {
-    private readonly ImmutableEquatableArray<RequestMessageModel> _requestMessages;
-    private readonly ImmutableEquatableArray<NotificationMessageModel> _notificationMessages;
-    private readonly ImmutableEquatableArray<RequestMessageHandlerModel> _requestMessageHandlers;
-    private readonly ImmutableEquatableArray<NotificationMessageHandlerModel> _notificationMessageHandlers;
+    private const int ManyMessagesTreshold = 16;
 
     public CompilationModel(string mediatorNamespace, string generatorVersion)
     {
-        HasErrors = true;
         MediatorNamespace = mediatorNamespace;
         GeneratorVersion = generatorVersion;
-        _requestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
-        _notificationMessages = ImmutableEquatableArray<NotificationMessageModel>.Empty;
-        _requestMessageHandlers = ImmutableEquatableArray<RequestMessageHandlerModel>.Empty;
-        _notificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
+        HasErrors = true;
+        IsTestRun = false;
+        ConfiguredViaAttribute = false;
+        ServiceLifetime = "global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton";
+        ServiceLifetimeShort = "Singleton";
+        SingletonServiceLifetime = ServiceLifetime;
+        ServiceLifetimeIsSingleton = true;
+        ServiceLifetimeIsScoped = false;
+        ServiceLifetimeIsTransient = false;
+        ContainerMetadataField = "_containerMetadata.Value";
+        InternalsNamespace = $"{MediatorNamespace}.Internals";
+        TotalMessages = 0;
+        NotificationPublisherType = new("global::Mediator.ForeachAwaitPublisher", "ForeachAwaitPublisher");
+
         RequestMessageHandlerWrappers = ImmutableEquatableArray<RequestMessageHandlerWrapperModel>.Empty;
+        RequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        NotificationMessages = ImmutableEquatableArray<NotificationMessageModel>.Empty;
+        NotificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
+        OpenGenericNotificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
+
+        IRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        ICommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IQueryMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IStreamRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IStreamQueryMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IStreamCommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
     }
 
     public CompilationModel(
         ImmutableEquatableArray<RequestMessageModel> requestMessages,
         ImmutableEquatableArray<NotificationMessageModel> notificationMessages,
-        ImmutableEquatableArray<RequestMessageHandlerModel> requestMessageHandlers,
         ImmutableEquatableArray<NotificationMessageHandlerModel> notificationMessageHandlers,
         ImmutableEquatableArray<RequestMessageHandlerWrapperModel> requestMessageHandlerWrappers,
         NotificationPublisherTypeModel notificationPublisherType,
@@ -33,125 +49,119 @@ internal record CompilationModel
         string? serviceLifetimeShort,
         string? singletonServiceLifetime,
         bool isTestRun,
-        bool configuredViaAttribute,
-        bool configuredViaConfiguration
+        bool configuredViaAttribute
     )
     {
-        _requestMessages = requestMessages;
-        _notificationMessages = notificationMessages;
-        _requestMessageHandlers = requestMessageHandlers;
-        _notificationMessageHandlers = notificationMessageHandlers;
-        NotificationPublisherType = notificationPublisherType;
-        RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
-        HasErrors = hasErrors;
         MediatorNamespace = mediatorNamespace;
         GeneratorVersion = generatorVersion;
+        HasErrors = hasErrors;
+        IsTestRun = isTestRun;
+        ConfiguredViaAttribute = configuredViaAttribute;
         ServiceLifetime = serviceLifetime;
         ServiceLifetimeShort = serviceLifetimeShort;
         SingletonServiceLifetime = singletonServiceLifetime;
-        IsTestRun = isTestRun;
-        ConfiguredViaAttribute = configuredViaAttribute;
-        ConfiguredViaConfiguration = configuredViaConfiguration;
+        ServiceLifetimeIsSingleton = serviceLifetimeShort == "Singleton";
+        ServiceLifetimeIsScoped = serviceLifetimeShort == "Scoped";
+        ServiceLifetimeIsTransient = serviceLifetimeShort == "Transient";
+        ContainerMetadataField = ServiceLifetimeIsSingleton ? "_containerMetadata.Value" : "_containerMetadata";
+        InternalsNamespace = $"{MediatorNamespace}.Internals";
+        TotalMessages = requestMessages.Count + notificationMessages.Count;
+        NotificationPublisherType = notificationPublisherType;
+
+        RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
+        RequestMessages = new(requestMessages.Where(r => r.Handler is not null));
+        NotificationMessages = notificationMessages;
+        NotificationMessageHandlers = new(notificationMessageHandlers.Where(h => !h.IsOpenGeneric));
+        OpenGenericNotificationMessageHandlers = new(notificationMessageHandlers.Where(h => h.IsOpenGeneric));
+
+        IRequestMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request"));
+        ICommandMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command"));
+        IQueryMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query"));
+        IStreamRequestMessages = new(
+            requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest")
+        );
+        IStreamQueryMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery"));
+        IStreamCommandMessages = new(
+            requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand")
+        );
+
+        HasRequests = requestMessages.Any(r => r.Handler is not null && r.MessageType == "Request");
+        HasCommands = requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
+        HasQueries = requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
+        HasStreamRequests = requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
+        HasStreamQueries = requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
+        HasStreamCommands = requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
+        HasNotifications = notificationMessages.Any();
+
+        var t = ManyMessagesTreshold;
+        var m = requestMessages;
+        HasManyRequests = m.Count(r => r.Handler is not null && r.MessageType == "Request") > t;
+        HasManyCommands = m.Count(r => r.Handler is not null && r.MessageType == "Command") > t;
+        HasManyQueries = m.Count(r => r.Handler is not null && r.MessageType == "Query") > t;
+        HasManyStreamRequests = m.Count(r => r.Handler is not null && r.MessageType == "StreamRequest") > t;
+        HasManyStreamQueries = m.Count(r => r.Handler is not null && r.MessageType == "StreamQuery") > t;
+        HasManyStreamCommands = m.Count(r => r.Handler is not null && r.MessageType == "StreamCommand") > t;
+        HasManyNotifications = notificationMessages.Count() > t;
+
+        HasAnyRequest = HasRequests || HasCommands || HasQueries;
+        HasAnyStreamRequest = HasStreamRequests || HasStreamQueries || HasStreamCommands;
+        HasAnyValueTypeStreamResponse = requestMessages.Any(r =>
+            r.MessageType.StartsWith("Stream") && r.ResponseIsValueType
+        );
     }
-
-    public ImmutableEquatableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers { get; }
-
-    public IEnumerable<RequestMessageModel> RequestMessages => _requestMessages.Where(r => r.Handler is not null);
-
-    public IEnumerable<NotificationMessageModel> NotificationMessages => _notificationMessages;
-
-    public int TotalMessages => _requestMessages.Count + _notificationMessages.Count;
-
-    public IEnumerable<RequestMessageHandlerModel> RequestMessageHandlers => _requestMessageHandlers;
-
-    public NotificationPublisherTypeModel NotificationPublisherType { get; }
-
-    public bool HasErrors { get; }
-
-    public IEnumerable<NotificationMessageHandlerModel> NotificationMessageHandlers =>
-        _notificationMessageHandlers.Where(h => !h.IsOpenGeneric);
-
-    public IEnumerable<NotificationMessageHandlerModel> OpenGenericNotificationMessageHandlers =>
-        _notificationMessageHandlers.Where(h => h.IsOpenGeneric);
-
-    public bool HasRequests => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Request");
-    public bool HasCommands => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
-    public bool HasQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
-
-    private const int ManyMessagesTreshold = 16;
-
-    public bool HasManyRequests =>
-        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "Request") > ManyMessagesTreshold;
-    public bool HasManyCommands =>
-        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "Command") > ManyMessagesTreshold;
-    public bool HasManyQueries =>
-        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "Query") > ManyMessagesTreshold;
-
-    public bool HasStreamRequests =>
-        _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
-    public bool HasStreamQueries => _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
-    public bool HasStreamCommands =>
-        _requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
-
-    public bool HasManyStreamRequests =>
-        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "StreamRequest") > ManyMessagesTreshold;
-    public bool HasManyStreamQueries =>
-        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "StreamQuery") > ManyMessagesTreshold;
-    public bool HasManyStreamCommands =>
-        _requestMessages.Count(r => r.Handler is not null && r.MessageType == "StreamCommand") > ManyMessagesTreshold;
-
-    public bool HasAnyRequest => HasRequests || HasCommands || HasQueries;
-
-    public bool HasAnyStreamRequest => HasStreamRequests || HasStreamQueries || HasStreamCommands;
-
-    public bool HasAnyValueTypeStreamResponse =>
-        _requestMessages.Any(r => r.MessageType.StartsWith("Stream") && r.ResponseIsValueType);
-
-    public bool HasNotifications => _notificationMessages.Any();
-    public bool HasManyNotifications => _notificationMessages.Count() > ManyMessagesTreshold;
-
-    public IEnumerable<RequestMessageModel> IRequestMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request");
-    public IEnumerable<RequestMessageModel> ICommandMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command");
-    public IEnumerable<RequestMessageModel> IQueryMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query");
-
-    public IEnumerable<RequestMessageModel> IStreamRequestMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest");
-    public IEnumerable<RequestMessageModel> IStreamQueryMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery");
-    public IEnumerable<RequestMessageModel> IStreamCommandMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand");
-
-    public IEnumerable<RequestMessageModel> IMessages =>
-        _requestMessages.Where(r => r.Handler is not null && !r.IsStreaming);
-    public IEnumerable<RequestMessageModel> IStreamMessages =>
-        _requestMessages.Where(r => r.Handler is not null && r.IsStreaming);
 
     public string MediatorNamespace { get; }
     public string GeneratorVersion { get; }
-
-    public string? ServiceLifetime { get; }
-
-    public string? ServiceLifetimeShort { get; }
-
-    public string? SingletonServiceLifetime { get; }
-
-    public bool ServiceLifetimeIsSingleton => ServiceLifetimeShort == "Singleton";
-
-    public string ContainerMetadataField =>
-        ServiceLifetimeIsSingleton ? "_containerMetadata.Value" : "_containerMetadata";
-
-    public bool ServiceLifetimeIsScoped => ServiceLifetimeShort == "Scoped";
-
-    public bool ServiceLifetimeIsTransient => ServiceLifetimeShort == "Transient";
-
+    public bool HasErrors { get; }
     public bool IsTestRun { get; }
-
     public bool ConfiguredViaAttribute { get; }
+    public string? ServiceLifetime { get; }
+    public string? ServiceLifetimeShort { get; }
+    public string? SingletonServiceLifetime { get; }
+    public bool ServiceLifetimeIsSingleton { get; }
+    public bool ServiceLifetimeIsScoped { get; }
+    public bool ServiceLifetimeIsTransient { get; }
+    public string ContainerMetadataField { get; }
+    public string InternalsNamespace { get; }
+    public int TotalMessages { get; }
 
-    public bool ConfiguredViaConfiguration { get; }
+    public NotificationPublisherTypeModel NotificationPublisherType { get; }
 
-    public string InternalsNamespace => $"{MediatorNamespace}.Internals";
+    public ImmutableEquatableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers { get; }
+
+    public ImmutableEquatableArray<RequestMessageModel> RequestMessages { get; }
+
+    public ImmutableEquatableArray<NotificationMessageModel> NotificationMessages { get; }
+
+    public ImmutableEquatableArray<NotificationMessageHandlerModel> NotificationMessageHandlers { get; }
+
+    public ImmutableEquatableArray<NotificationMessageHandlerModel> OpenGenericNotificationMessageHandlers { get; }
+
+    public ImmutableEquatableArray<RequestMessageModel> IRequestMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> ICommandMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IQueryMessages { get; }
+
+    public ImmutableEquatableArray<RequestMessageModel> IStreamRequestMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IStreamQueryMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IStreamCommandMessages { get; }
+
+    public bool HasRequests { get; }
+    public bool HasCommands { get; }
+    public bool HasQueries { get; }
+    public bool HasStreamRequests { get; }
+    public bool HasStreamQueries { get; }
+    public bool HasStreamCommands { get; }
+    public bool HasNotifications { get; }
+
+    public bool HasManyRequests { get; }
+    public bool HasManyCommands { get; }
+    public bool HasManyQueries { get; }
+    public bool HasManyStreamRequests { get; }
+    public bool HasManyStreamQueries { get; }
+    public bool HasManyStreamCommands { get; }
+    public bool HasManyNotifications { get; }
+
+    public bool HasAnyRequest { get; }
+    public bool HasAnyStreamRequest { get; }
+    public bool HasAnyValueTypeStreamResponse { get; }
 }
