@@ -81,7 +81,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ for registration in message.HandlerServicesRegistrationBlock ~}}
             {{ registration }}
             {{~ end ~}}
-            services.Add(new SD(typeof(global::{{ InternalsNamespace }}.NotificationHandlerWrapper<{{ message.FullName }}>), typeof(global::{{ InternalsNamespace }}.NotificationHandlerWrapper<{{ message.FullName }}>), {{ SingletonServiceLifetime }}));
+            services.Add(new SD(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
 
             {{~ for handler in OpenGenericNotificationMessageHandlers ~}}
@@ -149,7 +149,7 @@ namespace {{ InternalsNamespace }}
 
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    internal interface I{{ wrapperType.MessageType }}HandlerBase<TResponse> : {{ wrapperType.HandlerBase }}
+    internal interface {{ wrapperType.InterfaceTypeNameWithGenericParameter }} : {{ wrapperType.HandlerBase }}
     {
         {{ wrapperType.ReturnTypeName }} Handle(
             {{~ if !ServiceLifetimeIsSingleton ~}}
@@ -162,13 +162,13 @@ namespace {{ InternalsNamespace }}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class {{ wrapperType.HandlerWrapperTypeNameWithGenericTypeParameters }} : I{{ wrapperType.MessageType }}HandlerBase<TResponse>
+    internal sealed class {{ wrapperType.TypeNameWithGenericParameters }} : {{ wrapperType.InterfaceTypeNameWithGenericParameter }}
         where TRequest : global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
     {
         {{~ if ServiceLifetimeIsSingleton ~}}
         private {{ wrapperType.MessageHandlerDelegateName }} _rootHandler = null!;
 
-        public {{ wrapperType.HandlerWrapperTypeNameWithGenericTypeParameters }} Init(
+        public {{ wrapperType.TypeNameWithGenericParameters }} Init(
             global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
@@ -811,7 +811,7 @@ namespace {{ MediatorNamespace }}
         {{~ for message in IRequestMessages ~}}
 
         /// <summary>
-        /// Send a request of type {{ message.RequestFullName }}.
+        /// Send a request of type {{ message.FullName }}.
         {{- if message.IsClass }}
         /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         {{- end }}
@@ -819,8 +819,8 @@ namespace {{ MediatorNamespace }}
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
-            {{ message.RequestFullName }} request,
+        {{ message.AccessibilityModifier }} {{ message.ReturnType }} {{ message.MethodName }}(
+            {{ message.FullName }} request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
@@ -833,7 +833,7 @@ namespace {{ MediatorNamespace }}
         {{~ for message in ICommandMessages ~}}
 
         /// <summary>
-        /// Send a command of type {{ message.RequestFullName }}.
+        /// Send a command of type {{ message.FullName }}.
         {{- if message.IsClass }}
         /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
         {{- end }}
@@ -841,8 +841,8 @@ namespace {{ MediatorNamespace }}
         /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
-            {{ message.RequestFullName }} command,
+        {{ message.AccessibilityModifier }} {{ message.ReturnType }} {{ message.MethodName }}(
+            {{ message.FullName }} command,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
@@ -855,7 +855,7 @@ namespace {{ MediatorNamespace }}
         {{~ for message in IQueryMessages ~}}
 
         /// <summary>
-        /// Send a query of type {{ message.RequestFullName }}.
+        /// Send a query of type {{ message.FullName }}.
         {{- if message.IsClass }}
         /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
         {{- end }}
@@ -863,8 +863,8 @@ namespace {{ MediatorNamespace }}
         /// <param name="query">Incoming query</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
-            {{ message.RequestFullName }} query,
+        {{ message.AccessibilityModifier }} {{ message.ReturnType }} {{ message.MethodName }}(
+            {{ message.FullName }} query,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
@@ -877,7 +877,7 @@ namespace {{ MediatorNamespace }}
         {{~ for message in IStreamRequestMessages ~}}
 
         /// <summary>
-        /// Create a stream from request type {{ message.RequestFullName }}.
+        /// Create a stream from request type {{ message.FullName }}.
         {{- if message.IsClass }}
         /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         {{- end }}
@@ -885,8 +885,8 @@ namespace {{ MediatorNamespace }}
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
-            {{ message.RequestFullName }} request,
+        {{ message.AccessibilityModifier }} {{ message.ReturnType }} {{ message.MethodName }}(
+            {{ message.FullName }} request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
@@ -899,7 +899,7 @@ namespace {{ MediatorNamespace }}
         {{~ for message in IStreamCommandMessages ~}}
 
         /// <summary>
-        /// Create a stream from command type {{ message.RequestFullName }}.
+        /// Create a stream from command type {{ message.FullName }}.
         {{- if message.IsClass }}
         /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
         {{- end }}
@@ -907,8 +907,8 @@ namespace {{ MediatorNamespace }}
         /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
-            {{ message.RequestFullName }} command,
+        {{ message.AccessibilityModifier }} {{ message.ReturnType }} {{ message.MethodName }}(
+            {{ message.FullName }} command,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
@@ -921,7 +921,7 @@ namespace {{ MediatorNamespace }}
         {{~ for message in IStreamQueryMessages ~}}
 
         /// <summary>
-        /// Create a stream from query type {{ message.RequestFullName }}.
+        /// Create a stream from query type {{ message.FullName }}.
         {{- if message.IsClass }}
         /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
         {{- end }}
@@ -929,8 +929,8 @@ namespace {{ MediatorNamespace }}
         /// <param name="query">Incoming query</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} {{ message.AsyncReturnType }} {{ message.AsyncMethodName }}(
-            {{ message.RequestFullName }} query,
+        {{ message.AccessibilityModifier }} {{ message.ReturnType }} {{ message.MethodName }}(
+            {{ message.FullName }} query,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
@@ -968,12 +968,12 @@ namespace {{ MediatorNamespace }}
             switch (request)
             {
                 {{~ for message in IRequestMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     return SendAsync(request, cancellationToken);
                 }
@@ -1008,7 +1008,7 @@ namespace {{ MediatorNamespace }}
             switch (request)
             {
                 {{~ for message in IRequestMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     var response = await Send(r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
@@ -1054,10 +1054,10 @@ namespace {{ MediatorNamespace }}
             switch (request)
             {
                 {{~ for message in IStreamRequestMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
                 }
                 {{~ end ~}}
                 default:
@@ -1115,12 +1115,12 @@ namespace {{ MediatorNamespace }}
             switch (command)
             {
                 {{~ for message in ICommandMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     return SendAsync(command, cancellationToken);
                 }
@@ -1155,7 +1155,7 @@ namespace {{ MediatorNamespace }}
             switch (command)
             {
                 {{~ for message in ICommandMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     var response = await Send(r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
@@ -1201,10 +1201,10 @@ namespace {{ MediatorNamespace }}
             switch (command)
             {
                 {{~ for message in IStreamCommandMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
                 }
                 {{~ end ~}}
                 default:
@@ -1262,12 +1262,12 @@ namespace {{ MediatorNamespace }}
             switch (query)
             {
                 {{~ for message in IQueryMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     if (typeof(TResponse) == typeof({{ message.ResponseFullNameWithoutReferenceNullability }}))
                     {
                         var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ReturnType }}, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     return SendAsync(query, cancellationToken);
                 }
@@ -1302,7 +1302,7 @@ namespace {{ MediatorNamespace }}
             switch (query)
             {
                 {{~ for message in IQueryMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     var response = await Send(r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ResponseFullName }}, TResponse>(ref response);
@@ -1348,10 +1348,10 @@ namespace {{ MediatorNamespace }}
             switch (query)
             {
                 {{~ for message in IStreamQueryMessages ~}}
-                case {{ message.RequestFullName }} r:
+                case {{ message.FullName }} r:
                 {
                     var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.AsyncReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<{{ message.ReturnType }}, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
                 }
                 {{~ end ~}}
                 default:
@@ -1414,7 +1414,7 @@ namespace {{ MediatorNamespace }}
                     switch (request)
                     {
                         {{~ for message in IRequestMessages ~}}
-                        case {{ message.RequestFullName }} r: return await Send(r, cancellationToken);
+                        case {{ message.FullName }} r: return await Send(r, cancellationToken);
                         {{~ end ~}}
                         default:
                         {
@@ -1438,7 +1438,7 @@ namespace {{ MediatorNamespace }}
                     switch (command)
                     {
                         {{~ for message in ICommandMessages ~}}
-                        case {{ message.RequestFullName }} r: return await Send(r, cancellationToken);
+                        case {{ message.FullName }} r: return await Send(r, cancellationToken);
                         {{~ end ~}}
                         default:
                         {
@@ -1462,7 +1462,7 @@ namespace {{ MediatorNamespace }}
                     switch (query)
                     {
                         {{~ for message in IQueryMessages ~}}
-                        case {{ message.RequestFullName }} r: return await Send(r, cancellationToken);
+                        case {{ message.FullName }} r: return await Send(r, cancellationToken);
                         {{~ end ~}}
                         default:
                         {
@@ -1513,7 +1513,7 @@ namespace {{ MediatorNamespace }}
                     switch (request)
                     {
                         {{~ for message in IStreamRequestMessages ~}}
-                        case {{ message.RequestFullName }} m:
+                        case {{ message.FullName }} m:
                         {
                             {{~ if message.ResponseIsValueType ~}}
                             var value = CreateStream(m, cancellationToken);
@@ -1545,7 +1545,7 @@ namespace {{ MediatorNamespace }}
                     switch (command)
                     {
                         {{~ for message in IStreamCommandMessages ~}}
-                        case {{ message.RequestFullName }} m:
+                        case {{ message.FullName }} m:
                         {
                             {{~ if message.ResponseIsValueType ~}}
                             var value = CreateStream(m, cancellationToken);
@@ -1577,7 +1577,7 @@ namespace {{ MediatorNamespace }}
                     switch (query)
                     {
                         {{~ for message in IStreamQueryMessages ~}}
-                        case {{ message.RequestFullName }} m:
+                        case {{ message.FullName }} m:
                         {
                             {{~ if message.ResponseIsValueType ~}}
                             var value = CreateStream(m, cancellationToken);

@@ -23,7 +23,6 @@ internal sealed class CompilationAnalyzer
 
     private readonly HashSet<RequestMessage> _requestMessages;
     private readonly HashSet<NotificationMessage> _notificationMessages;
-    private readonly HashSet<RequestMessageHandler> _requestMessageHandlers;
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
 
     public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
@@ -76,7 +75,6 @@ internal sealed class CompilationAnalyzer
     {
         _context = context;
         _requestMessages = new();
-        _requestMessageHandlers = new();
         _notificationMessages = new();
         _notificationMessageHandlers = new();
         _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
@@ -319,7 +317,6 @@ internal sealed class CompilationAnalyzer
                     )
                 ),
                 ToModelsSortedByInheritanceDepth(_notificationMessages, m => m.ToModel()),
-                _requestMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
                 _notificationMessageHandlers.Select(x => x.ToModel()).ToImmutableEquatableArray(),
                 RequestMessageHandlerWrappers.ToImmutableEquatableArray(),
                 new NotificationPublisherTypeModel(
@@ -333,8 +330,7 @@ internal sealed class CompilationAnalyzer
                 ServiceLifetimeShort,
                 SingletonServiceLifetime,
                 IsTestRun,
-                ConfiguredViaAttribute,
-                ConfiguredViaConfiguration
+                ConfiguredViaAttribute
             );
 
             return model;
@@ -628,8 +624,6 @@ internal sealed class CompilationAnalyzer
                             {
                                 mapping.Add(requestMessageSymbol, handler);
                             }
-
-                            _requestMessageHandlers.Add(handler);
                         }
                         else
                         {

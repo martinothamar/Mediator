@@ -4,24 +4,20 @@ namespace Mediator.SourceGenerator;
 
 internal abstract record MessageHandlerModel : SymbolMetadataModel
 {
-    private readonly int _typeArgumentsLength;
-
     protected MessageHandlerModel(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
         : base(symbol)
     {
-        ServiceLifetime = analyzer.ServiceLifetime;
+        var typeOfExpression = TypeOfExpression(symbol);
         ServiceRegistrationBlock =
-            $"services.TryAdd(new SD({TypeOfExpression(symbol)}, {TypeOfExpression(symbol)}, {ServiceLifetime}));";
-        _typeArgumentsLength = symbol.TypeArguments.Length;
+            $"services.TryAdd(new SD({typeOfExpression}, {typeOfExpression}, {analyzer.ServiceLifetime}));";
+        IsOpenGeneric = symbol.TypeArguments.Length > 0;
     }
 
-    public bool IsOpenGeneric => _typeArgumentsLength > 0;
+    public bool IsOpenGeneric { get; }
 
     public string ServiceRegistrationBlock { get; }
 
-    public string? ServiceLifetime { get; }
-
-    public static string TypeOfExpression(INamedTypeSymbol symbol, bool includeTypeParameters = true)
+    protected static string TypeOfExpression(INamedTypeSymbol symbol, bool includeTypeParameters = true)
     {
         var typeName = symbol.GetTypeSymbolFullName(includeTypeParameters: includeTypeParameters);
         var genericArguments = string.Empty;

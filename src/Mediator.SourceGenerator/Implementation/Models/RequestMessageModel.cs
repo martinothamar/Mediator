@@ -2,6 +2,16 @@
 
 namespace Mediator.SourceGenerator;
 
+internal enum RequestMessageKind
+{
+    Request,
+    Query,
+    Command,
+    StreamRequest,
+    StreamQuery,
+    StreamCommand
+}
+
 internal sealed record RequestMessageModel : SymbolMetadataModel
 {
     public RequestMessageModel(
@@ -13,56 +23,54 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
     )
         : base(symbol)
     {
+        MessageType = messageType;
+        MessageKind = messageType switch
+        {
+            "Request" => RequestMessageKind.Request,
+            "Query" => RequestMessageKind.Query,
+            "Command" => RequestMessageKind.Command,
+            "StreamRequest" => RequestMessageKind.StreamRequest,
+            "StreamQuery" => RequestMessageKind.StreamQuery,
+            "StreamCommand" => RequestMessageKind.StreamCommand,
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+        };
+        var isStreaming =
+            MessageKind
+                is RequestMessageKind.StreamRequest
+                    or RequestMessageKind.StreamQuery
+                    or RequestMessageKind.StreamCommand;
+
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();
         ResponseFullNameWithoutReferenceNullability = responseSymbol.GetTypeSymbolFullName(
             includeReferenceNullability: false
         );
-        WrapperType = wrapperType;
-        MessageType = messageType;
         Handler = handler;
 
-        IdentifierFullName = symbol
+        var fullHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.TypeName}";
+        HandlerWrapperTypeNameWithGenericTypeArguments =
+            $"{fullHandlerWrapperTypeName}<{FullName}, {ResponseFullName}>";
+
+        var identifierFullName = symbol
             .GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false)
             .Replace("global::", "")
             .Replace('.', '_');
 
-        HandlerWrapperTypeNameWithGenericTypeArguments = WrapperType.HandlerWrapperTypeNameWithGenericTypeArguments(
-            RequestFullName,
-            ResponseFullName
-        );
+        HandlerWrapperPropertyName = $"Wrapper_For_{identifierFullName}";
+        MethodName = isStreaming ? "CreateStream" : "Send";
+        ReturnType = isStreaming
+            ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
+            : $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
     }
 
-    public RequestMessageHandlerWrapperModel WrapperType { get; }
-
     public string MessageType { get; }
-
+    public RequestMessageKind MessageKind { get; }
     public RequestMessageHandlerModel? Handler { get; }
-
-    public string RequestFullName => FullName;
     public bool ResponseIsValueType { get; }
     public string ResponseFullName { get; }
     public string ResponseFullNameWithoutReferenceNullability { get; }
-
     public string HandlerWrapperTypeNameWithGenericTypeArguments { get; }
-
-    public string IdentifierFullName { get; }
-
-    public bool IsStreaming => MessageType.StartsWith("Stream");
-
-    public string PipelineHandlerType =>
-        IsStreaming
-            ? $"global::Mediator.IStreamPipelineBehavior<{RequestFullName}, {ResponseFullName}>"
-            : $"global::Mediator.IPipelineBehavior<{RequestFullName}, {ResponseFullName}>";
-
-    public string HandlerWrapperPropertyName => $"Wrapper_For_{IdentifierFullName}";
-
-    public string SyncMethodName => IsStreaming ? "CreateStream" : "Send";
-    public string AsyncMethodName => IsStreaming ? "CreateStream" : "Send";
-
-    public string SyncReturnType => ResponseFullName;
-    public string AsyncReturnType =>
-        IsStreaming
-            ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
-            : $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
+    public string HandlerWrapperPropertyName { get; }
+    public string MethodName { get; }
+    public string ReturnType { get; }
 }
