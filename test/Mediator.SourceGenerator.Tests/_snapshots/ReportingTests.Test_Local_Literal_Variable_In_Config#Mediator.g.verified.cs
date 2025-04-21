@@ -56,17 +56,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), typeof(global::SomeNamespace.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), typeof(global::SomeNamespace.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), typeof(global::SomeNamespace.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
-            
 
-
-
-
+            // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
-            
+
+            // Register internal components
             services.Add(new SD(typeof(global::SomeNamespace.Internals.IContainerProbe), typeof(global::SomeNamespace.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.Add(new SD(typeof(global::SomeNamespace.Internals.IContainerProbe), typeof(global::SomeNamespace.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
-
             services.Add(new SD(typeof(global::SomeNamespace.Internals.ContainerMetadata), typeof(global::SomeNamespace.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -637,13 +634,6 @@ namespace SomeNamespace.Internals
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
 
-
-
-
-
-
-
-
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             using (var scope = sp.CreateScope())
@@ -668,13 +658,6 @@ namespace SomeNamespace.Internals
 
             var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
-
-
-
-
-
-
-
         }
     }
 }

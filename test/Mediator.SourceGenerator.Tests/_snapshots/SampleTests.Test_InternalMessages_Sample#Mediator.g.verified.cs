@@ -52,33 +52,30 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-
             services.Add(new SD(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register handlers for request messages
             services.TryAdd(new SD(typeof(global::InternalMessages.Application.PingHandler), typeof(global::InternalMessages.Application.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), typeof(global::InternalMessages.Application.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(
-                typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>),
-                typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>),
-                global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
-            ));
+            services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register concrete handlers for notification messages
             services.TryAdd(new SD(typeof(global::InternalMessages.Application.PingPongedHandler), typeof(global::InternalMessages.Application.PingPongedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register handlers and wrappers for notification messages
             services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>), GetRequiredService<global::InternalMessages.Application.PingPongedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::InternalMessages.Domain.PingPonged>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::InternalMessages.Domain.PingPonged>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-
-
+            // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register internal components
             services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -686,11 +683,6 @@ namespace Mediator.Internals
 
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong> Wrapper_For_InternalMessages_Domain_Ping;
 
-
-
-
-
-
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::InternalMessages.Domain.PingPonged> Wrapper_For_InternalMessages_Domain_PingPonged;
 
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
@@ -721,11 +713,6 @@ namespace Mediator.Internals
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
             Wrapper_For_InternalMessages_Domain_Ping = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>>().Init(this, sp);
-
-
-
-
-
 
             Wrapper_For_InternalMessages_Domain_PingPonged = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::InternalMessages.Domain.PingPonged>>().Init(this, sp);
         }

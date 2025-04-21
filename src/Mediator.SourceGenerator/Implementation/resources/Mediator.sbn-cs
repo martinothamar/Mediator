@@ -56,49 +56,58 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
-            {{ else }}
+            {{~ else ~}}
             services.Add(new SD(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
             {{~ end ~}}
+            {{~ if (object.size RequestMessages) > 0 ~}}
 
+            // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistrationBlock }}
             services.Add(new SD(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
-            services.Add(new SD(
-                typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}),
-                typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}),
-                {{ SingletonServiceLifetime }}
-            ));
+            services.Add(new SD(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size NotificationMessageHandlers) > 0 ~}}
 
+            // Register concrete handlers for notification messages
             {{~ for handler in NotificationMessageHandlers ~}}
             {{ handler.ServiceRegistrationBlock }}
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size NotificationMessages) > 0 ~}}
 
+            // Register handlers and wrappers for notification messages
             {{~ for message in NotificationMessages ~}}
             {{~ for registration in message.HandlerServicesRegistrationBlock ~}}
             {{ registration }}
             {{~ end ~}}
             services.Add(new SD(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size OpenGenericNotificationMessageHandlers) > 0 ~}}
 
+            // Register open generic handlers
             {{~ for handler in OpenGenericNotificationMessageHandlers ~}}
             {{ handler.OpenGenericServiceRegistrationBlock }}
             {{~ end ~}}
+            {{~ end ~}}
 
+            // Register the notification publisher that was configured
             {{~ if ServiceLifetimeIsScoped || ServiceLifetimeIsTransient ~}}
             services.Add(new SD(typeof({{ NotificationPublisherType.FullName }}), typeof({{ NotificationPublisherType.FullName }}), {{ ServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ ServiceLifetime }}));
-            {{ else }}
+            {{~ else ~}}
             services.Add(new SD(typeof({{ NotificationPublisherType.FullName }}), typeof({{ NotificationPublisherType.FullName }}), {{ SingletonServiceLifetime }}));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
 
+            // Register internal components
             services.Add(new SD(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
             services.Add(new SD(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
-
             services.Add(new SD(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
 
             return services;
@@ -413,33 +422,47 @@ namespace {{ InternalsNamespace }}
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamQueryHandlerWrappers;
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
+        {{~ if (object.size IRequestMessages) > 0 ~}}
 
         {{~ for message in IRequestMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
+        {{~ end ~}}
+        {{~ if (object.size ICommandMessages) > 0 ~}}
 
         {{~ for message in ICommandMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
+        {{~ end ~}}
+        {{~ if (object.size IQueryMessages) > 0 ~}}
 
         {{~ for message in IQueryMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
+        {{~ end ~}}
+        {{~ if (object.size IStreamRequestMessages) > 0 ~}}
 
         {{~ for message in IStreamRequestMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
+        {{~ end ~}}
+        {{~ if (object.size IStreamCommandMessages) > 0 ~}}
 
         {{~ for message in IStreamCommandMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
+        {{~ end ~}}
+        {{~ if (object.size IStreamQueryMessages) > 0 ~}}
 
         {{~ for message in IStreamQueryMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
+        {{~ end ~}}
+        {{~ if (object.size NotificationMessages) > 0 ~}}
 
         {{~ for message in NotificationMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
+        {{~ end ~}}
         {{~ end ~}}
 
         {{~ if ServiceLifetimeIsSingleton ~}}
@@ -498,33 +521,47 @@ namespace {{ InternalsNamespace }}
             notificationHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
             {{~ end ~}}
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
+            {{~ if (object.size IRequestMessages) > 0 ~}}
 
             {{~ for message in IRequestMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size ICommandMessages) > 0 ~}}
 
             {{~ for message in ICommandMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size IQueryMessages) > 0 ~}}
 
             {{~ for message in IQueryMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size IStreamRequestMessages) > 0 ~}}
 
             {{~ for message in IStreamRequestMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size IStreamCommandMessages) > 0 ~}}
 
             {{~ for message in IStreamCommandMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size IStreamQueryMessages) > 0 ~}}
 
             {{~ for message in IStreamQueryMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ if (object.size NotificationMessages) > 0 ~}}
 
             {{~ for message in NotificationMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
+            {{~ end ~}}
             {{~ end ~}}
         }
     }

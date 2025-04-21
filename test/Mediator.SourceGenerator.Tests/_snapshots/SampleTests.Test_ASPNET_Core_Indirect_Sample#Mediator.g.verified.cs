@@ -52,30 +52,23 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-
             services.Add(new SD(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register handlers for request messages
             services.TryAdd(new SD(typeof(global::AspNetCoreIndirect.Application.Controllers.GetWeatherForecastHandler), typeof(global::AspNetCoreIndirect.Application.Controllers.GetWeatherForecastHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>>), typeof(global::AspNetCoreIndirect.Application.Controllers.GetWeatherForecastHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(
-                typeof(global::Mediator.Internals.RequestHandlerWrapper<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>>),
-                typeof(global::Mediator.Internals.RequestHandlerWrapper<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>>),
-                global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
-            ));
+            services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-
-
-
-
+            // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register internal components
             services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -681,12 +674,6 @@ namespace Mediator.Internals
 
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>> Wrapper_For_AspNetCoreIndirect_Application_GetWeatherForecast;
 
-
-
-
-
-
-
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
         public ContainerMetadata(global::System.IServiceProvider sp)
@@ -714,12 +701,6 @@ namespace Mediator.Internals
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
             Wrapper_For_AspNetCoreIndirect_Application_GetWeatherForecast = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::AspNetCoreIndirect.Application.GetWeatherForecast, global::System.Collections.Generic.IReadOnlyList<global::AspNetCoreIndirect.Application.WeatherForecast>>>().Init(this, sp);
-
-
-
-
-
-
         }
     }
 }
