@@ -509,17 +509,27 @@ AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
 
 ### Source generation
 
-``` ini
+```
 
-BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22621
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.26100.3775)
 AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
-.NET SDK=6.0.202
-  [Host] : .NET 6.0.14 (6.0.1423.7309), X64 RyuJIT
+.NET SDK 8.0.408
+  [Host]     : .NET 8.0.15 (8.0.1525.16413), X64 RyuJIT AVX2
+  DefaultJob : .NET 8.0.15 (8.0.1525.16413), X64 RyuJIT AVX2
 
-Job=InProcess  Toolchain=InProcessEmitToolchain
 
 ```
-|  Method |     Mean |    Error |   StdDev |     Gen 0 |   Gen 1 | Allocated |
-|-------- |---------:|---------:|---------:|----------:|--------:|----------:|
-| Compile | 14.52 ms | 0.249 ms | 0.233 ms | 1406.2500 | 31.2500 |     23 MB |
-
+| Method | ProjectType | ServiceLifetime | Mean      | Error     | StdDev    | Gen0      | Gen1     | Gen2    | Allocated |
+|------- |------------ |---------------- |----------:|----------:|----------:|----------:|---------:|--------:|----------:|
+| Cached | Small       | Scoped          |  3.130 ms | 0.0050 ms | 0.0045 ms |   93.7500 |  31.2500 |       - |   1.81 MB |
+| Cached | Small       | Transient       |  3.168 ms | 0.0195 ms | 0.0173 ms |  109.3750 |  15.6250 |       - |   1.81 MB |
+| Cached | Small       | Singleton       |  3.187 ms | 0.0102 ms | 0.0085 ms |   93.7500 |  31.2500 |       - |   1.81 MB |
+| Cold   | Small       | Transient       |  6.233 ms | 0.0311 ms | 0.0291 ms |  210.9375 |  70.3125 | 15.6250 |   3.65 MB |
+| Cold   | Small       | Scoped          |  6.249 ms | 0.0646 ms | 0.0604 ms |  210.9375 | 101.5625 | 15.6250 |   3.65 MB |
+| Cold   | Small       | Singleton       |  6.334 ms | 0.0841 ms | 0.0787 ms |  210.9375 |  62.5000 | 15.6250 |   3.65 MB |
+| Cached | Large       | Scoped          | 45.282 ms | 0.8975 ms | 0.9603 ms |  500.0000 |        - |       - |     12 MB |
+| Cached | Large       | Transient       | 45.604 ms | 0.9070 ms | 1.0081 ms |  500.0000 |        - |       - |  12.03 MB |
+| Cached | Large       | Singleton       | 45.977 ms | 0.9053 ms | 1.1450 ms |  500.0000 |        - |       - |  12.04 MB |
+| Cold   | Large       | Scoped          | 60.706 ms | 1.1644 ms | 1.4726 ms | 1000.0000 | 500.0000 |       - |  23.71 MB |
+| Cold   | Large       | Transient       | 61.231 ms | 1.1778 ms | 0.9835 ms | 1000.0000 | 500.0000 |       - |  23.75 MB |
+| Cold   | Large       | Singleton       | 64.621 ms | 1.2744 ms | 2.7158 ms | 1000.0000 | 500.0000 |       - |  23.67 MB |

@@ -1,72 +1,62 @@
+using System.Runtime.CompilerServices;
+using Buildalyzer;
+using Buildalyzer.Workspaces;
 using Mediator.SourceGenerator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.MSBuild;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.SourceGenerator;
 
 [MemoryDiagnoser(true)]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
-[InProcess]
-//[EventPipeProfiler(EventPipeProfile.CpuSampling)]
-//[EtwProfiler]
-//[DisassemblyDiagnoser]
-//[InliningDiagnoser(logFailuresOnly: true, allowedNamespaces: new[] { "Mediator" })]
 public class SourceGeneratorBenchmark
 {
+    private static string ProjectDir([CallerFilePath] string thisPath = "") =>
+        new DirectoryInfo(Path.GetDirectoryName(thisPath)).Parent.FullName;
+
+    private AdhocWorkspace _workspace;
     private Compilation _compilation;
-    const string SmallPath =
-        "../../samples/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj";
-    const string LargePath = "../Mediator.Benchmarks.Large/Mediator.Benchmarks.Large.csproj";
-
     private CSharpGeneratorDriver _driver;
-    private MSBuildWorkspace _workspace;
 
-    public void Setup(string path)
+    [Params("Small", "Large")]
+    public string ProjectType { get; set; }
+
+    [ParamsAllValues]
+    public ServiceLifetime ServiceLifetime { get; set; }
+
+    public void Setup()
     {
-        var currentDirectory = Directory.GetCurrentDirectory();
-        if (currentDirectory.Contains("bin", StringComparison.OrdinalIgnoreCase))
-            currentDirectory = currentDirectory.Split("bin")[0];
+        var currentDirectory = ProjectDir();
         ConsoleLogger.Default.WriteLine("Starting!!! at " + currentDirectory);
-        _workspace = MSBuildWorkspace.Create();
-        _workspace.WorkspaceFailed += (sender, args) =>
+        AnalyzerManager manager = new AnalyzerManager();
+        IProjectAnalyzer analyzer = manager.GetProject(Path.Combine(currentDirectory, "Mediator.Benchmarks.csproj"));
+        List<string> extraDefineConstants = [];
+        switch (ServiceLifetime)
         {
-            ConsoleLogger.Default.WriteLineError("-------------------------");
-            ConsoleLogger.Default.WriteLineError(args.Diagnostic.ToString());
-            ConsoleLogger.Default.WriteLineError("-------------------------");
-        };
-
-        var projectFile = Path.Combine(currentDirectory, path);
-        if (!File.Exists(projectFile))
-            throw new Exception("Project doesnt exist");
-        else
-            ConsoleLogger.Default.WriteLine("Project exists!");
-
-        Project project = null;
-        try
-        {
-            ConsoleLogger.Default.WriteLine("Loading project!!!");
-            ConsoleLogger.Default.WriteLine("");
-            project = _workspace.OpenProjectAsync(projectFile).GetAwaiter().GetResult();
-            ConsoleLogger.Default.WriteLine("");
-            ConsoleLogger.Default.WriteLine("Loaded project!!!");
-        }
-        catch (Exception ex)
-        {
-            ConsoleLogger.Default.WriteError(ex.Message);
-            throw;
+            case ServiceLifetime.Singleton:
+                extraDefineConstants.Add("Mediator_Lifetime_Singleton");
+                break;
+            case ServiceLifetime.Scoped:
+                extraDefineConstants.Add("Mediator_Lifetime_Scoped");
+                break;
+            case ServiceLifetime.Transient:
+                extraDefineConstants.Add("Mediator_Lifetime_Transient");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(ServiceLifetime), ServiceLifetime, null);
         }
 
+        extraDefineConstants.Add($"Mediator_{ProjectType}_Project");
+
+        analyzer.SetGlobalProperty("ExtraDefineConstants", string.Join(";", extraDefineConstants));
+
+        _workspace = analyzer.GetWorkspace(addProjectReferences: true);
+        var project = _workspace.CurrentSolution.Projects.Single(p => p.Name == "Mediator.Benchmarks");
         _compilation = project.GetCompilationAsync().GetAwaiter().GetResult();
-        if (_compilation is null)
-            throw new InvalidOperationException("Compilation returned null");
-
         var generator = GeneratorExtensions.AsSourceGenerator(new IncrementalMediatorGenerator());
 
-        _driver = CSharpGeneratorDriver.Create(
-            new[] { generator },
-            parseOptions: (CSharpParseOptions)project.ParseOptions!
-        );
+        _driver = CSharpGeneratorDriver.Create([generator], parseOptions: (CSharpParseOptions)project.ParseOptions!);
     }
 
     [GlobalCleanup]
@@ -75,46 +65,24 @@ public class SourceGeneratorBenchmark
         _workspace.Dispose();
     }
 
-    [GlobalSetup(Target = nameof(Compile))]
-    public void SetupSmall() => Setup(SmallPath);
-
-    [Benchmark]
-    public GeneratorDriver Compile()
-    {
-        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
-    }
+    [GlobalSetup(Target = nameof(Cold))]
+    public void SetupCold() => Setup();
 
     [GlobalSetup(Target = nameof(Cached))]
     public void SetupCached()
     {
-        Setup(SmallPath);
+        Setup();
         _driver = (CSharpGeneratorDriver)_driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
+    }
+
+    [Benchmark]
+    public GeneratorDriver Cold()
+    {
+        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
     }
 
     [Benchmark]
     public GeneratorDriver Cached()
-    {
-        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
-    }
-
-    [GlobalSetup(Target = nameof(LargeCompile))]
-    public void SetupLarge() => Setup(LargePath);
-
-    [Benchmark]
-    public GeneratorDriver LargeCompile()
-    {
-        return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
-    }
-
-    [GlobalSetup(Target = nameof(LargeCached))]
-    public void SetupLargeCached()
-    {
-        Setup(LargePath);
-        _driver = (CSharpGeneratorDriver)_driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
-    }
-
-    [Benchmark]
-    public GeneratorDriver LargeCached()
     {
         return _driver.RunGeneratorsAndUpdateCompilation(_compilation, out _, out _);
     }

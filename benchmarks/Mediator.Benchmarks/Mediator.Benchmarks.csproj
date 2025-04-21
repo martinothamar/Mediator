@@ -36,16 +36,7 @@
     <PackageReference Include="BenchmarkDotNet.Diagnostics.dotTrace" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    <PackageReference Include="Microsoft.Build.Locator" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces"  PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" />
-    <PackageReference Include="NuGet.ProjectModel" />
-    <PackageReference Include="NuGet.Frameworks" />
-    <PackageReference Include="NuGet.Packaging" />
+    <PackageReference Include="Buildalyzer.Workspaces" />
   </ItemGroup>
 
   <ItemGroup>
