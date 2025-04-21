@@ -283,7 +283,7 @@ services.AddMediator((MediatorOptions options) =>
 
 Singleton lifetime is highly recommended as it yields the best performance.
 Every application is different, but it is likely that a lot of your message handlers doesn't keep state and have no need for transient or scoped lifetime.
-In a lot of cases those lifetimes only generate allocate lots of memory for no particular reason.
+In a lot of cases those lifetimes only allocate lots of memory for no particular reason.
 
 ## 4. Getting started
 
