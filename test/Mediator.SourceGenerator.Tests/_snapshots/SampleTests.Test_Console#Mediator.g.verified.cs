@@ -52,30 +52,23 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-
             services.Add(new SD(typeof(global::SimpleConsole.Mediator), typeof(global::SimpleConsole.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::SimpleConsole.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::SimpleConsole.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::SimpleConsole.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register handlers for request messages
             services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(
-                typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>),
-                typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>),
-                global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
-            ));
+            services.Add(new SD(typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-
-
-
-
+            // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register internal components
             services.Add(new SD(typeof(global::SimpleConsole.Internals.IContainerProbe), typeof(global::SimpleConsole.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::SimpleConsole.Internals.IContainerProbe), typeof(global::SimpleConsole.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             services.Add(new SD(typeof(global::SimpleConsole.Internals.ContainerMetadata), typeof(global::SimpleConsole.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -681,12 +674,6 @@ namespace SimpleConsole.Internals
 
         public readonly global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong> Wrapper_For_Ping;
 
-
-
-
-
-
-
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
         public ContainerMetadata(global::System.IServiceProvider sp)
@@ -714,12 +701,6 @@ namespace SimpleConsole.Internals
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
             Wrapper_For_Ping = sp.GetRequiredService<global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp);
-
-
-
-
-
-
         }
     }
 }

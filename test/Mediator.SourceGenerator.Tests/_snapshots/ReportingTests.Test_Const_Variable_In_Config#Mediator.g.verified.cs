@@ -56,17 +56,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), typeof(global::SimpleConsole.Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), typeof(global::SimpleConsole.Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), typeof(global::SimpleConsole.Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            
 
-
-
-
+            // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            
+
+            // Register internal components
             services.Add(new SD(typeof(global::SimpleConsole.Mediator.Internals.IContainerProbe), typeof(global::SimpleConsole.Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new SD(typeof(global::SimpleConsole.Mediator.Internals.IContainerProbe), typeof(global::SimpleConsole.Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-
             services.Add(new SD(typeof(global::SimpleConsole.Mediator.Internals.ContainerMetadata), typeof(global::SimpleConsole.Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -637,13 +634,6 @@ namespace SimpleConsole.Mediator.Internals
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
 
-
-
-
-
-
-
-
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::SimpleConsole.Mediator.Internals.IContainerProbe>() is global::SimpleConsole.Mediator.Internals.IContainerProbe[];
@@ -665,13 +655,6 @@ namespace SimpleConsole.Mediator.Internals
 
             var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
-
-
-
-
-
-
-
         }
     }
 }

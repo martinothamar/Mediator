@@ -52,14 +52,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-
             services.Add(new SD(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-
-
+            // Register handlers and wrappers for notification messages
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -71,14 +69,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-
-
+            // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register internal components
             services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -684,12 +681,6 @@ namespace Mediator.Internals
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-
-
-
-
-
-
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually> Wrapper_For_TestCode_RoundSucceededActually;
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually> Wrapper_For_TestCode_Round2SucceededActually;
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated> Wrapper_For_TestCode_RoundCreated;
@@ -735,12 +726,6 @@ namespace Mediator.Internals
             notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp));
             notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent2), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp));
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
-
-
-
-
-
-
 
             Wrapper_For_TestCode_RoundSucceededActually = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp);
             Wrapper_For_TestCode_Round2SucceededActually = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp);
