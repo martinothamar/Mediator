@@ -93,7 +93,9 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - uses: actions/checkout@v2 # nbgv is not run on this job, so don't need fetch-depth: 0
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
 
     - uses: actions/cache@v3
       with:
