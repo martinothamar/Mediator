@@ -59,6 +59,39 @@ jobs:
     - name: Test Mediator.Tests
       run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
 
+  samples-netfx:
+    needs: build
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: .\samples\basic\NetFramework\
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+
+    - name: Restore Packages
+      run: nuget restore Console.sln
+
+    - name: Build solution
+      run: msbuild Console.sln -t:Rebuild
+
   publish:
     needs: build
     runs-on: ubuntu-latest
