@@ -60,26 +60,26 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
 
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundResulted>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundResulted>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Created>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Created>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Resulted>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Resulted>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
 
 
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::Mediator.ContainerMetadata), typeof(global::Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -89,7 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace Mediator
+namespace Mediator.Internals
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     internal interface IMessageHandlerBase
@@ -133,7 +133,7 @@ namespace Mediator
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public RequestHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -213,7 +213,7 @@ namespace Mediator
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -294,7 +294,7 @@ namespace Mediator
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public CommandHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -374,7 +374,7 @@ namespace Mediator
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -455,7 +455,7 @@ namespace Mediator
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public QueryHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -535,7 +535,7 @@ namespace Mediator
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -610,7 +610,7 @@ namespace Mediator
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         public NotificationHandlerWrapper<TNotification> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -690,22 +690,22 @@ namespace Mediator
 
 
 
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually> Wrapper_For_TestCode_RoundSucceededActually;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually> Wrapper_For_TestCode_Round2SucceededActually;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated> Wrapper_For_TestCode_RoundCreated;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted> Wrapper_For_TestCode_RoundResulted;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded> Wrapper_For_TestCode_RoundSucceeded;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created> Wrapper_For_TestCode_Round2Created;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted> Wrapper_For_TestCode_Round2Resulted;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded> Wrapper_For_TestCode_Round2Succeeded;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent> Wrapper_For_TestCode_DomainEvent;
-        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2> Wrapper_For_TestCode_DomainEvent2;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually> Wrapper_For_TestCode_RoundSucceededActually;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually> Wrapper_For_TestCode_Round2SucceededActually;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated> Wrapper_For_TestCode_RoundCreated;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundResulted> Wrapper_For_TestCode_RoundResulted;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceeded> Wrapper_For_TestCode_RoundSucceeded;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Created> Wrapper_For_TestCode_Round2Created;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Resulted> Wrapper_For_TestCode_Round2Resulted;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded> Wrapper_For_TestCode_Round2Succeeded;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent> Wrapper_For_TestCode_DomainEvent;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2> Wrapper_For_TestCode_DomainEvent2;
 
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
 
             NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
 
@@ -724,16 +724,16 @@ namespace Mediator
             StreamQueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamQueryHandlerTypes);
 
             var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(10);
-            notificationHandlerTypes.Add(typeof(global::TestCode.RoundSucceededActually), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.Round2SucceededActually), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.RoundCreated), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.RoundResulted), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.RoundSucceeded), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Created), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Resulted), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Succeeded), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp));
-            notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent2), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundSucceededActually), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2SucceededActually), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundCreated), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundResulted), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundResulted>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundSucceeded), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Created), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Created>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Resulted), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Resulted>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Succeeded), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent2), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp));
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
 
@@ -742,19 +742,22 @@ namespace Mediator
 
 
 
-            Wrapper_For_TestCode_RoundSucceededActually = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp);
-            Wrapper_For_TestCode_Round2SucceededActually = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp);
-            Wrapper_For_TestCode_RoundCreated = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>>().Init(this, sp);
-            Wrapper_For_TestCode_RoundResulted = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>>().Init(this, sp);
-            Wrapper_For_TestCode_RoundSucceeded = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>>().Init(this, sp);
-            Wrapper_For_TestCode_Round2Created = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>>().Init(this, sp);
-            Wrapper_For_TestCode_Round2Resulted = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>>().Init(this, sp);
-            Wrapper_For_TestCode_Round2Succeeded = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>>().Init(this, sp);
-            Wrapper_For_TestCode_DomainEvent = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp);
-            Wrapper_For_TestCode_DomainEvent2 = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundSucceededActually = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2SucceededActually = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundCreated = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundCreated>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundResulted = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundResulted>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundSucceeded = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2Created = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Created>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2Resulted = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Resulted>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2Succeeded = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>>().Init(this, sp);
+            Wrapper_For_TestCode_DomainEvent = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp);
+            Wrapper_For_TestCode_DomainEvent2 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp);
         }
     }
+}
 
+namespace Mediator
+{
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -766,7 +769,7 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
+        private FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
         private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
         internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
         {
@@ -811,8 +814,8 @@ namespace Mediator
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            _containerMetadata = new FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator>(
-                self => self.Services.GetRequiredService<global::Mediator.ContainerMetadata>(),
+            _containerMetadata = new FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator>(
+                self => self.Services.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(),
                 this
             );
         }

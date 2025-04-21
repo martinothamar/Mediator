@@ -5,7 +5,7 @@ internal sealed record RequestMessageHandlerWrapperModel
     public RequestMessageHandlerWrapperModel(string messageType, CompilationAnalyzer analyzer)
     {
         MessageType = messageType;
-        FullNamespace = $"global::{analyzer.MediatorNamespace}";
+        FullNamespace = $"global::{analyzer.MediatorNamespace}.Internals";
     }
 
     public string MessageType { get; }

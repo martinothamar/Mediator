@@ -81,7 +81,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ for registration in message.HandlerServicesRegistrationBlock ~}}
             {{ registration }}
             {{~ end ~}}
-            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.NotificationHandlerWrapper<{{ message.FullName }}>), typeof(global::{{ MediatorNamespace }}.NotificationHandlerWrapper<{{ message.FullName }}>), {{ SingletonServiceLifetime }}));
+            services.Add(new SD(typeof(global::{{ InternalsNamespace }}.NotificationHandlerWrapper<{{ message.FullName }}>), typeof(global::{{ InternalsNamespace }}.NotificationHandlerWrapper<{{ message.FullName }}>), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
 
             {{~ for handler in OpenGenericNotificationMessageHandlers ~}}
@@ -96,10 +96,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
 
-            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.IContainerProbe), typeof(global::{{ MediatorNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
-            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.IContainerProbe), typeof(global::{{ MediatorNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
+            services.Add(new SD(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
+            services.Add(new SD(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
 
-            services.Add(new SD(typeof(global::{{ MediatorNamespace }}.ContainerMetadata), typeof(global::{{ MediatorNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
+            services.Add(new SD(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
 
             return services;
 
@@ -111,7 +111,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace {{ MediatorNamespace }}
+namespace {{ InternalsNamespace }}
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     internal interface IMessageHandlerBase
@@ -169,7 +169,7 @@ namespace {{ MediatorNamespace }}
         private {{ wrapperType.MessageHandlerDelegateName }} _rootHandler = null!;
 
         public {{ wrapperType.HandlerWrapperTypeNameWithGenericTypeParameters }} Init(
-            global::{{ MediatorNamespace }}.ContainerMetadata containerMetadata,
+            global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -305,7 +305,7 @@ namespace {{ MediatorNamespace }}
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         public NotificationHandlerWrapper<TNotification> Init(
-            global::{{ MediatorNamespace }}.ContainerMetadata containerMetadata,
+            global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -451,10 +451,10 @@ namespace {{ MediatorNamespace }}
             {{~ if ServiceLifetimeIsScoped ~}}
             using (var scope = sp.CreateScope())
             {
-                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::{{ MediatorNamespace }}.IContainerProbe>() is global::{{ MediatorNamespace }}.IContainerProbe[];
+                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
             }
             {{~ else ~}}
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ MediatorNamespace }}.IContainerProbe>() is global::{{ MediatorNamespace }}.IContainerProbe[];
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
             {{~ end ~}}
 
             {{~ if ServiceLifetimeIsSingleton ~}}
@@ -528,7 +528,10 @@ namespace {{ MediatorNamespace }}
             {{~ end ~}}
         }
     }
+}
 
+namespace {{ MediatorNamespace }}
+{
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -541,7 +544,7 @@ namespace {{ MediatorNamespace }}
     {
         internal readonly global::System.IServiceProvider Services;
         {{~ if ServiceLifetimeIsSingleton ~}}
-        {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ MediatorNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
         private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
         internal {{ NotificationPublisherType.FullName }} NotificationPublisher
         {
@@ -565,15 +568,15 @@ namespace {{ MediatorNamespace }}
             }
         }
         {{~ else ~}}
-        private global::{{ MediatorNamespace }}.ContainerMetadata? _containerMetadataStorage;
-        private global::{{ MediatorNamespace }}.ContainerMetadata _containerMetadata
+        private global::{{ InternalsNamespace }}.ContainerMetadata? _containerMetadataStorage;
+        private global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_containerMetadataStorage == null)
                 {
-                    var containerMetadata = Services.GetRequiredService<global::{{ MediatorNamespace }}.ContainerMetadata>();
+                    var containerMetadata = Services.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>();
                     _containerMetadataStorage = containerMetadata;
                     return containerMetadata;
                 }
@@ -616,8 +619,8 @@ namespace {{ MediatorNamespace }}
         {
             Services = sp;
             {{~ if ServiceLifetimeIsSingleton ~}}
-            _containerMetadata = new FastLazyValue<global::{{ MediatorNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator>(
-                self => self.Services.GetRequiredService<global::{{ MediatorNamespace }}.ContainerMetadata>(),
+            _containerMetadata = new FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator>(
+                self => self.Services.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(),
                 this
             );
             {{~ end ~}}
@@ -955,9 +958,9 @@ namespace {{ MediatorNamespace }}
             {{~ if HasRequests ~}}
             {{~ if HasManyRequests ~}}
             var handlerObj = GetRequestHandler(request);
-            if (handlerObj is global::{{ MediatorNamespace }}.IRequestHandlerBase<TResponse>)
+            if (handlerObj is global::{{ InternalsNamespace }}.IRequestHandlerBase<TResponse>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IRequestHandlerBase<TResponse>>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IRequestHandlerBase<TResponse>>(ref handlerObj);
                 return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
             }
             return SendAsync(request, handlerObj, cancellationToken);
@@ -998,7 +1001,7 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasRequests ~}}
             {{~ if HasManyRequests ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IMessageHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
             var response = await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
             return global::System.Runtime.CompilerServices.Unsafe.As<object?, TResponse>(ref response);
             {{~ else ~}}
@@ -1041,9 +1044,9 @@ namespace {{ MediatorNamespace }}
             {{~ if HasStreamRequests ~}}
             {{~ if HasManyStreamRequests ~}}
             var handlerObj = GetStreamRequestHandler(request);
-            if (handlerObj is global::{{ MediatorNamespace }}.IStreamRequestHandlerBase<TResponse>)
+            if (handlerObj is global::{{ InternalsNamespace }}.IStreamRequestHandlerBase<TResponse>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IStreamRequestHandlerBase<TResponse>>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IStreamRequestHandlerBase<TResponse>>(ref handlerObj);
                 return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
             }
             return CreateStreamAsync(request, handlerObj, cancellationToken);
@@ -1077,7 +1080,7 @@ namespace {{ MediatorNamespace }}
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IStreamMessageHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IStreamMessageHandlerBase>(handlerObj);
             await foreach (var r in handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken))
             {
                 yield return (TResponse)r!;
@@ -1102,9 +1105,9 @@ namespace {{ MediatorNamespace }}
             {{~ if HasCommands ~}}
             {{~ if HasManyCommands ~}}
             var handlerObj = GetCommandHandler(command);
-            if (handlerObj is global::{{ MediatorNamespace }}.ICommandHandlerBase<TResponse>)
+            if (handlerObj is global::{{ InternalsNamespace }}.ICommandHandlerBase<TResponse>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.ICommandHandlerBase<TResponse>>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.ICommandHandlerBase<TResponse>>(ref handlerObj);
                 return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
             }
             return SendAsync(command, handlerObj, cancellationToken);
@@ -1145,7 +1148,7 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasCommands ~}}
             {{~ if HasManyCommands ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IMessageHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
             var response = await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
             return global::System.Runtime.CompilerServices.Unsafe.As<object?, TResponse>(ref response);
             {{~ else ~}}
@@ -1188,9 +1191,9 @@ namespace {{ MediatorNamespace }}
             {{~ if HasStreamCommands ~}}
             {{~ if HasManyStreamCommands ~}}
             var handlerObj = GetStreamCommandHandler(command);
-            if (handlerObj is global::{{ MediatorNamespace }}.IStreamCommandHandlerBase<TResponse>)
+            if (handlerObj is global::{{ InternalsNamespace }}.IStreamCommandHandlerBase<TResponse>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IStreamCommandHandlerBase<TResponse>>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IStreamCommandHandlerBase<TResponse>>(ref handlerObj);
                 return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
             }
             return CreateStreamAsync(command, handlerObj, cancellationToken);
@@ -1224,7 +1227,7 @@ namespace {{ MediatorNamespace }}
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IStreamMessageHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IStreamMessageHandlerBase>(handlerObj);
             await foreach (var r in handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken))
             {
                 yield return (TResponse)r!;
@@ -1249,9 +1252,9 @@ namespace {{ MediatorNamespace }}
             {{~ if HasQueries ~}}
             {{~ if HasManyQueries ~}}
             var handlerObj = GetQueryHandler(query);
-            if (handlerObj is global::{{ MediatorNamespace }}.IQueryHandlerBase<TResponse>)
+            if (handlerObj is global::{{ InternalsNamespace }}.IQueryHandlerBase<TResponse>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IQueryHandlerBase<TResponse>>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IQueryHandlerBase<TResponse>>(ref handlerObj);
                 return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
             }
             return SendAsync(query, handlerObj, cancellationToken);
@@ -1292,7 +1295,7 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasQueries ~}}
             {{~ if HasManyQueries ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IMessageHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
             var response = await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
             return global::System.Runtime.CompilerServices.Unsafe.As<object?, TResponse>(ref response);
             {{~ else ~}}
@@ -1335,9 +1338,9 @@ namespace {{ MediatorNamespace }}
             {{~ if HasStreamQueries ~}}
             {{~ if HasManyStreamQueries ~}}
             var handlerObj = GetStreamQueryHandler(query);
-            if (handlerObj is global::{{ MediatorNamespace }}.IStreamQueryHandlerBase<TResponse>)
+            if (handlerObj is global::{{ InternalsNamespace }}.IStreamQueryHandlerBase<TResponse>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ MediatorNamespace }}.IStreamQueryHandlerBase<TResponse>>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IStreamQueryHandlerBase<TResponse>>(ref handlerObj);
                 return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
             }
             return CreateStreamAsync(query, handlerObj, cancellationToken);
@@ -1371,7 +1374,7 @@ namespace {{ MediatorNamespace }}
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IStreamMessageHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IStreamMessageHandlerBase>(handlerObj);
             await foreach (var r in handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken))
             {
                 yield return (TResponse)r!;
@@ -1401,10 +1404,10 @@ namespace {{ MediatorNamespace }}
                     {
                         var handlerObj = GetRequestHandler(request);
                         global::System.Diagnostics.Debug.Assert(
-                            handlerObj is global::{{ MediatorNamespace }}.IMessageHandlerBase,
+                            handlerObj is global::{{ InternalsNamespace }}.IMessageHandlerBase,
                             $"Unexpected type: {handlerObj.GetType()}"
                         );
-                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IMessageHandlerBase>(handlerObj);
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
                         return await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
                     }
                     {{~ else ~}}
@@ -1425,10 +1428,10 @@ namespace {{ MediatorNamespace }}
                     {
                         var handlerObj = GetCommandHandler(command);
                         global::System.Diagnostics.Debug.Assert(
-                            handlerObj is global::{{ MediatorNamespace }}.IMessageHandlerBase,
+                            handlerObj is global::{{ InternalsNamespace }}.IMessageHandlerBase,
                             $"Unexpected type: {handlerObj.GetType()}"
                         );
-                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IMessageHandlerBase>(handlerObj);
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
                         return await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
                     }
                     {{~ else ~}}
@@ -1449,10 +1452,10 @@ namespace {{ MediatorNamespace }}
                     {
                         var handlerObj = GetQueryHandler(query);
                         global::System.Diagnostics.Debug.Assert(
-                            handlerObj is global::{{ MediatorNamespace }}.IMessageHandlerBase,
+                            handlerObj is global::{{ InternalsNamespace }}.IMessageHandlerBase,
                             $"Unexpected type: {handlerObj.GetType()}"
                         );
-                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IMessageHandlerBase>(handlerObj);
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
                         return await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
                     }
                     {{~ else ~}}
@@ -1500,10 +1503,10 @@ namespace {{ MediatorNamespace }}
                     {
                         var handlerObj = GetStreamRequestHandler(request);
                         global::System.Diagnostics.Debug.Assert(
-                            handlerObj is global::{{ MediatorNamespace }}.IStreamMessageHandlerBase,
+                            handlerObj is global::{{ InternalsNamespace }}.IStreamMessageHandlerBase,
                             $"Unexpected type: {handlerObj.GetType()}"
                         );
-                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IStreamMessageHandlerBase>(handlerObj);
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IStreamMessageHandlerBase>(handlerObj);
                         return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
                     }
                     {{~ else ~}}
@@ -1532,10 +1535,10 @@ namespace {{ MediatorNamespace }}
                     {
                         var handlerObj = GetStreamCommandHandler(command);
                         global::System.Diagnostics.Debug.Assert(
-                            handlerObj is global::{{ MediatorNamespace }}.IStreamMessageHandlerBase,
+                            handlerObj is global::{{ InternalsNamespace }}.IStreamMessageHandlerBase,
                             $"Unexpected type: {handlerObj.GetType()}"
                         );
-                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IStreamMessageHandlerBase>(handlerObj);
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IStreamMessageHandlerBase>(handlerObj);
                         return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
                     }
                     {{~ else ~}}
@@ -1564,10 +1567,10 @@ namespace {{ MediatorNamespace }}
                     {
                         var handlerObj = GetStreamQueryHandler(query);
                         global::System.Diagnostics.Debug.Assert(
-                            handlerObj is global::{{ MediatorNamespace }}.IStreamMessageHandlerBase,
+                            handlerObj is global::{{ InternalsNamespace }}.IStreamMessageHandlerBase,
                             $"Unexpected type: {handlerObj.GetType()}"
                         );
-                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.IStreamMessageHandlerBase>(handlerObj);
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IStreamMessageHandlerBase>(handlerObj);
                         return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
                     }
                     {{~ else ~}}
@@ -1634,10 +1637,10 @@ namespace {{ MediatorNamespace }}
                 {
                     var handlerObj = GetNotificationHandler(n);
                     global::System.Diagnostics.Debug.Assert(
-                        handlerObj is global::{{ MediatorNamespace }}.INotificationHandlerBase,
+                        handlerObj is global::{{ InternalsNamespace }}.INotificationHandlerBase,
                         $"Unexpected type: {handlerObj.GetType()}"
                     );
-                    var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.INotificationHandlerBase>(handlerObj);
+                    var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.INotificationHandlerBase>(handlerObj);
                     return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}n, cancellationToken);
                 }
                 {{~ else ~}}
@@ -1682,10 +1685,10 @@ namespace {{ MediatorNamespace }}
             {{~ else ~}}
             var handlerObj = GetNotificationHandler(notification);
             global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.INotificationHandlerBase,
+                handlerObj is global::{{ InternalsNamespace }}.INotificationHandlerBase,
                 $"Unexpected type: {handlerObj.GetType()}"
             );
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.INotificationHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.INotificationHandlerBase>(handlerObj);
             return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}notification, cancellationToken);
             {{~ end ~}}
         }
@@ -1710,10 +1713,10 @@ namespace {{ MediatorNamespace }}
             {{~ if HasManyNotifications ~}}
             var handlerObj = GetNotificationHandler(notification);
             global::System.Diagnostics.Debug.Assert(
-                handlerObj is global::{{ MediatorNamespace }}.INotificationHandlerBase,
+                handlerObj is global::{{ InternalsNamespace }}.INotificationHandlerBase,
                 $"Unexpected type: {handlerObj.GetType()}"
             );
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ MediatorNamespace }}.INotificationHandlerBase>(handlerObj);
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.INotificationHandlerBase>(handlerObj);
             return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}notification, cancellationToken);
             {{~ else ~}}
             switch (notification)

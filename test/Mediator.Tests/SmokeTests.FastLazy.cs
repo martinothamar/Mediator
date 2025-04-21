@@ -2,7 +2,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using LazyContainerMetadata = Mediator.Mediator.FastLazyValue<Mediator.ContainerMetadata, Mediator.Mediator>;
+using LazyContainerMetadata = Mediator.Mediator.FastLazyValue<Mediator.Internals.ContainerMetadata, Mediator.Mediator>;
 
 namespace Mediator.Tests;
 
@@ -25,7 +25,7 @@ public partial class SmokeTests
 
         var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        var threads = new Task<(ContainerMetadata Cache, long State)>[concurrency];
+        var threads = new Task<(Internals.ContainerMetadata Cache, long State)>[concurrency];
         for (int i = 0; i < concurrency; i++)
         {
             threads[i] = Task.Run(Thread);
@@ -43,7 +43,7 @@ public partial class SmokeTests
 
         Assert.All(handlers, h => Assert.Same(handler, h));
 
-        async Task<(ContainerMetadata Cache, long State)> Thread()
+        async Task<(Internals.ContainerMetadata Cache, long State)> Thread()
         {
             await start.Task;
 

@@ -64,10 +64,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             
-            services.Add(new SD(typeof(global::SimpleConsole.Mediator.IContainerProbe), typeof(global::SimpleConsole.Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new SD(typeof(global::SimpleConsole.Mediator.IContainerProbe), typeof(global::SimpleConsole.Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new SD(typeof(global::SimpleConsole.Mediator.Internals.IContainerProbe), typeof(global::SimpleConsole.Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new SD(typeof(global::SimpleConsole.Mediator.Internals.IContainerProbe), typeof(global::SimpleConsole.Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
 
-            services.Add(new SD(typeof(global::SimpleConsole.Mediator.ContainerMetadata), typeof(global::SimpleConsole.Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::SimpleConsole.Mediator.Internals.ContainerMetadata), typeof(global::SimpleConsole.Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -75,7 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace SimpleConsole.Mediator
+namespace SimpleConsole.Mediator.Internals
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     internal interface IMessageHandlerBase
@@ -646,7 +646,7 @@ namespace SimpleConsole.Mediator
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::SimpleConsole.Mediator.IContainerProbe>() is global::SimpleConsole.Mediator.IContainerProbe[];
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::SimpleConsole.Mediator.Internals.IContainerProbe>() is global::SimpleConsole.Mediator.Internals.IContainerProbe[];
 
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
@@ -674,7 +674,10 @@ namespace SimpleConsole.Mediator
 
         }
     }
+}
 
+namespace SimpleConsole.Mediator
+{
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -686,15 +689,15 @@ namespace SimpleConsole.Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private global::SimpleConsole.Mediator.ContainerMetadata? _containerMetadataStorage;
-        private global::SimpleConsole.Mediator.ContainerMetadata _containerMetadata
+        private global::SimpleConsole.Mediator.Internals.ContainerMetadata? _containerMetadataStorage;
+        private global::SimpleConsole.Mediator.Internals.ContainerMetadata _containerMetadata
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_containerMetadataStorage == null)
                 {
-                    var containerMetadata = Services.GetRequiredService<global::SimpleConsole.Mediator.ContainerMetadata>();
+                    var containerMetadata = Services.GetRequiredService<global::SimpleConsole.Mediator.Internals.ContainerMetadata>();
                     _containerMetadataStorage = containerMetadata;
                     return containerMetadata;
                 }

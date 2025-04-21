@@ -64,10 +64,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             
-            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
-            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
-            services.Add(new SD(typeof(global::Mediator.ContainerMetadata), typeof(global::Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -75,7 +75,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace Mediator
+namespace Mediator.Internals
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     internal interface IMessageHandlerBase
@@ -648,7 +648,7 @@ namespace Mediator
         {
             using (var scope = sp.CreateScope())
             {
-                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
             }
 
 
@@ -677,7 +677,10 @@ namespace Mediator
 
         }
     }
+}
 
+namespace Mediator
+{
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -689,15 +692,15 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private global::Mediator.ContainerMetadata? _containerMetadataStorage;
-        private global::Mediator.ContainerMetadata _containerMetadata
+        private global::Mediator.Internals.ContainerMetadata? _containerMetadataStorage;
+        private global::Mediator.Internals.ContainerMetadata _containerMetadata
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_containerMetadataStorage == null)
                 {
-                    var containerMetadata = Services.GetRequiredService<global::Mediator.ContainerMetadata>();
+                    var containerMetadata = Services.GetRequiredService<global::Mediator.Internals.ContainerMetadata>();
                     _containerMetadataStorage = containerMetadata;
                     return containerMetadata;
                 }

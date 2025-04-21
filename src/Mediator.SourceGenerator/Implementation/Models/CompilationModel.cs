@@ -152,4 +152,6 @@ internal record CompilationModel
     public bool ConfiguredViaAttribute { get; }
 
     public bool ConfiguredViaConfiguration { get; }
+
+    public string InternalsNamespace => $"{MediatorNamespace}.Internals";
 }

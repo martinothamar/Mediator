@@ -61,8 +61,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.IStreamRequestHandler<global::StreamPing, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(
-                typeof(global::Mediator.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>),
-                typeof(global::Mediator.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>),
+                typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>),
+                typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>),
                 global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
             ));
 
@@ -73,10 +73,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.IContainerProbe), typeof(global::Mediator.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::Mediator.ContainerMetadata), typeof(global::Mediator.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -84,7 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace Mediator
+namespace Mediator.Internals
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     internal interface IMessageHandlerBase
@@ -128,7 +128,7 @@ namespace Mediator
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public RequestHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -208,7 +208,7 @@ namespace Mediator
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -289,7 +289,7 @@ namespace Mediator
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public CommandHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -369,7 +369,7 @@ namespace Mediator
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -450,7 +450,7 @@ namespace Mediator
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public QueryHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -530,7 +530,7 @@ namespace Mediator
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -605,7 +605,7 @@ namespace Mediator
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         public NotificationHandlerWrapper<TNotification> Init(
-            global::Mediator.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -682,7 +682,7 @@ namespace Mediator
 
 
 
-        public readonly global::Mediator.StreamRequestHandlerWrapper<global::StreamPing, global::Pong> Wrapper_For_StreamPing;
+        public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::StreamPing, global::Pong> Wrapper_For_StreamPing;
 
 
 
@@ -691,7 +691,7 @@ namespace Mediator
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
 
             NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
 
@@ -705,7 +705,7 @@ namespace Mediator
             var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var streamCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var streamQueryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
-            streamRequestHandlerTypes.Add(typeof(global::StreamPing), sp.GetRequiredService<global::Mediator.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>>().Init(this, sp));
+            streamRequestHandlerTypes.Add(typeof(global::StreamPing), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>>().Init(this, sp));
             StreamRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamRequestHandlerTypes);
             StreamCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamCommandHandlerTypes);
             StreamQueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamQueryHandlerTypes);
@@ -716,13 +716,16 @@ namespace Mediator
 
 
 
-            Wrapper_For_StreamPing = sp.GetRequiredService<global::Mediator.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>>().Init(this, sp);
+            Wrapper_For_StreamPing = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::StreamPing, global::Pong>>().Init(this, sp);
 
 
 
         }
     }
+}
 
+namespace Mediator
+{
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -734,7 +737,7 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
+        private FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
         private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
         internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
         {
@@ -779,8 +782,8 @@ namespace Mediator
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            _containerMetadata = new FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator>(
-                self => self.Services.GetRequiredService<global::Mediator.ContainerMetadata>(),
+            _containerMetadata = new FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator>(
+                self => self.Services.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(),
                 this
             );
         }
