@@ -9,7 +9,7 @@ internal enum RequestMessageKind
     Command,
     StreamRequest,
     StreamQuery,
-    StreamCommand
+    StreamCommand,
 }
 
 internal sealed record RequestMessageModel : SymbolMetadataModel
@@ -32,7 +32,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
             "StreamRequest" => RequestMessageKind.StreamRequest,
             "StreamQuery" => RequestMessageKind.StreamQuery,
             "StreamCommand" => RequestMessageKind.StreamCommand,
-            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null),
         };
         var isStreaming =
             MessageKind

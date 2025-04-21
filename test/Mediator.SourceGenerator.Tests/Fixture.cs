@@ -19,7 +19,7 @@ public static class Fixture
         typeof(IMessage).Assembly,
         typeof(ServiceLifetime).Assembly,
         typeof(ServiceProvider).Assembly,
-        typeof(MulticastDelegate).Assembly
+        typeof(MulticastDelegate).Assembly,
     };
 
     public static Assembly[] AssemblyReferencesForCodegen =>

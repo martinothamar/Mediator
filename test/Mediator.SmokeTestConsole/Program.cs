@@ -49,7 +49,7 @@ public sealed class Work : BackgroundService
         while (!stoppingToken.IsCancellationRequested && iteration < maxIterations)
         {
             await using var sp = services.BuildServiceProvider(
-                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
             );
 
             var mediator = sp.GetRequiredService<Mediator.Mediator>();

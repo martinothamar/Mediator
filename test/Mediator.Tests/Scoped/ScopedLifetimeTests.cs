@@ -33,7 +33,7 @@ public sealed class ScopedLifetimeTests
         services.AddMediator();
 
         await using var sp = services.BuildServiceProvider(
-            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
         );
 
         IMediator mediator1;
@@ -71,7 +71,7 @@ public sealed class ScopedLifetimeTests
         SomeRequestHandler handler;
         await using (
             var sp = services.BuildServiceProvider(
-                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
             )
         )
         {

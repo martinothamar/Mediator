@@ -23,7 +23,7 @@ public class HeadlineBenchmarks
                             new MsBuildArgument(
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
                                     + (largeProject ? $"%3BMediator_Large_Project" : "")
-                            )
+                            ),
                         ]
                     )
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
