@@ -2,6 +2,16 @@
 
 namespace Mediator.SourceGenerator;
 
+internal enum RequestMessageKind
+{
+    Request,
+    Query,
+    Command,
+    StreamRequest,
+    StreamQuery,
+    StreamCommand
+}
+
 internal sealed record RequestMessageModel : SymbolMetadataModel
 {
     public RequestMessageModel(
@@ -13,12 +23,28 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
     )
         : base(symbol)
     {
+        MessageType = messageType;
+        MessageKind = messageType switch
+        {
+            "Request" => RequestMessageKind.Request,
+            "Query" => RequestMessageKind.Query,
+            "Command" => RequestMessageKind.Command,
+            "StreamRequest" => RequestMessageKind.StreamRequest,
+            "StreamQuery" => RequestMessageKind.StreamQuery,
+            "StreamCommand" => RequestMessageKind.StreamCommand,
+            _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+        };
+        var isStreaming =
+            MessageKind
+                is RequestMessageKind.StreamRequest
+                    or RequestMessageKind.StreamQuery
+                    or RequestMessageKind.StreamCommand;
+
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();
         ResponseFullNameWithoutReferenceNullability = responseSymbol.GetTypeSymbolFullName(
             includeReferenceNullability: false
         );
-        MessageType = messageType;
         Handler = handler;
 
         var fullHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.TypeName}";
@@ -29,7 +55,6 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
             .GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false)
             .Replace("global::", "")
             .Replace('.', '_');
-        var isStreaming = MessageType.StartsWith("Stream", StringComparison.Ordinal);
 
         HandlerWrapperPropertyName = $"Wrapper_For_{identifierFullName}";
         MethodName = isStreaming ? "CreateStream" : "Send";
@@ -39,6 +64,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
     }
 
     public string MessageType { get; }
+    public RequestMessageKind MessageKind { get; }
     public RequestMessageHandlerModel? Handler { get; }
     public bool ResponseIsValueType { get; }
     public string ResponseFullName { get; }

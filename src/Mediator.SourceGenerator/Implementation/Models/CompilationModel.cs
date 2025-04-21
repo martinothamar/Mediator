@@ -69,45 +69,74 @@ internal sealed record CompilationModel
         NotificationPublisherType = notificationPublisherType;
 
         RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
-        RequestMessages = new(requestMessages.Where(r => r.Handler is not null));
         NotificationMessages = notificationMessages;
         NotificationMessageHandlers = new(notificationMessageHandlers.Where(h => !h.IsOpenGeneric));
         OpenGenericNotificationMessageHandlers = new(notificationMessageHandlers.Where(h => h.IsOpenGeneric));
 
-        IRequestMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "Request"));
-        ICommandMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "Command"));
-        IQueryMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "Query"));
-        IStreamRequestMessages = new(
-            requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamRequest")
-        );
-        IStreamQueryMessages = new(requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamQuery"));
-        IStreamCommandMessages = new(
-            requestMessages.Where(r => r.Handler is not null && r.MessageType == "StreamCommand")
-        );
+        var reqMessages = new List<RequestMessageModel>();
 
-        HasRequests = requestMessages.Any(r => r.Handler is not null && r.MessageType == "Request");
-        HasCommands = requestMessages.Any(r => r.Handler is not null && r.MessageType == "Command");
-        HasQueries = requestMessages.Any(r => r.Handler is not null && r.MessageType == "Query");
-        HasStreamRequests = requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamRequest");
-        HasStreamQueries = requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamQuery");
-        HasStreamCommands = requestMessages.Any(r => r.Handler is not null && r.MessageType == "StreamCommand");
-        HasNotifications = notificationMessages.Any();
+        var iRequestMessages = new List<RequestMessageModel>();
+        var iCommandMessages = new List<RequestMessageModel>();
+        var iQueryMessages = new List<RequestMessageModel>();
+        var iStreamRequestMessages = new List<RequestMessageModel>();
+        var iStreamQueryMessages = new List<RequestMessageModel>();
+        var iStreamCommandMessages = new List<RequestMessageModel>();
 
-        var t = ManyMessagesTreshold;
-        var m = requestMessages;
-        HasManyRequests = m.Count(r => r.Handler is not null && r.MessageType == "Request") > t;
-        HasManyCommands = m.Count(r => r.Handler is not null && r.MessageType == "Command") > t;
-        HasManyQueries = m.Count(r => r.Handler is not null && r.MessageType == "Query") > t;
-        HasManyStreamRequests = m.Count(r => r.Handler is not null && r.MessageType == "StreamRequest") > t;
-        HasManyStreamQueries = m.Count(r => r.Handler is not null && r.MessageType == "StreamQuery") > t;
-        HasManyStreamCommands = m.Count(r => r.Handler is not null && r.MessageType == "StreamCommand") > t;
-        HasManyNotifications = notificationMessages.Count() > t;
+        for (int i = 0; i < requestMessages.Count; i++)
+        {
+            var r = requestMessages[i];
+            if (r.Handler is not null)
+            {
+                reqMessages.Add(r);
+                var list = r.MessageKind switch
+                {
+                    RequestMessageKind.Request => iRequestMessages,
+                    RequestMessageKind.Command => iCommandMessages,
+                    RequestMessageKind.Query => iQueryMessages,
+                    RequestMessageKind.StreamRequest => iStreamRequestMessages,
+                    RequestMessageKind.StreamQuery => iStreamQueryMessages,
+                    RequestMessageKind.StreamCommand => iStreamCommandMessages,
+                    _ => throw new ArgumentOutOfRangeException(nameof(r.MessageKind), r.MessageKind, null)
+                };
+                list.Add(r);
+            }
+
+            var isStreaming =
+                r.MessageKind
+                    is RequestMessageKind.StreamRequest
+                        or RequestMessageKind.StreamQuery
+                        or RequestMessageKind.StreamCommand;
+            if (isStreaming && r.ResponseIsValueType)
+                HasAnyValueTypeStreamResponse = true;
+        }
+
+        RequestMessages = new(reqMessages);
+
+        IRequestMessages = new(iRequestMessages);
+        ICommandMessages = new(iCommandMessages);
+        IQueryMessages = new(iQueryMessages);
+        IStreamRequestMessages = new(iStreamRequestMessages);
+        IStreamQueryMessages = new(iStreamQueryMessages);
+        IStreamCommandMessages = new(iStreamCommandMessages);
+
+        HasRequests = iRequestMessages.Count > 0;
+        HasCommands = iCommandMessages.Count > 0;
+        HasQueries = iQueryMessages.Count > 0;
+        HasStreamRequests = iStreamRequestMessages.Count > 0;
+        HasStreamQueries = iStreamQueryMessages.Count > 0;
+        HasStreamCommands = iStreamCommandMessages.Count > 0;
+        HasNotifications = notificationMessages.Count > 0;
+
+        HasManyRequests = iRequestMessages.Count > ManyMessagesTreshold;
+        HasManyCommands = iCommandMessages.Count > ManyMessagesTreshold;
+        HasManyQueries = iQueryMessages.Count > ManyMessagesTreshold;
+        HasManyStreamRequests = iStreamRequestMessages.Count > ManyMessagesTreshold;
+        HasManyStreamQueries = iStreamQueryMessages.Count > ManyMessagesTreshold;
+        HasManyStreamCommands = iStreamCommandMessages.Count > ManyMessagesTreshold;
+        HasManyNotifications = notificationMessages.Count > ManyMessagesTreshold;
 
         HasAnyRequest = HasRequests || HasCommands || HasQueries;
         HasAnyStreamRequest = HasStreamRequests || HasStreamQueries || HasStreamCommands;
-        HasAnyValueTypeStreamResponse = requestMessages.Any(r =>
-            r.MessageType.StartsWith("Stream") && r.ResponseIsValueType
-        );
     }
 
     public string MediatorNamespace { get; }
