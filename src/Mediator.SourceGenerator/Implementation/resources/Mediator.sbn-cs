@@ -729,6 +729,7 @@ namespace {{ MediatorNamespace }}
 
         {{~ if HasManyRequests ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetRequestHandler(global::Mediator.IBaseRequest request)
         {
             ThrowIfNull(request, nameof(request));
@@ -739,6 +740,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ if HasManyCommands ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetCommandHandler(global::Mediator.IBaseCommand command)
         {
             ThrowIfNull(command, nameof(command));
@@ -749,6 +751,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ if HasManyQueries ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetQueryHandler(global::Mediator.IBaseQuery query)
         {
             ThrowIfNull(query, nameof(query));
@@ -759,6 +762,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ if HasManyStreamRequests ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetStreamRequestHandler(global::Mediator.IBaseStreamRequest request)
         {
             ThrowIfNull(request, nameof(request));
@@ -769,6 +773,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ if HasManyStreamCommands ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetStreamCommandHandler(global::Mediator.IBaseStreamCommand command)
         {
             ThrowIfNull(command, nameof(command));
@@ -779,6 +784,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ if HasManyStreamQueries ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetStreamQueryHandler(global::Mediator.IBaseStreamQuery query)
         {
             ThrowIfNull(query, nameof(query));
@@ -789,6 +795,7 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ if HasManyNotifications ~}}
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetNotificationHandler(global::Mediator.INotification notification)
         {
             ThrowIfNull(notification, nameof(notification));
