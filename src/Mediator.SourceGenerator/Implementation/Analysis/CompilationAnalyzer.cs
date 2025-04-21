@@ -566,7 +566,6 @@ internal sealed class CompilationAnalyzer
                     break; // Continue loop
                 case IS_REQUEST_HANDLER:
                 case IS_NOTIFICATION_HANDLER:
-
                     {
                         if (isStruct)
                         {
@@ -646,7 +645,6 @@ internal sealed class CompilationAnalyzer
                     }
                     break;
                 case IS_REQUEST:
-
                     {
                         ITypeSymbol responseMessageSymbol =
                             typeInterfaceSymbol.TypeArguments.Length > 0
@@ -688,7 +686,6 @@ internal sealed class CompilationAnalyzer
                     }
                     break;
                 case IS_NOTIFICATION:
-
                     {
                         if (!_notificationMessages.Add(new NotificationMessage(typeSymbol, this)))
                         {
@@ -1082,10 +1079,13 @@ internal sealed class CompilationAnalyzer
             {
                 null => null,
                 IFieldSymbol fieldSymbol => TryResolveNamespaceSymbol(fieldSymbol, semanticModel, cancellationToken),
-                IPropertySymbol propertySymbol
-                    => TryResolveNamespaceSymbol(propertySymbol, semanticModel, cancellationToken),
+                IPropertySymbol propertySymbol => TryResolveNamespaceSymbol(
+                    propertySymbol,
+                    semanticModel,
+                    cancellationToken
+                ),
                 ILocalSymbol localSymbol => TryResolveNamespaceSymbol(localSymbol, semanticModel, cancellationToken),
-                _ => null
+                _ => null,
             };
         }
 
@@ -1103,11 +1103,10 @@ internal sealed class CompilationAnalyzer
             var syntaxReferences = symbol.DeclaringSyntaxReferences;
             var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
 
-            var initializerExpression = syntaxNode is VariableDeclaratorSyntax variableDeclarator
-                ? variableDeclarator.Initializer?.Value
-                : syntaxNode is PropertyDeclarationSyntax propertyDeclaration
-                    ? propertyDeclaration.Initializer?.Value
-                    : null;
+            var initializerExpression =
+                syntaxNode is VariableDeclaratorSyntax variableDeclarator ? variableDeclarator.Initializer?.Value
+                : syntaxNode is PropertyDeclarationSyntax propertyDeclaration ? propertyDeclaration.Initializer?.Value
+                : null;
 
             if (initializerExpression is null)
             {
@@ -1142,10 +1141,13 @@ internal sealed class CompilationAnalyzer
         return symbol switch
         {
             IFieldSymbol fieldSymbol => TryGetServiceLifetimeSymbol(fieldSymbol, semanticModel, cancellationToken),
-            IPropertySymbol propertySymbol
-                => TryGetServiceLifetimeSymbol(propertySymbol, semanticModel, cancellationToken),
+            IPropertySymbol propertySymbol => TryGetServiceLifetimeSymbol(
+                propertySymbol,
+                semanticModel,
+                cancellationToken
+            ),
             ILocalSymbol localSymbol => TryGetServiceLifetimeSymbol(localSymbol, semanticModel, cancellationToken),
-            _ => null
+            _ => null,
         };
     }
 
@@ -1175,11 +1177,10 @@ internal sealed class CompilationAnalyzer
         var syntaxReferences = symbol.DeclaringSyntaxReferences;
         var syntaxNode = syntaxReferences.First().GetSyntax(cancellationToken);
 
-        var initializerExpression = syntaxNode is VariableDeclaratorSyntax variableDeclarator
-            ? variableDeclarator.Initializer?.Value
-            : syntaxNode is PropertyDeclarationSyntax propertyDeclaration
-                ? propertyDeclaration.Initializer?.Value
-                : null;
+        var initializerExpression =
+            syntaxNode is VariableDeclaratorSyntax variableDeclarator ? variableDeclarator.Initializer?.Value
+            : syntaxNode is PropertyDeclarationSyntax propertyDeclaration ? propertyDeclaration.Initializer?.Value
+            : null;
 
         if (initializerExpression is null)
         {

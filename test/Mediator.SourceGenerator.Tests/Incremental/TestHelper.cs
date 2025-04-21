@@ -8,8 +8,10 @@ namespace Mediator.SourceGenerator.Tests.Incremental;
 
 internal static class TestHelper
 {
-    private static readonly GeneratorDriverOptions EnableIncrementalTrackingDriverOptions =
-        new(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
+    private static readonly GeneratorDriverOptions EnableIncrementalTrackingDriverOptions = new(
+        IncrementalGeneratorOutputKind.None,
+        trackIncrementalGeneratorSteps: true
+    );
 
     internal static GeneratorDriver GenerateTracked(Compilation compilation)
     {

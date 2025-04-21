@@ -36,7 +36,7 @@ public class RequestTests
         services.AddMediator();
 
         await using var sp = services.BuildServiceProvider(
-            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
         );
         var mediator = sp.GetRequiredService<Mediator>();
 
@@ -79,7 +79,7 @@ public class RequestTests
         services.AddMediator();
 
         using var sp = services.BuildServiceProvider(
-            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
         );
         var mediator = sp.GetRequiredService<IMediator>();
 

@@ -96,7 +96,7 @@ internal sealed record CompilationModel
                     RequestMessageKind.StreamRequest => iStreamRequestMessages,
                     RequestMessageKind.StreamQuery => iStreamQueryMessages,
                     RequestMessageKind.StreamCommand => iStreamCommandMessages,
-                    _ => throw new ArgumentOutOfRangeException(nameof(r.MessageKind), r.MessageKind, null)
+                    _ => throw new ArgumentOutOfRangeException(nameof(r.MessageKind), r.MessageKind, null),
                 };
                 list.Add(r);
             }

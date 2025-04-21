@@ -15,7 +15,7 @@ public class GetWeatherForecastHandler : ApplicationHandler<GetWeatherForecast, 
         "Balmy",
         "Hot",
         "Sweltering",
-        "Scorching"
+        "Scorching",
     };
 
     protected override ValueTask<IReadOnlyList<WeatherForecast>> ProcessRequest(
@@ -29,7 +29,7 @@ public class GetWeatherForecastHandler : ApplicationHandler<GetWeatherForecast, 
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = _summaries[Random.Shared.Next(_summaries.Length)]
+                Summary = _summaries[Random.Shared.Next(_summaries.Length)],
             })
             .ToArray();
 

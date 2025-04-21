@@ -14,7 +14,7 @@ public class NotificationTests
         services.AddMediator();
 
         using var sp = services.BuildServiceProvider(
-            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
         );
         var mediator = sp.GetRequiredService<IMediator>();
 

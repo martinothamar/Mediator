@@ -41,7 +41,7 @@ public sealed class TransientLifetimeTests
 
         await using (
             var sp = services.BuildServiceProvider(
-                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
             )
         )
         {
@@ -80,7 +80,7 @@ public sealed class TransientLifetimeTests
 
         await using (
             var sp = services.BuildServiceProvider(
-                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true, }
+                new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
             )
         )
         {

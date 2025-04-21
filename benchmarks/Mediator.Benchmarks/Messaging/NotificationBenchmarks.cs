@@ -122,7 +122,7 @@ public class NotificationBenchmarks
                                 $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
                                     + $"%3BMediator_Publisher_{publisher}"
                                     + (largeProject ? $"%3BMediator_Large_Project" : "")
-                            )
+                            ),
                         ]
                     )
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
@@ -168,7 +168,7 @@ public class NotificationBenchmarks
     {
         SingleHandlerSync,
         MultiHandlersSync,
-        MultiHandlersAsync
+        MultiHandlersAsync,
     }
 
     [ParamsAllValues]
