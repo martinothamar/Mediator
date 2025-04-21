@@ -96,7 +96,7 @@ Benchmark category descriptions
 
 See the [benchmarks/ folder](/benchmarks/README.md) for more detailed information, including varying lifetimes and project sizes.
 
-![Requests benchmark](/img/benchmarks.png "Benchmarks")
+![Benchmarks](/img/benchmarks.png "Benchmarks")
 
 ## 3. Usage and abstractions
 
