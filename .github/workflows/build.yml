@@ -36,10 +36,6 @@ jobs:
         dotnet-version: '8.0.x'
         include-prerelease: false
 
-    - uses: dotnet/nbgv@master
-      with:
-        setAllVars: true
-
     - uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/.nuget/packages
@@ -59,8 +55,72 @@ jobs:
     - name: Test Mediator.Tests
       run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
 
+  samples-net:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./samples/Showcase
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        include-prerelease: false
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Run
+      run: dotnet run
+
+  samples-netfx:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: .\samples\basic\NetFramework\
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v2
+
+    - name: Restore Packages
+      run: nuget restore Console.sln
+
+    - name: Build solution
+      run: msbuild Console.sln -t:Rebuild
+
+    - name: Run Console
+      run: .\Console\bin\Debug\Console.NetFramework.exe
+
   publish:
-    needs: build
+    needs: [build, samples-net, samples-netfx]
     runs-on: ubuntu-latest
 
     env:
