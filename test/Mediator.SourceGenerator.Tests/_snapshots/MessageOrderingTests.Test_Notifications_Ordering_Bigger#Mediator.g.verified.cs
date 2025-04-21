@@ -60,6 +60,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
 
 
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), typeof(global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
 
 
@@ -82,340 +92,575 @@ namespace Microsoft.Extensions.DependencyInjection
 namespace Mediator
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask<object?> Handle(
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface INotificationHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask Handle(
+            object notification,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IStreamMessageHandlerBase
+    {
+        global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IRequestHandlerBase<TResponse> : IMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.IRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class RequestClassHandlerWrapper<TRequest, TResponse>
-        where TRequest : class, global::Mediator.IRequest<TResponse>
+    internal sealed class RequestHandlerWrapper<TRequest, TResponse> : IRequestHandlerBase<TResponse>
+        where TRequest : global::Mediator.IRequest<TResponse>
     {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public RequestClassHandlerWrapper(
-            global::Mediator.IRequestHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public RequestHandlerWrapper<TRequest, TResponse> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
         )
         {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.IRequestHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = sp.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, TResponse>[]>(
+                    pipelineBehaviours
+                );
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = pipelineBehaviours.ToArray();
+            }
+
+            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+            {
+                var pipeline = pipelineBehavioursArray[i];
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
+            return this;
         }
 
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var handler = _rootHandler;
+            return handler(request, cancellationToken);
+        }
+
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.IRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle((TRequest)request, cancellationToken);
+        }
+
+        public async global::System.Threading.Tasks.ValueTask<object?> Handle(
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return await Handle((TRequest)request, cancellationToken);
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IStreamRequestHandlerBase<TResponse> : IStreamMessageHandlerBase
+    {
+        global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.IStreamRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class RequestStructHandlerWrapper<TRequest, TResponse>
-        where TRequest : struct, global::Mediator.IRequest<TResponse>
+    internal sealed class StreamRequestHandlerWrapper<TRequest, TResponse> : IStreamRequestHandlerBase<TResponse>
+        where TRequest : global::Mediator.IStreamRequest<TResponse>
     {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public RequestStructHandlerWrapper(
-            global::Mediator.IRequestHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
         )
         {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.IStreamRequestHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = sp.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
+            var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
+
+            global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]>(
+                    pipelineBehaviours
+                );
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = pipelineBehaviours.ToArray();
+            }
+
+            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+            {
+                var pipeline = pipelineBehavioursArray[i];
+                var handlerCopy = handler;
+                var pipelineCopy = pipeline;
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+            }
+
+            _rootHandler = handler;
+            return this;
+        }
+
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var handler = _rootHandler;
+            return handler(request, cancellationToken);
+        }
+
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.IStreamRequest<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle((TRequest)request, cancellationToken);
+        }
+
+        public async global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            object request,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            await foreach (var el in Handle((TRequest)request, cancellationToken))
+                yield return el;
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface ICommandHandlerBase<TResponse> : IMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.ICommand<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class CommandHandlerWrapper<TRequest, TResponse> : ICommandHandlerBase<TResponse>
+        where TRequest : global::Mediator.ICommand<TResponse>
+    {
+        private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
+
+        public CommandHandlerWrapper<TRequest, TResponse> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
+        )
+        {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.ICommandHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = sp.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, TResponse>[]>(
+                    pipelineBehaviours
+                );
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = pipelineBehaviours.ToArray();
+            }
+
+            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+            {
+                var pipeline = pipelineBehavioursArray[i];
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
+            return this;
         }
 
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var handler = _rootHandler;
+            return handler(request, cancellationToken);
+        }
+
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.ICommand<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle((TRequest)request, cancellationToken);
+        }
+
+        public async global::System.Threading.Tasks.ValueTask<object?> Handle(
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return await Handle((TRequest)request, cancellationToken);
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IStreamCommandHandlerBase<TResponse> : IStreamMessageHandlerBase
+    {
+        global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.IStreamCommand<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class StreamRequestClassHandlerWrapper<TRequest, TResponse>
-        where TRequest : class, global::Mediator.IStreamRequest<TResponse>
+    internal sealed class StreamCommandHandlerWrapper<TRequest, TResponse> : IStreamCommandHandlerBase<TResponse>
+        where TRequest : global::Mediator.IStreamCommand<TResponse>
     {
-        private readonly global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public StreamRequestClassHandlerWrapper(
-            global::Mediator.IStreamRequestHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
         )
         {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.IStreamCommandHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = sp.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]>(
+                    pipelineBehaviours
+                );
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = pipelineBehaviours.ToArray();
+            }
+
+            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+            {
+                var pipeline = pipelineBehavioursArray[i];
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
+            return this;
         }
 
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var handler = _rootHandler;
+            return handler(request, cancellationToken);
+        }
+
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.IStreamCommand<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle((TRequest)request, cancellationToken);
+        }
+
+        public async global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            object request,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            await foreach (var el in Handle((TRequest)request, cancellationToken))
+                yield return el;
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IQueryHandlerBase<TResponse> : IMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.IQuery<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class StreamRequestStructHandlerWrapper<TRequest, TResponse>
-        where TRequest : struct, global::Mediator.IStreamRequest<TResponse>
+    internal sealed class QueryHandlerWrapper<TRequest, TResponse> : IQueryHandlerBase<TResponse>
+        where TRequest : global::Mediator.IQuery<TResponse>
     {
-        private readonly global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public StreamRequestStructHandlerWrapper(
-            global::Mediator.IStreamRequestHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public QueryHandlerWrapper<TRequest, TResponse> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
         )
         {
-            var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
-            {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-            }
-
-            _rootHandler = handler;
-        }
-
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class CommandClassHandlerWrapper<TRequest, TResponse>
-        where TRequest : class, global::Mediator.ICommand<TResponse>
-    {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
-
-        public CommandClassHandlerWrapper(
-            global::Mediator.ICommandHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
-        )
-        {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.IQueryHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = sp.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, TResponse>[]>(
+                    pipelineBehaviours
+                );
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = pipelineBehaviours.ToArray();
+            }
+
+            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+            {
+                var pipeline = pipelineBehavioursArray[i];
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
+            return this;
         }
 
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var handler = _rootHandler;
+            return handler(request, cancellationToken);
+        }
+
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.IQuery<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle((TRequest)request, cancellationToken);
+        }
+
+        public async global::System.Threading.Tasks.ValueTask<object?> Handle(
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return await Handle((TRequest)request, cancellationToken);
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    internal interface IStreamQueryHandlerBase<TResponse> : IStreamMessageHandlerBase
+    {
+        global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.IStreamQuery<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class CommandStructHandlerWrapper<TRequest, TResponse>
-        where TRequest : struct, global::Mediator.ICommand<TResponse>
+    internal sealed class StreamQueryHandlerWrapper<TRequest, TResponse> : IStreamQueryHandlerBase<TResponse>
+        where TRequest : global::Mediator.IStreamQuery<TResponse>
     {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public CommandStructHandlerWrapper(
-            global::Mediator.ICommandHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
         )
         {
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
-            {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-            }
-
-            _rootHandler = handler;
-        }
-
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class StreamCommandClassHandlerWrapper<TRequest, TResponse>
-        where TRequest : class, global::Mediator.IStreamCommand<TResponse>
-    {
-        private readonly global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler;
-
-        public StreamCommandClassHandlerWrapper(
-            global::Mediator.IStreamCommandHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
-        )
-        {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.IStreamQueryHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = sp.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]>(
+                    pipelineBehaviours
+                );
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
+                );
+                pipelineBehavioursArray = pipelineBehaviours.ToArray();
+            }
+
+            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+            {
+                var pipeline = pipelineBehavioursArray[i];
                 var handlerCopy = handler;
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
+            return this;
         }
 
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var handler = _rootHandler;
+            return handler(request, cancellationToken);
+        }
+
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.IStreamQuery<TResponse> request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle((TRequest)request, cancellationToken);
+        }
+
+        public async global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            object request,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            await foreach (var el in Handle((TRequest)request, cancellationToken))
+                yield return el;
+        }
     }
+
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class StreamCommandStructHandlerWrapper<TRequest, TResponse>
-        where TRequest : struct, global::Mediator.IStreamCommand<TResponse>
+    internal sealed class NotificationHandlerWrapper<TNotification> : INotificationHandlerBase
+        where TNotification : global::Mediator.INotification
     {
-        private readonly global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler;
+        private global::Mediator.ForeachAwaitPublisher _publisher = null!;
+        private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
-        public StreamCommandStructHandlerWrapper(
-            global::Mediator.IStreamCommandHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public NotificationHandlerWrapper<TNotification> Init(
+            global::Mediator.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
         )
         {
-            var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            _publisher = containerMetadata.NotificationPublisher;
+            var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                global::System.Diagnostics.Debug.Assert(
+                    handlers is global::Mediator.INotificationHandler<TNotification>[],
+                    $"Unexpected type: {handlers.GetType()}"
+                );
+                _handlers = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<TNotification>[]>(
+                    handlers
+                );
             }
-
-            _rootHandler = handler;
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    handlers is not global::Mediator.INotificationHandler<TNotification>[],
+                    $"Unexpected type: {handlers.GetType()}"
+                );
+                _handlers = handlers.ToArray();
+            }
+            return this;
         }
 
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class QueryClassHandlerWrapper<TRequest, TResponse>
-        where TRequest : class, global::Mediator.IQuery<TResponse>
-    {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
-
-        public QueryClassHandlerWrapper(
-            global::Mediator.IQueryHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public global::System.Threading.Tasks.ValueTask Handle(
+            TNotification notification,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
+            var handlers = _handlers;
+            if (handlers.Length == 0)
             {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                return default;
             }
-
-            _rootHandler = handler;
+            return _publisher.Publish(
+                new global::Mediator.NotificationHandlers<TNotification>(handlers, isArray: true),
+                notification,
+                cancellationToken
+            );
         }
 
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class QueryStructHandlerWrapper<TRequest, TResponse>
-        where TRequest : struct, global::Mediator.IQuery<TResponse>
-    {
-        private readonly global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler;
-
-        public QueryStructHandlerWrapper(
-            global::Mediator.IQueryHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
+        public global::System.Threading.Tasks.ValueTask Handle(
+            object notification,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
-            {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-            }
-
-            _rootHandler = handler;
+            return Handle((TNotification)notification, cancellationToken);
         }
-
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class StreamQueryClassHandlerWrapper<TRequest, TResponse>
-        where TRequest : class, global::Mediator.IStreamQuery<TResponse>
-    {
-        private readonly global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler;
-
-        public StreamQueryClassHandlerWrapper(
-            global::Mediator.IStreamQueryHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
-        )
-        {
-            var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
-            {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-            }
-
-            _rootHandler = handler;
-        }
-
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class StreamQueryStructHandlerWrapper<TRequest, TResponse>
-        where TRequest : struct, global::Mediator.IStreamQuery<TResponse>
-    {
-        private readonly global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler;
-
-        public StreamQueryStructHandlerWrapper(
-            global::Mediator.IStreamQueryHandler<TRequest, TResponse> concreteHandler,
-            global::System.Collections.Generic.IEnumerable<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>> pipelineBehaviours
-        )
-        {
-            var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
-
-            foreach (var pipeline in pipelineBehaviours.Reverse())
-            {
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-            }
-
-            _rootHandler = handler;
-        }
-
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(TRequest request, global::System.Threading.CancellationToken cancellationToken) =>
-            _rootHandler(request, cancellationToken);
     }
 
     internal interface IContainerProbe { }
@@ -429,9 +674,84 @@ namespace Mediator
     {
         public readonly bool ServicesUnderlyingTypeIsArray;
 
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> RequestHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> CommandHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> QueryHandlerWrappers;
+
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamRequestHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamCommandHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamQueryHandlerWrappers;
+
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
+
+
+
+
+
+
+
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually> Wrapper_For_TestCode_RoundSucceededActually;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually> Wrapper_For_TestCode_Round2SucceededActually;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated> Wrapper_For_TestCode_RoundCreated;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted> Wrapper_For_TestCode_RoundResulted;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded> Wrapper_For_TestCode_RoundSucceeded;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created> Wrapper_For_TestCode_Round2Created;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted> Wrapper_For_TestCode_Round2Resulted;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded> Wrapper_For_TestCode_Round2Succeeded;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent> Wrapper_For_TestCode_DomainEvent;
+        public readonly global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2> Wrapper_For_TestCode_DomainEvent2;
+
+        public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
+
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.IContainerProbe>() is global::Mediator.IContainerProbe[];
+
+            NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+
+            var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
+            CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
+            QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
+
+            var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var streamCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var streamQueryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            StreamRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamRequestHandlerTypes);
+            StreamCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamCommandHandlerTypes);
+            StreamQueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamQueryHandlerTypes);
+
+            var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(10);
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundSucceededActually), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2SucceededActually), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundCreated), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundResulted), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.RoundSucceeded), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Created), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Resulted), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.Round2Succeeded), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp));
+            notificationHandlerTypes.Add(typeof(global::TestCode.DomainEvent2), sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp));
+            NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
+
+
+
+
+
+
+
+            Wrapper_For_TestCode_RoundSucceededActually = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2SucceededActually = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundCreated = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundCreated>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundResulted = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundResulted>>().Init(this, sp);
+            Wrapper_For_TestCode_RoundSucceeded = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.RoundSucceeded>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2Created = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Created>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2Resulted = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Resulted>>().Init(this, sp);
+            Wrapper_For_TestCode_Round2Succeeded = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>>().Init(this, sp);
+            Wrapper_For_TestCode_DomainEvent = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent>>().Init(this, sp);
+            Wrapper_For_TestCode_DomainEvent2 = sp.GetRequiredService<global::Mediator.NotificationHandlerWrapper<global::TestCode.DomainEvent2>>().Init(this, sp);
         }
     }
 
@@ -445,10 +765,30 @@ namespace Mediator
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
-        private readonly global::System.IServiceProvider _sp;
-        private readonly global::Mediator.ContainerMetadata _containerMetadata;
-
-        private FastLazyValue<DICache> _diCacheLazy;
+        internal readonly global::System.IServiceProvider Services;
+        private FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
+        private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
+        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = _containerMetadata.Value.NotificationPublisher;
+                return _notificationPublisher!;
+            }
+        }
+        private bool? _servicesUnderlyingTypeIsArray;
+        internal bool ServicesUnderlyingTypeIsArray
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_servicesUnderlyingTypeIsArray == null)
+                    _servicesUnderlyingTypeIsArray = _containerMetadata.Value.ServicesUnderlyingTypeIsArray;
+                return _servicesUnderlyingTypeIsArray!.Value;
+            }
+        }
 
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
@@ -463,30 +803,30 @@ namespace Mediator
         /// <summary>
         /// The total number of Mediator messages that were discovered.
         /// </summary>
-        public const int TotalMessages = 20;
+        public const int TotalMessages = 10;
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)
         {
-            _sp = sp;
-            _containerMetadata = sp.GetRequiredService<global::Mediator.ContainerMetadata>();
-            _diCacheLazy = new FastLazyValue<DICache>(() => new DICache(_sp, _containerMetadata));
+            Services = sp;
+            _containerMetadata = new FastLazyValue<global::Mediator.ContainerMetadata, global::Mediator.Mediator>(
+                self => self.Services.GetRequiredService<global::Mediator.ContainerMetadata>(),
+                this
+            );
         }
 
-        private struct FastLazyValue<T>
-            where T : struct
+        private struct FastLazyValue<T, TArg>
         {
             private const long UNINIT = 0;
             private const long INITING = 1;
             private const long INITD = 2;
-            
-            
 
-            private global::System.Func<T> _generator;
+            private global::System.Func<TArg, T> _generator;
             private long _state;
             private T _value;
+            private TArg _arg;
 
             public T Value
             {
@@ -518,7 +858,7 @@ namespace Mediator
                                 spinWait.SpinOnce();
                             return _value;
                         case UNINIT:
-                            _value = _generator();
+                            _value = _generator(_arg);
                             global::System.Threading.Interlocked.Exchange(ref _state, INITD);
                             return _value;
                     }
@@ -527,313 +867,15 @@ namespace Mediator
                 }
             }
 
-
-            public FastLazyValue(global::System.Func<T> generator)
+            public FastLazyValue(global::System.Func<TArg, T> generator, TArg arg)
             {
                 _generator = generator;
                 _state = UNINIT;
-                _value = default;
+                _value = default!;
+                _arg = arg;
             }
         }
 
-        private readonly struct DICache
-        {
-            private readonly global::System.IServiceProvider _sp;
-
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>[] Handlers_For_TestCode_Round2SucceededActually;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound2SucceededActually>[] Handlers_For_TestCode_Sound2SucceededActually;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[] Handlers_For_TestCode_RoundSucceededActually;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound20SucceededActually>[] Handlers_For_TestCode_Sound20SucceededActually;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[] Handlers_For_TestCode_RoundResulted;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Round2Created>[] Handlers_For_TestCode_Round2Created;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>[] Handlers_For_TestCode_Round2Resulted;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>[] Handlers_For_TestCode_Round2Succeeded;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound20Succeeded>[] Handlers_For_TestCode_Sound20Succeeded;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound2Created>[] Handlers_For_TestCode_Sound2Created;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound2Resulted>[] Handlers_For_TestCode_Sound2Resulted;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound2Succeeded>[] Handlers_For_TestCode_Sound2Succeeded;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[] Handlers_For_TestCode_RoundCreated;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound20Created>[] Handlers_For_TestCode_Sound20Created;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.Sound20Resulted>[] Handlers_For_TestCode_Sound20Resulted;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[] Handlers_For_TestCode_RoundSucceeded;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>[] Handlers_For_TestCode_DomainEvent2;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.DomainEvent10>[] Handlers_For_TestCode_DomainEvent10;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.DomainEvent11>[] Handlers_For_TestCode_DomainEvent11;
-            public readonly global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[] Handlers_For_TestCode_DomainEvent;
-
-            public readonly global::Mediator.ForeachAwaitPublisher InternalNotificationPublisherImpl;
-
-            public DICache(global::System.IServiceProvider sp, global::Mediator.ContainerMetadata containerMetadata)
-            {
-                _sp = sp;
-
-
-
-                var handlers_For_TestCode_Round2SucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2SucceededActually is global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>[]);
-                    Handlers_For_TestCode_Round2SucceededActually = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>[]>(
-                        handlers_For_TestCode_Round2SucceededActually
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2SucceededActually is not global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>[]);
-                    Handlers_For_TestCode_Round2SucceededActually = handlers_For_TestCode_Round2SucceededActually.ToArray();
-                }
-                var handlers_For_TestCode_Sound2SucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound2SucceededActually>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2SucceededActually is global::Mediator.INotificationHandler<global::TestCode.Sound2SucceededActually>[]);
-                    Handlers_For_TestCode_Sound2SucceededActually = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound2SucceededActually>[]>(
-                        handlers_For_TestCode_Sound2SucceededActually
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2SucceededActually is not global::Mediator.INotificationHandler<global::TestCode.Sound2SucceededActually>[]);
-                    Handlers_For_TestCode_Sound2SucceededActually = handlers_For_TestCode_Sound2SucceededActually.ToArray();
-                }
-                var handlers_For_TestCode_RoundSucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceededActually is global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[]);
-                    Handlers_For_TestCode_RoundSucceededActually = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[]>(
-                        handlers_For_TestCode_RoundSucceededActually
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceededActually is not global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>[]);
-                    Handlers_For_TestCode_RoundSucceededActually = handlers_For_TestCode_RoundSucceededActually.ToArray();
-                }
-                var handlers_For_TestCode_Sound20SucceededActually = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound20SucceededActually>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20SucceededActually is global::Mediator.INotificationHandler<global::TestCode.Sound20SucceededActually>[]);
-                    Handlers_For_TestCode_Sound20SucceededActually = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound20SucceededActually>[]>(
-                        handlers_For_TestCode_Sound20SucceededActually
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20SucceededActually is not global::Mediator.INotificationHandler<global::TestCode.Sound20SucceededActually>[]);
-                    Handlers_For_TestCode_Sound20SucceededActually = handlers_For_TestCode_Sound20SucceededActually.ToArray();
-                }
-                var handlers_For_TestCode_RoundResulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundResulted is global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[]);
-                    Handlers_For_TestCode_RoundResulted = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[]>(
-                        handlers_For_TestCode_RoundResulted
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundResulted is not global::Mediator.INotificationHandler<global::TestCode.RoundResulted>[]);
-                    Handlers_For_TestCode_RoundResulted = handlers_For_TestCode_RoundResulted.ToArray();
-                }
-                var handlers_For_TestCode_Round2Created = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Round2Created>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2Created is global::Mediator.INotificationHandler<global::TestCode.Round2Created>[]);
-                    Handlers_For_TestCode_Round2Created = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Round2Created>[]>(
-                        handlers_For_TestCode_Round2Created
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2Created is not global::Mediator.INotificationHandler<global::TestCode.Round2Created>[]);
-                    Handlers_For_TestCode_Round2Created = handlers_For_TestCode_Round2Created.ToArray();
-                }
-                var handlers_For_TestCode_Round2Resulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2Resulted is global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>[]);
-                    Handlers_For_TestCode_Round2Resulted = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>[]>(
-                        handlers_For_TestCode_Round2Resulted
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2Resulted is not global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>[]);
-                    Handlers_For_TestCode_Round2Resulted = handlers_For_TestCode_Round2Resulted.ToArray();
-                }
-                var handlers_For_TestCode_Round2Succeeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2Succeeded is global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>[]);
-                    Handlers_For_TestCode_Round2Succeeded = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>[]>(
-                        handlers_For_TestCode_Round2Succeeded
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Round2Succeeded is not global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>[]);
-                    Handlers_For_TestCode_Round2Succeeded = handlers_For_TestCode_Round2Succeeded.ToArray();
-                }
-                var handlers_For_TestCode_Sound20Succeeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound20Succeeded>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20Succeeded is global::Mediator.INotificationHandler<global::TestCode.Sound20Succeeded>[]);
-                    Handlers_For_TestCode_Sound20Succeeded = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound20Succeeded>[]>(
-                        handlers_For_TestCode_Sound20Succeeded
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20Succeeded is not global::Mediator.INotificationHandler<global::TestCode.Sound20Succeeded>[]);
-                    Handlers_For_TestCode_Sound20Succeeded = handlers_For_TestCode_Sound20Succeeded.ToArray();
-                }
-                var handlers_For_TestCode_Sound2Created = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound2Created>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2Created is global::Mediator.INotificationHandler<global::TestCode.Sound2Created>[]);
-                    Handlers_For_TestCode_Sound2Created = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound2Created>[]>(
-                        handlers_For_TestCode_Sound2Created
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2Created is not global::Mediator.INotificationHandler<global::TestCode.Sound2Created>[]);
-                    Handlers_For_TestCode_Sound2Created = handlers_For_TestCode_Sound2Created.ToArray();
-                }
-                var handlers_For_TestCode_Sound2Resulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound2Resulted>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2Resulted is global::Mediator.INotificationHandler<global::TestCode.Sound2Resulted>[]);
-                    Handlers_For_TestCode_Sound2Resulted = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound2Resulted>[]>(
-                        handlers_For_TestCode_Sound2Resulted
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2Resulted is not global::Mediator.INotificationHandler<global::TestCode.Sound2Resulted>[]);
-                    Handlers_For_TestCode_Sound2Resulted = handlers_For_TestCode_Sound2Resulted.ToArray();
-                }
-                var handlers_For_TestCode_Sound2Succeeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound2Succeeded>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2Succeeded is global::Mediator.INotificationHandler<global::TestCode.Sound2Succeeded>[]);
-                    Handlers_For_TestCode_Sound2Succeeded = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound2Succeeded>[]>(
-                        handlers_For_TestCode_Sound2Succeeded
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound2Succeeded is not global::Mediator.INotificationHandler<global::TestCode.Sound2Succeeded>[]);
-                    Handlers_For_TestCode_Sound2Succeeded = handlers_For_TestCode_Sound2Succeeded.ToArray();
-                }
-                var handlers_For_TestCode_RoundCreated = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundCreated is global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[]);
-                    Handlers_For_TestCode_RoundCreated = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[]>(
-                        handlers_For_TestCode_RoundCreated
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundCreated is not global::Mediator.INotificationHandler<global::TestCode.RoundCreated>[]);
-                    Handlers_For_TestCode_RoundCreated = handlers_For_TestCode_RoundCreated.ToArray();
-                }
-                var handlers_For_TestCode_Sound20Created = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound20Created>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20Created is global::Mediator.INotificationHandler<global::TestCode.Sound20Created>[]);
-                    Handlers_For_TestCode_Sound20Created = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound20Created>[]>(
-                        handlers_For_TestCode_Sound20Created
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20Created is not global::Mediator.INotificationHandler<global::TestCode.Sound20Created>[]);
-                    Handlers_For_TestCode_Sound20Created = handlers_For_TestCode_Sound20Created.ToArray();
-                }
-                var handlers_For_TestCode_Sound20Resulted = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.Sound20Resulted>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20Resulted is global::Mediator.INotificationHandler<global::TestCode.Sound20Resulted>[]);
-                    Handlers_For_TestCode_Sound20Resulted = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.Sound20Resulted>[]>(
-                        handlers_For_TestCode_Sound20Resulted
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_Sound20Resulted is not global::Mediator.INotificationHandler<global::TestCode.Sound20Resulted>[]);
-                    Handlers_For_TestCode_Sound20Resulted = handlers_For_TestCode_Sound20Resulted.ToArray();
-                }
-                var handlers_For_TestCode_RoundSucceeded = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceeded is global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[]);
-                    Handlers_For_TestCode_RoundSucceeded = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[]>(
-                        handlers_For_TestCode_RoundSucceeded
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_RoundSucceeded is not global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>[]);
-                    Handlers_For_TestCode_RoundSucceeded = handlers_For_TestCode_RoundSucceeded.ToArray();
-                }
-                var handlers_For_TestCode_DomainEvent2 = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent2 is global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>[]);
-                    Handlers_For_TestCode_DomainEvent2 = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>[]>(
-                        handlers_For_TestCode_DomainEvent2
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent2 is not global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>[]);
-                    Handlers_For_TestCode_DomainEvent2 = handlers_For_TestCode_DomainEvent2.ToArray();
-                }
-                var handlers_For_TestCode_DomainEvent10 = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent10>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent10 is global::Mediator.INotificationHandler<global::TestCode.DomainEvent10>[]);
-                    Handlers_For_TestCode_DomainEvent10 = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent10>[]>(
-                        handlers_For_TestCode_DomainEvent10
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent10 is not global::Mediator.INotificationHandler<global::TestCode.DomainEvent10>[]);
-                    Handlers_For_TestCode_DomainEvent10 = handlers_For_TestCode_DomainEvent10.ToArray();
-                }
-                var handlers_For_TestCode_DomainEvent11 = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent11>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent11 is global::Mediator.INotificationHandler<global::TestCode.DomainEvent11>[]);
-                    Handlers_For_TestCode_DomainEvent11 = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent11>[]>(
-                        handlers_For_TestCode_DomainEvent11
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent11 is not global::Mediator.INotificationHandler<global::TestCode.DomainEvent11>[]);
-                    Handlers_For_TestCode_DomainEvent11 = handlers_For_TestCode_DomainEvent11.ToArray();
-                }
-                var handlers_For_TestCode_DomainEvent = sp.GetServices<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>>();
-                if (containerMetadata.ServicesUnderlyingTypeIsArray)
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent is global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[]);
-                    Handlers_For_TestCode_DomainEvent = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[]>(
-                        handlers_For_TestCode_DomainEvent
-                    );
-                }
-                else
-                {
-                    global::System.Diagnostics.Debug.Assert(handlers_For_TestCode_DomainEvent is not global::Mediator.INotificationHandler<global::TestCode.DomainEvent>[]);
-                    Handlers_For_TestCode_DomainEvent = handlers_For_TestCode_DomainEvent.ToArray();
-                }
-
-
-                InternalNotificationPublisherImpl = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-            }
-        }
 
 
         /// <summary>
@@ -854,14 +896,6 @@ namespace Mediator
             return default;
         }
 
-        /// <summary>
-        /// Send request.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
-        /// </summary>
-        /// <param name="request">Incoming request</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.IRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken = default
@@ -907,14 +941,6 @@ namespace Mediator
             return default;
         }
 
-        /// <summary>
-        /// Send command.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
-        /// </summary>
-        /// <param name="command">Incoming command</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.ICommand<TResponse> command,
             global::System.Threading.CancellationToken cancellationToken = default
@@ -960,14 +986,6 @@ namespace Mediator
             return default;
         }
 
-        /// <summary>
-        /// Send query.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::Mediator.MissingMessageHandlerException"/> if no handler is registered.
-        /// </summary>
-        /// <param name="query">Incoming query</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.IQuery<TResponse> query,
             global::System.Threading.CancellationToken cancellationToken = default
@@ -1048,32 +1066,40 @@ namespace Mediator
         {
             switch (notification)
             {
-                case global::TestCode.Round2SucceededActually n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2SucceededActually n: return Publish(n, cancellationToken);
                 case global::TestCode.RoundSucceededActually n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20SucceededActually n: return Publish(n, cancellationToken);
+                case global::TestCode.Round2SucceededActually n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundCreated n: return Publish(n, cancellationToken);
                 case global::TestCode.RoundResulted n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundSucceeded n: return Publish(n, cancellationToken);
                 case global::TestCode.Round2Created n: return Publish(n, cancellationToken);
                 case global::TestCode.Round2Resulted n: return Publish(n, cancellationToken);
                 case global::TestCode.Round2Succeeded n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20Succeeded n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2Created n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2Resulted n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2Succeeded n: return Publish(n, cancellationToken);
-                case global::TestCode.RoundCreated n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20Created n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20Resulted n: return Publish(n, cancellationToken);
-                case global::TestCode.RoundSucceeded n: return Publish(n, cancellationToken);
-                case global::TestCode.DomainEvent2 n: return Publish(n, cancellationToken);
-                case global::TestCode.DomainEvent10 n: return Publish(n, cancellationToken);
-                case global::TestCode.DomainEvent11 n: return Publish(n, cancellationToken);
                 case global::TestCode.DomainEvent n: return Publish(n, cancellationToken);
+                case global::TestCode.DomainEvent2 n: return Publish(n, cancellationToken);
                 default:
                 {
                     ThrowInvalidNotification(notification, nameof(notification));
                     return default;
                 }
             }
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.RoundSucceededActually.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.RoundSucceededActually notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            return _containerMetadata.Value.Wrapper_For_TestCode_RoundSucceededActually.Handle(notification, cancellationToken);
         }
 
         /// <summary>
@@ -1090,340 +1116,10 @@ namespace Mediator
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Round2SucceededActually;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Round2SucceededActually>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_Round2SucceededActually.Handle(notification, cancellationToken);
         }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound2SucceededActually.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound2SucceededActually notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound2SucceededActually;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound2SucceededActually>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.RoundSucceededActually.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.RoundSucceededActually notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundSucceededActually;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceededActually>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound20SucceededActually.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound20SucceededActually notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound20SucceededActually;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound20SucceededActually>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.RoundResulted.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.RoundResulted notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundResulted;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundResulted>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Round2Created.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Round2Created notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Round2Created;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Round2Created>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Round2Resulted.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Round2Resulted notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Round2Resulted;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Round2Resulted>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Round2Succeeded.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Round2Succeeded notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Round2Succeeded;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Round2Succeeded>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound20Succeeded.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound20Succeeded notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound20Succeeded;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound20Succeeded>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound2Created.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound2Created notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound2Created;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound2Created>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound2Resulted.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound2Resulted notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound2Resulted;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound2Resulted>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound2Succeeded.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound2Succeeded notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
-
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound2Succeeded;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound2Succeeded>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
         /// <summary>
         /// Send a notification of type global::TestCode.RoundCreated.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -1438,23 +1134,12 @@ namespace Mediator
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundCreated;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundCreated>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_RoundCreated.Handle(notification, cancellationToken);
         }
+
         /// <summary>
-        /// Send a notification of type global::TestCode.Sound20Created.
+        /// Send a notification of type global::TestCode.RoundResulted.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
         /// </summary>
@@ -1462,55 +1147,15 @@ namespace Mediator
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound20Created notification,
+            global::TestCode.RoundResulted notification,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound20Created;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound20Created>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_RoundResulted.Handle(notification, cancellationToken);
         }
-        /// <summary>
-        /// Send a notification of type global::TestCode.Sound20Resulted.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.Sound20Resulted notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_Sound20Resulted;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.Sound20Resulted>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
-        }
         /// <summary>
         /// Send a notification of type global::TestCode.RoundSucceeded.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -1525,23 +1170,12 @@ namespace Mediator
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_RoundSucceeded;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.RoundSucceeded>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_RoundSucceeded.Handle(notification, cancellationToken);
         }
+
         /// <summary>
-        /// Send a notification of type global::TestCode.DomainEvent2.
+        /// Send a notification of type global::TestCode.Round2Created.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
         /// </summary>
@@ -1549,28 +1183,17 @@ namespace Mediator
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.DomainEvent2 notification,
+            global::TestCode.Round2Created notification,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_DomainEvent2;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent2>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_Round2Created.Handle(notification, cancellationToken);
         }
+
         /// <summary>
-        /// Send a notification of type global::TestCode.DomainEvent10.
+        /// Send a notification of type global::TestCode.Round2Resulted.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
         /// </summary>
@@ -1578,28 +1201,17 @@ namespace Mediator
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.DomainEvent10 notification,
+            global::TestCode.Round2Resulted notification,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_DomainEvent10;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent10>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_Round2Resulted.Handle(notification, cancellationToken);
         }
+
         /// <summary>
-        /// Send a notification of type global::TestCode.DomainEvent11.
+        /// Send a notification of type global::TestCode.Round2Succeeded.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
         /// </summary>
@@ -1607,26 +1219,15 @@ namespace Mediator
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.DomainEvent11 notification,
+            global::TestCode.Round2Succeeded notification,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_DomainEvent11;
-
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent11>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+            return _containerMetadata.Value.Wrapper_For_TestCode_Round2Succeeded.Handle(notification, cancellationToken);
         }
+
         /// <summary>
         /// Send a notification of type global::TestCode.DomainEvent.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -1641,20 +1242,26 @@ namespace Mediator
         )
         {
             ThrowIfNull(notification, nameof(notification));
-            
 
-            var handlers = _diCacheLazy.Value.Handlers_For_TestCode_DomainEvent;
+            return _containerMetadata.Value.Wrapper_For_TestCode_DomainEvent.Handle(notification, cancellationToken);
+        }
 
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            var publisher = _diCacheLazy.Value.InternalNotificationPublisherImpl;
-            return publisher.Publish(
-                new global::Mediator.NotificationHandlers<global::TestCode.DomainEvent>(handlers, isArray: true),
-                notification,
-                cancellationToken
-            );
+        /// <summary>
+        /// Send a notification of type global::TestCode.DomainEvent2.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.DomainEvent2 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            return _containerMetadata.Value.Wrapper_For_TestCode_DomainEvent2.Handle(notification, cancellationToken);
         }
 
         /// <summary>
@@ -1674,26 +1281,16 @@ namespace Mediator
         {
             switch (notification)
             {
-                case global::TestCode.Round2SucceededActually n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2SucceededActually n: return Publish(n, cancellationToken);
                 case global::TestCode.RoundSucceededActually n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20SucceededActually n: return Publish(n, cancellationToken);
+                case global::TestCode.Round2SucceededActually n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundCreated n: return Publish(n, cancellationToken);
                 case global::TestCode.RoundResulted n: return Publish(n, cancellationToken);
+                case global::TestCode.RoundSucceeded n: return Publish(n, cancellationToken);
                 case global::TestCode.Round2Created n: return Publish(n, cancellationToken);
                 case global::TestCode.Round2Resulted n: return Publish(n, cancellationToken);
                 case global::TestCode.Round2Succeeded n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20Succeeded n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2Created n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2Resulted n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound2Succeeded n: return Publish(n, cancellationToken);
-                case global::TestCode.RoundCreated n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20Created n: return Publish(n, cancellationToken);
-                case global::TestCode.Sound20Resulted n: return Publish(n, cancellationToken);
-                case global::TestCode.RoundSucceeded n: return Publish(n, cancellationToken);
-                case global::TestCode.DomainEvent2 n: return Publish(n, cancellationToken);
-                case global::TestCode.DomainEvent10 n: return Publish(n, cancellationToken);
-                case global::TestCode.DomainEvent11 n: return Publish(n, cancellationToken);
                 case global::TestCode.DomainEvent n: return Publish(n, cancellationToken);
+                case global::TestCode.DomainEvent2 n: return Publish(n, cancellationToken);
                 default:
                 {
                     ThrowInvalidNotification(notification, nameof(notification));

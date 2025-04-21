@@ -2,8 +2,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using DICache = Mediator.Mediator.DICache;
-using LazyDICache = Mediator.Mediator.FastLazyValue<Mediator.Mediator.DICache>;
+using LazyContainerMetadata = Mediator.Mediator.FastLazyValue<Mediator.ContainerMetadata, Mediator.Mediator>;
 
 namespace Mediator.Tests;
 
@@ -26,7 +25,7 @@ public partial class SmokeTests
 
         var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        var threads = new Task<(DICache Cache, long State)>[concurrency];
+        var threads = new Task<(ContainerMetadata Cache, long State)>[concurrency];
         for (int i = 0; i < concurrency; i++)
         {
             threads[i] = Task.Run(Thread);
@@ -36,19 +35,19 @@ public partial class SmokeTests
         var values = await Task.WhenAll(threads);
         var states = values.Select(v => v.State).ToArray();
 
-        Assert.DoesNotContain(LazyDICache.INVALID, states);
-        Assert.Single(states.Where(s => s == LazyDICache.UNINIT));
+        Assert.DoesNotContain(LazyContainerMetadata.INVALID, states);
+        Assert.Single(states.Where(s => s == LazyContainerMetadata.UNINIT));
 
         var handlers = values.Select(v => v.Cache.Wrapper_For_Mediator_Tests_TestTypes_SomeRequest).ToArray();
         var handler = handlers[0];
 
         Assert.All(handlers, h => Assert.Same(handler, h));
 
-        async Task<(DICache Cache, long State)> Thread()
+        async Task<(ContainerMetadata Cache, long State)> Thread()
         {
             await start.Task;
 
-            return concrete._diCacheLazy.ValueInstrumented;
+            return concrete._containerMetadata.ValueInstrumented;
         }
     }
 }

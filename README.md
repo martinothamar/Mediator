@@ -50,7 +50,7 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
       - [3.3.2. Error logging example](#332-error-logging-example)
     - [3.4. Configuration](#34-configuration)
   - [4. Getting started](#4-getting-started)
-    - [4.1. Add package](#41-add-package)
+    - [4.1. Add packages](#41-add-packages)
     - [4.2. Add Mediator to DI container](#42-add-mediator-to-di-container)
     - [4.3. Create `IRequest<>` type](#43-create-irequest-type)
     - [4.4. Use pipeline behaviors](#44-use-pipeline-behaviors)
@@ -277,7 +277,7 @@ illustrating the various ways the Mediator pattern can be used in an application
 
 See the full runnable sample code in the [Showcase sample](/samples/Showcase/).
 
-### 4.1. Add package
+### 4.1. Add packages
 
 ```pwsh
 dotnet add package Mediator.SourceGenerator --version 2.0.*
@@ -305,7 +305,7 @@ using System;
 var services = new ServiceCollection(); // Most likely IServiceCollection comes from IHostBuilder/Generic host abstraction in Microsoft.Extensions.Hosting
 
 services.AddMediator();
-var serviceProvider = services.BuildServiceProvider();
+using var serviceProvider = services.BuildServiceProvider();
 ```
 
 ### 4.3. Create `IRequest<>` type
@@ -454,7 +454,7 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
 
 ### 4.9. Notification publishers
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > This API is currently in the latest 3.0 previews, not available in stable.
 
 Notification publishers are responsible for dispatching notifications to a collection of handlers.

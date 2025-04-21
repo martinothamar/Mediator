@@ -28,7 +28,6 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
             .Replace('.', '_');
 
         HandlerWrapperTypeNameWithGenericTypeArguments = WrapperType.HandlerWrapperTypeNameWithGenericTypeArguments(
-            symbol.TypeKind,
             RequestFullName,
             ResponseFullName
         );

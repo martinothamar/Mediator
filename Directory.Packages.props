@@ -6,6 +6,7 @@
     <!-- Benchmarking -->
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.14.0" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.14.0" />
 
     <!-- Other libs -->
     <PackageVersion Include="MediatR" Version="12.5.0" />
@@ -30,9 +31,10 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.1.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageVersion Include="Buildalyzer.Workspaces" Version="7.1.0" />
 
     <!-- Templating -->
-    <PackageVersion Include="Scriban" Version="5.4.6" />
+    <PackageVersion Include="Scriban" Version="6.2.0" />
 
     <!-- Build -->
     <GlobalPackageReference Include="CSharpier.MsBuild" Version="0.27.3">

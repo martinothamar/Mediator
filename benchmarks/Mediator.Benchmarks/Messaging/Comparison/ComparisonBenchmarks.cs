@@ -67,6 +67,11 @@ public class ComparisonBenchmarks
         {
             var lifetimes = Enum.GetValues<ServiceLifetime>();
             bool[] largeProjectOptions = [false, true];
+
+            // Local override
+            // lifetimes = [ServiceLifetime.Transient];
+            // largeProjectOptions = [false];
+
             var jobs =
                 from lifetime in lifetimes
                 from largeProject in largeProjectOptions
@@ -99,6 +104,7 @@ public class ComparisonBenchmarks
                 .AddColumn(RankColumn.Arabic)
                 .WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared))
                 .AddDiagnoser(MemoryDiagnoser.Default);
+            // .AddDiagnoser(new DotTraceDiagnoser());
         }
     }
 

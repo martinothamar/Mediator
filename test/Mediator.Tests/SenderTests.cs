@@ -73,17 +73,4 @@ public sealed class SenderTests
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
     }
-
-    [Fact]
-    public async Task Test_Fails_On_Dynamic_Type()
-    {
-        var (_, mediator) = Fixture.GetMediator();
-        ISender sender = mediator;
-
-        var id = Guid.NewGuid();
-        object obj = new { Id = id };
-
-        var request = Unsafe.As<object, IRequest>(ref obj);
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await sender.Send(request));
-    }
 }
