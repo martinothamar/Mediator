@@ -36,10 +36,6 @@ jobs:
         dotnet-version: '8.0.x'
         include-prerelease: false
 
-    - uses: dotnet/nbgv@master
-      with:
-        setAllVars: true
-
     - uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/.nuget/packages
@@ -69,6 +65,8 @@ jobs:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -95,7 +93,7 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2 # nbgv is not run on this job, so don't need fetch-depth: 0
 
     - uses: actions/cache@v3
       with:
