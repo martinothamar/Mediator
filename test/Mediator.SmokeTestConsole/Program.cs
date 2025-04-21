@@ -6,8 +6,8 @@ using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ContainerMetadata = Mediator.ContainerMetadata;
-using LazyContainerMetadata = Mediator.Mediator.FastLazyValue<Mediator.ContainerMetadata, Mediator.Mediator>;
+using ContainerMetadata = Mediator.Internals.ContainerMetadata;
+using LazyContainerMetadata = Mediator.Mediator.FastLazyValue<Mediator.Internals.ContainerMetadata, Mediator.Mediator>;
 
 await Host.CreateDefaultBuilder()
     .ConfigureLogging(

@@ -61,8 +61,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(
-                typeof(global::SimpleConsoleAOT.RequestHandlerWrapper<global::Ping, global::Pong>),
-                typeof(global::SimpleConsoleAOT.RequestHandlerWrapper<global::Ping, global::Pong>),
+                typeof(global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>),
+                typeof(global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>),
                 global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton
             ));
 
@@ -73,10 +73,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.IContainerProbe), typeof(global::SimpleConsoleAOT.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.IContainerProbe), typeof(global::SimpleConsoleAOT.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.IContainerProbe), typeof(global::SimpleConsoleAOT.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.IContainerProbe), typeof(global::SimpleConsoleAOT.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.ContainerMetadata), typeof(global::SimpleConsoleAOT.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.ContainerMetadata), typeof(global::SimpleConsoleAOT.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -84,7 +84,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace SimpleConsoleAOT
+namespace SimpleConsoleAOT.Internals
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     internal interface IMessageHandlerBase
@@ -128,7 +128,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public RequestHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -208,7 +208,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -289,7 +289,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public CommandHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -369,7 +369,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -450,7 +450,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public QueryHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -530,7 +530,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -605,7 +605,7 @@ namespace SimpleConsoleAOT
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         public NotificationHandlerWrapper<TNotification> Init(
-            global::SimpleConsoleAOT.ContainerMetadata containerMetadata,
+            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -679,7 +679,7 @@ namespace SimpleConsoleAOT
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-        public readonly global::SimpleConsoleAOT.RequestHandlerWrapper<global::Ping, global::Pong> Wrapper_For_Ping;
+        public readonly global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong> Wrapper_For_Ping;
 
 
 
@@ -691,14 +691,14 @@ namespace SimpleConsoleAOT
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::SimpleConsoleAOT.IContainerProbe>() is global::SimpleConsoleAOT.IContainerProbe[];
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::SimpleConsoleAOT.Internals.IContainerProbe>() is global::SimpleConsoleAOT.Internals.IContainerProbe[];
 
             NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
-            requestHandlerTypes.Add(typeof(global::Ping), sp.GetRequiredService<global::SimpleConsoleAOT.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp));
+            requestHandlerTypes.Add(typeof(global::Ping), sp.GetRequiredService<global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp));
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
@@ -713,7 +713,7 @@ namespace SimpleConsoleAOT
             var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
-            Wrapper_For_Ping = sp.GetRequiredService<global::SimpleConsoleAOT.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp);
+            Wrapper_For_Ping = sp.GetRequiredService<global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp);
 
 
 
@@ -722,7 +722,10 @@ namespace SimpleConsoleAOT
 
         }
     }
+}
 
+namespace SimpleConsoleAOT
+{
     /// <summary>
     /// Generated code for Mediator implementation.
     /// This type is also registered as a DI service.
@@ -734,7 +737,7 @@ namespace SimpleConsoleAOT
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private FastLazyValue<global::SimpleConsoleAOT.ContainerMetadata, global::SimpleConsoleAOT.Mediator> _containerMetadata;
+        private FastLazyValue<global::SimpleConsoleAOT.Internals.ContainerMetadata, global::SimpleConsoleAOT.Mediator> _containerMetadata;
         private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
         internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
         {
@@ -779,8 +782,8 @@ namespace SimpleConsoleAOT
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            _containerMetadata = new FastLazyValue<global::SimpleConsoleAOT.ContainerMetadata, global::SimpleConsoleAOT.Mediator>(
-                self => self.Services.GetRequiredService<global::SimpleConsoleAOT.ContainerMetadata>(),
+            _containerMetadata = new FastLazyValue<global::SimpleConsoleAOT.Internals.ContainerMetadata, global::SimpleConsoleAOT.Mediator>(
+                self => self.Services.GetRequiredService<global::SimpleConsoleAOT.Internals.ContainerMetadata>(),
                 this
             );
         }

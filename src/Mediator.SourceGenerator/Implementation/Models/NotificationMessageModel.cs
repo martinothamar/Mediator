@@ -19,7 +19,7 @@ internal sealed record NotificationMessageModel : SymbolMetadataModel
             .GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false)
             .Replace("global::", "")
             .Replace('.', '_');
-        FullNamespace = $"global::{analyzer.MediatorNamespace}";
+        HandlerWrapperNamespace = $"global::{analyzer.MediatorNamespace}.Internals";
     }
 
     public string IdentifierFullName { get; }
@@ -28,12 +28,12 @@ internal sealed record NotificationMessageModel : SymbolMetadataModel
 
     public string? ServiceLifetime { get; }
 
-    public string FullNamespace { get; }
+    public string HandlerWrapperNamespace { get; }
 
     public string HandlerTypeOfExpression => $"typeof(global::Mediator.INotificationHandler<{FullName}>)";
 
     public string HandlerWrapperTypeNameWithGenericTypeArguments =>
-        $"{FullNamespace}.NotificationHandlerWrapper<{FullName}>";
+        $"{HandlerWrapperNamespace}.NotificationHandlerWrapper<{FullName}>";
 
     public string HandlerWrapperPropertyName => $"Wrapper_For_{IdentifierFullName}";
 
