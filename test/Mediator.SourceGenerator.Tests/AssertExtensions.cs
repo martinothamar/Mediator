@@ -1,14 +1,14 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using VerifyTests;
 using VerifyXunit;
 
 namespace Mediator.SourceGenerator.Tests;
 
 public static class AssertExtensions
 {
-    public static async Task AssertAndVerify(
+    public static SettingsTask AssertAndVerify(
         this Compilation inputCompilation,
         params Action<GeneratorResult>[] assertionDelegates
     )
@@ -30,6 +30,6 @@ public static class AssertExtensions
         foreach (var assertions in assertionDelegates)
             assertions(result);
 
-        await Verifier.Verify(driver);
+        return Verifier.Verify(driver);
     }
 }
