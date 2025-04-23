@@ -4,8 +4,11 @@ Just like Console, but with [NativeAOT](https://github.com/dotnet/runtimelab/tre
 
 ### Build and run
 
+Replace `<RID>` with your runtime below, e.g. `win-x64` or `linux-x64`.
+
 ```console
-$ dotnet run
+$ dotnet publish -r <RID> -c Release
+$ ./bin/Release/net8.0/win-x64/ConsoleAOT
 1) Running logger handler
 2) Running ping validator
 3) Valid input!
