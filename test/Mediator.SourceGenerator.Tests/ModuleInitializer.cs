@@ -10,10 +10,7 @@ public static class ModuleInitializer
 {
     private static VisualStudioInstance? _instance;
 
-    // ModuleInitializer should only be used in apps
-#pragma warning disable CA2255
     [ModuleInitializer]
-#pragma warning restore CA2255
     public static void Init()
     {
         _instance ??= MSBuildLocator.RegisterDefaults();
