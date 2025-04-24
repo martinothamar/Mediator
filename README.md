@@ -248,7 +248,7 @@ public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : MessageExceptio
         // using the base class helper Handle().
         // This requires you to know something about TResponse,
         // so TResponse needs to be constrained to something,
-        // typically with a static abstract member acting as a consructor on an interface or abstract class.
+        // typically with a static abstract member acting as a constructor on an interface or abstract class.
         return Handled(null!);
     }
 }
