@@ -24,6 +24,7 @@ internal sealed class CompilationAnalyzer
     private readonly HashSet<RequestMessage> _requestMessages;
     private readonly HashSet<NotificationMessage> _notificationMessages;
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
+    private readonly List<PipelineBehaviorType> _pipelineBehaviors;
 
     public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
 
@@ -77,6 +78,7 @@ internal sealed class CompilationAnalyzer
         _requestMessages = new();
         _notificationMessages = new();
         _notificationMessageHandlers = new();
+        _pipelineBehaviors = new();
         _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
         _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
     }
@@ -323,6 +325,7 @@ internal sealed class CompilationAnalyzer
                     _notificationPublisherImplementationSymbol.GetTypeSymbolFullName(),
                     _notificationPublisherImplementationSymbol.Name
                 ),
+                _pipelineBehaviors.Select(x => x.ToModel()).ToImmutableEquatableArray(),
                 HasErrors,
                 MediatorNamespace,
                 GeneratorVersion,
@@ -682,6 +685,9 @@ internal sealed class CompilationAnalyzer
                             {
                                 mapping.Add(typeSymbol, message);
                             }
+
+                            foreach (var pipelineBehaviorType in _pipelineBehaviors)
+                                pipelineBehaviorType.TryAddMessage(message);
                         }
                     }
                     break;
@@ -1141,6 +1147,32 @@ internal sealed class CompilationAnalyzer
                         )
                 );
                 return false;
+            }
+        }
+        else if (opt == "PipelineBehaviors")
+        {
+            var typeOfExpressions = assignment.Right.DescendantNodes().OfType<TypeOfExpressionSyntax>().ToArray();
+
+            HashSet<INamedTypeSymbol> pipelineBehaviorTypeSymbols = new(_symbolComparer);
+            foreach (var typeOfExpression in typeOfExpressions)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(typeOfExpression.Type, cancellationToken);
+                if (typeInfo.Type is not INamedTypeSymbol pipelineTypeSymbol)
+                {
+                    // TODO: fix diagnostics
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return false;
+                }
+                pipelineTypeSymbol = pipelineTypeSymbol.OriginalDefinition;
+
+                if (!pipelineBehaviorTypeSymbols.Add(pipelineTypeSymbol))
+                {
+                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    return false;
+                }
+
+                var pipelineBehaviorType = new PipelineBehaviorType(pipelineTypeSymbol, this);
+                _pipelineBehaviors.Add(pipelineBehaviorType);
             }
         }
         else

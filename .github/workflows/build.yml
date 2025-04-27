@@ -84,6 +84,38 @@ jobs:
     - name: Run
       run: dotnet run
 
+  samples-aot:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./samples/basic/ConsoleAOT
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        include-prerelease: false
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Publish
+      run: dotnet publish -r linux-x64 -c Release
+
+    - name: Run
+      run: ./bin/Release/net8.0/linux-x64/ConsoleAOT
+
   samples-netfx:
     runs-on: windows-latest
     defaults:

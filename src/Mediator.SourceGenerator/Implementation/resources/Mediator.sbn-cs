@@ -95,6 +95,13 @@ namespace Microsoft.Extensions.DependencyInjection
             {{ handler.OpenGenericServiceRegistrationBlock }}
             {{~ end ~}}
             {{~ end ~}}
+            {{~ if (object.size PipelineBehaviors) > 0 ~}}
+
+            // Register pipeline behaviors configured through options
+            {{~ for behavior in PipelineBehaviors ~}}
+            {{ behavior.ServiceRegistrationBlock }}
+            {{~ end ~}}
+            {{~ end ~}}
 
             // Register the notification publisher that was configured
             {{~ if ServiceLifetimeIsScoped || ServiceLifetimeIsTransient ~}}

@@ -52,20 +52,20 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.Mediator), typeof(global::SimpleConsoleAOT.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::SimpleConsoleAOT.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::SimpleConsoleAOT.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::SimpleConsoleAOT.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers for request messages
-            services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), typeof(global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::TestCode.PingHandler), typeof(global::TestCode.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::TestCode.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register pipeline behaviors configured through options
-            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::GenericLoggerHandler<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::TestCode.GenericLoggerHandler<global::TestCode.Ping, global::TestCode.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::TestCode.PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
 
             // Register the notification publisher that was configured
@@ -73,9 +73,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register internal components
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.IContainerProbe), typeof(global::SimpleConsoleAOT.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.IContainerProbe), typeof(global::SimpleConsoleAOT.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.ContainerMetadata), typeof(global::SimpleConsoleAOT.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -83,7 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
     }
 }
 
-namespace SimpleConsoleAOT.Internals
+namespace Mediator.Internals
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
     internal interface IMessageHandlerBase
@@ -127,7 +127,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public RequestHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -207,7 +207,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -288,7 +288,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public CommandHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -368,7 +368,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -449,7 +449,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public QueryHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -529,7 +529,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -604,7 +604,7 @@ namespace SimpleConsoleAOT.Internals
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         public NotificationHandlerWrapper<TNotification> Init(
-            global::SimpleConsoleAOT.Internals.ContainerMetadata containerMetadata,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -678,20 +678,20 @@ namespace SimpleConsoleAOT.Internals
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-        public readonly global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong> Wrapper_For_Ping;
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong> Wrapper_For_TestCode_Ping;
 
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::SimpleConsoleAOT.Internals.IContainerProbe>() is global::SimpleConsoleAOT.Internals.IContainerProbe[];
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
 
             NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
-            requestHandlerTypes.Add(typeof(global::Ping), sp.GetRequiredService<global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp));
+            requestHandlerTypes.Add(typeof(global::TestCode.Ping), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>>().Init(this, sp));
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
@@ -706,12 +706,12 @@ namespace SimpleConsoleAOT.Internals
             var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
-            Wrapper_For_Ping = sp.GetRequiredService<global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp);
+            Wrapper_For_TestCode_Ping = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>>().Init(this, sp);
         }
     }
 }
 
-namespace SimpleConsoleAOT
+namespace Mediator
 {
     /// <summary>
     /// Generated code for Mediator implementation.
@@ -724,7 +724,7 @@ namespace SimpleConsoleAOT
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private FastLazyValue<global::SimpleConsoleAOT.Internals.ContainerMetadata, global::SimpleConsoleAOT.Mediator> _containerMetadata;
+        private FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
         private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
         internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
         {
@@ -769,8 +769,8 @@ namespace SimpleConsoleAOT
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            _containerMetadata = new FastLazyValue<global::SimpleConsoleAOT.Internals.ContainerMetadata, global::SimpleConsoleAOT.Mediator>(
-                self => self.Services.GetRequiredService<global::SimpleConsoleAOT.Internals.ContainerMetadata>(),
+            _containerMetadata = new FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator>(
+                self => self.Services.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(),
                 this
             );
         }
@@ -837,17 +837,17 @@ namespace SimpleConsoleAOT
 
 
         /// <summary>
-        /// Send a request of type global::Ping.
+        /// Send a request of type global::TestCode.Ping.
         /// </summary>
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<global::Pong> Send(
-            global::Ping request,
+        public global::System.Threading.Tasks.ValueTask<global::TestCode.Pong> Send(
+            global::TestCode.Ping request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            return _containerMetadata.Value.Wrapper_For_Ping.Handle(request, cancellationToken);
+            return _containerMetadata.Value.Wrapper_For_TestCode_Ping.Handle(request, cancellationToken);
         }
 
         /// <summary>
@@ -866,12 +866,12 @@ namespace SimpleConsoleAOT
         {
             switch (request)
             {
-                case global::Ping r:
+                case global::TestCode.Ping r:
                 {
-                    if (typeof(TResponse) == typeof(global::Pong))
+                    if (typeof(TResponse) == typeof(global::TestCode.Pong))
                     {
                         var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::Pong>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::TestCode.Pong>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     return SendAsync(request, cancellationToken);
                 }
@@ -890,10 +890,10 @@ namespace SimpleConsoleAOT
         {
             switch (request)
             {
-                case global::Ping r:
+                case global::TestCode.Ping r:
                 {
                     var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::Pong, TResponse>(ref response);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<global::TestCode.Pong, TResponse>(ref response);
                 }
                 default:
                 {
@@ -1030,7 +1030,7 @@ namespace SimpleConsoleAOT
                 case global::Mediator.IBaseRequest request:
                     switch (request)
                     {
-                        case global::Ping r: return await Send(r, cancellationToken);
+                        case global::TestCode.Ping r: return await Send(r, cancellationToken);
                         default:
                         {
                             ThrowInvalidRequest(request, nameof(request));

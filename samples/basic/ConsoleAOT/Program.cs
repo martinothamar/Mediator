@@ -8,12 +8,14 @@ var services = new ServiceCollection();
 services.AddMediator(options =>
 {
     options.Namespace = "SimpleConsoleAOT";
+    options.PipelineBehaviors =
+    [
+        // Standard handlers are added by default, but we need to add pipeline steps manually.
+        // Here are two examples.
+        typeof(GenericLoggerHandler<,>), // This will run 1st
+        typeof(PingValidator), // This will run 2nd
+    ];
 });
-
-// Standard handlers are added by default, but we need to add pipeline steps manually.
-// Here are two examples.
-services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericLoggerHandler<,>)); // This will run 1st
-services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>(); // This will run 2nd
 
 var serviceProvider = services.BuildServiceProvider();
 
@@ -35,9 +37,9 @@ return response.Id == id ? 0 : 1;
 // Here are the types used
 //
 
-public sealed record Ping(Guid Id) : IRequest<Pong>;
+public readonly record struct Ping(Guid Id) : IRequest<Pong>;
 
-public sealed record Pong(Guid Id);
+public readonly record struct Pong(Guid Id);
 
 public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
     where TMessage : IMessage
@@ -72,7 +74,7 @@ public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
     )
     {
         Console.WriteLine("2) Running ping validator");
-        if (request is null || request.Id == default)
+        if (request.Id == default)
             throw new ArgumentException("Invalid input");
         else
             Console.WriteLine("3) Valid input!");

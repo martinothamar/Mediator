@@ -28,5 +28,11 @@ namespace Mediator
         /// </summary>
         public global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime { get; set; } =
             global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
+
+        /// <summary>
+        /// The collection of types of pipeline behaviors to register in DI.
+        /// When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
+        /// </summary>
+        public global::System.Collections.Generic.IReadOnlyList<global::System.Type> PipelineBehaviors { get; set; } = new global::System.Type[0];
     }
 }
