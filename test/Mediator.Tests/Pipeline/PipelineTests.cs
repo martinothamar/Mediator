@@ -28,6 +28,26 @@ public sealed class PipelineTests
     }
 
     [Fact]
+    public async Task Test_Pipeline_Early_Return()
+    {
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<IPipelineBehavior<SomeRequest, SomeResponse>>(new SomePipeline(earlyReturn: true));
+        });
+
+        var id = Guid.NewGuid();
+
+        var pipelineStep =
+            sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is SomePipeline)
+            as SomePipeline;
+        Assert.NotNull(pipelineStep);
+        var response = await mediator.Send(new SomeRequest(id));
+        Assert.Equal(id, response.Id);
+        Assert.True(response.ReturnedEarly);
+        Assert.NotEqual(id, pipelineStep!.Id);
+    }
+
+    [Fact]
     public async Task Test_Generic_Pipeline()
     {
         var (sp, mediator) = Fixture.GetMediator(services =>
