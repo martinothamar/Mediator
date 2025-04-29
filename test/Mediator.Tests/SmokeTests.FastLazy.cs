@@ -36,7 +36,7 @@ public partial class SmokeTests
         var states = values.Select(v => v.State).ToArray();
 
         Assert.DoesNotContain(LazyContainerMetadata.INVALID, states);
-        Assert.Single(states.Where(s => s == LazyContainerMetadata.UNINIT));
+        Assert.Single(states, s => s == LazyContainerMetadata.UNINIT);
 
         var handlers = values.Select(v => v.Cache.Wrapper_For_Mediator_Tests_TestTypes_SomeRequest).ToArray();
         var handler = handlers[0];
