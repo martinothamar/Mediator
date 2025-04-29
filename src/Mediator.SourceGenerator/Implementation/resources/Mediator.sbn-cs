@@ -1177,7 +1177,7 @@ namespace {{ MediatorNamespace }}
 
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.ICommand<TResponse> command,
-            {{~ if HasManyRequests ~}}
+            {{~ if HasManyCommands ~}}
             object handlerObj,
             {{~ end ~}}
             global::System.Threading.CancellationToken cancellationToken = default
