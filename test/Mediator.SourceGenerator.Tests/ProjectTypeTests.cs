@@ -1,18 +1,20 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.SourceGenerator.Tests;
 
 public sealed class ProjectTypeTests
 {
-    [Theory]
-    [InlineData(16)]
-    [InlineData(17)]
-    public async Task Test_Project_Sizes(int n)
+    private static string GenerateMessagesAndHandlers(
+        int n,
+        ServiceLifetime serviceLifetime,
+        string manyOfMessageType = ""
+    )
     {
         var code = new StringBuilder(
-            """
+            $$"""
             using System;
             using System.Collections.Generic;
             using System.Threading;
@@ -29,17 +31,21 @@ public sealed class ProjectTypeTests
                 {
                     var services = new ServiceCollection();
 
-                    services.AddMediator();
+                    services.AddMediator(options =>
+                    {
+                        options.ServiceLifetime = ServiceLifetime.{{serviceLifetime}};
+                    });
                 }
             }
-
+            
             """
         );
 
         string[] messageTypes = ["Request", "Query", "Command", "Notification"];
         foreach (var messageType in messageTypes)
         {
-            for (int i = 0; i < n; i++)
+            var toGenerate = messageType == manyOfMessageType ? 17 : n;
+            for (int i = 0; i < toGenerate; i++)
             {
                 if (messageType == "Notification")
                 {
@@ -68,6 +74,7 @@ public sealed class ProjectTypeTests
             if (messageType == "Notification")
                 continue;
 
+            var toGenerate = $"Stream{messageType}" == manyOfMessageType ? 17 : n;
             code.AppendLine();
             for (int i = 0; i < n; i++)
             {
@@ -80,7 +87,15 @@ public sealed class ProjectTypeTests
             }
         }
 
-        var inputCompilation = Fixture.CreateLibrary(code.ToString());
+        return code.ToString();
+    }
+
+    [Theory, CombinatorialData]
+    public async Task Test_Project_Sizes([CombinatorialValues(16, 17)] int n, ServiceLifetime serviceLifetime)
+    {
+        var code = GenerateMessagesAndHandlers(n, serviceLifetime);
+
+        var inputCompilation = Fixture.CreateLibrary(code);
 
         await inputCompilation
             .AssertAndVerify(
@@ -107,6 +122,37 @@ public sealed class ProjectTypeTests
                     Assert.True(model.HasNotifications);
                 }
             )
-            .UseParameters(n);
+            .UseParameters(n, serviceLifetime);
+    }
+
+    [Theory, CombinatorialData]
+    public async Task Test_Project_Size_Uneven(
+        [CombinatorialValues(
+            "Request",
+            "Query",
+            "Command",
+            "Notification",
+            "StreamRequest",
+            "StreamQuery",
+            "StreamCommand"
+        )]
+            string manyOfMessageType,
+        ServiceLifetime serviceLifetime
+    )
+    {
+        var code = GenerateMessagesAndHandlers(1, serviceLifetime, manyOfMessageType);
+
+        var inputCompilation = Fixture.CreateLibrary(code);
+
+        await inputCompilation
+            .AssertAndVerify(
+                Assertions.CompilesWithoutDiagnostics,
+                result =>
+                {
+                    var model = result.Generator.CompilationModel;
+                    Assert.NotNull(model);
+                }
+            )
+            .UseParameters(manyOfMessageType, serviceLifetime);
     }
 }
