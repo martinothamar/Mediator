@@ -111,7 +111,7 @@ jobs:
       uses: nuget/setup-nuget@v2
 
     - name: Restore Packages
-      run: nuget restore Console.sln
+      run: msbuild Console.sln -t:Restore
 
     - name: Build solution
       run: msbuild Console.sln -t:Rebuild
