@@ -1,14 +1,17 @@
 ﻿{
   Diagnostics: [
     {
-      Id: MSG0005,
-      Title: MediatorGenerator message warning,
+      Message: MediatorGenerator found message without any registered handler: Some.Nested.Types.Program.Ping,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (0,0)-(0,0),
-      MessageFormat: MediatorGenerator found message without any registered handler: {0},
-      Message: MediatorGenerator found message without any registered handler: Some.Nested.Types.Program.Ping,
-      Category: MediatorGenerator
+      Descriptor: {
+        Id: MSG0005,
+        Title: MediatorGenerator message warning,
+        MessageFormat: MediatorGenerator found message without any registered handler: {0},
+        Category: MediatorGenerator,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

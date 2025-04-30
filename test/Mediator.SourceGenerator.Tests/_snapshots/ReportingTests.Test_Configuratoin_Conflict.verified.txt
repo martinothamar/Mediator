@@ -1,14 +1,16 @@
 ﻿{
   Diagnostics: [
     {
-      Id: MSG0006,
-      Title: MediatorGenerator configuration error,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (0,0)-(0,0),
-      MessageFormat: MediatorGenerator found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.,
       Message: MediatorGenerator found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.,
-      Category: MediatorGenerator
+      Severity: Error,
+      Descriptor: {
+        Id: MSG0006,
+        Title: MediatorGenerator configuration error,
+        MessageFormat: MediatorGenerator found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.,
+        Category: MediatorGenerator,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

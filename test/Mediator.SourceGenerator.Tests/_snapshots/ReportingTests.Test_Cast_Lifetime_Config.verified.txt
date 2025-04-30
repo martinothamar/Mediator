@@ -1,14 +1,16 @@
 ﻿{
   Diagnostics: [
     {
-      Id: MSG0007,
-      Title: MediatorGenerator configuration error,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (0,0)-(0,0),
-      MessageFormat: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
       Message: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
-      Category: MediatorGenerator
+      Severity: Error,
+      Descriptor: {
+        Id: MSG0007,
+        Title: MediatorGenerator configuration error,
+        MessageFormat: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
+        Category: MediatorGenerator,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }
