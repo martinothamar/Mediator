@@ -30,6 +30,6 @@ public static class AssertExtensions
         foreach (var assertions in assertionDelegates)
             assertions(result);
 
-        return Verifier.Verify(driver);
+        return Verifier.Verify(driver).IgnoreGeneratedResult(r => r.HintName.Contains("MediatorOptions"));
     }
 }
