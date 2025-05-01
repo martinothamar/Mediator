@@ -1,6 +1,13 @@
 ﻿{
   Diagnostics: [
     {
+      Location: /*
+
+public readonly struct PingHandler : IRequestHandler<Ping, Pong>
+                       ^^^^^^^^^^^
+{
+*/
+ : (27,23)-(27,34),
       Message: MediatorGenerator found invalid handler type PingHandler,
       Severity: Warning,
       WarningLevel: 1,
@@ -14,6 +21,13 @@
       }
     },
     {
+      Location: /*
+
+public sealed record Ping(Guid Id) : IRequest<Pong>;
+                     ^^^^
+
+*/
+ : (23,21)-(23,25),
       Message: MediatorGenerator found message without any registered handler: Ping,
       Severity: Warning,
       WarningLevel: 1,

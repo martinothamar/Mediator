@@ -1,24 +1,38 @@
 ﻿{
   Diagnostics: [
     {
-      Message: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
+      Location: /*
+    {
+        private static string MediatorNamespace { get; }
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        private static ServiceLifetime Lifetime { get; }
+*/
+ : (10,8)-(10,56),
+      Message: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. Failed to resolve namespace configuration,
       Severity: Error,
       Descriptor: {
         Id: MSG0007,
         Title: MediatorGenerator configuration error,
-        MessageFormat: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
+        MessageFormat: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. {0},
         Category: MediatorGenerator,
         DefaultSeverity: Error,
         IsEnabledByDefault: true
       }
     },
     {
-      Message: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
+      Location: /*
+            {
+                options.Namespace = MediatorNamespace;
+                                    ^^^^^^^^^^^^^^^^^
+                options.ServiceLifetime = Lifetime;
+*/
+ : (19,36)-(19,53),
+      Message: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. Could not resolve namespace configuration,
       Severity: Error,
       Descriptor: {
         Id: MSG0007,
         Title: MediatorGenerator configuration error,
-        MessageFormat: MediatorGenerator cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.,
+        MessageFormat: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. {0},
         Category: MediatorGenerator,
         DefaultSeverity: Error,
         IsEnabledByDefault: true

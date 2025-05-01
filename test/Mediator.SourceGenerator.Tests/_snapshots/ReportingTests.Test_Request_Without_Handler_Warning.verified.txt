@@ -1,6 +1,13 @@
 ﻿{
   Diagnostics: [
     {
+      Location: /*
+
+        public sealed record Ping(Guid Id) : IRequest<Pong>;
+                             ^^^^
+
+*/
+ : (30,29)-(30,33),
       Message: MediatorGenerator found message without any registered handler: Some.Nested.Types.Program.Ping,
       Severity: Warning,
       WarningLevel: 1,

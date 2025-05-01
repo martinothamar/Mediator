@@ -1,6 +1,13 @@
 ﻿{
   Diagnostics: [
     {
+      Location: /*
+
+public sealed class DuplicatePingHandler : IRequestHandler<Ping, Pong>
+                    ^^^^^^^^^^^^^^^^^^^^
+{
+*/
+ : (35,20)-(35,40),
       Message: MediatorGenerator found multiple handlers of message type DuplicatePingHandler,
       Severity: Warning,
       WarningLevel: 1,
@@ -14,6 +21,13 @@
       }
     },
     {
+      Location: /*
+
+public readonly struct StructPingHandler : IRequestHandler<Ping, Pong>
+                       ^^^^^^^^^^^^^^^^^
+{
+*/
+ : (43,23)-(43,40),
       Message: MediatorGenerator found invalid handler type StructPingHandler,
       Severity: Warning,
       WarningLevel: 1,

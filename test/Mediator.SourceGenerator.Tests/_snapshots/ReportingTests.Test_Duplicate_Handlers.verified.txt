@@ -1,6 +1,13 @@
 ﻿{
   Diagnostics: [
     {
+      Location: /*
+
+public sealed class DuplicatePingHandler : IRequestHandler<Ping, Pong>
+                    ^^^^^^^^^^^^^^^^^^^^
+{
+*/
+ : (35,20)-(35,40),
       Message: MediatorGenerator found multiple handlers of message type DuplicatePingHandler,
       Severity: Warning,
       WarningLevel: 1,
