@@ -287,7 +287,7 @@ services.AddMediator((MediatorOptions options) =>
   * `Scoped`    - mediator and handlers registered as scoped
 * `NotificationPublisherType` - the type used for publishing notifications (`ForeachAwaitPublisher` and `TaskWhenAllPublisher` are built in)
 * `PipelineBehaviors`/`StreamPipelineBehaviors` - ordered array of types used for the pipeline
-  * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT
+  * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT. You can also manually add pipeline behaviors to the DI container if you are not doing AoT compilation.
 
 Singleton lifetime is highly recommended as it yields the best performance.
 Every application is different, but it is likely that a lot of your message handlers doesn't keep state and have no need for transient or scoped lifetime.
