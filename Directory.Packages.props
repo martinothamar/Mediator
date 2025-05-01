@@ -10,7 +10,7 @@
 
     <!-- Other libs -->
     <PackageVersion Include="MediatR" Version="12.5.0" />
-    <PackageVersion Include="PolySharp" Version="1.14.1" />
+    <PackageVersion Include="PolySharp" Version="1.15.0" />
 
     <!-- BCL -->
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(DotNetVersion)" />

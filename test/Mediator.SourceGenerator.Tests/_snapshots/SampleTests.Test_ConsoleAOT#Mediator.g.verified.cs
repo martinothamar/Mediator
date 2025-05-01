@@ -64,9 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register pipeline behaviors configured through options
             services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::GenericLoggerHandler<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
 
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));

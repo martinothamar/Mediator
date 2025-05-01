@@ -58,15 +58,20 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers for request messages
-            services.TryAdd(new SD(typeof(global::TestCode.PingHandler), typeof(global::TestCode.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::TestCode.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::TestCode.RequestHandler), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::TestCode.RequestHandler), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register pipeline behaviors configured through options
-            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::TestCode.GenericLoggerHandler<global::TestCode.Ping, global::TestCode.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
-            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Ping, global::TestCode.Pong>), typeof(global::TestCode.PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.GenericBehavior<global::TestCode.Request, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.GenericRequestBehavior<global::TestCode.Request, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.ConcreteBehavior), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IStreamPipelineBehavior<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.StreamGenericBehavior<global::TestCode.StreamRequest, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IStreamPipelineBehavior<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.StreamGenericRequestBehavior<global::TestCode.StreamRequest, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IStreamPipelineBehavior<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.StreamConcreteBehavior), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -678,7 +683,9 @@ namespace Mediator.Internals
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong> Wrapper_For_TestCode_Ping;
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response> Wrapper_For_TestCode_Request;
+
+        public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response> Wrapper_For_TestCode_StreamRequest;
 
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
@@ -691,14 +698,15 @@ namespace Mediator.Internals
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
-            requestHandlerTypes.Add(typeof(global::TestCode.Ping), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>>().Init(this, sp));
+            requestHandlerTypes.Add(typeof(global::TestCode.Request), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>>().Init(this, sp));
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
 
-            var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var streamCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var streamQueryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            streamRequestHandlerTypes.Add(typeof(global::TestCode.StreamRequest), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>>().Init(this, sp));
             StreamRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamRequestHandlerTypes);
             StreamCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamCommandHandlerTypes);
             StreamQueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamQueryHandlerTypes);
@@ -706,7 +714,9 @@ namespace Mediator.Internals
             var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
-            Wrapper_For_TestCode_Ping = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Ping, global::TestCode.Pong>>().Init(this, sp);
+            Wrapper_For_TestCode_Request = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>>().Init(this, sp);
+
+            Wrapper_For_TestCode_StreamRequest = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>>().Init(this, sp);
         }
     }
 }
@@ -761,7 +771,7 @@ namespace Mediator
         /// <summary>
         /// The total number of Mediator messages that were discovered.
         /// </summary>
-        public const int TotalMessages = 1;
+        public const int TotalMessages = 2;
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -837,17 +847,31 @@ namespace Mediator
 
 
         /// <summary>
-        /// Send a request of type global::TestCode.Ping.
+        /// Send a request of type global::TestCode.Request.
         /// </summary>
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<global::TestCode.Pong> Send(
-            global::TestCode.Ping request,
+        public global::System.Threading.Tasks.ValueTask<global::TestCode.Response> Send(
+            global::TestCode.Request request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            return _containerMetadata.Value.Wrapper_For_TestCode_Ping.Handle(request, cancellationToken);
+            return _containerMetadata.Value.Wrapper_For_TestCode_Request.Handle(request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create a stream from request type global::TestCode.StreamRequest.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<global::TestCode.Response> CreateStream(
+            global::TestCode.StreamRequest request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            return _containerMetadata.Value.Wrapper_For_TestCode_StreamRequest.Handle(request, cancellationToken);
         }
 
         /// <summary>
@@ -866,12 +890,12 @@ namespace Mediator
         {
             switch (request)
             {
-                case global::TestCode.Ping r:
+                case global::TestCode.Request r:
                 {
-                    if (typeof(TResponse) == typeof(global::TestCode.Pong))
+                    if (typeof(TResponse) == typeof(global::TestCode.Response))
                     {
                         var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::TestCode.Pong>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::TestCode.Response>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
                     }
                     return SendAsync(request, cancellationToken);
                 }
@@ -890,10 +914,10 @@ namespace Mediator
         {
             switch (request)
             {
-                case global::TestCode.Ping r:
+                case global::TestCode.Request r:
                 {
                     var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::TestCode.Pong, TResponse>(ref response);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<global::TestCode.Response, TResponse>(ref response);
                 }
                 default:
                 {
@@ -917,8 +941,19 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowInvalidStreamRequest(request, nameof(request));
-            return default!;
+            switch (request)
+            {
+                case global::TestCode.StreamRequest r:
+                {
+                    var task = CreateStream(r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::TestCode.Response>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
+                }
+                default:
+                {
+                    ThrowInvalidStreamRequest(request, nameof(request));
+                    return default!;
+                }
+            }
         }
 
         /// <summary>
@@ -1030,7 +1065,7 @@ namespace Mediator
                 case global::Mediator.IBaseRequest request:
                     switch (request)
                     {
-                        case global::TestCode.Ping r: return await Send(r, cancellationToken);
+                        case global::TestCode.Request r: return await Send(r, cancellationToken);
                         default:
                         {
                             ThrowInvalidRequest(request, nameof(request));
@@ -1075,8 +1110,52 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowInvalidStreamMessage(message, nameof(message));
-            return default!;
+            switch (message)
+            {
+                case global::Mediator.IBaseStreamRequest request:
+                    switch (request)
+                    {
+                        case global::TestCode.StreamRequest m:
+                        {
+                            var value = CreateStream(m, cancellationToken);
+                            return AsyncWrapper(value);
+                        }
+                        default:
+                        {
+                            ThrowInvalidStreamMessage(message, nameof(message));
+                            return default!;
+                        }
+                    }
+                case global::Mediator.IBaseStreamCommand command:
+                    switch (command)
+                    {
+                        default:
+                        {
+                            ThrowInvalidStreamMessage(message, nameof(message));
+                            return default!;
+                        }
+                    }
+                case global::Mediator.IBaseStreamQuery query:
+                    switch (query)
+                    {
+                        default:
+                        {
+                            ThrowInvalidStreamMessage(message, nameof(message));
+                            return default!;
+                        }
+                    }
+                default:
+                    ThrowInvalidStreamMessage(message, nameof(message));
+                    return default!;
+            }
+
+            static async global::System.Collections.Generic.IAsyncEnumerable<object?> AsyncWrapper<T>(global::System.Collections.Generic.IAsyncEnumerable<T> wrapped, [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default) where T : struct
+            {
+                await foreach (var value in global::System.Threading.Tasks.TaskAsyncEnumerableExtensions.WithCancellation(wrapped, cancellationToken))
+                {
+                    yield return value;
+                }
+            }
         }
 
         /// <summary>

@@ -125,6 +125,8 @@ public sealed class ConfigurationTests
             using System;
             using System.Threading;
             using System.Threading.Tasks;
+            using System.Collections.Generic;
+            using System.Runtime.CompilerServices;
             using Mediator;
             using Microsoft.Extensions.DependencyInjection;
 
@@ -140,59 +142,121 @@ public sealed class ConfigurationTests
                     {
                         options.PipelineBehaviors =
                         [
-                            typeof(GenericLoggerHandler<,>),
-                            typeof(PingValidator),
+                            typeof(GenericBehavior<,>),
+                            typeof(GenericRequestBehavior<,>),
+                            typeof(GenericQueryBehavior<,>),
+                            typeof(ConcreteBehavior),
+                        ];
+                        options.StreamPipelineBehaviors =
+                        [
+                            typeof(StreamGenericBehavior<,>),
+                            typeof(StreamGenericRequestBehavior<,>),
+                            typeof(StreamGenericQueryBehavior<,>),
+                            typeof(StreamConcreteBehavior),
                         ];
                     });
                 }
             }
 
-            public readonly record struct Ping(Guid Id) : IRequest<Pong>;
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
 
-            public readonly record struct Pong(Guid Id);
+            public readonly record struct Response(Guid Id);
 
-            public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+            public readonly record struct StreamRequest(Guid Id) : IStreamRequest<Response>;
+
+            public sealed class GenericBehavior<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
                 where TMessage : IMessage
             {
-                public async ValueTask<TResponse> Handle(
+                public ValueTask<TResponse> Handle(
                     TMessage message,
                     MessageHandlerDelegate<TMessage, TResponse> next,
                     CancellationToken cancellationToken
-                )
-                {
-                    try
-                    {
-                        var response = await next(message, cancellationToken);
-                        return response;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                        throw;
-                    }
-                }
+                ) => next(message, cancellationToken);
             }
 
-            public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
+            public sealed class StreamGenericBehavior<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
+                where TMessage : IStreamMessage
             {
-                public ValueTask<Pong> Handle(
-                    Ping request,
-                    MessageHandlerDelegate<Ping, Pong> next,
+                public IAsyncEnumerable<TResponse> Handle(
+                    TMessage message,
+                    StreamHandlerDelegate<TMessage, TResponse> next,
                     CancellationToken cancellationToken
-                )
-                {
-                    if (request.Id == default)
-                        throw new ArgumentException("Invalid input");
-
-                    return next(request, cancellationToken);
-                }
+                ) => next(message, cancellationToken);
             }
 
-            public sealed class PingHandler : IRequestHandler<Ping, Pong>
+            public sealed class GenericRequestBehavior<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+                where TMessage : IRequest<TResponse>
             {
-                public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken)
+                public ValueTask<TResponse> Handle(
+                    TMessage message,
+                    MessageHandlerDelegate<TMessage, TResponse> next,
+                    CancellationToken cancellationToken
+                ) => next(message, cancellationToken);
+            }
+
+            public sealed class StreamGenericRequestBehavior<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
+                where TMessage : IStreamRequest<TResponse>
+            {
+                public IAsyncEnumerable<TResponse> Handle(
+                    TMessage message,
+                    StreamHandlerDelegate<TMessage, TResponse> next,
+                    CancellationToken cancellationToken
+                ) => next(message, cancellationToken);
+            }
+
+            public sealed class GenericQueryBehavior<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+                where TMessage : IQuery<TResponse>
+            {
+                public ValueTask<TResponse> Handle(
+                    TMessage message,
+                    MessageHandlerDelegate<TMessage, TResponse> next,
+                    CancellationToken cancellationToken
+                ) => next(message, cancellationToken);
+            }
+
+            public sealed class StreamGenericQueryBehavior<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
+                where TMessage : IStreamQuery<TResponse>
+            {
+                public IAsyncEnumerable<TResponse> Handle(
+                    TMessage message,
+                    StreamHandlerDelegate<TMessage, TResponse> next,
+                    CancellationToken cancellationToken
+                ) => next(message, cancellationToken);
+            }
+
+            public sealed class ConcreteBehavior : IPipelineBehavior<Request, Response>
+            {
+                public ValueTask<Response> Handle(
+                    Request request,
+                    MessageHandlerDelegate<Request, Response> next,
+                    CancellationToken cancellationToken
+                ) => next(request, cancellationToken);
+            }
+
+            public sealed class StreamConcreteBehavior : IStreamPipelineBehavior<StreamRequest, Response>
+            {
+                public IAsyncEnumerable<Response> Handle(
+                    StreamRequest request,
+                    StreamHandlerDelegate<StreamRequest, Response> next,
+                    CancellationToken cancellationToken
+                ) => next(request, cancellationToken);
+            }
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>, IStreamRequestHandler<StreamRequest, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+
+                public async IAsyncEnumerable<Response> Handle(
+                    StreamRequest request,
+                    [EnumeratorCancellation] CancellationToken cancellationToken
+                )
                 {
-                    return new ValueTask<Pong>(new Pong(request.Id));
+                    for (var i = 0; i < 3; i++)
+                    {
+                        await Task.Delay(10, cancellationToken);
+                        yield return new Response(request.Id);
+                    }
                 }
             }
             """

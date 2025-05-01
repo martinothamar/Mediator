@@ -99,7 +99,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register pipeline behaviors configured through options
             {{~ for behavior in PipelineBehaviors ~}}
-            {{ behavior.ServiceRegistrationBlock }}
+            {{~ for registration in behavior.ServiceRegistrations ~}}
+            {{ registration }}
+            {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
 

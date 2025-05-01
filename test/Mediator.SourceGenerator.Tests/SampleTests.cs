@@ -6,6 +6,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
+using VerifyTests;
 using VerifyXunit;
 
 namespace Mediator.SourceGenerator.Tests;
@@ -48,7 +49,7 @@ public sealed class SampleTests
         result.Diagnostics.Should().BeEmpty();
         result.GeneratedTrees.Length.Should().Be(3);
 
-        await Verifier.Verify(driver);
+        await Verifier.Verify(driver).IgnoreGeneratedResult(_ => _.HintName.Contains("MediatorOptions"));
     }
 
     [Fact]

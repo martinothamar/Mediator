@@ -1,3 +1,5 @@
+using Mediator.SourceGenerator.Extensions;
+
 namespace Mediator.SourceGenerator;
 
 internal sealed class PipelineBehaviorType : SymbolMetadata<PipelineBehaviorType>
@@ -7,13 +9,12 @@ internal sealed class PipelineBehaviorType : SymbolMetadata<PipelineBehaviorType
 
     public IReadOnlyList<RequestMessage> Messages => _messages;
 
-    public PipelineBehaviorType(INamedTypeSymbol symbol, CompilationAnalyzer analyzer)
+    public PipelineBehaviorType(INamedTypeSymbol symbol, INamedTypeSymbol interfaceSymbol, CompilationAnalyzer analyzer)
         : base(symbol, analyzer)
     {
         InterfaceSymbol = symbol.AllInterfaces.Single(i =>
-            (i.Name == "IPipelineBehavior" || i.Name == "IStreamPipelineBehavior")
-            && i.IsGenericType
-            && i.TypeArguments.Length == 2
+            i.ConstructUnboundGenericType()
+                .Equals(interfaceSymbol.ConstructUnboundGenericType(), SymbolEqualityComparer.Default)
         );
         _messages = new List<RequestMessage>();
     }
@@ -23,9 +24,10 @@ internal sealed class PipelineBehaviorType : SymbolMetadata<PipelineBehaviorType
         if (Symbol.IsGenericType && Symbol.TypeParameters.Length == 2)
         {
             var messageSymbol = message.Symbol;
-            var constraints = Symbol.TypeParameters[0].ConstraintTypes;
+            var responseSymbol = message.ResponseSymbol;
+
             var compilation = Analyzer.Compilation;
-            if (constraints.All(constraint => compilation.HasImplicitConversion(messageSymbol, constraint)))
+            if (Symbol.SatisfiesConstraints([messageSymbol, responseSymbol], compilation))
             {
                 _messages.Add(message);
             }
