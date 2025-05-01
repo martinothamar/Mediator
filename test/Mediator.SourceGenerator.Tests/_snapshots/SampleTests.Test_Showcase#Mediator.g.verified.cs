@@ -76,6 +76,10 @@ namespace Microsoft.Extensions.DependencyInjection
             // Register open generic handlers
             services.Add(new SD(typeof(global::Mediator.INotificationHandler<>), typeof(global::GenericNotificationHandler<>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register pipeline behaviors configured through options
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::ErrorLoggerHandler<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::FireAndForgetNotificationPublisher), typeof(global::FireAndForgetNotificationPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::FireAndForgetNotificationPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
