@@ -146,6 +146,8 @@ public sealed class ConfigurationTests
                             typeof(GenericRequestBehavior<,>),
                             typeof(GenericQueryBehavior<,>),
                             typeof(ConcreteBehavior),
+                            typeof(GenericExceptionHandler<,>),
+                            typeof(GenericPreProcessor<,>),
                         ];
                         options.StreamPipelineBehaviors =
                         [
@@ -172,6 +174,26 @@ public sealed class ConfigurationTests
                     MessageHandlerDelegate<TMessage, TResponse> next,
                     CancellationToken cancellationToken
                 ) => next(message, cancellationToken);
+            }
+
+            public sealed class GenericPreProcessor<TMessage, TResponse> : MessagePreProcessor<TMessage, TResponse>
+                where TMessage : IMessage
+            {
+                protected override ValueTask Handle(TMessage message, CancellationToken cancellationToken) =>
+                    default;
+            }
+
+            public sealed class GenericExceptionHandler<TMessage, TResponse> : MessageExceptionHandler<TMessage, TResponse>
+                where TMessage : IMessage
+            {
+                protected override ValueTask<ExceptionHandlingResult<TResponse>> Handle(
+                    TMessage message,
+                    Exception exception,
+                    CancellationToken cancellationToken
+                )
+                {
+                    return NotHandled;
+                }
             }
 
             public sealed class StreamGenericBehavior<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
@@ -270,5 +292,92 @@ public sealed class ConfigurationTests
                 Assert.NotNull(model);
             }
         );
+    }
+
+    [Fact]
+    public async Task Test_PipelineBehaviors_Invalid_Types()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using System.Collections.Generic;
+            using System.Runtime.CompilerServices;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.PipelineBehaviors =
+                        [
+                            typeof(GenericBehavior<,>),
+                            typeof(object),
+                        ];
+                        options.StreamPipelineBehaviors =
+                        [
+                            typeof(StreamGenericBehavior<,>),
+                            typeof(object),
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public readonly record struct StreamRequest(Guid Id) : IStreamRequest<Response>;
+
+            public sealed class GenericBehavior<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
+                where TMessage : IMessage
+            {
+                public ValueTask<TResponse> Handle(
+                    TMessage message,
+                    MessageHandlerDelegate<TMessage, TResponse> next,
+                    CancellationToken cancellationToken
+                ) => next(message, cancellationToken);
+            }
+
+
+            public sealed class StreamGenericBehavior<TMessage, TResponse> : IStreamPipelineBehavior<TMessage, TResponse>
+                where TMessage : IStreamMessage
+            {
+                public IAsyncEnumerable<TResponse> Handle(
+                    TMessage message,
+                    StreamHandlerDelegate<TMessage, TResponse> next,
+                    CancellationToken cancellationToken
+                ) => next(message, cancellationToken);
+            }
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>, IStreamRequestHandler<StreamRequest, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+
+                public async IAsyncEnumerable<Response> Handle(
+                    StreamRequest request,
+                    [EnumeratorCancellation] CancellationToken cancellationToken
+                )
+                {
+                    for (var i = 0; i < 3; i++)
+                    {
+                        await Task.Delay(10, cancellationToken);
+                        yield return new Response(request.Id);
+                    }
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify();
     }
 }

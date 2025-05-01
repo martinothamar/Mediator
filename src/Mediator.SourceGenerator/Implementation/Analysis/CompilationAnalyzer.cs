@@ -909,7 +909,7 @@ internal sealed class CompilationAnalyzer
                             (in CompilationAnalyzerContext c, Location l) =>
                                 c.ReportInvalidCodeBasedConfiguration(l, "Expected statement expression")
                         );
-                        break;
+                        continue;
                     }
                     if (statementExpression.Expression is not AssignmentExpressionSyntax assignment)
                     {
@@ -918,10 +918,10 @@ internal sealed class CompilationAnalyzer
                             (in CompilationAnalyzerContext c, Location l) =>
                                 c.ReportInvalidCodeBasedConfiguration(l, "Expected assignment expression")
                         );
-                        break;
+                        continue;
                     }
                     if (!ProcessAddMediatorAssignmentStatement(assignment, semanticModel, cancellationToken))
-                        break;
+                        continue;
                 }
             }
             else
@@ -1182,9 +1182,12 @@ internal sealed class CompilationAnalyzer
                 var typeInfo = semanticModel.GetTypeInfo(typeOfExpression.Type, cancellationToken);
                 if (typeInfo.Type is not INamedTypeSymbol pipelineTypeSymbol)
                 {
-                    // TODO: fix diagnostics
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
-                    return false;
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, $"Could not resolve type: {typeOfExpression.Type}")
+                    );
+                    continue;
                 }
                 pipelineTypeSymbol = pipelineTypeSymbol.OriginalDefinition;
 
@@ -1199,14 +1202,28 @@ internal sealed class CompilationAnalyzer
                     )
                 )
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
-                    return false;
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                $"The type '{typeOfExpression.Type}' does not implement '{interfaceName}'"
+                            )
+                    );
+                    continue;
                 }
 
                 if (!pipelineBehaviorTypeSymbols.Add(pipelineTypeSymbol))
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
-                    return false;
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                $"The type '{typeOfExpression.Type}' is duplicated in the pipeline configuration"
+                            )
+                    );
+                    continue;
                 }
 
                 var pipelineBehaviorType = new PipelineBehaviorType(pipelineTypeSymbol, interfaceSymbol, this);
