@@ -1,6 +1,13 @@
 ﻿{
   Diagnostics: [
     {
+      Location: /*
+
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Transient)]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (6,11)-(6,109),
       Message: MediatorGenerator found conflicting configuration - both MediatorOptions and MediatorOptionsAttribute configuration are being used.,
       Severity: Error,
       Descriptor: {

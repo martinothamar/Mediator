@@ -834,7 +834,11 @@ internal sealed class CompilationAnalyzer
                     and not ParenthesizedLambdaExpressionSyntax
             )
             {
-                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic(
+                    lifetimeArgument.Expression.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected lambda expression")
+                );
                 continue;
             }
 
@@ -875,12 +879,20 @@ internal sealed class CompilationAnalyzer
                 {
                     if (statement is not ExpressionStatementSyntax statementExpression)
                     {
-                        ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                        ReportDiagnostic(
+                            statement.GetLocation(),
+                            (in CompilationAnalyzerContext c, Location l) =>
+                                c.ReportInvalidCodeBasedConfiguration(l, "Expected statement expression")
+                        );
                         break;
                     }
                     if (statementExpression.Expression is not AssignmentExpressionSyntax assignment)
                     {
-                        ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                        ReportDiagnostic(
+                            statementExpression.Expression.GetLocation(),
+                            (in CompilationAnalyzerContext c, Location l) =>
+                                c.ReportInvalidCodeBasedConfiguration(l, "Expected assignment expression")
+                        );
                         break;
                     }
                     if (!ProcessAddMediatorAssignmentStatement(assignment, semanticModel, cancellationToken))
@@ -889,7 +901,11 @@ internal sealed class CompilationAnalyzer
             }
             else
             {
-                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic(
+                    body.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected block or simple assignment")
+                );
             }
         }
     }
@@ -902,20 +918,20 @@ internal sealed class CompilationAnalyzer
     {
         var compilation = _context.Compilation;
 
+        var syntaxReference = optionsAttr.ApplicationSyntaxReference;
+        var optionsAttrSyntax = optionsAttr.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
+        if (syntaxReference is null || optionsAttrSyntax is null || optionsAttrSyntax.ArgumentList is null)
+            return;
+
         if (configuredByAddMediator)
         {
-            ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportConflictingConfiguration());
+            ReportDiagnostic(
+                optionsAttrSyntax.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) => c.ReportConflictingConfiguration(l)
+            );
         }
 
-        var syntaxReference = optionsAttr.ApplicationSyntaxReference;
-        if (syntaxReference is null)
-            return;
-
         var semanticModel = compilation.GetSemanticModel(syntaxReference.SyntaxTree);
-
-        var optionsAttrSyntax = optionsAttr.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
-        if (optionsAttrSyntax is null || optionsAttrSyntax.ArgumentList is null)
-            return;
 
         foreach (var attrArg in optionsAttrSyntax.ArgumentList.Arguments)
         {
@@ -944,25 +960,50 @@ internal sealed class CompilationAnalyzer
             {
                 if (attrArg.Expression is not TypeOfExpressionSyntax identifier)
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Must provide a typeof expression to 'NotificationPublisherType' configuration"
+                            )
+                    );
                     return;
                 }
                 var typeSymbol = semanticModel.GetTypeInfo(identifier.Type, cancellationToken).Type;
                 if (typeSymbol is null)
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        identifier.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, $"Could not resolve type: {identifier.Type}")
+                    );
                     return;
                 }
 
                 if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        identifier.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Type configuration for NotificationPublisherType must be a named type"
+                            )
+                    );
                     return;
                 }
 
                 if (!Context.Compilation.HasImplicitConversion(namedTypeSymbol, _notificationPublisherInterfaceSymbol))
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        identifier.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "The type provided for NotificationPublisherType must implement the INotificationPublisher interface"
+                            )
+                    );
                     return;
                 }
 
@@ -996,13 +1037,24 @@ internal sealed class CompilationAnalyzer
                 }
                 else
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        assignment.Right.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, "Could not resolve namespace configuration")
+                    );
                     return false;
                 }
             }
             else
             {
-                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "Expected literal or identifier in namespace configuration"
+                        )
+                );
                 return false;
             }
         }
@@ -1023,7 +1075,11 @@ internal sealed class CompilationAnalyzer
             }
             else
             {
-                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Could not resolve lifetime configuration")
+                );
                 return false;
             }
         }
@@ -1034,20 +1090,41 @@ internal sealed class CompilationAnalyzer
                 var typeSymbol = semanticModel.GetTypeInfo(identifier.Type, cancellationToken).Type;
                 if (typeSymbol is null)
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        identifier.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                $"Could not resolve type for NotificationPublisherType: {identifier.Type}"
+                            )
+                    );
                     return false;
                 }
 
                 if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        identifier.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Type configuration for NotificationPublisherType must be a named type"
+                            )
+                    );
                     return false;
                 }
 
                 // Check if namedTypeSymbol is assignable to handler
                 if (!Context.Compilation.HasImplicitConversion(namedTypeSymbol, _notificationPublisherInterfaceSymbol))
                 {
-                    ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                    ReportDiagnostic(
+                        identifier.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "The type provided for NotificationPublisherType must implement the INotificationPublisher interface"
+                            )
+                    );
                     return false;
                 }
 
@@ -1055,13 +1132,24 @@ internal sealed class CompilationAnalyzer
             }
             else
             {
-                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "NotificationPublisherType must be configured with a typeof expression"
+                        )
+                );
                 return false;
             }
         }
         else
         {
-            ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+            ReportDiagnostic(
+                assignment.Left.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) =>
+                    c.ReportInvalidCodeBasedConfiguration(l, $"Unrecognized option: {opt}")
+            );
             return false;
         }
 
@@ -1110,7 +1198,11 @@ internal sealed class CompilationAnalyzer
 
             if (initializerExpression is null)
             {
-                ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+                ReportDiagnostic(
+                    syntaxNode.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Failed to resolve namespace configuration")
+                );
                 return null;
             }
 
@@ -1184,7 +1276,11 @@ internal sealed class CompilationAnalyzer
 
         if (initializerExpression is null)
         {
-            ReportDiagnostic((in CompilationAnalyzerContext c) => c.ReportInvalidCodeBasedConfiguration());
+            ReportDiagnostic(
+                syntaxNode.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) =>
+                    c.ReportInvalidCodeBasedConfiguration(l, "Failed to resolve lifetime configuration")
+            );
             return null;
         }
 

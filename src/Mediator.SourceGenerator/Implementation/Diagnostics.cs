@@ -85,7 +85,8 @@ public static class Diagnostics
         InvalidCodeBasedConfiguration = new DiagnosticDescriptor(
             GetNextId(),
             $"{nameof(MediatorGenerator)} configuration error",
-            $"{nameof(MediatorGenerator)} cannot parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration.",
+            $"{nameof(MediatorGenerator)} could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration."
+                + " {0}",
             nameof(MediatorGenerator),
             DiagnosticSeverity.Error,
             isEnabledByDefault: true
@@ -113,28 +114,33 @@ public static class Diagnostics
     private static Diagnostic Report<T>(
         this CompilationAnalyzerContext context,
         DiagnosticDescriptor diagnosticDescriptor,
-        T arg
+        T arg,
+        Location? location = null
     )
         where T : class
     {
         Diagnostic diagnostic;
         if (arg is ISymbol symbolArg)
         {
-            var location = symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
+            location ??= symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
             var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-            diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, symbolName);
+            diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, symbolName);
         }
         else
         {
-            diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None, arg);
+            diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, arg);
         }
         context.ReportDiagnostic(diagnostic);
         return diagnostic;
     }
 
-    private static Diagnostic Report(this CompilationAnalyzerContext context, DiagnosticDescriptor diagnosticDescriptor)
+    private static Diagnostic Report(
+        this CompilationAnalyzerContext context,
+        DiagnosticDescriptor diagnosticDescriptor,
+        Location? location = null
+    )
     {
-        var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
+        var diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None);
         context.ReportDiagnostic(diagnostic);
         return diagnostic;
     }
@@ -195,13 +201,18 @@ public static class Diagnostics
 
     public static readonly DiagnosticDescriptor ConflictingConfiguration;
 
-    internal static Diagnostic ReportConflictingConfiguration(this CompilationAnalyzerContext context) =>
-        context.Report(ConflictingConfiguration);
+    internal static Diagnostic ReportConflictingConfiguration(
+        this CompilationAnalyzerContext context,
+        Location location
+    ) => context.Report(ConflictingConfiguration, location);
 
     public static readonly DiagnosticDescriptor InvalidCodeBasedConfiguration;
 
-    internal static Diagnostic ReportInvalidCodeBasedConfiguration(this CompilationAnalyzerContext context) =>
-        context.Report(InvalidCodeBasedConfiguration);
+    internal static Diagnostic ReportInvalidCodeBasedConfiguration(
+        this CompilationAnalyzerContext context,
+        Location location,
+        string message
+    ) => context.Report(InvalidCodeBasedConfiguration, message, location);
 
     public static readonly DiagnosticDescriptor RequiredSymbolNotFound;
 
