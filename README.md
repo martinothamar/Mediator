@@ -189,6 +189,7 @@ public sealed class MessageValidatorBehaviour<TMessage, TResponse> : MessagePreP
 }
 
 // Register as IPipelineBehavior<,> in either case
+// NOTE: for NativeAOT, you should use the pipeline configuration on `MediatorOptions` instead (during `AddMediator`)
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(MessageValidatorBehaviour<,>))
 ```
 
@@ -267,12 +268,16 @@ There are two ways to configure Mediator. Configuration values are needed during
 services.AddMediator((MediatorOptions options) =>
 {
     options.Namespace = "SimpleConsole.Mediator";
-    options.ServiceLifetime = ServiceLifetime.Transient;
+    options.ServiceLifetime = ServiceLifetime.Singleton;
+    // Only available from v3:
+    options.NotificationPublisherType = typeof(Mediator.ForeachAwaitPublisher);
+    options.PipelineBehaviors = [];
+    options.StreamPipelineBehaviors = [];
 });
 
 // or
 
-[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Transient)]
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Singleton)]
 ```
 
 * `Namespace` - where the `IMediator` implementation is generated
@@ -280,6 +285,9 @@ services.AddMediator((MediatorOptions options) =>
   * `Singleton` - (default value) everything registered as singletons, minimal allocations
   * `Transient` - mediator and handlers registered as transient
   * `Scoped`    - mediator and handlers registered as scoped
+* `NotificationPublisherType` - the type used for publishing notifications (`ForeachAwaitPublisher` and `TaskWhenAllPublisher` are built in)
+* `PipelineBehaviors`/`StreamPipelineBehaviors` - ordered array of types used for the pipeline
+  * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT
 
 Singleton lifetime is highly recommended as it yields the best performance.
 Every application is different, but it is likely that a lot of your message handlers doesn't keep state and have no need for transient or scoped lifetime.
@@ -356,8 +364,10 @@ The pipeline behavior below validates all incoming `Ping` messages.
 Pipeline behaviors currently must be added manually.
 
 ```csharp
-services.AddMediator();
-services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>();
+services.AddMediator((MediatorOptions options) =>
+{
+    options.PipelineBehaviors = [typeof(PingValidator)];
+});
 
 public sealed class PingValidator : IPipelineBehavior<Ping, Pong>
 {
@@ -379,8 +389,10 @@ It also publishes a notification allowing notification handlers to react to erro
 Message pre- and post-processors along with the exception handlers can also constrain the generic type parameters in the same way.
 
 ```csharp
-services.AddMediator();
-services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggerHandler<,>));
+services.AddMediator((MediatorOptions options) =>
+{
+    options.PipelineBehaviors = [typeof(ErrorLoggerHandler<,>)];
+});
 
 public sealed record ErrorMessage(Exception Exception) : INotification;
 public sealed record SuccessfulMessage() : INotification;
