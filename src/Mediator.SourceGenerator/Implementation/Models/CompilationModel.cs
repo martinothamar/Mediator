@@ -27,6 +27,7 @@ internal sealed record CompilationModel
         NotificationMessages = ImmutableEquatableArray<NotificationMessageModel>.Empty;
         NotificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
         OpenGenericNotificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
+        PipelineBehaviors = ImmutableEquatableArray<PipelineBehaviorModel>.Empty;
 
         IRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         ICommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
@@ -42,6 +43,7 @@ internal sealed record CompilationModel
         ImmutableEquatableArray<NotificationMessageHandlerModel> notificationMessageHandlers,
         ImmutableEquatableArray<RequestMessageHandlerWrapperModel> requestMessageHandlerWrappers,
         NotificationPublisherTypeModel notificationPublisherType,
+        ImmutableEquatableArray<PipelineBehaviorModel> pipelineBehaviors,
         bool hasErrors,
         string mediatorNamespace,
         string generatorVersion,
@@ -67,6 +69,7 @@ internal sealed record CompilationModel
         InternalsNamespace = $"{MediatorNamespace}.Internals";
         TotalMessages = requestMessages.Count + notificationMessages.Count;
         NotificationPublisherType = notificationPublisherType;
+        PipelineBehaviors = pipelineBehaviors;
 
         RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
         NotificationMessages = notificationMessages;
@@ -155,7 +158,6 @@ internal sealed record CompilationModel
     public int TotalMessages { get; }
 
     public NotificationPublisherTypeModel NotificationPublisherType { get; }
-
     public ImmutableEquatableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers { get; }
 
     public ImmutableEquatableArray<RequestMessageModel> RequestMessages { get; }
@@ -165,6 +167,7 @@ internal sealed record CompilationModel
     public ImmutableEquatableArray<NotificationMessageHandlerModel> NotificationMessageHandlers { get; }
 
     public ImmutableEquatableArray<NotificationMessageHandlerModel> OpenGenericNotificationMessageHandlers { get; }
+    public ImmutableEquatableArray<PipelineBehaviorModel> PipelineBehaviors { get; }
 
     public ImmutableEquatableArray<RequestMessageModel> IRequestMessages { get; }
     public ImmutableEquatableArray<RequestMessageModel> ICommandMessages { get; }

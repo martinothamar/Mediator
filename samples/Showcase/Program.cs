@@ -11,11 +11,13 @@ var services = new ServiceCollection();
 services.AddMediator(options =>
 {
     options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
+    options.PipelineBehaviors =
+    [
+        // Ordering of pipeline behavior registrations matter!
+        typeof(ErrorLoggerHandler<,>),
+        typeof(PingValidator),
+    ];
 });
-
-// Ordering of pipeline behavior registrations matter!
-services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggerHandler<,>));
-services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>();
 
 var sp = services.BuildServiceProvider();
 

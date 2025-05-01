@@ -62,6 +62,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), typeof(global::SimpleConsoleAOT.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
+            // Register pipeline behaviors configured through options
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::GenericLoggerHandler<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -832,7 +836,6 @@ namespace SimpleConsoleAOT
 
         /// <summary>
         /// Send a request of type global::Ping.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         /// </summary>
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -842,7 +845,6 @@ namespace SimpleConsoleAOT
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowIfNull(request, nameof(request));
             return _containerMetadata.Value.Wrapper_For_Ping.Handle(request, cancellationToken);
         }
 
