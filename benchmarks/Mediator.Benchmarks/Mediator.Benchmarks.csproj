@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <LangVersion>latest</LangVersion>
@@ -11,12 +10,10 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
     <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <Using Include="BenchmarkDotNet.Attributes" />
     <Using Include="BenchmarkDotNet.Order" />
@@ -29,7 +26,6 @@
     <Using Include="BenchmarkDotNet.Diagnostics.Windows.Configs" />
     <Using Include="BenchmarkDotNet.Diagnostics.dotTrace" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" />
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" />
@@ -38,10 +34,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Buildalyzer.Workspaces" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" OutputItemType="Analyzer" />
+    <ProjectReference
+      Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj"
+      OutputItemType="Analyzer"
+    />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
-
 </Project>

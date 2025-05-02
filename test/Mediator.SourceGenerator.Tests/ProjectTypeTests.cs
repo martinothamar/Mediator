@@ -37,7 +37,7 @@ public sealed class ProjectTypeTests
                     });
                 }
             }
-            
+
             """
         );
 

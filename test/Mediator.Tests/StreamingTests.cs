@@ -165,12 +165,12 @@ public sealed class StreamingTests
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await mediator.CreateStream((IStreamQuery<SomeResponse>)null!).ToListAsync()
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.CreateStream((IStreamQuery<SomeResponse>)null!).ToListAsync()
         );
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.CreateStream(null!).ToListAsync());
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await concrete.CreateStream((SomeStreamingQuery)null!).ToListAsync()
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await concrete.CreateStream((SomeStreamingQuery)null!).ToListAsync()
         );
     }
 
@@ -184,8 +184,7 @@ public sealed class StreamingTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(
-            async () => await mediator.CreateStream(message).ToListAsync()
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(message).ToListAsync()
         );
     }
 
@@ -199,14 +198,14 @@ public sealed class StreamingTests
 
         var query = new SomeStreamingQueryWithoutHandler(id);
 
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await mediator.CreateStream((object)query).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.CreateStream((object)query).ToListAsync()
         );
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await mediator.CreateStream(query).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.CreateStream(query).ToListAsync()
         );
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await concrete.CreateStream(query).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await concrete.CreateStream(query).ToListAsync()
         );
     }
 
@@ -216,12 +215,12 @@ public sealed class StreamingTests
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await mediator.CreateStream((IStreamCommand<SomeResponse>)null!).ToListAsync()
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.CreateStream((IStreamCommand<SomeResponse>)null!).ToListAsync()
         );
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.CreateStream(null!).ToListAsync());
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await concrete.CreateStream((SomeStreamingCommand)null!).ToListAsync()
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await concrete.CreateStream((SomeStreamingCommand)null!).ToListAsync()
         );
     }
 
@@ -235,8 +234,7 @@ public sealed class StreamingTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(
-            async () => await mediator.CreateStream(message).ToListAsync()
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(message).ToListAsync()
         );
     }
 
@@ -250,14 +248,14 @@ public sealed class StreamingTests
 
         var command = new SomeStreamingCommandWithoutHandler(id);
 
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await mediator.CreateStream((object)command).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.CreateStream((object)command).ToListAsync()
         );
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await mediator.CreateStream(command).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.CreateStream(command).ToListAsync()
         );
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await concrete.CreateStream(command).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await concrete.CreateStream(command).ToListAsync()
         );
     }
 
@@ -267,12 +265,12 @@ public sealed class StreamingTests
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await mediator.CreateStream((IStreamRequest<SomeResponse>)null!).ToListAsync()
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.CreateStream((IStreamRequest<SomeResponse>)null!).ToListAsync()
         );
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.CreateStream(null!).ToListAsync());
-        await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await concrete.CreateStream((SomeStreamingRequest)null!).ToListAsync()
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await concrete.CreateStream((SomeStreamingRequest)null!).ToListAsync()
         );
     }
 
@@ -286,8 +284,7 @@ public sealed class StreamingTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(
-            async () => await mediator.CreateStream(message).ToListAsync()
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(message).ToListAsync()
         );
     }
 
@@ -301,14 +298,14 @@ public sealed class StreamingTests
 
         var request = new SomeStreamingRequestWithoutHandler(id);
 
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await mediator.CreateStream((object)request).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.CreateStream((object)request).ToListAsync()
         );
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await mediator.CreateStream(request).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.CreateStream(request).ToListAsync()
         );
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(
-            async () => await concrete.CreateStream(request).ToListAsync()
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await concrete.CreateStream(request).ToListAsync()
         );
     }
 }
