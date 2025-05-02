@@ -1,16 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="System.Runtime.CompilerServices" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" />
     <PackageReference Include="FluentAssertions" />
@@ -38,7 +35,6 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" />
     <PackageReference Include="NuGet.ProjectModel" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="resources\*.cs" />
     <None Include="resources\*.cs">
@@ -49,10 +45,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj" />
     <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
   </ItemGroup>
-
 </Project>

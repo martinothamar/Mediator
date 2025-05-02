@@ -6,19 +6,22 @@
       "version": "3.2.0",
       "commands": [
         "fixie"
-      ]
+      ],
+      "rollForward": false
     },
     "husky": {
       "version": "0.6.3",
       "commands": [
         "husky"
-      ]
+      ],
+      "rollForward": false
     },
     "csharpier": {
-      "version": "0.30.6",
+      "version": "1.0.1",
       "commands": [
-        "dotnet-csharpier"
-      ]
+        "csharpier"
+      ],
+      "rollForward": false
     }
   }
 }

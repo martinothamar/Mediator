@@ -62,8 +62,8 @@ public class NonSyncNotificationHandlerWithExceptionTests
         Assert.NotNull(handler2);
         SomeNonSyncNotificationHandler0.ShouldThrow = true;
         var timestampBefore = Stopwatch.GetTimestamp();
-        var ex = await Assert.ThrowsAsync<AggregateException>(
-            async () => await mediator.Publish(new SomeNonSyncNotification(id))
+        var ex = await Assert.ThrowsAsync<AggregateException>(async () =>
+            await mediator.Publish(new SomeNonSyncNotification(id))
         );
         var timestampAfter = Stopwatch.GetTimestamp();
         Assert.NotNull(ex);
@@ -90,8 +90,8 @@ public class NonSyncNotificationHandlerWithExceptionTests
         Assert.NotNull(handler2);
         SomeNonSyncNotificationHandler1.ShouldThrow = true;
         var timestampBefore = Stopwatch.GetTimestamp();
-        var ex = await Assert.ThrowsAsync<AggregateException>(
-            async () => await mediator.Publish(new SomeNonSyncNotification(id))
+        var ex = await Assert.ThrowsAsync<AggregateException>(async () =>
+            await mediator.Publish(new SomeNonSyncNotification(id))
         );
         var timestampAfter = Stopwatch.GetTimestamp();
         Assert.NotNull(ex);
