@@ -1188,8 +1188,7 @@ internal sealed class CompilationAnalyzer
                         : _streamPipelineBehaviorInterfaceSymbol!;
                 if (
                     !pipelineTypeSymbol.AllInterfaces.Any(i =>
-                        i.ConstructUnboundGenericType()
-                            .Equals(interfaceSymbol.ConstructUnboundGenericType(), _symbolComparer)
+                        i.IsGenericType && i.OriginalDefinition.Equals(interfaceSymbol, _symbolComparer)
                     )
                 )
                 {

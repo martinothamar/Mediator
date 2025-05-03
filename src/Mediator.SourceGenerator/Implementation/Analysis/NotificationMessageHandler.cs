@@ -17,10 +17,9 @@ internal sealed class NotificationMessageHandler : MessageHandler<NotificationMe
     )
         : base(symbol, analyzer)
     {
-        UnconstructedInterfaceSymbol = interfaceSymbol.ConstructUnboundGenericType();
+        UnconstructedInterfaceSymbol = interfaceSymbol;
         InterfaceSymbol = symbol.AllInterfaces.Single(i =>
-            i.IsGenericType
-            && i.ConstructUnboundGenericType().Equals(UnconstructedInterfaceSymbol, SymbolEqualityComparer.Default)
+            i.IsGenericType && i.OriginalDefinition.Equals(UnconstructedInterfaceSymbol, SymbolEqualityComparer.Default)
         );
         _messages = new List<NotificationMessage>();
     }
@@ -40,7 +39,7 @@ internal sealed class NotificationMessageHandler : MessageHandler<NotificationMe
         }
         else
         {
-            var serviceType = UnconstructedInterfaceSymbol.OriginalDefinition.Construct([message.Symbol]);
+            var serviceType = UnconstructedInterfaceSymbol.Construct([message.Symbol]);
             if (Analyzer.Compilation.HasImplicitConversion(Symbol, serviceType))
             {
                 _messages.Add(message);

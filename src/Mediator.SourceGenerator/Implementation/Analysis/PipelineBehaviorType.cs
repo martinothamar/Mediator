@@ -13,9 +13,7 @@ internal sealed class PipelineBehaviorType : SymbolMetadata<PipelineBehaviorType
         : base(symbol, analyzer)
     {
         InterfaceSymbol = symbol.AllInterfaces.Single(i =>
-            i.IsGenericType
-            && i.ConstructUnboundGenericType()
-                .Equals(interfaceSymbol.ConstructUnboundGenericType(), SymbolEqualityComparer.Default)
+            i.IsGenericType && i.OriginalDefinition.Equals(interfaceSymbol, SymbolEqualityComparer.Default)
         );
         _messages = new List<RequestMessage>();
     }
