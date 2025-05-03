@@ -2,7 +2,7 @@
 
 namespace Mediator.SourceGenerator;
 
-internal sealed record RequestMessageHandlerModel
+internal sealed record RequestMessageHandlerModel : SymbolMetadataModel
 {
     public string MessageType { get; }
     public RequestMessageHandlerWrapperModel WrapperType { get; }
@@ -13,6 +13,7 @@ internal sealed record RequestMessageHandlerModel
         CompilationAnalyzer analyzer,
         RequestMessageHandlerWrapperModel wrapperType
     )
+        : base(symbol)
     {
         MessageType = messageType;
         WrapperType = wrapperType;

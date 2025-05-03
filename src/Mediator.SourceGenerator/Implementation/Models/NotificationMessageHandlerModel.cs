@@ -2,9 +2,10 @@
 
 namespace Mediator.SourceGenerator;
 
-internal sealed record NotificationMessageHandlerModel
+internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
 {
     public NotificationMessageHandlerModel(NotificationMessageHandler handler, CompilationAnalyzer analyzer)
+        : base(handler.Symbol)
     {
         ServiceRegistrations = ImmutableEquatableArray<string>.Empty;
         if (handler.Messages.Count > 0)
