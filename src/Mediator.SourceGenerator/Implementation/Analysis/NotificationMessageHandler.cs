@@ -40,13 +40,8 @@ internal sealed class NotificationMessageHandler : MessageHandler<NotificationMe
         }
         else
         {
-            var notificationType = InterfaceSymbol.TypeArguments[0];
             var serviceType = UnconstructedInterfaceSymbol.OriginalDefinition.Construct([message.Symbol]);
-            var compilation = Analyzer.Compilation;
-            if (
-                compilation.HasImplicitConversion(message.Symbol, notificationType)
-                && compilation.HasImplicitConversion(Symbol, serviceType)
-            )
+            if (Analyzer.Compilation.HasImplicitConversion(Symbol, serviceType))
             {
                 _messages.Add(message);
                 return true;
