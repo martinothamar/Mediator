@@ -305,7 +305,7 @@ namespace MyCode
         );
     }
 
-    [Fact(Skip = "We can't statically prove a notification isn't handled yet, see TODO in CompilationAnalyzer")]
+    [Fact]
     public async Task Test_Notification_Without_Any_Handlers()
     {
         var source = await Fixture.SourceFromResourceFile("NotificationWithoutHandlerProgram.cs");

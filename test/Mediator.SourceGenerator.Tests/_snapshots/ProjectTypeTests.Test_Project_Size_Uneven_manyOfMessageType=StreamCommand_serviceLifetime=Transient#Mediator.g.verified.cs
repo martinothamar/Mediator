@@ -77,12 +77,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand0, global::System.Int32>), typeof(global::TestCode.TestStreamCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new SD(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            // Register concrete handlers for notification messages
-            services.TryAdd(new SD(typeof(global::TestCode.TestNotification0Handler), typeof(global::TestCode.TestNotification0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-
             // Register handlers and wrappers for notification messages
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::TestCode.TestNotification0>), GetRequiredService<global::TestCode.TestNotification0Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            // Register notification handlers
+            services.TryAdd(new SD(typeof(global::TestCode.TestNotification0Handler), typeof(global::TestCode.TestNotification0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::TestCode.TestNotification0>), GetRequiredService<global::TestCode.TestNotification0Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
 
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));

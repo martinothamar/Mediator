@@ -57,17 +57,16 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            // Register concrete handlers for notification messages
-            services.TryAdd(new SD(typeof(global::CatchAllNotificationHandler), typeof(global::CatchAllNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::ConcreteNotificationHandler), typeof(global::ConcreteNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             // Register handlers and wrappers for notification messages
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::Notification>), GetRequiredService<global::CatchAllNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::Notification>), GetRequiredService<global::ConcreteNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::Notification>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::Notification>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            // Register open generic handlers
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<>), typeof(global::GenericNotificationHandler<>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            // Register notification handlers
+            services.TryAdd(new SD(typeof(global::GenericNotificationHandler<global::Notification>), typeof(global::GenericNotificationHandler<global::Notification>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::Notification>), GetRequiredService<global::GenericNotificationHandler<global::Notification>>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::CatchAllNotificationHandler), typeof(global::CatchAllNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::Notification>), GetRequiredService<global::CatchAllNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new SD(typeof(global::ConcreteNotificationHandler), typeof(global::ConcreteNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::Notification>), GetRequiredService<global::ConcreteNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));

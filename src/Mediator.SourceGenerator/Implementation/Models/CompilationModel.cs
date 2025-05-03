@@ -26,7 +26,6 @@ internal sealed record CompilationModel
         RequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         NotificationMessages = ImmutableEquatableArray<NotificationMessageModel>.Empty;
         NotificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
-        OpenGenericNotificationMessageHandlers = ImmutableEquatableArray<NotificationMessageHandlerModel>.Empty;
         PipelineBehaviors = ImmutableEquatableArray<PipelineBehaviorModel>.Empty;
 
         IRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
@@ -73,8 +72,7 @@ internal sealed record CompilationModel
 
         RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
         NotificationMessages = notificationMessages;
-        NotificationMessageHandlers = new(notificationMessageHandlers.Where(h => !h.IsOpenGeneric));
-        OpenGenericNotificationMessageHandlers = new(notificationMessageHandlers.Where(h => h.IsOpenGeneric));
+        NotificationMessageHandlers = new(notificationMessageHandlers);
 
         var reqMessages = new List<RequestMessageModel>();
 
@@ -166,7 +164,6 @@ internal sealed record CompilationModel
 
     public ImmutableEquatableArray<NotificationMessageHandlerModel> NotificationMessageHandlers { get; }
 
-    public ImmutableEquatableArray<NotificationMessageHandlerModel> OpenGenericNotificationMessageHandlers { get; }
     public ImmutableEquatableArray<PipelineBehaviorModel> PipelineBehaviors { get; }
 
     public ImmutableEquatableArray<RequestMessageModel> IRequestMessages { get; }
