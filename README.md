@@ -446,6 +446,7 @@ public sealed class ErrorNotificationHandler : INotificationHandler<ErrorMessage
 ### 4.7. Polymorphic dispatch with notification handlers
 
 We can also define a notification handler that receives all notifications.
+Note that polymorphic dispatch does not work with struct notifications.
 
 ```csharp
 

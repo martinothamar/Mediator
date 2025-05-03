@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +16,8 @@ public sealed class PolymorphicDispatchTests
     public sealed record SomeNotification(Guid Id) : IPolymorphicDispatchNotification;
 
     public sealed record SomeOtherNotification(Guid Id) : IPolymorphicDispatchNotification;
+
+    public readonly record struct SomeThirdNotification(Guid Id) : IPolymorphicDispatchNotification;
 
     public sealed class SomePolymorphicNotificationHandler : INotificationHandler<IPolymorphicDispatchNotification>
     {
@@ -38,6 +39,7 @@ public sealed class PolymorphicDispatchTests
 
         var notification1 = new SomeNotification(Guid.NewGuid());
         var notification2 = new SomeOtherNotification(Guid.NewGuid());
+        var notification3 = new SomeThirdNotification(Guid.NewGuid());
 
         var handler = sp.GetRequiredService<SomePolymorphicNotificationHandler>();
         Assert.NotNull(handler);
@@ -50,6 +52,13 @@ public sealed class PolymorphicDispatchTests
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
 
+        // Polymorphic dispatch does not work with structs because
+        // `SomePolymorphicNotificationHandler` is not convertible to `INotificationHandler<SomeThirdNotification>`, but
+        // `SomePolymorphicNotificationHandler` is in fact convertible to `INotificationHandler<SomeOtherNotification>`
+        await mediator.Publish(notification3);
+        Assert.DoesNotContain(notification3.Id, SomePolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(0, handler.InstanceIds, notification3.Id);
+
         await mediator.Publish(notification1);
         AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
@@ -61,6 +70,7 @@ public sealed class PolymorphicDispatchTests
 
         var notification1 = new SomeNotification(Guid.NewGuid());
         var notification2 = new SomeOtherNotification(Guid.NewGuid());
+        var notification3 = new SomeThirdNotification(Guid.NewGuid());
 
         var handler = sp.GetRequiredService<SomePolymorphicNotificationHandler>();
         Assert.NotNull(handler);
@@ -72,6 +82,10 @@ public sealed class PolymorphicDispatchTests
         await mediator.Publish((object)notification2);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
+
+        await mediator.Publish(notification3);
+        Assert.DoesNotContain(notification3.Id, SomePolymorphicNotificationHandler.Ids);
+        AssertInstanceIdCount(0, handler.InstanceIds, notification3.Id);
 
         await mediator.Publish(notification1);
         AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
