@@ -66,33 +66,25 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
-            {{ message.Handler.ServiceRegistrationBlock }}
+            {{ message.Handler.ServiceRegistration }}
             services.Add(new SD(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
             services.Add(new SD(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
-            {{~ end ~}}
-            {{~ end ~}}
-            {{~ if (object.size NotificationMessageHandlers) > 0 ~}}
-
-            // Register concrete handlers for notification messages
-            {{~ for handler in NotificationMessageHandlers ~}}
-            {{ handler.ServiceRegistrationBlock }}
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size NotificationMessages) > 0 ~}}
 
             // Register handlers and wrappers for notification messages
             {{~ for message in NotificationMessages ~}}
-            {{~ for registration in message.HandlerServicesRegistrationBlock ~}}
-            {{ registration }}
-            {{~ end ~}}
             services.Add(new SD(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
             {{~ end ~}}
-            {{~ if (object.size OpenGenericNotificationMessageHandlers) > 0 ~}}
+            {{~ if (object.size NotificationMessageHandlers) > 0 ~}}
 
-            // Register open generic handlers
-            {{~ for handler in OpenGenericNotificationMessageHandlers ~}}
-            {{ handler.OpenGenericServiceRegistrationBlock }}
+            // Register notification handlers
+            {{~ for handler in NotificationMessageHandlers ~}}
+            {{~ for registration in handler.ServiceRegistrations ~}}
+            {{ registration }}
+            {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size PipelineBehaviors) > 0 ~}}

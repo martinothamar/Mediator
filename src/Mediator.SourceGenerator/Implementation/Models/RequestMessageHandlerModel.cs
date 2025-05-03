@@ -1,6 +1,8 @@
-﻿namespace Mediator.SourceGenerator;
+﻿using Mediator.SourceGenerator.Extensions;
 
-internal sealed record RequestMessageHandlerModel : MessageHandlerModel
+namespace Mediator.SourceGenerator;
+
+internal sealed record RequestMessageHandlerModel : SymbolMetadataModel
 {
     public string MessageType { get; }
     public RequestMessageHandlerWrapperModel WrapperType { get; }
@@ -11,9 +13,15 @@ internal sealed record RequestMessageHandlerModel : MessageHandlerModel
         CompilationAnalyzer analyzer,
         RequestMessageHandlerWrapperModel wrapperType
     )
-        : base(symbol, analyzer)
+        : base(symbol)
     {
         MessageType = messageType;
         WrapperType = wrapperType;
+
+        var typeOfExpression = $"typeof({symbol.GetTypeSymbolFullName()})";
+        ServiceRegistration =
+            $"services.TryAdd(new SD({typeOfExpression}, {typeOfExpression}, {analyzer.ServiceLifetime}));";
     }
+
+    public string ServiceRegistration { get; }
 }

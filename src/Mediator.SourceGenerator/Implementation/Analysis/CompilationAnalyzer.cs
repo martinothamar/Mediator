@@ -506,28 +506,17 @@ internal sealed class CompilationAnalyzer
 
         foreach (var notificationMessage in _notificationMessages)
         {
-            var handlerInterface = _notificationHandlerInterfaceSymbol.Construct(notificationMessage.Symbol);
-
+            var isHandled = false;
             foreach (var notificationMessageHandler in _notificationMessageHandlers)
+                isHandled |= notificationMessageHandler.TryAddMessage(notificationMessage);
+
+            if (!isHandled)
             {
-                if (notificationMessageHandler.IsOpenGeneric) // These are added as open generics
-                    continue;
-
-                if (compilation.HasImplicitConversion(notificationMessageHandler.Symbol, handlerInterface))
-                    notificationMessage.AddHandlers(notificationMessageHandler);
+                ReportDiagnostic(
+                    notificationMessage.Symbol,
+                    (in CompilationAnalyzerContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s)
+                );
             }
-
-            // This diagnostic is not safe to use here.
-            // A user can define a notification, expecting it to only
-            // show up in an open generic handler.
-            // We don't keep track of bindings between notification and
-            // these open generic handlers, so we can't know what notifications
-            // are and aren't handled just yet.
-            // TODO - include open generic handlers in analysis as well, so that we can report this correctly.
-            //if (notificationMessage.HandlerCount == 0)
-            //{
-            //    ReportDiagnostic(notificationMessage.Symbol, (in GeneratorExecutionContext c, INamedTypeSymbol s) => c.ReportMessageWithoutHandler(s));
-            //}
         }
 
         const int NOT_RELEVANT = 0;
@@ -662,7 +651,9 @@ internal sealed class CompilationAnalyzer
                             {
                                 return true;
                             }
-                            _notificationMessageHandlers.Add(new NotificationMessageHandler(typeSymbol, this));
+                            _notificationMessageHandlers.Add(
+                                new NotificationMessageHandler(typeSymbol, _notificationHandlerInterfaceSymbol, this)
+                            );
                         }
                     }
                     break;
@@ -1197,8 +1188,7 @@ internal sealed class CompilationAnalyzer
                         : _streamPipelineBehaviorInterfaceSymbol!;
                 if (
                     !pipelineTypeSymbol.AllInterfaces.Any(i =>
-                        i.ConstructUnboundGenericType()
-                            .Equals(interfaceSymbol.ConstructUnboundGenericType(), _symbolComparer)
+                        i.IsGenericType && i.OriginalDefinition.Equals(interfaceSymbol, _symbolComparer)
                     )
                 )
                 {

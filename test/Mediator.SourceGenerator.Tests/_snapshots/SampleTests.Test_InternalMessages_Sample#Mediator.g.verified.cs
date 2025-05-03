@@ -62,12 +62,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), typeof(global::InternalMessages.Application.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            // Register concrete handlers for notification messages
-            services.TryAdd(new SD(typeof(global::InternalMessages.Application.PingPongedHandler), typeof(global::InternalMessages.Application.PingPongedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
             // Register handlers and wrappers for notification messages
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>), GetRequiredService<global::InternalMessages.Application.PingPongedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::InternalMessages.Domain.PingPonged>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::InternalMessages.Domain.PingPonged>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            // Register notification handlers
+            services.TryAdd(new SD(typeof(global::InternalMessages.Application.PingPongedHandler), typeof(global::InternalMessages.Application.PingPongedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::InternalMessages.Domain.PingPonged>), GetRequiredService<global::InternalMessages.Application.PingPongedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
             services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
