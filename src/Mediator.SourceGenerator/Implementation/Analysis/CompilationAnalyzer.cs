@@ -87,6 +87,8 @@ internal sealed class CompilationAnalyzer
         (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false)
         || (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
 
+    public bool GenerateTypesAsInternal { get; private set; }
+
     private bool ConfiguredViaAttribute { get; set; }
 
     private bool ConfiguredViaConfiguration { get; set; }
@@ -360,7 +362,8 @@ internal sealed class CompilationAnalyzer
                 ServiceLifetimeShort,
                 SingletonServiceLifetime,
                 IsTestRun,
-                ConfiguredViaAttribute
+                ConfiguredViaAttribute,
+                GenerateTypesAsInternal
             );
 
             return model;
@@ -881,7 +884,12 @@ internal sealed class CompilationAnalyzer
             {
                 var parameterTypeName = parameterSymbol.Type.GetTypeSymbolFullName(false);
                 // Parameter type name will be empty string if it can't be resolved
-                if (parameterTypeName != "" && parameterTypeName != "Mediator.MediatorOptions")
+                if (
+                    parameterTypeName != ""
+                    && parameterTypeName != "Mediator.MediatorOptions"
+                    // TODO: now that options are generated in the same source gen step, full name gets resolved to this, this is hopefully temporary
+                    && parameterTypeName != "MediatorOptions"
+                )
                     continue;
             }
 
@@ -1076,6 +1084,38 @@ internal sealed class CompilationAnalyzer
                         c.ReportInvalidCodeBasedConfiguration(
                             l,
                             "Expected literal or identifier in namespace configuration"
+                        )
+                );
+                return false;
+            }
+        }
+        else if (opt == "GenerateTypesAsInternal")
+        {
+            if (assignment.Right is not LiteralExpressionSyntax literal)
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "Expected literal expression for 'GenerateTypesAsInternal'"
+                        )
+                );
+                return false;
+            }
+
+            if (literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                GenerateTypesAsInternal = true;
+            else if (literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                GenerateTypesAsInternal = false;
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "Expected boolean literal expression for 'GenerateTypesAsInternal'"
                         )
                 );
                 return false;

@@ -8,13 +8,18 @@ namespace Mediator
     /// Provide options for the Mediator source generator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    public sealed class MediatorOptions
+    {{ TypeAccessibility }} sealed class MediatorOptions
     {
         /// <summary>
         /// The namespace in which the Mediator implementation is generated.
         /// By default, the namespace is "Mediator".
         /// </summary>
         public string Namespace { get; set; } = "Mediator";
+
+        /// <summary>
+        /// Wether or not generated configuration types should be <c>internal</c> (they are public by default).
+        /// </summary>
+        public bool GenerateTypesAsInternal { get; set; } = false;
 
         /// <summary>
         /// The <see cref="global::Mediator.INotificationPublisher" /> type to use when publishing notifications.
