@@ -11,4 +11,6 @@ cd AspNetCoreBlazor
 dotnet run
 ```
 
-Now you can open [localhost:5000](http://localhost:5000) and test out the counter page.
+Now you can open [localhost:5000](http://localhost:5000) and check out the
+* Counter page - it uses a Mediator request to bump the counter
+* Weather page - it uses a streaming query to update the UI
