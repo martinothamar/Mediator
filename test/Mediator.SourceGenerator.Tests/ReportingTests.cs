@@ -27,8 +27,8 @@ namespace MyCode
             Assertions.CompilesWithoutDiagnostics,
             result =>
             {
-                Assert.True(result.OutputCompilation.SyntaxTrees.Count() == 4); // Original + attribute + options + mediator impl
-                Assert.True(result.RunResult.GeneratedTrees.Length == 3); // attribute + options + mediator impl
+                Assert.True(result.OutputCompilation.SyntaxTrees.Count() == 5); // Original + attribute + options + mediator impl
+                Assert.True(result.RunResult.GeneratedTrees.Length == 4); // attribute + options + mediator impl
             }
         );
     }
