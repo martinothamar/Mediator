@@ -11,6 +11,7 @@ internal sealed record CompilationModel
         HasErrors = true;
         IsTestRun = false;
         ConfiguredViaAttribute = false;
+        TypeAccessibility = "public";
         ServiceLifetime = "global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton";
         ServiceLifetimeShort = "Singleton";
         SingletonServiceLifetime = ServiceLifetime;
@@ -50,7 +51,8 @@ internal sealed record CompilationModel
         string? serviceLifetimeShort,
         string? singletonServiceLifetime,
         bool isTestRun,
-        bool configuredViaAttribute
+        bool configuredViaAttribute,
+        bool generateTypesAsInternal
     )
     {
         MediatorNamespace = mediatorNamespace;
@@ -58,6 +60,7 @@ internal sealed record CompilationModel
         HasErrors = hasErrors;
         IsTestRun = isTestRun;
         ConfiguredViaAttribute = configuredViaAttribute;
+        TypeAccessibility = generateTypesAsInternal ? "internal" : "public";
         ServiceLifetime = serviceLifetime;
         ServiceLifetimeShort = serviceLifetimeShort;
         SingletonServiceLifetime = singletonServiceLifetime;
@@ -145,6 +148,7 @@ internal sealed record CompilationModel
     public bool HasErrors { get; }
     public bool IsTestRun { get; }
     public bool ConfiguredViaAttribute { get; }
+    public string TypeAccessibility { get; }
     public string? ServiceLifetime { get; }
     public string? ServiceLifetimeShort { get; }
     public string? SingletonServiceLifetime { get; }

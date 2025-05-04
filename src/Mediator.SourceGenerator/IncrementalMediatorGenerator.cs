@@ -10,13 +10,6 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(static context =>
-        {
-            var generatorVersion = Versioning.GetVersion();
-
-            MediatorOptionsGenerator.Generate(context.AddSource, generatorVersion);
-        });
-
         var compilationProvider = context.CompilationProvider;
         var addMediatorCalls = context.SyntaxProvider.CreateSyntaxProvider(
             predicate: static (s, _) => SyntaxReceiver.ShouldVisit(s, out var _),
@@ -51,6 +44,8 @@ public sealed class IncrementalMediatorGenerator : IIncrementalGenerator
             {
                 var report = context.ReportDiagnostic;
                 var reportDiagnostic = (Exception exception) => report.ReportGenericError(exception);
+
+                MediatorOptionsGenerator.Generate(context.AddSource, source);
                 MediatorImplementationGenerator.Generate(source, context.AddSource, reportDiagnostic);
             }
         );

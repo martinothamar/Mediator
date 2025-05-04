@@ -9,7 +9,7 @@ namespace Mediator
     /// </summary>
     [global::System.AttributeUsage(global::System.AttributeTargets.Assembly, AllowMultiple = false)]
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    public sealed class MediatorOptionsAttribute : global::System.Attribute
+    {{ TypeAccessibility }} sealed class MediatorOptionsAttribute : global::System.Attribute
     {
         /// <summary>
         /// The namespace in which the Mediator implementation is generated.

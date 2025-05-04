@@ -1,0 +1,21 @@
+﻿@page "/counter"
+@using Mediator
+@rendermode InteractiveAuto
+@inject IMediator Mediator
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="async () => await IncrementCount()">Click me</button>
+
+@code {
+    private long currentCount = 0;
+
+    private async ValueTask IncrementCount()
+    {
+        currentCount = await Mediator.Send(new IncrementCounter());
+    }
+}
