@@ -49,7 +49,11 @@ public sealed class SampleTests
         result.Diagnostics.Should().BeEmpty();
         result.GeneratedTrees.Length.Should().Be(3);
 
-        await Verifier.Verify(driver).IgnoreGeneratedResult(_ => _.HintName.Contains("MediatorOptions"));
+        await Verifier
+            .Verify(driver)
+            .IgnoreGeneratedResult(r =>
+                r.HintName.Contains("MediatorOptions") || r.HintName.Contains("AssemblyReference")
+            );
     }
 
     [Fact]

@@ -58,7 +58,7 @@ public static class Fixture
         }
 
         var compilation = CSharpCompilation.Create(
-            "compilation",
+            "Library",
             source,
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
