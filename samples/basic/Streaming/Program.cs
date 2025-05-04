@@ -9,7 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Mediator" namespace by default.
-services.AddMediator();
+services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Assemblies = [typeof(StreamPing)];
+    }
+);
 
 var serviceProvider = services.BuildServiceProvider();
 

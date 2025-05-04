@@ -8,16 +8,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddMediator(options =>
-{
-    options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
-    options.PipelineBehaviors =
-    [
-        // Ordering of pipeline behavior registrations matter!
-        typeof(ErrorLoggerHandler<,>),
-        typeof(PingValidator),
-    ];
-});
+services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Assemblies = [typeof(Ping)];
+        options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
+        options.PipelineBehaviors =
+        [
+            // Ordering of pipeline behavior registrations matter!
+            typeof(ErrorLoggerHandler<,>),
+            typeof(PingValidator),
+        ];
+    }
+);
 
 var sp = services.BuildServiceProvider();
 

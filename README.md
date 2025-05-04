@@ -271,6 +271,7 @@ services.AddMediator((MediatorOptions options) =>
     options.ServiceLifetime = ServiceLifetime.Singleton;
     // Only available from v3:
     options.NotificationPublisherType = typeof(Mediator.ForeachAwaitPublisher);
+    options.Assemblies = [typeof(...)];
     options.PipelineBehaviors = [];
     options.StreamPipelineBehaviors = [];
 });
@@ -286,8 +287,11 @@ services.AddMediator((MediatorOptions options) =>
   * `Transient` - mediator and handlers registered as transient
   * `Scoped`    - mediator and handlers registered as scoped
 * `NotificationPublisherType` - the type used for publishing notifications (`ForeachAwaitPublisher` and `TaskWhenAllPublisher` are built in)
+* `Assemblies` - which assemblies the source generator should scan for messages and handlers. When not used the source generator will scan all references assemblies (same behavior as v2)
 * `PipelineBehaviors`/`StreamPipelineBehaviors` - ordered array of types used for the pipeline
   * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT. You can also manually add pipeline behaviors to the DI container if you are not doing AoT compilation.
+
+Note that since parsing of these options is done during compilation/source generation, all values must be compile time constants.
 
 Singleton lifetime is highly recommended as it yields the best performance.
 Every application is different, but it is likely that a lot of your message handlers doesn't keep state and have no need for transient or scoped lifetime.
@@ -334,6 +338,8 @@ using var serviceProvider = services.BuildServiceProvider();
 ### 4.3. Create `IRequest<>` type
 
 ```csharp
+services.AddMediator((MediatorOptions options) => options.Assemblies = [typeof(Ping)]);
+using var serviceProvider = services.BuildServiceProvider();
 var mediator = serviceProvider.GetRequiredService<IMediator>();
 var ping = new Ping(Guid.NewGuid());
 var pong = await mediator.Send(ping);
@@ -366,6 +372,7 @@ Pipeline behaviors currently must be added manually.
 ```csharp
 services.AddMediator((MediatorOptions options) =>
 {
+    options.Assemblies = [typeof(Ping)];
     options.PipelineBehaviors = [typeof(PingValidator)];
 });
 
@@ -391,6 +398,7 @@ Message pre- and post-processors along with the exception handlers can also cons
 ```csharp
 services.AddMediator((MediatorOptions options) =>
 {
+    options.Assemblies = [typeof(ErrorMessage)];
     options.PipelineBehaviors = [typeof(ErrorLoggerHandler<,>)];
 });
 

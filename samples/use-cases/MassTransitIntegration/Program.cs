@@ -6,7 +6,12 @@ using Mediator;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMediator((MediatorOptions options) => { });
+builder.Services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Assemblies = [typeof(WeatherUpdated)];
+    }
+);
 
 builder.Services.AddMassTransit(options =>
 {
