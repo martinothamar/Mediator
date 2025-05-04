@@ -18,7 +18,7 @@ namespace SimpleConsole
                 (MediatorOptions options) =>
                 {
                     options.Namespace = "SimpleConsole";
-                    options.Assemblies = [typeof(Ping)];
+                    options.Assemblies = new AssemblyReference[] { typeof(Ping) };
                 }
             );
 
