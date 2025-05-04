@@ -1,3 +1,6 @@
+using ASPNETCore.WeatherForecasts;
+using Mediator;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,7 +11,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddMediator();
+builder.Services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Assemblies = [typeof(GetWeatherForecasts).Assembly];
+    }
+);
 
 var app = builder.Build();
 

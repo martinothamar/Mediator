@@ -47,9 +47,13 @@ public sealed class SampleTests
 
         var result = driver.GetRunResult();
         result.Diagnostics.Should().BeEmpty();
-        result.GeneratedTrees.Length.Should().Be(3);
+        result.GeneratedTrees.Length.Should().Be(4);
 
-        await Verifier.Verify(driver).IgnoreGeneratedResult(_ => _.HintName.Contains("MediatorOptions"));
+        await Verifier
+            .Verify(driver)
+            .IgnoreGeneratedResult(r =>
+                r.HintName.Contains("MediatorOptions") || r.HintName.Contains("AssemblyReference")
+            );
     }
 
     [Fact]

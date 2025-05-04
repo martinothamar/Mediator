@@ -30,6 +30,12 @@ namespace Mediator
             global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
 
         /// <summary>
+        /// The collection of assemblies to scan for Mediator handlers.
+        /// By default, the collection is empty, in which case the source generator will scan all assemblies through references from the source generated project.
+        /// </summary>
+        public global::System.Collections.Generic.IReadOnlyList<global::Mediator.AssemblyReference> Assemblies { get; set; } = new global::Mediator.AssemblyReference[0];
+
+        /// <summary>
         /// The collection of types of pipeline behaviors to register in DI.
         /// When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
         /// </summary>

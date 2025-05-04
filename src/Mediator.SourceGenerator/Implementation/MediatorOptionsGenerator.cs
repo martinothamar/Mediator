@@ -10,6 +10,7 @@ public static class MediatorOptionsGenerator
     {
         GenerateOptions(addSource, generatorVersion);
         GenerateOptionsAttribute(addSource, generatorVersion);
+        GenerateAssemblyReference(addSource, generatorVersion);
     }
 
     private static void GenerateOptions(Action<string, SourceText> addSource, string generatorVersion)
@@ -30,5 +31,15 @@ public static class MediatorOptionsGenerator
         var template = Template.Parse(EmbeddedResource.GetContent(file), file);
         var output = template.Render(model, member => member.Name);
         addSource("MediatorOptionsAttribute.g.cs", SourceText.From(output, Encoding.UTF8));
+    }
+
+    private static void GenerateAssemblyReference(Action<string, SourceText> addSource, string generatorVersion)
+    {
+        var model = new { GeneratorVersion = generatorVersion };
+
+        var file = @"resources/AssemblyReference.sbn-cs";
+        var template = Template.Parse(EmbeddedResource.GetContent(file), file);
+        var output = template.Render(model, member => member.Name);
+        addSource("AssemblyReference.g.cs", SourceText.From(output, Encoding.UTF8));
     }
 }

@@ -25,6 +25,7 @@ internal sealed class CompilationAnalyzer
     private readonly HashSet<NotificationMessage> _notificationMessages;
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
     private readonly List<PipelineBehaviorType> _pipelineBehaviors;
+    private Queue<INamespaceOrTypeSymbol>? _configuredAssemblies;
 
     public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
 
@@ -277,9 +278,11 @@ internal sealed class CompilationAnalyzer
 
         try
         {
-            var queue = new Queue<INamespaceOrTypeSymbol>();
-
-            FindGlobalNamespaces(queue);
+            var queue = _configuredAssemblies ?? new Queue<INamespaceOrTypeSymbol>();
+            if (_configuredAssemblies is null)
+            {
+                FindGlobalNamespaces(queue);
+            }
 
             PopulateMetadata(queue);
         }
@@ -1038,6 +1041,7 @@ internal sealed class CompilationAnalyzer
     {
         Debug.Assert(_pipelineBehaviorInterfaceSymbol is not null);
         Debug.Assert(_streamPipelineBehaviorInterfaceSymbol is not null);
+        Debug.Assert(_unitSymbol is not null);
 
         var opt = ((MemberAccessExpressionSyntax)assignment.Left).Name.Identifier.Text;
         if (opt == "Namespace")
@@ -1160,6 +1164,80 @@ internal sealed class CompilationAnalyzer
                         )
                 );
                 return false;
+            }
+        }
+        else if (opt == "Assemblies")
+        {
+            if (_configuredAssemblies is not null)
+            {
+                ReportDiagnostic(
+                    assignment.Left.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Assemblies can only be configured once")
+                );
+                return false;
+            }
+
+            var assemblyCache = new Dictionary<IModuleSymbol, ImmutableArray<IAssemblySymbol>>(
+                SymbolEqualityComparer.Default
+            );
+            _configuredAssemblies = new();
+            var typeOfExpressions = assignment.Right.DescendantNodes().OfType<TypeOfExpressionSyntax>().ToArray();
+            HashSet<IAssemblySymbol> visitedAssemblies = new(_symbolComparer);
+            foreach (var typeOfExpression in typeOfExpressions)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(typeOfExpression.Type, cancellationToken);
+                if (typeInfo.Type is not INamedTypeSymbol typeSymbol)
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, $"Could not resolve type: {typeOfExpression.Type}")
+                    );
+                    continue;
+                }
+                var assemblySymbol = typeSymbol.OriginalDefinition.ContainingAssembly;
+
+                if (_symbolComparer.Equals(_unitSymbol!.ContainingAssembly, assemblySymbol))
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Tried to configure 'Mediator.Abstractions' as an assembly"
+                            )
+                    );
+                    continue;
+                }
+
+                if (!visitedAssemblies.Add(assemblySymbol))
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                $"The assembly '{assemblySymbol.Name}' is already configured"
+                            )
+                    );
+                    continue;
+                }
+
+                if (!assemblySymbol.Modules.Any(m => IsMediatorLibReferencedByTheModule(m, assemblyCache)))
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Configured assembly does not reference 'Mediator.Abstractions', so it cannot have messages and handlers"
+                            )
+                    );
+                    continue;
+                }
+
+                _configuredAssemblies.Enqueue(assemblySymbol.GlobalNamespace);
             }
         }
         else if (opt == "PipelineBehaviors" || opt == "StreamPipelineBehaviors")

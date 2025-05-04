@@ -14,10 +14,13 @@ namespace SimpleConsole
 
             // This extensions method is generated, and is put in the "Microsoft.Extensions.DependencyInjection" namespace.
             // We override the namespace in the "MediatorOptions" object.
-            services.AddMediator(options =>
-            {
-                options.Namespace = "SimpleConsole";
-            });
+            services.AddMediator(
+                (MediatorOptions options) =>
+                {
+                    options.Namespace = "SimpleConsole";
+                    options.Assemblies = new AssemblyReference[] { typeof(Ping) };
+                }
+            );
 
             // Standard handlers are added by default, but we need to add pipeline steps manually.
             // Here are two examples.

@@ -1,9 +1,16 @@
+using InternalMessages.Application;
 using InternalMessages.Domain;
+using Mediator;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMediator();
+builder.Services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Assemblies = [typeof(Ping), typeof(PingHandler)];
+    }
+);
 
 var app = builder.Build();
 

@@ -7,10 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddMediator(options =>
-{
-    options.NotificationPublisherType = typeof(MyNotificationPublisher);
-});
+services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Assemblies = [typeof(Notification)];
+        options.NotificationPublisherType = typeof(MyNotificationPublisher);
+    }
+);
 
 var serviceProvider = services.BuildServiceProvider();
 

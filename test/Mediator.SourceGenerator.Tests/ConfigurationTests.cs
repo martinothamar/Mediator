@@ -118,6 +118,367 @@ public sealed class ConfigurationTests
     }
 
     [Fact]
+    public async Task Test_Assemblies_TypeOf()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Assemblies =
+                        [
+                            typeof(Program),
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
+    public async Task Test_Assemblies_TypeOf_Assembly()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Assemblies =
+                        [
+                            typeof(Program).Assembly,
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
+    public async Task Test_Assemblies_Duplicate_Reference()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Assemblies =
+                        [
+                            typeof(Program),
+                            typeof(Program),
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify();
+    }
+
+    [Fact]
+    public async Task Test_Assemblies_Duplicate_Configuration()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Assemblies =
+                        [
+                            typeof(Program),
+                        ];
+                        options.Assemblies =
+                        [
+                            typeof(Program),
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify();
+    }
+
+    [Fact]
+    public async Task Test_Assemblies_Mediator_Abstractions_Reference()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Assemblies =
+                        [
+                            typeof(Unit),
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify();
+    }
+
+    [Fact]
+    public async Task Test_Assemblies_Invalid_Reference()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Assemblies =
+                        [
+                            typeof(object),
+                        ];
+                    });
+                }
+            }
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify();
+    }
+
+    [Fact]
+    public async Task Test_Assemblies_Valid_Reference()
+    {
+        var referencedLibrary1 = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Mediator;
+
+                namespace TestCode.Library1;
+
+                public readonly record struct Request1(Guid Id) : IRequest<Response1>;
+                public readonly record struct Response1(Guid Id);
+                public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+                {
+                    public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
+                        new ValueTask<Response1>(new Response1(request.Id));
+                }
+                """
+            )
+            .WithAssemblyName("TestCode.Library1");
+
+        var referencedLibrary2 = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Mediator;
+
+                namespace TestCode.Library2;
+
+                public readonly record struct Request2(Guid Id) : IRequest<Response2>;
+                public readonly record struct Response2(Guid Id);
+                public sealed class Request2Handler : IRequestHandler<Request2, Response2>
+                {
+                    public ValueTask<Response2> Handle(Request2 request, CancellationToken cancellationToken) =>
+                        new ValueTask<Response2>(new Response2(request.Id));
+                }
+                """
+            )
+            .WithAssemblyName("TestCode.Library2");
+
+        var mainLibrary0 = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Mediator;
+                using Microsoft.Extensions.DependencyInjection;
+                using TestCode.Library1;
+
+                namespace TestCode;
+
+                public class Program
+                {
+                    public static void Main()
+                    {
+                        var services = new ServiceCollection();
+
+                        services.AddMediator(options =>
+                        {
+                            options.Assemblies =
+                            [
+                                typeof(Request0),
+                                typeof(Request1),
+                            ];
+                        });
+                    }
+                }
+
+                public readonly record struct Request0(Guid Id) : IRequest<Response0>;
+                public readonly record struct Response0(Guid Id);
+                public sealed class Request0Handler : IRequestHandler<Request0, Response0>
+                {
+                    public ValueTask<Response0> Handle(Request0 request, CancellationToken cancellationToken) =>
+                        new ValueTask<Response0>(new Response0(request.Id));
+                }
+                """
+            )
+            .WithAssemblyName("TestCode");
+        mainLibrary0 = mainLibrary0.AddReferences(
+            referencedLibrary1.ToMetadataReference(),
+            referencedLibrary2.ToMetadataReference()
+        );
+
+        await mainLibrary0.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
     public async Task Test_PipelineBehaviors()
     {
         var inputCompilation = Fixture.CreateLibrary(

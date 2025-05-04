@@ -5,17 +5,20 @@ var services = new ServiceCollection();
 
 // This extensions method is generated, and is put in the "Mediator" namespace by default.
 // We override the namespace in the "MediatorOptions" object.
-services.AddMediator(options =>
-{
-    options.Namespace = "SimpleConsoleAOT";
-    options.PipelineBehaviors =
-    [
-        // Standard handlers are added by default, but we need to add pipeline steps manually.
-        // Here are two examples.
-        typeof(GenericLoggerHandler<,>), // This will run 1st
-        typeof(PingValidator), // This will run 2nd
-    ];
-});
+services.AddMediator(
+    (MediatorOptions options) =>
+    {
+        options.Namespace = "SimpleConsoleAOT";
+        options.Assemblies = [typeof(Ping)];
+        options.PipelineBehaviors =
+        [
+            // Standard handlers are added by default, but we need to add pipeline steps manually.
+            // Here are two examples.
+            typeof(GenericLoggerHandler<,>), // This will run 1st
+            typeof(PingValidator), // This will run 2nd
+        ];
+    }
+);
 
 var serviceProvider = services.BuildServiceProvider();
 

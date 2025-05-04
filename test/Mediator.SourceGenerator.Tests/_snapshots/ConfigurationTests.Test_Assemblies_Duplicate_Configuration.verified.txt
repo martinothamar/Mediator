@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+            ];
+            options.Assemblies =
+            ^^^^^^^^^^^^^^^^^^
+            [
+*/
+ : (20,12)-(20,30),
+      Message: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. Assemblies can only be configured once,
+      Severity: Error,
+      Descriptor: {
+        Id: MSG0007,
+        Title: MediatorGenerator configuration error,
+        MessageFormat: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. {0},
+        Category: MediatorGenerator,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
