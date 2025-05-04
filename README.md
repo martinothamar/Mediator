@@ -292,6 +292,7 @@ services.AddMediator((MediatorOptions options) =>
   * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT. You can also manually add pipeline behaviors to the DI container if you are not doing AoT compilation.
 
 Note that since parsing of these options is done during compilation/source generation, all values must be compile time constants.
+In addition, since some types are not valid attributes parameter types (such as arrays/lists), some configuration is only available through `AddMediator`/`MediatorOptions` and not the assembly attribute.
 
 Singleton lifetime is highly recommended as it yields the best performance.
 Every application is different, but it is likely that a lot of your message handlers doesn't keep state and have no need for transient or scoped lifetime.
