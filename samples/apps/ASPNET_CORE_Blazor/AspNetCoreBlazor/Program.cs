@@ -1,5 +1,6 @@
 using AspNetCoreBlazor.Client.Pages;
 using AspNetCoreBlazor.Components;
+using AspNetCoreBlazor.Components.Pages;
 using Mediator;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddIntera
 builder.Services.AddMediator(
     (MediatorOptions options) =>
     {
-        options.Assemblies = [typeof(IncrementCounter)];
+        options.Assemblies = [typeof(GetWeatherForecasts), typeof(IncrementCounter)];
         options.GenerateTypesAsInternal = true;
     }
 );
