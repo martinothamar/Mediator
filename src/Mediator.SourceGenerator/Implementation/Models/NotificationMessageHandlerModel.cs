@@ -10,7 +10,9 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
         ServiceRegistrations = ImmutableEquatableArray<string>.Empty;
         if (handler.Messages.Count > 0)
         {
-            var interfaceSymbol = handler.InterfaceSymbol.GetTypeSymbolFullName(includeTypeParameters: false);
+            var interfaceSymbol = handler.UnconstructedInterfaceSymbol.GetTypeSymbolFullName(
+                includeTypeParameters: false
+            );
             var concreteSymbol = handler.Symbol.GetTypeSymbolFullName(includeTypeParameters: false);
             var builder = new List<string>(handler.Messages.Count);
 

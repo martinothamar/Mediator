@@ -4,7 +4,6 @@ namespace Mediator.SourceGenerator;
 
 internal sealed class NotificationMessageHandler : MessageHandler<NotificationMessageHandler>
 {
-    public readonly INamedTypeSymbol InterfaceSymbol;
     public readonly INamedTypeSymbol UnconstructedInterfaceSymbol;
     private readonly List<NotificationMessage> _messages;
 
@@ -18,9 +17,6 @@ internal sealed class NotificationMessageHandler : MessageHandler<NotificationMe
         : base(symbol, analyzer)
     {
         UnconstructedInterfaceSymbol = interfaceSymbol;
-        InterfaceSymbol = symbol.AllInterfaces.Single(i =>
-            i.IsGenericType && i.OriginalDefinition.Equals(UnconstructedInterfaceSymbol, SymbolEqualityComparer.Default)
-        );
         _messages = new List<NotificationMessage>();
     }
 
