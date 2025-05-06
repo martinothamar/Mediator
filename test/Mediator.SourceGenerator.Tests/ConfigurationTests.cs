@@ -4,6 +4,73 @@ namespace Mediator.SourceGenerator.Tests;
 
 public sealed class ConfigurationTests
 {
+    [Theory]
+    [CombinatorialData]
+    public async Task Test_GenerateTypesAsInternal(bool value)
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.GenerateTypesAsInternal = {{value.ToString().ToLowerInvariant()}};
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation
+            .AssertAndVerify(ignoreGeneratedResult: null, Assertions.CompilesWithoutDiagnostics)
+            .UseParameters(value);
+    }
+
+    [Fact]
+    public async Task Test_GenerateTypesAsInternal_Non_Literal()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                private static readonly bool _generateTypesAsInternal = true;
+
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.GenerateTypesAsInternal = _generateTypesAsInternal;
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify();
+    }
+
     [Fact]
     public async Task Test_ForEachAwaitPublisher_Default()
     {
