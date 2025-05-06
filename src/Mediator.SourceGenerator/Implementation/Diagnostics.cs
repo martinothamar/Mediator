@@ -122,13 +122,16 @@ public static class Diagnostics
         Diagnostic diagnostic;
         if (arg is ISymbol symbolArg)
         {
-            location ??= symbolArg.Locations.FirstOrDefault(l => l.IsInSource);
+            var compilation = context.Compilation;
+            location ??= symbolArg.Locations.FirstOrDefault(l =>
+                l.IsInSource && !l.IsInMetadata && compilation.ContainsSyntaxTree(l.SourceTree)
+            );
             var symbolName = symbolArg.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat);
-            diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, symbolName);
+            diagnostic = Diagnostic.Create(diagnosticDescriptor, location, symbolName);
         }
         else
         {
-            diagnostic = Diagnostic.Create(diagnosticDescriptor, location ?? Location.None, arg);
+            diagnostic = Diagnostic.Create(diagnosticDescriptor, location, arg);
         }
         context.ReportDiagnostic(diagnostic);
         return diagnostic;

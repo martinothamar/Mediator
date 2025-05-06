@@ -306,6 +306,62 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_Request_Without_Handler_In_Referenced_Library()
+    {
+        var referencedLibrary1 = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Mediator;
+
+                namespace TestCode.Library1;
+
+                public readonly record struct Request1(Guid Id) : IRequest<Response1>;
+                public readonly record struct Response1(Guid Id);
+                """
+            )
+            .WithAssemblyName("TestCode.Library1");
+
+        var mainLibrary0 = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Mediator;
+                using Microsoft.Extensions.DependencyInjection;
+
+                namespace TestCode;
+
+                public class Program
+                {
+                    public static void Main()
+                    {
+                        var services = new ServiceCollection();
+
+                        services.AddMediator();
+                    }
+                }
+                """
+            )
+            .WithAssemblyName("TestCode");
+        mainLibrary0 = mainLibrary0.AddReferences(referencedLibrary1.ToMetadataReference());
+
+        await mainLibrary0.AssertAndVerify(
+            Assertions.CompilesWithoutErrorDiagnostics,
+            result =>
+            {
+                Assert.Contains(
+                    result.Diagnostics,
+                    d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
+                );
+            }
+        );
+    }
+
+    [Fact]
     public async Task Test_Notification_Without_Any_Handlers()
     {
         var source = await Fixture.SourceFromResourceFile("NotificationWithoutHandlerProgram.cs");
