@@ -17,7 +17,7 @@ namespace Mediator
         public string Namespace { get; set; } = "Mediator";
 
         /// <summary>
-        /// Wether or not generated configuration types should be <c>internal</c> (they are public by default).
+        /// Wether or not generated types should be <c>internal</c> (they are public by default).
         /// </summary>
         public bool GenerateTypesAsInternal { get; set; } = false;
 
