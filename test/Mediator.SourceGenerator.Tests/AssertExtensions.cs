@@ -13,6 +13,19 @@ public static class AssertExtensions
         params Action<GeneratorResult>[] assertionDelegates
     )
     {
+        return AssertAndVerify(
+            inputCompilation,
+            r => r.HintName.Contains("MediatorOptions") || r.HintName.Contains("AssemblyReference"),
+            assertionDelegates
+        );
+    }
+
+    public static SettingsTask AssertAndVerify(
+        this Compilation inputCompilation,
+        Func<GeneratedSourceResult, bool>? ignoreGeneratedResult,
+        params Action<GeneratorResult>[] assertionDelegates
+    )
+    {
         var generator = new IncrementalMediatorGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
@@ -30,10 +43,9 @@ public static class AssertExtensions
         foreach (var assertions in assertionDelegates)
             assertions(result);
 
-        return Verifier
-            .Verify(driver)
-            .IgnoreGeneratedResult(r =>
-                r.HintName.Contains("MediatorOptions") || r.HintName.Contains("AssemblyReference")
-            );
+        var verifier = Verifier.Verify(driver);
+        if (ignoreGeneratedResult is not null)
+            verifier = verifier.IgnoreGeneratedResult(r => ignoreGeneratedResult(r));
+        return verifier;
     }
 }
