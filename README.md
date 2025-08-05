@@ -8,10 +8,6 @@
 
 # Mediator
 
-> **Note**
->
-> **Version 3.0** is currently being finalized. It is recommended to start using v3 prereleases as opposed to v2.1. See status and provide feedback [here (#98)](https://github.com/martinothamar/Mediator/issues/98)
-
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
 The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, with some deviations to allow for better performance.
 Packages are .NET Standard 2.0 compatible.
@@ -36,16 +32,16 @@ In particular, source generators in this library is used to
 NuGet packages:
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 3.0.*-*
-dotnet add package Mediator.Abstractions --version 3.0.*-*
+dotnet add package Mediator.SourceGenerator --version 3.0.*
+dotnet add package Mediator.Abstractions --version 3.0.*
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="3.0.*-*">
+<PackageReference Include="Mediator.SourceGenerator" Version="3.0.*">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
+<PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
 
 See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash), covering both similarities and differences between Mediator and MediatR
@@ -310,16 +306,16 @@ See the full runnable sample code in the [Showcase sample](/samples/Showcase/).
 ### 4.1. Add packages
 
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 3.0.*-*
-dotnet add package Mediator.Abstractions --version 3.0.*-*
+dotnet add package Mediator.SourceGenerator --version 3.0.*
+dotnet add package Mediator.Abstractions --version 3.0.*
 ```
 or
 ```xml
-<PackageReference Include="Mediator.SourceGenerator" Version="3.0.*-*">
+<PackageReference Include="Mediator.SourceGenerator" Version="3.0.*">
   <PrivateAssets>all</PrivateAssets>
   <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 </PackageReference>
-<PackageReference Include="Mediator.Abstractions" Version="3.0.*-*" />
+<PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
 
 ### 4.2. Add Mediator to DI container
@@ -492,9 +488,6 @@ public sealed class GenericNotificationHandler<TNotification> : INotificationHan
 ```
 
 ### 4.9. Notification publishers
-
-> [!IMPORTANT]
-> This API is currently in the latest 3.0 previews, not available in stable.
 
 Notification publishers are responsible for dispatching notifications to a collection of handlers.
 There are two built in implementations:
