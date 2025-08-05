@@ -13,8 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
 
-using SD = global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
@@ -52,43 +50,43 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-            services.Add(new SD(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers for request messages
-            services.TryAdd(new SD(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers and wrappers for notification messages
-            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::ErrorMessage>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::ErrorMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::SuccessfulMessage>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::SuccessfulMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::ErrorMessage>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::ErrorMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::SuccessfulMessage>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::SuccessfulMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register notification handlers
-            services.TryAdd(new SD(typeof(global::ErrorNotificationHandler), typeof(global::ErrorNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::ErrorMessage>), GetRequiredService<global::ErrorNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::StatsNotificationHandler), typeof(global::StatsNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::ErrorMessage>), GetRequiredService<global::StatsNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::SuccessfulMessage>), GetRequiredService<global::StatsNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::GenericNotificationHandler<global::ErrorMessage>), typeof(global::GenericNotificationHandler<global::ErrorMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::ErrorMessage>), GetRequiredService<global::GenericNotificationHandler<global::ErrorMessage>>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::GenericNotificationHandler<global::SuccessfulMessage>), typeof(global::GenericNotificationHandler<global::SuccessfulMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.INotificationHandler<global::SuccessfulMessage>), GetRequiredService<global::GenericNotificationHandler<global::SuccessfulMessage>>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::ErrorNotificationHandler), typeof(global::ErrorNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::ErrorMessage>), GetRequiredService<global::ErrorNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::StatsNotificationHandler), typeof(global::StatsNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::ErrorMessage>), GetRequiredService<global::StatsNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::SuccessfulMessage>), GetRequiredService<global::StatsNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::GenericNotificationHandler<global::ErrorMessage>), typeof(global::GenericNotificationHandler<global::ErrorMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::ErrorMessage>), GetRequiredService<global::GenericNotificationHandler<global::ErrorMessage>>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::GenericNotificationHandler<global::SuccessfulMessage>), typeof(global::GenericNotificationHandler<global::SuccessfulMessage>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::SuccessfulMessage>), GetRequiredService<global::GenericNotificationHandler<global::SuccessfulMessage>>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register pipeline behaviors configured through options
-            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::ErrorLoggerHandler<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::ErrorLoggerHandler<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPipelineBehavior<global::Ping, global::Pong>), typeof(global::PingValidator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
-            services.Add(new SD(typeof(global::FireAndForgetNotificationPublisher), typeof(global::FireAndForgetNotificationPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::FireAndForgetNotificationPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::FireAndForgetNotificationPublisher), typeof(global::FireAndForgetNotificationPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::FireAndForgetNotificationPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register internal components
-            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new SD(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 

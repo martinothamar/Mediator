@@ -11,6 +11,7 @@ internal sealed record PipelineBehaviorModel : SymbolMetadataModel
         ServiceRegistrations = ImmutableEquatableArray<string>.Empty;
         if (type.Messages.Count > 0)
         {
+            var sd = "global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor";
             var interfaceSymbol = type.InterfaceSymbol.GetTypeSymbolFullName(includeTypeParameters: false);
             var concreteSymbol = type.Symbol.GetTypeSymbolFullName(includeTypeParameters: false);
             var builder = new List<string>(type.Messages.Count);
@@ -19,7 +20,7 @@ internal sealed record PipelineBehaviorModel : SymbolMetadataModel
                 var requestType = message.Symbol.GetTypeSymbolFullName();
                 var responseType = message.ResponseSymbol.GetTypeSymbolFullName();
                 var registration =
-                    $"services.Add(new SD(typeof({interfaceSymbol}<{requestType}, {responseType}>), typeof({concreteSymbol}{(type.Symbol.IsGenericType ? $"<{requestType}, {responseType}>" : "")}), {analyzer.ServiceLifetime}));";
+                    $"services.Add(new {sd}(typeof({interfaceSymbol}<{requestType}, {responseType}>), typeof({concreteSymbol}{(type.Symbol.IsGenericType ? $"<{requestType}, {responseType}>" : "")}), {analyzer.ServiceLifetime}));";
                 builder.Add(registration);
             }
 

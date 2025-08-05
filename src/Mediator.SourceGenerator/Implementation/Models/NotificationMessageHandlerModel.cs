@@ -10,6 +10,7 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
         ServiceRegistrations = ImmutableEquatableArray<string>.Empty;
         if (handler.Messages.Count > 0)
         {
+            var sd = "global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor";
             var interfaceSymbol = handler.UnconstructedInterfaceSymbol.GetTypeSymbolFullName(
                 includeTypeParameters: false
             );
@@ -19,7 +20,7 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
             if (!handler.Symbol.IsGenericType)
             {
                 var concreteRegistration =
-                    $"services.TryAdd(new SD(typeof({concreteSymbol}), typeof({concreteSymbol}), {analyzer.ServiceLifetime}));";
+                    $"services.TryAdd(new {sd}(typeof({concreteSymbol}), typeof({concreteSymbol}), {analyzer.ServiceLifetime}));";
                 builder.Add(concreteRegistration);
             }
 
@@ -29,13 +30,13 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
                 if (handler.Symbol.IsGenericType)
                 {
                     var concreteRegistration =
-                        $"services.TryAdd(new SD(typeof({concreteSymbol}<{requestType}>), typeof({concreteSymbol}<{requestType}>), {analyzer.ServiceLifetime}));";
+                        $"services.TryAdd(new {sd}(typeof({concreteSymbol}<{requestType}>), typeof({concreteSymbol}<{requestType}>), {analyzer.ServiceLifetime}));";
                     builder.Add(concreteRegistration);
                 }
                 var getExpression =
                     $"GetRequiredService<{concreteSymbol}{(handler.Symbol.IsGenericType ? $"<{requestType}>" : "")}>()";
                 var registration =
-                    $"services.Add(new SD(typeof({interfaceSymbol}<{requestType}>), {getExpression}, {analyzer.ServiceLifetime}));";
+                    $"services.Add(new {sd}(typeof({interfaceSymbol}<{requestType}>), {getExpression}, {analyzer.ServiceLifetime}));";
                 builder.Add(registration);
             }
 

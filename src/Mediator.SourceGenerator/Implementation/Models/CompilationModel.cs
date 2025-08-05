@@ -152,6 +152,7 @@ internal sealed record CompilationModel
     public string? ServiceLifetime { get; }
     public string? ServiceLifetimeShort { get; }
     public string? SingletonServiceLifetime { get; }
+    public string SD => "global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor";
     public bool ServiceLifetimeIsSingleton { get; }
     public bool ServiceLifetimeIsScoped { get; }
     public bool ServiceLifetimeIsTransient { get; }
