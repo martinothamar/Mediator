@@ -9,7 +9,7 @@ namespace Mediator
     /// Provide options for the Mediator source generator.
     /// </summary>
     [global::System.AttributeUsage(global::System.AttributeTargets.Assembly, AllowMultiple = false)]
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal sealed class MediatorOptionsAttribute : global::System.Attribute
     {
         /// <summary>

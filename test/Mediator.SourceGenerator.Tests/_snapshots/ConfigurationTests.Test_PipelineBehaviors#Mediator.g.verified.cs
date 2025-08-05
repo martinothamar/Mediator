@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// DI extensions for Mediator.
     /// </summary>
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public static class MediatorDependencyInjectionExtensions
@@ -90,7 +90,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 namespace Mediator.Internals
 {
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<object?> Handle(
@@ -98,7 +98,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface INotificationHandlerBase
     {
         global::System.Threading.Tasks.ValueTask Handle(
@@ -106,7 +106,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
@@ -115,7 +115,7 @@ namespace Mediator.Internals
         );
     }
 
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IRequestHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
@@ -123,7 +123,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class RequestHandlerWrapper<TRequest, TResponse> : IRequestHandlerBase<TResponse>
@@ -195,7 +195,7 @@ namespace Mediator.Internals
             return await Handle((TRequest)request, cancellationToken);
         }
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IStreamRequestHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
@@ -203,7 +203,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class StreamRequestHandlerWrapper<TRequest, TResponse> : IStreamRequestHandlerBase<TResponse>
@@ -276,7 +276,7 @@ namespace Mediator.Internals
                 yield return el;
         }
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface ICommandHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
@@ -284,7 +284,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class CommandHandlerWrapper<TRequest, TResponse> : ICommandHandlerBase<TResponse>
@@ -356,7 +356,7 @@ namespace Mediator.Internals
             return await Handle((TRequest)request, cancellationToken);
         }
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IStreamCommandHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
@@ -364,7 +364,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class StreamCommandHandlerWrapper<TRequest, TResponse> : IStreamCommandHandlerBase<TResponse>
@@ -437,7 +437,7 @@ namespace Mediator.Internals
                 yield return el;
         }
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IQueryHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
@@ -445,7 +445,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class QueryHandlerWrapper<TRequest, TResponse> : IQueryHandlerBase<TResponse>
@@ -517,7 +517,7 @@ namespace Mediator.Internals
             return await Handle((TRequest)request, cancellationToken);
         }
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IStreamQueryHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
@@ -525,7 +525,7 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class StreamQueryHandlerWrapper<TRequest, TResponse> : IStreamQueryHandlerBase<TResponse>
@@ -599,7 +599,7 @@ namespace Mediator.Internals
         }
     }
 
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class NotificationHandlerWrapper<TNotification> : INotificationHandlerBase
@@ -666,7 +666,7 @@ namespace Mediator.Internals
     internal sealed class ContainerProbe0 : IContainerProbe { }
     internal sealed class ContainerProbe1 : IContainerProbe { }
 
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class ContainerMetadata
@@ -728,7 +728,7 @@ namespace Mediator
     /// This type is also registered as a DI service.
     /// Can be used directly for high performance scenarios.
     /// </summary>
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
