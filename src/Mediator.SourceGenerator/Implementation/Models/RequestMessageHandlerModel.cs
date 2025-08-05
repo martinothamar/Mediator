@@ -18,9 +18,10 @@ internal sealed record RequestMessageHandlerModel : SymbolMetadataModel
         MessageType = messageType;
         WrapperType = wrapperType;
 
+        var sd = "global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor";
         var typeOfExpression = $"typeof({symbol.GetTypeSymbolFullName()})";
         ServiceRegistration =
-            $"services.TryAdd(new SD({typeOfExpression}, {typeOfExpression}, {analyzer.ServiceLifetime}));";
+            $"services.TryAdd(new {sd}({typeOfExpression}, {typeOfExpression}, {analyzer.ServiceLifetime}));";
     }
 
     public string ServiceRegistration { get; }

@@ -13,8 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
 
-using SD = global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
@@ -52,19 +50,19 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
-            services.Add(new SD(typeof(global::Mediator2.Mediator), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new SD(typeof(global::Mediator.IMediator), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new SD(typeof(global::Mediator.ISender), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new SD(typeof(global::Mediator.IPublisher), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Mediator), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), typeof(global::Mediator2.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
 
             // Register the notification publisher that was configured
-            services.Add(new SD(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new SD(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
 
             // Register internal components
-            services.Add(new SD(typeof(global::Mediator2.Internals.IContainerProbe), typeof(global::Mediator2.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new SD(typeof(global::Mediator2.Internals.IContainerProbe), typeof(global::Mediator2.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new SD(typeof(global::Mediator2.Internals.ContainerMetadata), typeof(global::Mediator2.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Internals.IContainerProbe), typeof(global::Mediator2.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Internals.IContainerProbe), typeof(global::Mediator2.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Internals.ContainerMetadata), typeof(global::Mediator2.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
