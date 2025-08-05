@@ -184,7 +184,8 @@ public sealed class StreamingTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(message).ToListAsync()
+        await Assert.ThrowsAsync<InvalidMessageException>(async () =>
+            await mediator.CreateStream(message).ToListAsync()
         );
     }
 
@@ -234,7 +235,8 @@ public sealed class StreamingTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(message).ToListAsync()
+        await Assert.ThrowsAsync<InvalidMessageException>(async () =>
+            await mediator.CreateStream(message).ToListAsync()
         );
     }
 
@@ -284,7 +286,8 @@ public sealed class StreamingTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.CreateStream(message).ToListAsync()
+        await Assert.ThrowsAsync<InvalidMessageException>(async () =>
+            await mediator.CreateStream(message).ToListAsync()
         );
     }
 

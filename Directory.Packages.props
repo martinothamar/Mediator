@@ -37,7 +37,7 @@
     <PackageVersion Include="Scriban" Version="6.2.0" />
 
     <!-- Build -->
-    <GlobalPackageReference Include="CSharpier.MsBuild" Version="1.0.1">
+    <GlobalPackageReference Include="CSharpier.MsBuild" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </GlobalPackageReference>

@@ -287,7 +287,7 @@ services.AddMediator((MediatorOptions options) =>
   * `Singleton` - (default value) everything registered as singletons, minimal allocations
   * `Transient` - mediator and handlers registered as transient
   * `Scoped`    - mediator and handlers registered as scoped
-* `GenerateTypesAsInternal` - makes all generated types `internal` as opposed to `public`
+* `GenerateTypesAsInternal` - makes all generated types `internal` as opposed to `public`, which may be necessary depending on project setup (e.g. for [Blazor sample](/samples/apps/ASPNET_CORE_Blazor))
 * `NotificationPublisherType` - the type used for publishing notifications (`ForeachAwaitPublisher` and `TaskWhenAllPublisher` are built in)
 * `Assemblies` - which assemblies the source generator should scan for messages and handlers. When not used the source generator will scan all references assemblies (same behavior as v2)
 * `PipelineBehaviors`/`StreamPipelineBehaviors` - ordered array of types used for the pipeline
