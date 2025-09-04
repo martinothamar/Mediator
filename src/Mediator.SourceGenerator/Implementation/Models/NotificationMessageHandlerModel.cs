@@ -1,4 +1,4 @@
-﻿using Mediator.SourceGenerator.Extensions;
+using Mediator.SourceGenerator.Extensions;
 
 namespace Mediator.SourceGenerator;
 
@@ -19,8 +19,10 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
 
             if (!handler.Symbol.IsGenericType)
             {
-                var concreteRegistration =
-                    $"services.TryAdd(new {sd}(typeof({concreteSymbol}), typeof({concreteSymbol}), {analyzer.ServiceLifetime}));";
+                var concreteRegistration = $"""
+                    if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof({concreteSymbol}), typeof({concreteSymbol})))
+                       services.TryAdd(new {sd}(typeof({concreteSymbol}), typeof({concreteSymbol}), {analyzer.ServiceLifetime}));
+                    """;
                 builder.Add(concreteRegistration);
             }
 
@@ -29,14 +31,19 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
                 var requestType = message.Symbol.GetTypeSymbolFullName();
                 if (handler.Symbol.IsGenericType)
                 {
-                    var concreteRegistration =
-                        $"services.TryAdd(new {sd}(typeof({concreteSymbol}<{requestType}>), typeof({concreteSymbol}<{requestType}>), {analyzer.ServiceLifetime}));";
+                    var concreteRegistration = $"""
+                        if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof({concreteSymbol}<{requestType}>), typeof({concreteSymbol}<{requestType}>)))
+                           services.TryAdd(new {sd}(typeof({concreteSymbol}<{requestType}>), typeof({concreteSymbol}<{requestType}>), {analyzer.ServiceLifetime}));
+                        """;
                     builder.Add(concreteRegistration);
                 }
-                var getExpression =
-                    $"GetRequiredService<{concreteSymbol}{(handler.Symbol.IsGenericType ? $"<{requestType}>" : "")}>()";
-                var registration =
-                    $"services.Add(new {sd}(typeof({interfaceSymbol}<{requestType}>), {getExpression}, {analyzer.ServiceLifetime}));";
+
+                var concreteImpl = $"{concreteSymbol}{(handler.Symbol.IsGenericType ? $"<{requestType}>" : "")}";
+                var getExpression = $"GetRequiredService<{concreteImpl}>()";
+                var registration = $"""
+                    if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof({interfaceSymbol}<{requestType}>), typeof({concreteImpl})))
+                       services.Add(new {sd}(typeof({interfaceSymbol}<{requestType}>), {getExpression}, {analyzer.ServiceLifetime}));
+                    """;
                 builder.Add(registration);
             }
 
