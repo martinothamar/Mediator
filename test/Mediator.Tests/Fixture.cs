@@ -15,10 +15,14 @@ public static class Fixture
     public static (IServiceProvider sp, IMediator mediator) GetMediator(
         Action<IServiceCollection>? configureServices = null,
         bool? createScope = null
+    ) => GetMediator(new ServiceCollection(), configureServices, createScope);
+
+    public static (IServiceProvider sp, IMediator mediator) GetMediator(
+        ServiceCollection services,
+        Action<IServiceCollection>? configureServices = null,
+        bool? createScope = null
     )
     {
-        var services = new ServiceCollection();
-
         services.AddMediator();
 
         configureServices?.Invoke(services);

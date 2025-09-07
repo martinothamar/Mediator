@@ -50,11 +50,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
+            // Build cache of existing registrations for efficient lookup
+            var existingRegistrations = BuildRegistrationCache(services);
+
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             // Register handlers and wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.RoundSucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2SucceededActually>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -66,52 +69,132 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.Round2Succeeded>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.DomainEvent2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             // Register notification handlers
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.DomainEventHandler), typeof(global::TestCode.DomainEventHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.DomainEvent>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundCreated>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundResulted>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundCreatedHandler), typeof(global::TestCode.RoundCreatedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundCreated>), GetRequiredService<global::TestCode.RoundCreatedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundResultedHandler), typeof(global::TestCode.RoundResultedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundResulted>), GetRequiredService<global::TestCode.RoundResultedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundSucceededHandler), typeof(global::TestCode.RoundSucceededHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>), GetRequiredService<global::TestCode.RoundSucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), GetRequiredService<global::TestCode.RoundSucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), GetRequiredService<global::TestCode.RoundSucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundSucceededActuallyHandler), typeof(global::TestCode.RoundSucceededActuallyHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), GetRequiredService<global::TestCode.RoundSucceededActuallyHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.DomainEvent2Handler), typeof(global::TestCode.DomainEvent2Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Created>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2CreatedHandler), typeof(global::TestCode.Round2CreatedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Created>), GetRequiredService<global::TestCode.Round2CreatedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2ResultedHandler), typeof(global::TestCode.Round2ResultedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>), GetRequiredService<global::TestCode.Round2ResultedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2SucceededHandler), typeof(global::TestCode.Round2SucceededHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>), GetRequiredService<global::TestCode.Round2SucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2SucceededActuallyHandler), typeof(global::TestCode.Round2SucceededActuallyHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), GetRequiredService<global::TestCode.Round2SucceededActuallyHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.DomainEventHandler), typeof(global::TestCode.DomainEventHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.DomainEventHandler), typeof(global::TestCode.DomainEventHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.DomainEvent>), typeof(global::TestCode.DomainEventHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.DomainEvent>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundCreated>), typeof(global::TestCode.DomainEventHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundCreated>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundResulted>), typeof(global::TestCode.DomainEventHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundResulted>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>), typeof(global::TestCode.DomainEventHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), typeof(global::TestCode.DomainEventHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), typeof(global::TestCode.DomainEventHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), GetRequiredService<global::TestCode.DomainEventHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.RoundCreatedHandler), typeof(global::TestCode.RoundCreatedHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundCreatedHandler), typeof(global::TestCode.RoundCreatedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundCreated>), typeof(global::TestCode.RoundCreatedHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundCreated>), GetRequiredService<global::TestCode.RoundCreatedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.RoundResultedHandler), typeof(global::TestCode.RoundResultedHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundResultedHandler), typeof(global::TestCode.RoundResultedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundResulted>), typeof(global::TestCode.RoundResultedHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundResulted>), GetRequiredService<global::TestCode.RoundResultedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.RoundSucceededHandler), typeof(global::TestCode.RoundSucceededHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundSucceededHandler), typeof(global::TestCode.RoundSucceededHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>), typeof(global::TestCode.RoundSucceededHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceeded>), GetRequiredService<global::TestCode.RoundSucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), typeof(global::TestCode.RoundSucceededHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), GetRequiredService<global::TestCode.RoundSucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), typeof(global::TestCode.RoundSucceededHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), GetRequiredService<global::TestCode.RoundSucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.RoundSucceededActuallyHandler), typeof(global::TestCode.RoundSucceededActuallyHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.RoundSucceededActuallyHandler), typeof(global::TestCode.RoundSucceededActuallyHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), typeof(global::TestCode.RoundSucceededActuallyHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.RoundSucceededActually>), GetRequiredService<global::TestCode.RoundSucceededActuallyHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.DomainEvent2Handler), typeof(global::TestCode.DomainEvent2Handler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.DomainEvent2Handler), typeof(global::TestCode.DomainEvent2Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>), typeof(global::TestCode.DomainEvent2Handler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.DomainEvent2>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Created>), typeof(global::TestCode.DomainEvent2Handler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Created>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>), typeof(global::TestCode.DomainEvent2Handler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>), typeof(global::TestCode.DomainEvent2Handler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>), GetRequiredService<global::TestCode.DomainEvent2Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.Round2CreatedHandler), typeof(global::TestCode.Round2CreatedHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2CreatedHandler), typeof(global::TestCode.Round2CreatedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Created>), typeof(global::TestCode.Round2CreatedHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Created>), GetRequiredService<global::TestCode.Round2CreatedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.Round2ResultedHandler), typeof(global::TestCode.Round2ResultedHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2ResultedHandler), typeof(global::TestCode.Round2ResultedHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>), typeof(global::TestCode.Round2ResultedHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Resulted>), GetRequiredService<global::TestCode.Round2ResultedHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.Round2SucceededHandler), typeof(global::TestCode.Round2SucceededHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2SucceededHandler), typeof(global::TestCode.Round2SucceededHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>), typeof(global::TestCode.Round2SucceededHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2Succeeded>), GetRequiredService<global::TestCode.Round2SucceededHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::TestCode.Round2SucceededActuallyHandler), typeof(global::TestCode.Round2SucceededActuallyHandler)))
+               services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Round2SucceededActuallyHandler), typeof(global::TestCode.Round2SucceededActuallyHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            if (!IsHandlerAlreadyRegistered(existingRegistrations, typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), typeof(global::TestCode.Round2SucceededActuallyHandler)))
+               services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.Round2SucceededActually>), GetRequiredService<global::TestCode.Round2SucceededActuallyHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+        
             // Register the notification publisher that was configured
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             // Register internal components
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             return services;
-
+        
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             static global::System.Func<global::System.IServiceProvider, T> GetRequiredService<T>() where T : notnull => sp => sp.GetRequiredService<T>();
+        }
+
+        /// <summary>
+        /// Builds a cache of existing service registrations for efficient duplicate detection.
+        /// Maps service types to their registered implementation types.
+        /// </summary>
+        /// <param name="services">The service collection to analyze</param>
+        /// <returns>Dictionary mapping service types to sets of implementation types</returns>
+        private static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>> 
+            BuildRegistrationCache(IServiceCollection services)
+        {
+            var cache = new global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>>();
+            
+            foreach (var service in services)
+            {
+                if (service.ServiceType == null) continue;
+                
+                if (!cache.ContainsKey(service.ServiceType))
+                {
+                    cache[service.ServiceType] = new global::System.Collections.Generic.HashSet<global::System.Type>();
+                }
+                
+                // Handle different ServiceDescriptor registration patterns
+                if (service.ImplementationType != null)
+                {
+                    cache[service.ServiceType].Add(service.ImplementationType);
+                }
+                else if (service.ImplementationInstance != null)
+                {
+                    cache[service.ServiceType].Add(service.ImplementationInstance.GetType());
+                }
+            }
+            
+            return cache;
+        }
+
+        /// <summary>
+        /// Checks if a handler registration already exists in the service collection.
+        /// </summary>
+        /// <param name="existingRegistrations">Cache of existing registrations</param>
+        /// <param name="serviceType">The service interface type</param>
+        /// <param name="implementationType">The concrete implementation type</param>
+        /// <returns>True if the handler is already registered</returns>
+        private static bool IsHandlerAlreadyRegistered(
+            global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>> existingRegistrations,
+            global::System.Type serviceType,
+            global::System.Type implementationType)
+        {
+            return existingRegistrations.ContainsKey(serviceType) && 
+                existingRegistrations[serviceType].Contains(implementationType);
         }
     }
 }

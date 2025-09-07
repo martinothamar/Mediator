@@ -49,6 +49,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
+            // Build cache of existing registrations for efficient lookup
+            var existingRegistrations = BuildRegistrationCache(services);
+
             {{~ if ServiceLifetimeIsTransient || ServiceLifetimeIsScoped ~}}
             services.Add(new {{ SD }}(typeof(global::{{ MediatorNamespace }}.Mediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
             services.TryAdd(new {{ SD }}(typeof(global::Mediator.IMediator), typeof(global::{{ MediatorNamespace }}.Mediator), {{ ServiceLifetime }}));
@@ -61,7 +64,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new {{ SD }}(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>(), {{ ServiceLifetime }}));
             {{~ end ~}}
             {{~ if (object.size RequestMessages) > 0 ~}}
-
+        
             // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistration }}
@@ -70,14 +73,14 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size NotificationMessages) > 0 ~}}
-
+        
             // Register handlers and wrappers for notification messages
             {{~ for message in NotificationMessages ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size NotificationMessageHandlers) > 0 ~}}
-
+        
             // Register notification handlers
             {{~ for handler in NotificationMessageHandlers ~}}
             {{~ for registration in handler.ServiceRegistrations ~}}
@@ -86,7 +89,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size PipelineBehaviors) > 0 ~}}
-
+        
             // Register pipeline behaviors configured through options
             {{~ for behavior in PipelineBehaviors ~}}
             {{~ for registration in behavior.ServiceRegistrations ~}}
@@ -94,7 +97,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
-
+        
             // Register the notification publisher that was configured
             {{~ if ServiceLifetimeIsScoped || ServiceLifetimeIsTransient ~}}
             services.Add(new {{ SD }}(typeof({{ NotificationPublisherType.FullName }}), typeof({{ NotificationPublisherType.FullName }}), {{ ServiceLifetime }}));
@@ -103,18 +106,68 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new {{ SD }}(typeof({{ NotificationPublisherType.FullName }}), typeof({{ NotificationPublisherType.FullName }}), {{ SingletonServiceLifetime }}));
             services.TryAdd(new {{ SD }}(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>(), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
-
+        
             // Register internal components
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
-
+        
             return services;
-
-			{{~ if HasNotifications ~}}
+        
+            {{~ if HasNotifications ~}}
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             static global::System.Func<global::System.IServiceProvider, T> GetRequiredService<T>() where T : notnull => sp => sp.GetRequiredService<T>();
-			{{~ end ~}}
+            {{~ end ~}}
+        }
+
+        /// <summary>
+        /// Builds a cache of existing service registrations for efficient duplicate detection.
+        /// Maps service types to their registered implementation types.
+        /// </summary>
+        /// <param name="services">The service collection to analyze</param>
+        /// <returns>Dictionary mapping service types to sets of implementation types</returns>
+        private static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>> 
+            BuildRegistrationCache(IServiceCollection services)
+        {
+            var cache = new global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>>();
+            
+            foreach (var service in services)
+            {
+                if (service.ServiceType == null) continue;
+                
+                if (!cache.ContainsKey(service.ServiceType))
+                {
+                    cache[service.ServiceType] = new global::System.Collections.Generic.HashSet<global::System.Type>();
+                }
+                
+                // Handle different ServiceDescriptor registration patterns
+                if (service.ImplementationType != null)
+                {
+                    cache[service.ServiceType].Add(service.ImplementationType);
+                }
+                else if (service.ImplementationInstance != null)
+                {
+                    cache[service.ServiceType].Add(service.ImplementationInstance.GetType());
+                }
+            }
+            
+            return cache;
+        }
+
+        /// <summary>
+        /// Checks if a handler registration already exists in the service collection.
+        /// </summary>
+        /// <param name="existingRegistrations">Cache of existing registrations</param>
+        /// <param name="serviceType">The service interface type</param>
+        /// <param name="implementationType">The concrete implementation type</param>
+        /// <returns>True if the handler is already registered</returns>
+        private static bool IsHandlerAlreadyRegistered(
+            global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>> existingRegistrations,
+            global::System.Type serviceType,
+            global::System.Type implementationType)
+        {
+            return existingRegistrations.ContainsKey(serviceType) && 
+                existingRegistrations[serviceType].Contains(implementationType);
         }
     }
 }
