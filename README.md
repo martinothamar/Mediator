@@ -426,7 +426,7 @@ public sealed class ErrorLoggerHandler<TMessage, TResponse> : IPipelineBehavior<
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling message");
-            await _mediator.Publish(new ErrorMessage(ex));
+            await _mediator.Publish(new ErrorMessage(ex), cancellationToken);
             throw;
         }
     }
