@@ -9,7 +9,7 @@
 # Mediator
 
 This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
-The API and usage is mostly based on the great [MediatR](https://github.com/jbogard/MediatR) library, with some deviations to allow for better performance.
+The API and usage is mostly based on the great [MediatR](https://github.com/LuckyPennySoftware/MediatR) library, with some deviations to allow for better performance.
 Packages are .NET Standard 2.0 compatible.
 
 The mediator pattern is great for implementing cross cutting concern (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
@@ -74,6 +74,7 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
   - [5. Diagnostics](#5-diagnostics)
   - [6. Differences from MediatR](#6-differences-from-mediatr)
   - [7. Versioning](#7-versioning)
+  - [8. Related projects](#8-related-projects)
 
 ## 2. Benchmarks
 
@@ -577,7 +578,7 @@ Since this is a source generator, diagnostics are also included. Examples below
 ![Multiple request handlers found](/img/multiple_request_handlers.png "Multiple request handlers found")
 
 
-## 6. Differences from [MediatR](https://github.com/jbogard/MediatR)
+## 6. Differences from [MediatR](https://github.com/LuckyPennySoftware/MediatR)
 
 This is a work in progress list on the differences between this library and MediatR.
 
@@ -597,3 +598,14 @@ For versioning this library I try to follow [semver 2.0](https://semver.org/) as
 * Major bump for breaking changes
 * Minor bump for new backward compatible features
 * Patch bump for bugfixes
+
+## 8. Related projects
+
+There are various options for Mediator implementations in the .NET ecosystem. Here are some good ones that you might consider:
+
+* [MediatR](https://github.com/LuckyPennySoftware/MediatR) - the original reflection-based implementation (in-memory only)
+* Mediator (this library) - keeps a very similar API to MediatR, but with improved performance and NativeAoT-friendliness (in-memory only)
+* [Foundatio.Mediator](https://github.com/FoundatioFx/Foundatio.Mediator) - different, conventions based API
+* [Wolverine](https://wolverinefx.net/) (part of the critterstack) - also conventions based, is a larger framework that also offers async/distributed messaging
+* [MassTransit](https://masstransit.io/) - also offers a mediator implementation, and also offers async/distributed messaging
+
