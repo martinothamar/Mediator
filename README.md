@@ -604,8 +604,8 @@ For versioning this library I try to follow [semver 2.0](https://semver.org/) as
 There are various options for Mediator implementations in the .NET ecosystem. Here are some good ones that you might consider:
 
 * [MediatR](https://github.com/LuckyPennySoftware/MediatR) - the original reflection-based implementation (in-memory only)
-* Mediator (this library) - keeps a very similar API to MediatR, but with improved performance and NativeAoT-friendliness (in-memory only)
-* [Foundatio.Mediator](https://github.com/FoundatioFx/Foundatio.Mediator) - different, conventions based API
+* Mediator (this library) - keeps a very similar API to MediatR, but with improved performance and NativeAoT-friendliness (in-memory only) in part due to sourcegenerators
+* [Foundatio.Mediator](https://github.com/FoundatioFx/Foundatio.Mediator) - different, conventions based API. Also sourcegenerator-based (in-memory only)
 * [Wolverine](https://wolverinefx.net/) (part of the critterstack) - also conventions based, is a larger framework that also offers async/distributed messaging
 * [MassTransit](https://masstransit.io/) - also offers a mediator implementation, and also offers async/distributed messaging
 
