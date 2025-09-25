@@ -44,7 +44,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
                     or RequestMessageKind.StreamQuery
                     or RequestMessageKind.StreamCommand;
 
-        var isVoid = MessageKind is RequestMessageKind.VoidCommand or RequestMessageKind.VoidRequest;
+        IsVoid = MessageKind is RequestMessageKind.VoidCommand or RequestMessageKind.VoidRequest;
 
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();
@@ -54,7 +54,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         Handler = handler;
 
         var fullHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.TypeName}";
-        HandlerWrapperTypeNameWithGenericTypeArguments = isVoid
+        HandlerWrapperTypeNameWithGenericTypeArguments = IsVoid
             ? $"{fullHandlerWrapperTypeName}<{FullName}>"
             : $"{fullHandlerWrapperTypeName}<{FullName}, {ResponseFullName}>";
 
@@ -67,7 +67,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         MethodName = isStreaming ? "CreateStream" : "Send";
         ReturnType =
             isStreaming ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
-            : isVoid ? $"global::System.Threading.Tasks.ValueTask"
+            : IsVoid ? $"global::System.Threading.Tasks.ValueTask"
             : $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
     }
 
@@ -81,4 +81,5 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
     public string HandlerWrapperPropertyName { get; }
     public string MethodName { get; }
     public string ReturnType { get; }
+    public bool IsVoid { get; }
 }

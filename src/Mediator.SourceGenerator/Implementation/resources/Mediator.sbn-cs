@@ -65,7 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistration }}
-            {{~ if message.Handler.WrapperType.IsVoid ~}}
+            {{~ if message.IsVoid ~}}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
             {{~ else ~}}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
