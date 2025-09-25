@@ -43,6 +43,8 @@ return response.Id == id ? 0 : 1;
 
 public sealed record Ping(Guid Id) : IRequest<Pong>;
 
+public sealed record PingPong(Guid Id) : IRequest;
+
 public sealed record Pong(Guid Id);
 
 public sealed class GenericLoggerHandler<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
@@ -93,5 +95,55 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
     {
         Console.WriteLine("4) Returning pong!");
         return new ValueTask<Pong>(new Pong(request.Id));
+    }
+}
+
+public sealed class GenericLoggerHandler<TMessage> : IPipelineBehavior<TMessage>
+    where TMessage : IMessage
+{
+    public async ValueTask Handle(
+        TMessage message,
+        MessageHandlerDelegate<TMessage> next,
+        CancellationToken cancellationToken
+    )
+    {
+        Console.WriteLine("1) Running logger handler");
+        try
+        {
+            await next(message, cancellationToken);
+            Console.WriteLine("5) No error!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+}
+
+public sealed class PingPongValidator : IPipelineBehavior<PingPong>
+{
+    public ValueTask Handle(
+        PingPong request,
+        MessageHandlerDelegate<PingPong> next,
+        CancellationToken cancellationToken
+    )
+    {
+        Console.WriteLine("2) Running pingpong validator");
+        if (request is null || request.Id == default)
+            throw new ArgumentException("Invalid input");
+        else
+            Console.WriteLine("3) Valid input!");
+
+        return next(request, cancellationToken);
+    }
+}
+
+public sealed class PingPongHandler : IRequestHandler<PingPong>
+{
+    public ValueTask Handle(PingPong request, CancellationToken cancellationToken)
+    {
+        Console.WriteLine("4) Pingpong!");
+        return default;
     }
 }

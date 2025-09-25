@@ -120,8 +120,10 @@ internal sealed class CompilationAnalyzer
             {
                 new RequestMessageHandlerWrapperModel("Request", this),
                 new RequestMessageHandlerWrapperModel("StreamRequest", this),
+                new RequestMessageHandlerWrapperModel("VoidRequest", this),
                 new RequestMessageHandlerWrapperModel("Command", this),
                 new RequestMessageHandlerWrapperModel("StreamCommand", this),
+                new RequestMessageHandlerWrapperModel("VoidCommand", this),
                 new RequestMessageHandlerWrapperModel("Query", this),
                 new RequestMessageHandlerWrapperModel("StreamQuery", this),
             }.ToImmutableArray();
@@ -677,6 +679,9 @@ internal sealed class CompilationAnalyzer
                             typeInterfaceSymbol.Name.IndexOf('<') == -1
                                 ? typeInterfaceSymbol.Name.Substring(1)
                                 : typeInterfaceSymbol.Name.Substring(1, typeInterfaceSymbol.Name.IndexOf('<') - 1);
+
+                        var isVoid = _symbolComparer.Equals(_unitSymbol, responseMessageSymbol);
+                        messageType = isVoid ? $"Void{messageType}" : messageType;
 
                         var message = new RequestMessage(typeSymbol, responseMessageSymbol, messageType, this);
                         if (!_requestMessages.Add(message))

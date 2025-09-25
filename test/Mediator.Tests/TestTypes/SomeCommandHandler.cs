@@ -20,7 +20,7 @@ public sealed class SomeCommandWithoutResponseHandler : ICommandHandler<SomeComm
 {
     internal static readonly ConcurrentBag<Guid> Ids = new();
 
-    public ValueTask<Unit> Handle(SomeCommandWithoutResponse command, CancellationToken cancellationToken)
+    public ValueTask Handle(SomeCommandWithoutResponse command, CancellationToken cancellationToken)
     {
         Ids.Add(command.Id);
         return default;
@@ -32,7 +32,7 @@ public sealed class SomeStructCommandHandler : ICommandHandler<SomeStructCommand
     internal static readonly ConcurrentBag<Guid> Ids = new();
     internal static readonly ConcurrentBag<long> Addresses = new();
 
-    public unsafe ValueTask<Unit> Handle(SomeStructCommand command, CancellationToken cancellationToken)
+    public unsafe ValueTask Handle(SomeStructCommand command, CancellationToken cancellationToken)
     {
         Ids.Add(command.Id);
         var addr = *(long*)&command;

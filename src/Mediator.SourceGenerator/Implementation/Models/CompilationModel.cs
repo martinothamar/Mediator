@@ -1,4 +1,4 @@
-﻿namespace Mediator.SourceGenerator;
+namespace Mediator.SourceGenerator;
 
 internal sealed record CompilationModel
 {
@@ -31,6 +31,8 @@ internal sealed record CompilationModel
 
         IRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         ICommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IVoidRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IVoidCommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         IQueryMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         IStreamRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         IStreamQueryMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
@@ -81,6 +83,8 @@ internal sealed record CompilationModel
 
         var iRequestMessages = new List<RequestMessageModel>();
         var iCommandMessages = new List<RequestMessageModel>();
+        var iVoidRequestMessages = new List<RequestMessageModel>();
+        var iVoidCommandMessages = new List<RequestMessageModel>();
         var iQueryMessages = new List<RequestMessageModel>();
         var iStreamRequestMessages = new List<RequestMessageModel>();
         var iStreamQueryMessages = new List<RequestMessageModel>();
@@ -96,6 +100,8 @@ internal sealed record CompilationModel
                 {
                     RequestMessageKind.Request => iRequestMessages,
                     RequestMessageKind.Command => iCommandMessages,
+                    RequestMessageKind.VoidRequest => iVoidRequestMessages,
+                    RequestMessageKind.VoidCommand => iVoidCommandMessages,
                     RequestMessageKind.Query => iQueryMessages,
                     RequestMessageKind.StreamRequest => iStreamRequestMessages,
                     RequestMessageKind.StreamQuery => iStreamQueryMessages,
@@ -118,6 +124,8 @@ internal sealed record CompilationModel
 
         IRequestMessages = new(iRequestMessages);
         ICommandMessages = new(iCommandMessages);
+        IVoidCommandMessages = new(iVoidCommandMessages);
+        IVoidRequestMessages = new(iVoidRequestMessages);
         IQueryMessages = new(iQueryMessages);
         IStreamRequestMessages = new(iStreamRequestMessages);
         IStreamQueryMessages = new(iStreamQueryMessages);
@@ -173,6 +181,8 @@ internal sealed record CompilationModel
 
     public ImmutableEquatableArray<RequestMessageModel> IRequestMessages { get; }
     public ImmutableEquatableArray<RequestMessageModel> ICommandMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IVoidRequestMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IVoidCommandMessages { get; }
     public ImmutableEquatableArray<RequestMessageModel> IQueryMessages { get; }
 
     public ImmutableEquatableArray<RequestMessageModel> IStreamRequestMessages { get; }

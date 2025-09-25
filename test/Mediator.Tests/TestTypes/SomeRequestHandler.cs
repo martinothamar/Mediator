@@ -19,7 +19,7 @@ public sealed class SomeRequestWithoutResponseHandler : IRequestHandler<SomeRequ
 {
     internal static readonly ConcurrentBag<Guid> Ids = new();
 
-    public ValueTask<Unit> Handle(SomeRequestWithoutResponse request, CancellationToken cancellationToken)
+    public ValueTask Handle(SomeRequestWithoutResponse request, CancellationToken cancellationToken)
     {
         Ids.Add(request.Id);
         return default;

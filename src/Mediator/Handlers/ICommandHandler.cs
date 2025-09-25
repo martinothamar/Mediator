@@ -6,5 +6,8 @@ public interface ICommandHandler<in TCommand, TResponse>
     ValueTask<TResponse> Handle(TCommand command, CancellationToken cancellationToken);
 }
 
-public interface ICommandHandler<in TCommand> : ICommandHandler<TCommand, Unit>
-    where TCommand : ICommand<Unit> { }
+public interface ICommandHandler<in TCommand>
+    where TCommand : ICommand
+{
+    ValueTask Handle(TCommand command, CancellationToken cancellationToken);
+}

@@ -110,33 +110,33 @@ public sealed record Request() : IRequest;
 
 public sealed class RequestHandler : IRequestHandler<Request>
 {
-    public ValueTask<Unit> Handle(Request request, CancellationToken cancellationToken) => default;
+    public ValueTask Handle(Request request, CancellationToken cancellationToken) => default;
 }
 
 public sealed record Request2() : IRequest;
 
 public sealed class Request2Handler : IRequestHandler<Request2>
 {
-    public ValueTask<Unit> Handle(Request2 request, CancellationToken cancellationToken) => default;
+    public ValueTask Handle(Request2 request, CancellationToken cancellationToken) => default;
 }
 
 public sealed record Request3() : IRequest;
 
 public sealed class Request3Handler : IRequestHandler<Request3>
 {
-    public ValueTask<Unit> Handle(Request3 request, CancellationToken cancellationToken) => default;
+    public ValueTask Handle(Request3 request, CancellationToken cancellationToken) => default;
 }
 
 public sealed record Request4() : IRequest;
 
 public sealed class Request4Handler : IRequestHandler<Request4>
 {
-    public ValueTask<Unit> Handle(Request4 request, CancellationToken cancellationToken) => default;
+    public ValueTask Handle(Request4 request, CancellationToken cancellationToken) => default;
 }
 
 public sealed record Request5() : IRequest;
 
 public sealed class Request5Handler : IRequestHandler<Request5>
 {
-    public ValueTask<Unit> Handle(Request5 request, CancellationToken cancellationToken) => default;
+    public ValueTask Handle(Request5 request, CancellationToken cancellationToken) => default;
 }

@@ -9,3 +9,9 @@ public interface IPipelineBehavior<TMessage, TResponse>
         CancellationToken cancellationToken
     );
 }
+
+public interface IPipelineBehavior<TMessage>
+    where TMessage : notnull, IMessage
+{
+    ValueTask Handle(TMessage message, MessageHandlerDelegate<TMessage> next, CancellationToken cancellationToken);
+}
