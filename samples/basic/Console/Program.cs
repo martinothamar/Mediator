@@ -25,6 +25,10 @@ var serviceProvider = services.BuildServiceProvider();
 
 var mediator = serviceProvider.GetRequiredService<IMediator>();
 
+await mediator.Send(new PingPong(Guid.NewGuid()));
+
+Console.WriteLine("-----------------------------------");
+
 var id = Guid.NewGuid();
 var request = new Ping(id);
 
@@ -143,7 +147,7 @@ public sealed class PingPongHandler : IRequestHandler<PingPong>
 {
     public ValueTask Handle(PingPong request, CancellationToken cancellationToken)
     {
-        Console.WriteLine("4) Pingpong!");
+        Console.WriteLine($"0) Pingpong! {request.Id}");
         return default;
     }
 }

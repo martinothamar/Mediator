@@ -134,20 +134,24 @@ internal sealed record CompilationModel
         HasRequests = iRequestMessages.Count > 0;
         HasCommands = iCommandMessages.Count > 0;
         HasQueries = iQueryMessages.Count > 0;
+        HasVoidRequests = iVoidRequestMessages.Count > 0;
+        HasVoidCommands = iVoidCommandMessages.Count > 0;
         HasStreamRequests = iStreamRequestMessages.Count > 0;
         HasStreamQueries = iStreamQueryMessages.Count > 0;
         HasStreamCommands = iStreamCommandMessages.Count > 0;
         HasNotifications = notificationMessages.Count > 0;
 
         HasManyRequests = iRequestMessages.Count > ManyMessagesTreshold;
+        HasManyVoidRequests = iVoidRequestMessages.Count > ManyMessagesTreshold;
         HasManyCommands = iCommandMessages.Count > ManyMessagesTreshold;
+        HasManyVoidCommands = iVoidCommandMessages.Count > ManyMessagesTreshold;
         HasManyQueries = iQueryMessages.Count > ManyMessagesTreshold;
         HasManyStreamRequests = iStreamRequestMessages.Count > ManyMessagesTreshold;
         HasManyStreamQueries = iStreamQueryMessages.Count > ManyMessagesTreshold;
         HasManyStreamCommands = iStreamCommandMessages.Count > ManyMessagesTreshold;
         HasManyNotifications = notificationMessages.Count > ManyMessagesTreshold;
 
-        HasAnyRequest = HasRequests || HasCommands || HasQueries;
+        HasAnyRequest = HasRequests || HasCommands || HasQueries || HasVoidCommands || HasVoidRequests;
         HasAnyStreamRequest = HasStreamRequests || HasStreamQueries || HasStreamCommands;
     }
 
@@ -190,7 +194,9 @@ internal sealed record CompilationModel
     public ImmutableEquatableArray<RequestMessageModel> IStreamCommandMessages { get; }
 
     public bool HasRequests { get; }
+    public bool HasVoidRequests { get; }
     public bool HasCommands { get; }
+    public bool HasVoidCommands { get; }
     public bool HasQueries { get; }
     public bool HasStreamRequests { get; }
     public bool HasStreamQueries { get; }
@@ -198,7 +204,9 @@ internal sealed record CompilationModel
     public bool HasNotifications { get; }
 
     public bool HasManyRequests { get; }
+    public bool HasManyVoidRequests { get; }
     public bool HasManyCommands { get; }
+    public bool HasManyVoidCommands { get; }
     public bool HasManyQueries { get; }
     public bool HasManyStreamRequests { get; }
     public bool HasManyStreamQueries { get; }
