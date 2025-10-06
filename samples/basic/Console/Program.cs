@@ -20,6 +20,7 @@ services.AddMediator(
 // Here are two examples.
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericLoggerHandler<,>)); // This will run 1st
 services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>(); // This will run 2nd
+services.AddSingleton<IPipelineBehavior<PingPong, Unit>, PingPongValidator>();
 
 var serviceProvider = services.BuildServiceProvider();
 
