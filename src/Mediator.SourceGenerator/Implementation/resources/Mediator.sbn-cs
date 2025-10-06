@@ -67,6 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{ message.Handler.ServiceRegistration }}
             {{~ if message.IsVoid ~}}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.Handler.WrapperType.VoidMessageType }}Handler<{{ message.FullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
+            services.Add(new {{ SD }}(typeof({{message.Handler.WrapperType.FullNamespace}}.I{{ message.MessageType }}Handler<{{ message.FullName }}>),typeof({{message.Handler.WrapperType.FullNamespace}}.{{ message.MessageType }}Handler<{{ message.FullName }}>), {{ ServiceLifetime }}));
             {{~ else ~}}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
             {{~ end ~}}
@@ -137,17 +138,6 @@ namespace {{ InternalsNamespace }}
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    internal interface IVoidMessageHandlerBase
-    {
-        global::System.Threading.Tasks.ValueTask Handle(
-            {{~ if !ServiceLifetimeIsSingleton ~}}
-            global::{{ MediatorNamespace }}.Mediator mediator,
-            {{~ end ~}}
-            object request,
-            global::System.Threading.CancellationToken cancellationToken
-        );
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     internal interface INotificationHandlerBase
     {
         global::System.Threading.Tasks.ValueTask Handle(
@@ -187,6 +177,29 @@ namespace {{ InternalsNamespace }}
         );
     }
 
+    {{~ if wrapperType.IsVoid ~}}
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    internal interface I{{ wrapperType.MessageType }}Handler<TRequest>  where TRequest : global::Mediator.I{{ wrapperType.VoidMessageType }}
+    {
+        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    internal class {{ wrapperType.MessageType }}Handler<TRequest>(global::System.IServiceProvider sp) : I{{ wrapperType.MessageType }}Handler<TRequest>  where TRequest : global::Mediator.I{{ wrapperType.VoidMessageType }}
+    {
+        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            await sp.GetRequiredService<global::Mediator.I{{ wrapperType.VoidMessageType }}Handler<TRequest>>().Handle(request, cancellationToken);
+            return default;
+        }
+    }
+    {{~ end ~}}
+
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
@@ -206,7 +219,7 @@ namespace {{ InternalsNamespace }}
         )
         {
             {{~ if wrapperType.IsVoid ~}}
-            var concreteHandler = sp.GetRequiredService<global::Mediator.I{{ wrapperType.VoidMessageType }}Handler<TRequest>>();
+            var concreteHandler = sp.GetRequiredService<I{{ wrapperType.MessageType }}Handler<TRequest>>();
             {{~ else ~}}
             var concreteHandler = sp.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
             {{~ end }}
@@ -256,7 +269,7 @@ namespace {{ InternalsNamespace }}
             var handler = _rootHandler;
             {{~ else ~}}
             {{~ if wrapperType.IsVoid ~}}
-            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.I{{ wrapperType.VoidMessageType }}Handler<TRequest>>();
+            var concreteHandler = mediator.Services.GetRequiredService<{{ wrapperType.MessageType }}Handler<TRequest>>();
             {{~ else ~}}
             var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
             {{~ end ~}}
@@ -332,11 +345,7 @@ namespace {{ InternalsNamespace }}
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            {{~ if wrapperType.IsVoid ~}}
-            await Handle({{ if !ServiceLifetimeIsSingleton; "mediator, "; end; }}(TRequest)request, cancellationToken);
-            {{~ else ~}}
             return await Handle({{ if !ServiceLifetimeIsSingleton; "mediator, "; end; }}(TRequest)request, cancellationToken);
-            {{~ end ~}}
         }
         {{~ end ~}}
     }
@@ -975,7 +984,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask {{ message.MethodName }}(
+        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> {{ message.MethodName }}(
             {{ message.FullName }} request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -1019,7 +1028,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask {{ message.MethodName }}(
+        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> {{ message.MethodName }}(
             {{ message.FullName }} command,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -1225,7 +1234,8 @@ namespace {{ MediatorNamespace }}
             if (handlerObj is global::{{ InternalsNamespace }}.IVoidRequestHandlerBase)
             {
                 ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IVoidRequestHandlerBase>(ref handlerObj);
-                return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
+                var valueTask = handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
+                return valueTask.IsCompletedSuccessfully ? default : new ValueTask(valueTask.AsTask());
             }
             return SendAsync(request, handlerObj, cancellationToken);
             {{~ else ~}}
@@ -1452,7 +1462,8 @@ namespace {{ MediatorNamespace }}
             if (handlerObj is global::{{ InternalsNamespace }}.IVoidCommandHandlerBase)
             {
                 ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IVoidCommandHandlerBase>(ref handlerObj);
-                return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
+                var valueTask = handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
+                return valueTask.IsCompletedSuccessfully ? default : new ValueTask(valueTask.AsTask());
             }
             return SendAsync(command, handlerObj, cancellationToken);
             {{~ else ~}}

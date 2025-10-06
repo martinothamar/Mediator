@@ -54,7 +54,6 @@ public sealed class PipelineTests
         {
             services.AddSingleton<GenericPipelineState>();
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
-            services.AddSingleton(typeof(IPipelineBehavior<>), typeof(GenericPipeline<>));
         });
 
         var request = new SomeRequest(Guid.NewGuid());
@@ -95,7 +94,6 @@ public sealed class PipelineTests
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CommandSpecificPipeline<,>));
-            services.AddSingleton(typeof(IPipelineBehavior<>), typeof(CommandSpecificPipeline<>));
         });
 
         var id = Guid.NewGuid();
@@ -106,7 +104,7 @@ public sealed class PipelineTests
         Assert.Equal(1, CommandSpecificPipeline<SomeCommand, SomeResponse>.CallCount);
 
         await mediator.Send(new SomeCommandWithoutResponse(id));
-        Assert.Equal(1, CommandSpecificPipeline<SomeCommandWithoutResponse>.CallCount);
+        Assert.Equal(1, CommandSpecificPipeline<SomeCommandWithoutResponse, Unit>.CallCount);
     }
 
     [Fact]
@@ -136,15 +134,15 @@ public sealed class PipelineTests
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<GenericPipelineState>();
-            services.AddSingleton(typeof(IPipelineBehavior<>), typeof(GenericPipeline<>));
-            services.AddSingleton<IPipelineBehavior<SomeRequestWithoutResponse>, SomePipelineWithoutResponse>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
         });
 
         var id = Guid.NewGuid();
 
         await mediator.Send(new SomeRequestWithoutResponse(id));
 
-        var pipelineSteps = sp.GetServices<IPipelineBehavior<SomeRequestWithoutResponse>>().Cast<IPipelineTestData>();
+        var pipelineSteps = sp.GetServices<IPipelineBehavior<SomeRequestWithoutResponse, Unit>>()
+            .Cast<IPipelineTestData>();
 
         var original = pipelineSteps.Select(p => p.LastMsgTimestamp).ToArray();
         var ordered = pipelineSteps.Select(p => p.LastMsgTimestamp).OrderBy(x => x).ToArray();

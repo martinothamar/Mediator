@@ -18,19 +18,3 @@ public sealed class CommandSpecificPipeline<TCommand, TResponse> : IPipelineBeha
         return next(message, cancellationToken);
     }
 }
-
-public sealed class CommandSpecificPipeline<TCommand> : IPipelineBehavior<TCommand>
-    where TCommand : IBaseCommand
-{
-    public static int CallCount { get; private set; }
-
-    public ValueTask Handle(
-        TCommand message,
-        MessageHandlerDelegate<TCommand> next,
-        CancellationToken cancellationToken
-    )
-    {
-        CallCount++;
-        return next(message, cancellationToken);
-    }
-}

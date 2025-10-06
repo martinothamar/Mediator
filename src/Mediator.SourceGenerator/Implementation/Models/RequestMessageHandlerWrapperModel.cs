@@ -28,22 +28,22 @@ internal sealed record RequestMessageHandlerWrapperModel
     public string InterfaceTypeNameWithGenericParameter { get; }
     public string MessageHandlerDelegateName =>
         IsStreaming ? $"global::Mediator.StreamHandlerDelegate<TRequest, TResponse>"
-        : IsVoid ? "global::Mediator.MessageHandlerDelegate<TRequest>"
+        : IsVoid ? "global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>"
         : $"global::Mediator.MessageHandlerDelegate<TRequest, TResponse>";
     public string PipelineHandlerTypeName =>
         IsStreaming ? "global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>"
-        : IsVoid ? "global::Mediator.IPipelineBehavior<TRequest>"
+        : IsVoid ? "global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>"
         : "global::Mediator.IPipelineBehavior<TRequest, TResponse>";
     public string ReturnTypeName =>
         IsStreaming ? "global::System.Collections.Generic.IAsyncEnumerable<TResponse>"
-        : IsVoid ? "global::System.Threading.Tasks.ValueTask"
+        : IsVoid ? "global::System.Threading.Tasks.ValueTask<global::Mediator.Unit>"
         : "global::System.Threading.Tasks.ValueTask<TResponse>";
     public string ReturnTypeNameWhenObject =>
         IsStreaming ? "global::System.Collections.Generic.IAsyncEnumerable<object?>"
-        : IsVoid ? "global::System.Threading.Tasks.ValueTask"
+        : IsVoid ? "global::System.Threading.Tasks.ValueTask<object?>"
         : "global::System.Threading.Tasks.ValueTask<object?>";
     public string HandlerBase =>
         IsStreaming ? "IStreamMessageHandlerBase"
-        : IsVoid ? "IVoidMessageHandlerBase"
+        : IsVoid ? "IMessageHandlerBase"
         : "IMessageHandlerBase";
 }

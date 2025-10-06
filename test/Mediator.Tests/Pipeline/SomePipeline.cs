@@ -37,33 +37,3 @@ public sealed class SomePipeline(bool earlyReturn = false)
         return next(message, cancellationToken);
     }
 }
-
-public sealed class SomePipelineWithoutResponse(bool earlyReturn = false)
-    : IPipelineBehavior<SomeRequestWithoutResponse>,
-        IPipelineTestData
-{
-    public Guid Id { get; private set; }
-    public long LastMsgTimestamp { get; private set; }
-    private readonly bool _earlyReturn = earlyReturn;
-
-    public ValueTask Handle(
-        SomeRequestWithoutResponse message,
-        MessageHandlerDelegate<SomeRequestWithoutResponse> next,
-        CancellationToken cancellationToken
-    )
-    {
-        LastMsgTimestamp = Stopwatch.GetTimestamp();
-
-        if (_earlyReturn)
-        {
-            return default;
-        }
-
-        if (message is null || message.Id == default)
-            throw new ArgumentException("Invalid input");
-
-        Id = message.Id;
-
-        return next(message, cancellationToken);
-    }
-}

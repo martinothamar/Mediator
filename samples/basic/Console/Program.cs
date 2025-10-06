@@ -102,34 +102,11 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
     }
 }
 
-public sealed class GenericLoggerHandler<TMessage> : IPipelineBehavior<TMessage>
-    where TMessage : IMessage
+public sealed class PingPongValidator : IPipelineBehavior<PingPong, Unit>
 {
-    public async ValueTask Handle(
-        TMessage message,
-        MessageHandlerDelegate<TMessage> next,
-        CancellationToken cancellationToken
-    )
-    {
-        Console.WriteLine("1) Running logger handler");
-        try
-        {
-            await next(message, cancellationToken);
-            Console.WriteLine("5) No error!");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            throw;
-        }
-    }
-}
-
-public sealed class PingPongValidator : IPipelineBehavior<PingPong>
-{
-    public ValueTask Handle(
+    public ValueTask<Unit> Handle(
         PingPong request,
-        MessageHandlerDelegate<PingPong> next,
+        MessageHandlerDelegate<PingPong, Unit> next,
         CancellationToken cancellationToken
     )
     {
@@ -147,7 +124,7 @@ public sealed class PingPongHandler : IRequestHandler<PingPong>
 {
     public ValueTask Handle(PingPong request, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"0) Pingpong! {request.Id}");
+        Console.WriteLine($"4) Pingpong! {request.Id}");
         return default;
     }
 }

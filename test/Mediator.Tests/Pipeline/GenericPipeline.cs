@@ -26,20 +26,6 @@ public sealed class GenericPipelineState : IPipelineTestData
         return next(message, cancellationToken);
     }
 
-    public ValueTask Handle<TMessage>(
-        TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage> next
-    )
-        where TMessage : IMessage
-    {
-        LastMsgTimestamp = Stopwatch.GetTimestamp();
-
-        Message = message;
-
-        return next(message, cancellationToken);
-    }
-
     public IAsyncEnumerable<TResponse> Handle<TMessage, TResponse>(
         TMessage message,
         CancellationToken cancellationToken,
@@ -69,24 +55,6 @@ public sealed class GenericPipeline<TMessage, TResponse> : IPipelineBehavior<TMe
     public ValueTask<TResponse> Handle(
         TMessage message,
         MessageHandlerDelegate<TMessage, TResponse> next,
-        CancellationToken cancellationToken
-    ) => _state.Handle(message, cancellationToken, next);
-}
-
-public sealed class GenericPipeline<TMessage> : IPipelineBehavior<TMessage>, IPipelineTestData
-    where TMessage : IMessage
-{
-    private readonly GenericPipelineState _state;
-
-    public GenericPipeline(GenericPipelineState state) => _state = state;
-
-    public Guid Id => _state.Id;
-
-    public long LastMsgTimestamp => _state.LastMsgTimestamp;
-
-    public ValueTask Handle(
-        TMessage message,
-        MessageHandlerDelegate<TMessage> next,
         CancellationToken cancellationToken
     ) => _state.Handle(message, cancellationToken, next);
 }
