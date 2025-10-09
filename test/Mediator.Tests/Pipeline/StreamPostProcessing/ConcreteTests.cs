@@ -1,0 +1,101 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Mediator.Tests.TestTypes;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Mediator.Tests.Pipeline.StreamPostProcessing;
+
+public class ConcreteTests
+{
+    [Fact]
+    public async Task Test_StreamPostProcessor()
+    {
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<PostProcessingState>();
+            services.AddSingleton<
+                IStreamPipelineBehavior<SomeStreamingRequest, SomeResponse>,
+                TestStreamMessagePostProcessor
+            >();
+            services.AddSingleton<
+                IStreamPipelineBehavior<SomeStreamingRequest, SomeResponse>,
+                TestStreamMessagePostProcessor2
+            >();
+        });
+
+        var id = Guid.NewGuid();
+        var queryId = Guid.NewGuid();
+
+        var state = sp.GetRequiredService<PostProcessingState>();
+
+        Assert.NotNull(state);
+
+        int counter = 0;
+        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id)))
+        {
+            Assert.Equal(id, response.Id);
+            counter++;
+        }
+
+        Assert.Equal(3, counter);
+        Assert.Equal(id, state!.Id);
+        // PostProcessor is called for each item in the stream, so 3 items * 2 processors = 6
+        Assert.Equal(6, state.Calls);
+
+        // Test with SomeStreamingQuery - should not trigger the concrete postprocessors
+        counter = 0;
+        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(queryId)))
+        {
+            Assert.Equal(queryId, response.Id);
+            counter++;
+        }
+
+        Assert.Equal(3, counter);
+        Assert.Equal(id, state!.Id); // Should still be the old id
+        Assert.Equal(6, state.Calls); // Should still be 6
+    }
+
+    private sealed class PostProcessingState
+    {
+        public Guid Id;
+        public int Calls;
+    }
+
+    private sealed class TestStreamMessagePostProcessor : StreamMessagePostProcessor<SomeStreamingRequest, SomeResponse>
+    {
+        private readonly PostProcessingState _state;
+
+        public TestStreamMessagePostProcessor(PostProcessingState state) => _state = state;
+
+        protected override ValueTask Handle(
+            SomeStreamingRequest message,
+            SomeResponse response,
+            CancellationToken cancellationToken
+        )
+        {
+            _state.Id = message.Id;
+            _state.Calls++;
+            return default;
+        }
+    }
+
+    private sealed class TestStreamMessagePostProcessor2
+        : StreamMessagePostProcessor<SomeStreamingRequest, SomeResponse>
+    {
+        private readonly PostProcessingState _state;
+
+        public TestStreamMessagePostProcessor2(PostProcessingState state) => _state = state;
+
+        protected override ValueTask Handle(
+            SomeStreamingRequest message,
+            SomeResponse response,
+            CancellationToken cancellationToken
+        )
+        {
+            _state.Id = message.Id;
+            _state.Calls++;
+            return default;
+        }
+    }
+}
