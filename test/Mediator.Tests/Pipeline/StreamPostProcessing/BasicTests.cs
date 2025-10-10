@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator.Tests.TestTypes;
@@ -33,8 +34,7 @@ public class BasicTests
 
         Assert.Equal(3, counter);
         Assert.Equal(id, state!.Id);
-        // PostProcessor is called for each item in the stream, so 3 items * 2 processors = 6
-        Assert.Equal(6, state.Calls);
+        Assert.Equal(2, state.Calls); // Called once per stream * 2 processors
     }
 
     private sealed class PostProcessingState
@@ -51,7 +51,11 @@ public class BasicTests
 
         public TestStreamMessagePostProcessor(PostProcessingState state) => _state = state;
 
-        protected override ValueTask Handle(TMessage message, TResponse response, CancellationToken cancellationToken)
+        protected override ValueTask Handle(
+            TMessage message,
+            IEnumerable<TResponse> responses,
+            CancellationToken cancellationToken
+        )
         {
             _state.Id = (Guid)typeof(TMessage).GetProperty("Id")!.GetValue(message)!;
             _state.Calls++;
@@ -67,7 +71,11 @@ public class BasicTests
 
         public TestStreamMessagePostProcessor2(PostProcessingState state) => _state = state;
 
-        protected override ValueTask Handle(TMessage message, TResponse response, CancellationToken cancellationToken)
+        protected override ValueTask Handle(
+            TMessage message,
+            IEnumerable<TResponse> responses,
+            CancellationToken cancellationToken
+        )
         {
             _state.Id = (Guid)typeof(TMessage).GetProperty("Id")!.GetValue(message)!;
             _state.Calls++;

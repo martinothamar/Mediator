@@ -263,7 +263,7 @@ services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggingBehaviour
 For streaming messages (e.g., `IStreamRequest<TResponse>`, `IStreamCommand<TResponse>`, `IStreamQuery<TResponse>`), you can use `StreamMessagePreProcessor` and `StreamMessagePostProcessor` to handle pre/post-processing logic.
 
 ```csharp
-// Stream message pre-processor - runs before the handler
+// Stream message pre-processor - runs once before stream starts
 public sealed class StreamLoggingPreProcessor<TMessage, TResponse> : StreamMessagePreProcessor<TMessage, TResponse>
     where TMessage : notnull, IStreamMessage
 {
@@ -281,7 +281,7 @@ public sealed class StreamLoggingPreProcessor<TMessage, TResponse> : StreamMessa
     }
 }
 
-// Stream message post-processor - runs after each item is yielded from the handler
+// Stream message post-processor - runs once after stream completes
 public sealed class StreamLoggingPostProcessor<TMessage, TResponse> : StreamMessagePostProcessor<TMessage, TResponse>
     where TMessage : notnull, IStreamMessage
 {
@@ -292,9 +292,9 @@ public sealed class StreamLoggingPostProcessor<TMessage, TResponse> : StreamMess
         _logger = logger;
     }
 
-    protected override ValueTask Handle(TMessage message, TResponse response, CancellationToken cancellationToken)
+    protected override ValueTask Handle(TMessage message, IEnumerable<TResponse> responses, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Received item from stream: {Response}", response);
+        _logger.LogInformation("Stream completed with {Count} items", responses.Count());
         return default;
     }
 }

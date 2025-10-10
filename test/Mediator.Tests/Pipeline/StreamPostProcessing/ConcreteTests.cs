@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator.Tests.TestTypes;
@@ -40,8 +41,7 @@ public class ConcreteTests
 
         Assert.Equal(3, counter);
         Assert.Equal(id, state!.Id);
-        // PostProcessor is called for each item in the stream, so 3 items * 2 processors = 6
-        Assert.Equal(6, state.Calls);
+        Assert.Equal(2, state.Calls); // Called once per stream * 2 processors
 
         // Test with SomeStreamingQuery - should not trigger the concrete postprocessors
         counter = 0;
@@ -53,7 +53,7 @@ public class ConcreteTests
 
         Assert.Equal(3, counter);
         Assert.Equal(id, state!.Id); // Should still be the old id
-        Assert.Equal(6, state.Calls); // Should still be 6
+        Assert.Equal(2, state.Calls); // Should still be 2
     }
 
     private sealed class PostProcessingState
@@ -70,7 +70,7 @@ public class ConcreteTests
 
         protected override ValueTask Handle(
             SomeStreamingRequest message,
-            SomeResponse response,
+            IEnumerable<SomeResponse> responses,
             CancellationToken cancellationToken
         )
         {
@@ -89,7 +89,7 @@ public class ConcreteTests
 
         protected override ValueTask Handle(
             SomeStreamingRequest message,
-            SomeResponse response,
+            IEnumerable<SomeResponse> responses,
             CancellationToken cancellationToken
         )
         {

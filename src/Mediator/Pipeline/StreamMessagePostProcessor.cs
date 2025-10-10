@@ -11,12 +11,19 @@ public abstract class StreamMessagePostProcessor<TMessage, TResponse> : IStreamP
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
+        var responses = new List<TResponse>();
         await foreach (var response in next(message, cancellationToken).WithCancellation(cancellationToken))
         {
-            await Handle(message, response, cancellationToken);
+            responses.Add(response);
             yield return response;
         }
+
+        await Handle(message, responses, cancellationToken);
     }
 
-    protected abstract ValueTask Handle(TMessage message, TResponse response, CancellationToken cancellationToken);
+    protected abstract ValueTask Handle(
+        TMessage message,
+        IEnumerable<TResponse> responses,
+        CancellationToken cancellationToken
+    );
 }

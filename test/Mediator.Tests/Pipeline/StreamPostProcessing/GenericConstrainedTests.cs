@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator.Tests.TestTypes;
@@ -33,7 +34,7 @@ public class GenericConstrainedTests
         }
         Assert.Equal(3, counter);
         Assert.Equal(id, state!.Id);
-        Assert.Equal(6, state.Calls); // 3 items * 2 processors
+        Assert.Equal(2, state.Calls); // Called once per stream * 2 processors
 
         counter = 0;
         await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(queryId)))
@@ -43,7 +44,7 @@ public class GenericConstrainedTests
         }
         Assert.Equal(3, counter);
         Assert.Equal(id, state!.Id); // Still the old id, query doesn't match the constraint
-        Assert.Equal(6, state.Calls); // Still 6, query doesn't match the constraint
+        Assert.Equal(2, state.Calls); // Still 2, query doesn't match the constraint
 
         counter = 0;
         await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id)))
@@ -53,7 +54,7 @@ public class GenericConstrainedTests
         }
         Assert.Equal(3, counter);
         Assert.Equal(id, state!.Id);
-        Assert.Equal(12, state.Calls); // 6 + (3 * 2)
+        Assert.Equal(4, state.Calls); // 2 + 2
     }
 
     private sealed class PostProcessingState
@@ -70,7 +71,11 @@ public class GenericConstrainedTests
 
         public TestStreamMessagePostProcessor(PostProcessingState state) => _state = state;
 
-        protected override ValueTask Handle(TMessage message, TResponse response, CancellationToken cancellationToken)
+        protected override ValueTask Handle(
+            TMessage message,
+            IEnumerable<TResponse> responses,
+            CancellationToken cancellationToken
+        )
         {
             _state.Id = (Guid)typeof(TMessage).GetProperty("Id")!.GetValue(message)!;
             _state.Calls++;
@@ -86,7 +91,11 @@ public class GenericConstrainedTests
 
         public TestStreamMessagePostProcessor2(PostProcessingState state) => _state = state;
 
-        protected override ValueTask Handle(TMessage message, TResponse response, CancellationToken cancellationToken)
+        protected override ValueTask Handle(
+            TMessage message,
+            IEnumerable<TResponse> responses,
+            CancellationToken cancellationToken
+        )
         {
             _state.Id = (Guid)typeof(TMessage).GetProperty("Id")!.GetValue(message)!;
             _state.Calls++;
