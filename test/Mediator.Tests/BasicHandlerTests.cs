@@ -59,7 +59,7 @@ public class BasicHandlerTests
         var concrete = (Mediator)mediator;
 
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IRequest<SomeResponse>)null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IRequest)null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeRequest)null!));
     }
 
@@ -132,7 +132,7 @@ public class BasicHandlerTests
         var id = Guid.NewGuid();
 
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IQuery<SomeResponse>)null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IQuery<object>)null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeQuery)null!));
     }
 
@@ -197,7 +197,7 @@ public class BasicHandlerTests
         var id = Guid.NewGuid();
 
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((ICommand<SomeResponse>)null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((ICommand)null!));
         await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeCommand)null!));
     }
 

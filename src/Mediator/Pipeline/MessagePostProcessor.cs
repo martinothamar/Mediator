@@ -1,4 +1,4 @@
-﻿namespace Mediator;
+namespace Mediator;
 
 public abstract class MessagePostProcessor<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
     where TMessage : notnull, IMessage

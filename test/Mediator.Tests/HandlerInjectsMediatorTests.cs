@@ -18,7 +18,7 @@ public class HandlerInjectsMediatorTests
             Assert.NotNull(mediator);
         }
 
-        public ValueTask<Unit> Handle(Request request, CancellationToken cancellationToken)
+        public ValueTask Handle(Request request, CancellationToken cancellationToken)
         {
             Ids.Add(request.Id);
             return default;

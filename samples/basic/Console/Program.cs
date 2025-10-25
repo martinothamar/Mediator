@@ -20,10 +20,15 @@ services.AddMediator(
 // Here are two examples.
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericLoggerHandler<,>)); // This will run 1st
 services.AddSingleton<IPipelineBehavior<Ping, Pong>, PingValidator>(); // This will run 2nd
+services.AddSingleton<IPipelineBehavior<PingPong, Unit>, PingPongValidator>();
 
 var serviceProvider = services.BuildServiceProvider();
 
 var mediator = serviceProvider.GetRequiredService<IMediator>();
+
+await mediator.Send(new PingPong(Guid.NewGuid()));
+
+Console.WriteLine("-----------------------------------");
 
 var id = Guid.NewGuid();
 var request = new Ping(id);
@@ -42,6 +47,8 @@ return response.Id == id ? 0 : 1;
 //
 
 public sealed record Ping(Guid Id) : IRequest<Pong>;
+
+public sealed record PingPong(Guid Id) : IRequest;
 
 public sealed record Pong(Guid Id);
 
@@ -93,5 +100,32 @@ public sealed class PingHandler : IRequestHandler<Ping, Pong>
     {
         Console.WriteLine("4) Returning pong!");
         return new ValueTask<Pong>(new Pong(request.Id));
+    }
+}
+
+public sealed class PingPongValidator : IPipelineBehavior<PingPong, Unit>
+{
+    public ValueTask<Unit> Handle(
+        PingPong request,
+        MessageHandlerDelegate<PingPong, Unit> next,
+        CancellationToken cancellationToken
+    )
+    {
+        Console.WriteLine("2) Running pingpong validator");
+        if (request is null || request.Id == default)
+            throw new ArgumentException("Invalid input");
+        else
+            Console.WriteLine("3) Valid input!");
+
+        return next(request, cancellationToken);
+    }
+}
+
+public sealed class PingPongHandler : IRequestHandler<PingPong>
+{
+    public ValueTask Handle(PingPong request, CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"4) Pingpong! {request.Id}");
+        return default;
     }
 }

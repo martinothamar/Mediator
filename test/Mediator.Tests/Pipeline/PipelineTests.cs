@@ -127,4 +127,25 @@ public sealed class PipelineTests
         var ordered = pipelineSteps.Select(p => p.LastMsgTimestamp).OrderBy(x => x).ToArray();
         Assert.True(original.SequenceEqual(ordered));
     }
+
+    [Fact]
+    public async Task Test_Void_Pipeline_Ordering()
+    {
+        var (sp, mediator) = Fixture.GetMediator(services =>
+        {
+            services.AddSingleton<GenericPipelineState>();
+            services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(GenericPipeline<,>));
+        });
+
+        var id = Guid.NewGuid();
+
+        await mediator.Send(new SomeRequestWithoutResponse(id));
+
+        var pipelineSteps = sp.GetServices<IPipelineBehavior<SomeRequestWithoutResponse, Unit>>()
+            .Cast<IPipelineTestData>();
+
+        var original = pipelineSteps.Select(p => p.LastMsgTimestamp).ToArray();
+        var ordered = pipelineSteps.Select(p => p.LastMsgTimestamp).OrderBy(x => x).ToArray();
+        Assert.True(original.SequenceEqual(ordered));
+    }
 }
