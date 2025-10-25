@@ -303,7 +303,7 @@ namespace SimpleConsole.Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = mediator.Services.GetRequiredService<VoidRequestHandler<TRequest>>();
+            var concreteHandler = mediator.Services.GetRequiredService<IVoidRequestHandler<TRequest>>();
             var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>)concreteHandler.Handle;
 
@@ -560,7 +560,7 @@ namespace SimpleConsole.Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = mediator.Services.GetRequiredService<VoidCommandHandler<TRequest>>();
+            var concreteHandler = mediator.Services.GetRequiredService<IVoidCommandHandler<TRequest>>();
             var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>)concreteHandler.Handle;
 

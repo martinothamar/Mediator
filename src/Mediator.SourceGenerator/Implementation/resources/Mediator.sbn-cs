@@ -172,7 +172,7 @@ namespace {{ InternalsNamespace }}
             global::Mediator.I{{ wrapperType.VoidMessageType }} request,
             {{~ else }}
             global::Mediator.I{{ wrapperType.MessageType }}<TResponse> request,
-            {{~ end ~}}            
+            {{~ end ~}}
             global::System.Threading.CancellationToken cancellationToken
         );
     }
@@ -269,7 +269,7 @@ namespace {{ InternalsNamespace }}
             var handler = _rootHandler;
             {{~ else ~}}
             {{~ if wrapperType.IsVoid ~}}
-            var concreteHandler = mediator.Services.GetRequiredService<{{ wrapperType.MessageType }}Handler<TRequest>>();
+            var concreteHandler = mediator.Services.GetRequiredService<I{{ wrapperType.MessageType }}Handler<TRequest>>();
             {{~ else ~}}
             var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
             {{~ end ~}}
