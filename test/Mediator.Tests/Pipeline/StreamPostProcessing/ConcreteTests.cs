@@ -70,7 +70,7 @@ public class ConcreteTests
 
         protected override ValueTask Handle(
             SomeStreamingRequest message,
-            IEnumerable<SomeResponse> responses,
+            IReadOnlyList<SomeResponse> responses,
             CancellationToken cancellationToken
         )
         {
@@ -89,7 +89,7 @@ public class ConcreteTests
 
         protected override ValueTask Handle(
             SomeStreamingRequest message,
-            IEnumerable<SomeResponse> responses,
+            IReadOnlyList<SomeResponse> responses,
             CancellationToken cancellationToken
         )
         {

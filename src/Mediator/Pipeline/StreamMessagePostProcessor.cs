@@ -23,7 +23,7 @@ public abstract class StreamMessagePostProcessor<TMessage, TResponse> : IStreamP
 
     protected abstract ValueTask Handle(
         TMessage message,
-        IEnumerable<TResponse> responses,
+        IReadOnlyList<TResponse> responses,
         CancellationToken cancellationToken
     );
 }

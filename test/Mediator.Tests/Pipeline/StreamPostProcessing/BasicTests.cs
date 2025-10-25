@@ -53,7 +53,7 @@ public class BasicTests
 
         protected override ValueTask Handle(
             TMessage message,
-            IEnumerable<TResponse> responses,
+            IReadOnlyList<TResponse> responses,
             CancellationToken cancellationToken
         )
         {
@@ -73,7 +73,7 @@ public class BasicTests
 
         protected override ValueTask Handle(
             TMessage message,
-            IEnumerable<TResponse> responses,
+            IReadOnlyList<TResponse> responses,
             CancellationToken cancellationToken
         )
         {

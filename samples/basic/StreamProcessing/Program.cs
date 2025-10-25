@@ -84,7 +84,7 @@ public sealed class StreamPostProcessor<TMessage, TResponse> : StreamMessagePost
 {
     protected override ValueTask Handle(
         TMessage message,
-        IEnumerable<TResponse> responses,
+        IReadOnlyList<TResponse> responses,
         CancellationToken cancellationToken
     )
     {

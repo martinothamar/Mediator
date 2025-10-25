@@ -261,6 +261,7 @@ services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggingBehaviour
 #### 3.3.3. Stream message processing example
 
 For streaming messages (e.g., `IStreamRequest<TResponse>`, `IStreamCommand<TResponse>`, `IStreamQuery<TResponse>`), you can use `StreamMessagePreProcessor` and `StreamMessagePostProcessor` to handle pre/post-processing logic.
+NOTE: `StreamMessagePostProcessor` implementations will need to buffer all responses so that they can be passed as an `IReadOnlyList<>` to the `Handle` method.
 
 ```csharp
 // Stream message pre-processor - runs once before stream starts
@@ -292,9 +293,9 @@ public sealed class StreamLoggingPostProcessor<TMessage, TResponse> : StreamMess
         _logger = logger;
     }
 
-    protected override ValueTask Handle(TMessage message, IEnumerable<TResponse> responses, CancellationToken cancellationToken)
+    protected override ValueTask Handle(TMessage message, IReadOnlyList<TResponse> responses, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Stream completed with {Count} items", responses.Count());
+        _logger.LogInformation("Stream completed with {Count} items", responses.Count);
         return default;
     }
 }
