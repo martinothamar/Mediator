@@ -206,7 +206,6 @@ jobs:
         dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
         dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
-    # No previews yet
-    # - name: Push to NuGet
-    #   if: ${{ success() && github.event_name != 'pull_request' }}
-    #   run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+    - name: Push to NuGet
+      if: ${{ success() && github.event_name != 'pull_request' }}
+      run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
