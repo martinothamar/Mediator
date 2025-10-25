@@ -59,6 +59,7 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
     - [3.3. Pipeline types](#33-pipeline-types)
       - [3.3.1. Message validation example](#331-message-validation-example)
       - [3.3.2. Error logging example](#332-error-logging-example)
+      - [3.3.3. Stream message processing example](#333-stream-message-processing-example)
     - [3.4. Configuration](#34-configuration)
   - [4. Getting started](#4-getting-started)
     - [4.1. Add packages](#41-add-packages)
@@ -150,6 +151,8 @@ These types are used in correlation with the message types above.
 * `IStreamPipelineBehavior<TMessage, TResponse>`
 * `MessagePreProcessor<TMessage, TResponse>`
 * `MessagePostProcessor<TMessage, TResponse>`
+* `StreamMessagePreProcessor<TMessage, TResponse>`
+* `StreamMessagePostProcessor<TMessage, TResponse>`
 * `MessageExceptionHandler<TMessage, TResponse, TException>`
 
 #### 3.3.1. Message validation example
@@ -253,6 +256,53 @@ public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : MessageExceptio
 
 // Register as IPipelineBehavior<,> in either case
 services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(ErrorLoggingBehaviour<,>))
+```
+
+#### 3.3.3. Stream message processing example
+
+For streaming messages (e.g., `IStreamRequest<TResponse>`, `IStreamCommand<TResponse>`, `IStreamQuery<TResponse>`), you can use `StreamMessagePreProcessor` and `StreamMessagePostProcessor` to handle pre/post-processing logic.
+
+```csharp
+// Stream message pre-processor - runs once before stream starts
+public sealed class StreamLoggingPreProcessor<TMessage, TResponse> : StreamMessagePreProcessor<TMessage, TResponse>
+    where TMessage : notnull, IStreamMessage
+{
+    private readonly ILogger<StreamLoggingPreProcessor<TMessage, TResponse>> _logger;
+
+    public StreamLoggingPreProcessor(ILogger<StreamLoggingPreProcessor<TMessage, TResponse>> logger)
+    {
+        _logger = logger;
+    }
+
+    protected override ValueTask Handle(TMessage message, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Starting stream processing for {MessageType}", typeof(TMessage).Name);
+        return default;
+    }
+}
+
+// Stream message post-processor - runs once after stream completes
+public sealed class StreamLoggingPostProcessor<TMessage, TResponse> : StreamMessagePostProcessor<TMessage, TResponse>
+    where TMessage : notnull, IStreamMessage
+{
+    private readonly ILogger<StreamLoggingPostProcessor<TMessage, TResponse>> _logger;
+
+    public StreamLoggingPostProcessor(ILogger<StreamLoggingPostProcessor<TMessage, TResponse>> logger)
+    {
+        _logger = logger;
+    }
+
+    protected override ValueTask Handle(TMessage message, IEnumerable<TResponse> responses, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Stream completed with {Count} items", responses.Count());
+        return default;
+    }
+}
+
+// Register as IStreamPipelineBehavior<,>
+// NOTE: for NativeAOT, you should use the pipeline configuration on `MediatorOptions` instead (during `AddMediator`)
+services.AddSingleton(typeof(IStreamPipelineBehavior<,>), typeof(StreamLoggingPreProcessor<,>))
+services.AddSingleton(typeof(IStreamPipelineBehavior<,>), typeof(StreamLoggingPostProcessor<,>))
 ```
 
 ### 3.4. Configuration
