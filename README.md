@@ -8,25 +8,32 @@
 
 # Mediator
 
-This is a high performance .NET implementation of the Mediator pattern using the [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/) feature introduced in .NET 5.
-The API and usage is mostly based on the great [MediatR](https://github.com/LuckyPennySoftware/MediatR) library, with some deviations to allow for better performance.
-Packages are .NET Standard 2.0 compatible.
+This is a high performance .NET implementation of the Mediator pattern using [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/).
+It provides a similar API to the great [MediatR](https://github.com/LuckyPennySoftware/MediatR) library while delivering better performance and full Native AOT support.
+Packages target .NET Standard 2.0 and .NET 8.
 
-The mediator pattern is great for implementing cross cutting concern (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
+The mediator pattern is great for implementing cross cutting concerns (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
 
 Goals for this library
 * High performance
-  * Runtime performance can be the same for both runtime reflection and source generator based approaches, but it's easier to optimize in the latter case
+  * Efficient and fast by default, slower configurations are opt-in (in the spirit of [non-pessimization](https://stackoverflow.com/questions/32618848/what-is-pessimization))
+  * See [benchmarks](#2-benchmarks) for comparisons
 * AOT friendly
-  * MS are investing time in various AOT scenarios, and for example iOS requires AOT compilation
+  * Full Native AOT support without reflection or runtime code generation
+  * Cold start performance matters for lots of scenarios (serverless, edge, apps, mobile)
 * Build time errors instead of runtime errors
-  * The generator includes diagnostics, i.e. if a handler is not defined for a request, a warning is emitted
+  * The generator includes diagnostics (example: if a handler is not defined for a request, a warning is emitted)
+  * Catch configuration mistakes during development, not during runtime
+* Stability
+  * Stable API that only changes for good reason - fewer changes means less patching for you
+  * Follows [semantic versioning](#7-versioning) strictly
 
-In particular, source generators in this library is used to
+In particular, a source generator in this library is used to
 * Generate code for DI registration
-* Generate code for `IMediator` implementation
-  * Request/Command/Query `Send` methods are monomorphized (1 method per T), the generic `ISender.Send` methods rely on these
-  * You can use both `IMediator` and `Mediator`, the latter allows for better performance
+* Generate code for the `IMediator` implementation
+  * Request/Command/Query `Send` methods are monomorphized
+  * Fast dictionary lookups for methods taking `object`/generic arguments (takes effect above a certain project size threshold)
+  * You can use both `IMediator` and the concrete `Mediator` class, the latter allows for better performance
 * Generate diagnostics related messages and message handlers
 
 NuGet packages:
