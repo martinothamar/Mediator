@@ -3,16 +3,16 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, release/v** ]
+    branches: [main, release/v**]
     paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
-      - 'img/**'
-      - 'benchmarks/**'
-      - 'samples/**'
-      - '*.sln'
+      - "README.md"
+      - "LICENSE"
+      - "img/**"
+      - "benchmarks/**"
+      - "samples/**"
+      - "*.sln"
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -26,34 +26,34 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0 # depth is needed for nbgv
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '8.0.x'
-        include-prerelease: false
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.0.x"
+          include-prerelease: false
 
-    - uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Clean
-      run: dotnet clean -v m
+      - name: Clean
+        run: dotnet clean -v m
 
-    - name: Build Mediator.Tests
-      run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}%3BMediator_${{matrix.size}}_Project\" -v m ./test/Mediator.Tests/
+      - name: Build Mediator.Tests
+        run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}%3BMediator_${{matrix.size}}_Project\" -v m ./test/Mediator.Tests/
 
-    - name: Test Mediator.Tests
-      run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
+      - name: Test Mediator.Tests
+        run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
 
   samples-net:
     runs-on: ubuntu-latest
@@ -64,25 +64,25 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0 # depth is needed for nbgv
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '8.0.x'
-        include-prerelease: false
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.0.x"
+          include-prerelease: false
 
-    - uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Run
-      run: dotnet run
+      - name: Run
+        run: dotnet run
 
   samples-aot:
     runs-on: ubuntu-latest
@@ -93,28 +93,28 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0 # depth is needed for nbgv
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '8.0.x'
-        include-prerelease: false
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.0.x"
+          include-prerelease: false
 
-    - uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Publish
-      run: dotnet publish -r linux-x64 -c Release
+      - name: Publish
+        run: dotnet publish -r linux-x64 -c Release
 
-    - name: Run
-      run: ./bin/Release/net8.0/linux-x64/ConsoleAOT
+      - name: Run
+        run: ./bin/Release/net8.0/linux-x64/ConsoleAOT
 
   samples-netfx:
     runs-on: windows-latest
@@ -125,31 +125,31 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0 # depth is needed for nbgv
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
 
-    - uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v2
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
 
-    - name: Restore Packages
-      run: msbuild Console.sln -t:Restore
+      - name: Restore Packages
+        run: msbuild Console.sln -t:Restore
 
-    - name: Build solution
-      run: msbuild Console.sln -t:Rebuild
+      - name: Build solution
+        run: msbuild Console.sln -t:Rebuild
 
-    - name: Run Console
-      run: .\Console\bin\Debug\Console.NetFramework.exe
+      - name: Run Console
+        run: .\Console\bin\Debug\Console.NetFramework.exe
 
   publish:
     if: ${{ always() }}
@@ -159,53 +159,53 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-    - name: Check for failures
-      run: exit 1
-      if: >-
-        ${{
-             contains(needs.*.result, 'failure')
-          || contains(needs.*.result, 'cancelled')
-          || contains(needs.*.result, 'skipped')
-        }}
+      - name: Check for failures
+        run: exit 1
+        if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+            || contains(needs.*.result, 'skipped')
+          }}
 
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0 # depth is needed for nbgv
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '8.0.x'
-        include-prerelease: false
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "8.0.x"
+          include-prerelease: false
 
-    - uses: dotnet/nbgv@master
-      with:
-        setAllVars: true
+      - uses: dotnet/nbgv@master
+        with:
+          setAllVars: true
 
-    - uses: actions/cache@v3
-      with:
-        path: ${{ github.workspace }}/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Clean
-      run: dotnet clean -v m
+      - name: Clean
+        run: dotnet clean -v m
 
-    - name: Build
-      run: dotnet build --no-restore -c Release
+      - name: Build
+        run: dotnet build --no-restore -c Release
 
-    - name: Test
-      run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
+      - name: Test
+        run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
 
-    - name: Pack
-      run: |
-        dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
-        dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
+      - name: Pack
+        run: |
+          dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
+          dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
-    - name: Push to NuGet
-      if: ${{ success() && github.event_name != 'pull_request' }}
-      run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
+      - name: Push to NuGet
+        if: ${{ success() && github.event_name != 'pull_request' }}
+        run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
