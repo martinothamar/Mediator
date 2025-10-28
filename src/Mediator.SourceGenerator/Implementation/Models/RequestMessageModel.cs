@@ -66,6 +66,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
             isStreaming ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
             : HasResponse ? $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>"
             : $"global::System.Threading.Tasks.ValueTask";
+        UnitHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.UnitHandlerTypeName}";
     }
 
     public string MessageType { get; }
@@ -79,4 +80,10 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
     public string MethodName { get; }
     public string ReturnType { get; }
     public bool HasResponse { get; }
+    public string InterfaceHandlerWrapperTypeWithGenericTypeArguments =>
+        HasResponse
+            ? $"global::Mediator.I{MessageType}Handler<{FullName}, {ResponseFullName}>"
+            : $"global::Mediator.I{MessageType}Handler<{FullName}>";
+
+    public string UnitHandlerWrapperTypeName { get; }
 }

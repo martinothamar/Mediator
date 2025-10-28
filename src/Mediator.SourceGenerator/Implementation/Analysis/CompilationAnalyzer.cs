@@ -119,8 +119,10 @@ internal sealed class CompilationAnalyzer
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapperModel[]
             {
                 new RequestMessageHandlerWrapperModel("Request", this),
+                new RequestMessageHandlerWrapperModel("Request", this, false),
                 new RequestMessageHandlerWrapperModel("StreamRequest", this),
                 new RequestMessageHandlerWrapperModel("Command", this),
+                new RequestMessageHandlerWrapperModel("Command", this, false),
                 new RequestMessageHandlerWrapperModel("StreamCommand", this),
                 new RequestMessageHandlerWrapperModel("Query", this),
                 new RequestMessageHandlerWrapperModel("StreamQuery", this),
@@ -345,7 +347,7 @@ internal sealed class CompilationAnalyzer
                         m.MessageType,
                         m.Handler?.ToModel(),
                         m.WrapperType,
-                        !_symbolComparer.Equals(m.Symbol, _unitSymbol)
+                        !_symbolComparer.Equals(m.ResponseSymbol, _unitSymbol)
                     )
                 ),
                 ToModelsSortedByInheritanceDepth(_notificationMessages, m => m.ToModel()),
@@ -620,7 +622,7 @@ internal sealed class CompilationAnalyzer
                                 typeInterfaceSymbol.Name.IndexOf("Handler") - 1
                             );
 
-                            var handler = new RequestMessageHandler(typeSymbol, messageType, this);
+                            var handler = new RequestMessageHandler(typeSymbol, typeInterfaceSymbol, messageType, this);
                             var requestMessageSymbol = (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0];
                             if (mapping.TryGetValue(requestMessageSymbol, out var requestMessageObj))
                             {

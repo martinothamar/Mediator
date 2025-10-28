@@ -10,8 +10,11 @@ internal sealed class RequestMessage : SymbolMetadata<RequestMessage>
     )
         : base(symbol, analyzer)
     {
+        bool hasResponse = !responseSymbol.Name.Equals("Unit", StringComparison.Ordinal);
         ResponseSymbol = responseSymbol;
-        WrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);
+        WrapperType = analyzer.RequestMessageHandlerWrappers.Single(w =>
+            w.MessageType == messageType && w.HasResponse == hasResponse
+        );
         MessageType = messageType;
     }
 

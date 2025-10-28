@@ -5,11 +5,19 @@ internal sealed class RequestMessageHandler : MessageHandler<RequestMessageHandl
     private readonly string _messageType;
     private readonly RequestMessageHandlerWrapperModel _wrapperType;
 
-    public RequestMessageHandler(INamedTypeSymbol symbol, string messageType, CompilationAnalyzer analyzer)
+    public RequestMessageHandler(
+        INamedTypeSymbol symbol,
+        INamedTypeSymbol interfaceSymbol,
+        string messageType,
+        CompilationAnalyzer analyzer
+    )
         : base(symbol, analyzer)
     {
+        var hasResponse = interfaceSymbol.TypeArguments.Length == 2;
         _messageType = messageType;
-        _wrapperType = analyzer.RequestMessageHandlerWrappers.Single(w => w.MessageType == messageType);
+        _wrapperType = analyzer.RequestMessageHandlerWrappers.Single(w =>
+            w.MessageType == messageType && w.HasResponse == hasResponse
+        );
     }
 
     public RequestMessageHandlerModel ToModel()
