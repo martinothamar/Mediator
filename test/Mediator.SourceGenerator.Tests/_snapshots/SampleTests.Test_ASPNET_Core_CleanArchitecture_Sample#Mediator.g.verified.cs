@@ -50,11 +50,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new global::System.Exception(errMsg);
             }
 
+            // Build cache of existing registrations for efficient lookup
+            var existingRegistrations = BuildRegistrationCache(services);
+
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             // Register handlers for request messages
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::AspNetCoreSample.Application.TodoItemCommandHandler), typeof(global::AspNetCoreSample.Application.TodoItemCommandHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::AspNetCoreSample.Application.AddTodoItem, global::AspNetCoreSample.Domain.TodoItem>), typeof(global::AspNetCoreSample.Application.TodoItemCommandHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -62,18 +65,68 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::AspNetCoreSample.Application.TodoItemQueryHandler), typeof(global::AspNetCoreSample.Application.TodoItemQueryHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::AspNetCoreSample.Application.GetTodoItems, global::System.Collections.Generic.IEnumerable<global::AspNetCoreSample.Domain.TodoItem>>), typeof(global::AspNetCoreSample.Application.TodoItemQueryHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::AspNetCoreSample.Application.GetTodoItems, global::System.Collections.Generic.IEnumerable<global::AspNetCoreSample.Domain.TodoItem>>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::AspNetCoreSample.Application.GetTodoItems, global::System.Collections.Generic.IEnumerable<global::AspNetCoreSample.Domain.TodoItem>>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             // Register the notification publisher that was configured
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             // Register internal components
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
+        
             return services;
+        
+        }
 
+        /// <summary>
+        /// Builds a cache of existing service registrations for efficient duplicate detection.
+        /// Maps service types to their registered implementation types.
+        /// </summary>
+        /// <param name="services">The service collection to analyze</param>
+        /// <returns>Dictionary mapping service types to sets of implementation types</returns>
+        private static global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>> 
+            BuildRegistrationCache(IServiceCollection services)
+        {
+            var cache = new global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>>();
+            
+            foreach (var service in services)
+            {
+                if (service.ServiceType == null) continue;
+                
+                if (!cache.ContainsKey(service.ServiceType))
+                {
+                    cache[service.ServiceType] = new global::System.Collections.Generic.HashSet<global::System.Type>();
+                }
+                
+                // Handle different ServiceDescriptor registration patterns
+                if (service.ImplementationType != null)
+                {
+                    cache[service.ServiceType].Add(service.ImplementationType);
+                }
+                else if (service.ImplementationInstance != null)
+                {
+                    cache[service.ServiceType].Add(service.ImplementationInstance.GetType());
+                }
+            }
+            
+            return cache;
+        }
+
+        /// <summary>
+        /// Checks if a handler registration already exists in the service collection.
+        /// </summary>
+        /// <param name="existingRegistrations">Cache of existing registrations</param>
+        /// <param name="serviceType">The service interface type</param>
+        /// <param name="implementationType">The concrete implementation type</param>
+        /// <returns>True if the handler is already registered</returns>
+        private static bool IsHandlerAlreadyRegistered(
+            global::System.Collections.Generic.Dictionary<global::System.Type, global::System.Collections.Generic.HashSet<global::System.Type>> existingRegistrations,
+            global::System.Type serviceType,
+            global::System.Type implementationType)
+        {
+            return existingRegistrations.ContainsKey(serviceType) && 
+                existingRegistrations[serviceType].Contains(implementationType);
         }
     }
 }
