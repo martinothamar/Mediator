@@ -65,11 +65,10 @@ namespace Microsoft.Extensions.DependencyInjection
             // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistration }}
-            {{~ if message.IsVoid ~}}
-            services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.Handler.WrapperType.VoidMessageType }}Handler<{{ message.FullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
-            services.Add(new {{ SD }}(typeof({{message.Handler.WrapperType.FullNamespace}}.I{{ message.MessageType }}Handler<{{ message.FullName }}>),typeof({{message.Handler.WrapperType.FullNamespace}}.{{ message.MessageType }}Handler<{{ message.FullName }}>), {{ ServiceLifetime }}));
-            {{~ else ~}}
+            {{~ if message.HasResponse ~}}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
+            {{~ else ~}}
+            services.Add(new {{ SD }}(typeof({{message.Handler.WrapperType.FullNamespace}}.I{{ message.MessageType }}Handler<{{ message.FullName }}>),typeof({{message.Handler.WrapperType.FullNamespace}}.{{ message.MessageType }}Handler<{{ message.FullName }}>), {{ ServiceLifetime }}));
             {{~ end ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
@@ -168,47 +167,16 @@ namespace {{ InternalsNamespace }}
             {{~ if !ServiceLifetimeIsSingleton ~}}
             global::{{ MediatorNamespace }}.Mediator mediator,
             {{~ end ~}}
-            {{~ if wrapperType.IsVoid ~}}
-            global::Mediator.I{{ wrapperType.VoidMessageType }} request,
-            {{~ else }}
             global::Mediator.I{{ wrapperType.MessageType }}<TResponse> request,
-            {{~ end ~}}
             global::System.Threading.CancellationToken cancellationToken
         );
     }
-
-    {{~ if wrapperType.IsVoid ~}}
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    internal interface I{{ wrapperType.MessageType }}Handler<TRequest>  where TRequest : global::Mediator.I{{ wrapperType.VoidMessageType }}
-    {
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        );
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    internal class {{ wrapperType.MessageType }}Handler<TRequest>(global::System.IServiceProvider sp) : I{{ wrapperType.MessageType }}Handler<TRequest>  where TRequest : global::Mediator.I{{ wrapperType.VoidMessageType }}
-    {
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            await sp.GetRequiredService<global::Mediator.I{{ wrapperType.VoidMessageType }}Handler<TRequest>>().Handle(request, cancellationToken);
-            return default;
-        }
-    }
-    {{~ end ~}}
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class {{ wrapperType.TypeNameWithGenericParameters }} : {{ wrapperType.InterfaceTypeNameWithGenericParameter }}
-        {{~ if wrapperType.IsVoid ~}}
-        where TRequest : global::Mediator.I{{ wrapperType.VoidMessageType }}
-        {{~ else ~}}
         where TRequest : global::Mediator.I{{ wrapperType.MessageType }}<TResponse>
-        {{~ end ~}}
     {
         {{~ if ServiceLifetimeIsSingleton ~}}
         private {{ wrapperType.MessageHandlerDelegateName }} _rootHandler = null!;
@@ -218,11 +186,7 @@ namespace {{ InternalsNamespace }}
             global::System.IServiceProvider sp
         )
         {
-            {{~ if wrapperType.IsVoid ~}}
-            var concreteHandler = sp.GetRequiredService<I{{ wrapperType.MessageType }}Handler<TRequest>>();
-            {{~ else ~}}
             var concreteHandler = sp.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
-            {{~ end }}
             var pipelineBehaviours = sp.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
@@ -268,11 +232,7 @@ namespace {{ InternalsNamespace }}
             {{~ if ServiceLifetimeIsSingleton ~}}
             var handler = _rootHandler;
             {{~ else ~}}
-            {{~ if wrapperType.IsVoid ~}}
-            var concreteHandler = mediator.Services.GetRequiredService<I{{ wrapperType.MessageType }}Handler<TRequest>>();
-            {{~ else ~}}
             var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
-            {{~ end ~}}
             var pipelineBehaviours = mediator.Services.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
@@ -313,11 +273,7 @@ namespace {{ InternalsNamespace }}
             {{~ if !ServiceLifetimeIsSingleton ~}}
             global::{{ MediatorNamespace }}.Mediator mediator,
             {{~ end ~}}
-            {{~ if wrapperType.IsVoid ~}}
-            global::Mediator.I{{ wrapperType.VoidMessageType }} request,
-            {{~ else ~}}
             global::Mediator.I{{ wrapperType.MessageType }}<TResponse> request,
-            {{~ end ~}}
             global::System.Threading.CancellationToken cancellationToken
         )
         {
@@ -462,9 +418,9 @@ namespace {{ InternalsNamespace }}
         public readonly bool ServicesUnderlyingTypeIsArray;
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> RequestHandlerWrappers;
-        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> VoidRequestHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> UnitRequestHandlerWrappers;
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> CommandHandlerWrappers;
-        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> VoidCommandHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> UnitCommandHandlerWrappers;
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> QueryHandlerWrappers;
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamRequestHandlerWrappers;
@@ -478,9 +434,9 @@ namespace {{ InternalsNamespace }}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
-        {{~ if (object.size IVoidRequestMessages) > 0 ~}}
+        {{~ if (object.size IUnitRequestMessages) > 0 ~}}
 
-        {{~ for message in IVoidRequestMessages ~}}
+        {{~ for message in IUnitRequestMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
@@ -490,9 +446,9 @@ namespace {{ InternalsNamespace }}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
-         {{~ if (object.size IVoidCommandMessages) > 0 ~}}
+        {{~ if (object.size IUnitCommandMessages) > 0 ~}}
 
-        {{~ for message in IVoidCommandMessages ~}}
+        {{~ for message in IUnitCommandMessages ~}}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
@@ -547,29 +503,29 @@ namespace {{ InternalsNamespace }}
             {{~ end ~}}
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IRequestMessages }});
-            var voidRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IVoidRequestMessages }});
+            var unitRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IUnitRequestMessages }});
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size ICommandMessages }});
-            var voidCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IVoidCommandMessages }});
+            var unitCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IUnitCommandMessages }});
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IQueryMessages }});
             {{~ for message in IRequestMessages ~}}
             requestHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
             {{~ end ~}}
-            {{~ for message in IVoidRequestMessages ~}}
-            voidRequestHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
+            {{~ for message in IUnitRequestMessages ~}}
+            unitRequestHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
             {{~ end ~}}
             {{~ for message in ICommandMessages ~}}
             commandHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
             {{~ end ~}}
-            {{~ for message in IVoidCommandMessages ~}}
-            voidCommandHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
+            {{~ for message in IUnitCommandMessages ~}}
+            unitCommandHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
             {{~ end ~}}
             {{~ for message in IQueryMessages ~}}
             queryHandlerTypes.Add(typeof({{ message.FullName }}), sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }});
             {{~ end ~}}
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
-            VoidRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(voidRequestHandlerTypes);
+            UnitRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(unitRequestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
-            VoidCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(voidCommandHandlerTypes);
+            UnitCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(unitCommandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
 
             var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IStreamRequestMessages }});
@@ -599,9 +555,9 @@ namespace {{ InternalsNamespace }}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
             {{~ end ~}}
-            {{~ if (object.size IVoidRequestMessages) > 0 ~}}
+            {{~ if (object.size IUnitRequestMessages) > 0 ~}}
 
-            {{~ for message in IVoidRequestMessages ~}}
+            {{~ for message in IUnitRequestMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
             {{~ end ~}}
@@ -611,9 +567,9 @@ namespace {{ InternalsNamespace }}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
             {{~ end ~}}
-            {{~ if (object.size IVoidCommandMessages) > 0 ~}}
+            {{~ if (object.size IUnitCommandMessages) > 0 ~}}
 
-            {{~ for message in IVoidCommandMessages ~}}
+            {{~ for message in IUnitCommandMessages ~}}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
             {{~ end ~}}
@@ -851,7 +807,7 @@ namespace {{ MediatorNamespace }}
         }
         {{~ end ~}}
 
-        {{~ if HasManyRequests ~}}
+        {{~ if HasManyRequests || HasManyUnitRequests ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetRequestHandler(global::Mediator.IBaseRequest request)
@@ -862,32 +818,10 @@ namespace {{ MediatorNamespace }}
             return handler!;
         }
         {{~ end ~}}
-        {{~ if HasManyCommands ~}}
+        {{~ if HasManyCommands || HasManyUnitCommands ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetCommandHandler(global::Mediator.IBaseCommand command)
-        {
-            ThrowIfNull(command, nameof(command));
-            if (!{{ ContainerMetadataField }}.CommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
-                ThrowMissingHandler(command);
-            return handler!;
-        }
-        {{~ end ~}}
-         {{~ if HasManyVoidRequests ~}}
-
-        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private object GetVoidRequestHandler(global::Mediator.IBaseRequest request)
-        {
-            ThrowIfNull(request, nameof(request));
-            if (!{{ ContainerMetadataField }}.RequestHandlerWrappers.TryGetValue(request.GetType(), out var handler))
-                ThrowMissingHandler(request);
-            return handler!;
-        }
-        {{~ end ~}}
-        {{~ if HasVoidManyCommands ~}}
-
-        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private object GetVoidCommandHandler(global::Mediator.IBaseCommand command)
         {
             ThrowIfNull(command, nameof(command));
             if (!{{ ContainerMetadataField }}.CommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
@@ -973,7 +907,7 @@ namespace {{ MediatorNamespace }}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
         }
         {{~ end ~}}
-        {{~ for message in IVoidRequestMessages ~}}
+        {{~ for message in IUnitRequestMessages ~}}
 
         /// <summary>
         /// Send a request of type {{ message.FullName }}.
@@ -1017,7 +951,7 @@ namespace {{ MediatorNamespace }}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
         }
         {{~ end ~}}
-        {{~ for message in IVoidCommandMessages ~}}
+        {{~ for message in IUnitCommandMessages ~}}
 
         /// <summary>
         /// Send a command of type {{ message.FullName }}.
@@ -1228,12 +1162,12 @@ namespace {{ MediatorNamespace }}
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            {{~ if HasVoidRequests ~}}
-            {{~ if HasManyoidRequests ~}}
-            var handlerObj = GetVoidRequestHandler(request);
-            if (handlerObj is global::{{ InternalsNamespace }}.IVoidRequestHandlerBase)
+            {{~ if HasUnitRequests ~}}
+            {{~ if HasManyUnitRequests ~}}
+            var handlerObj = GetRequestHandler(request);
+            if (handlerObj is global::{{ InternalsNamespace }}.IRequestHandlerBase<global::Mediator.Unit>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IVoidRequestHandlerBase>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IRequestHandlerBase<global::Mediator.Unit>>(ref handlerObj);
                 var valueTask = handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
                 return valueTask.IsCompletedSuccessfully ? default : new ValueTask(valueTask.AsTask());
             }
@@ -1241,7 +1175,7 @@ namespace {{ MediatorNamespace }}
             {{~ else ~}}
             switch (request)
             {
-                {{~ for message in IVoidRequestMessages ~}}
+                {{~ for message in IUnitRequestMessages ~}}
                 case {{ message.FullName }} r:
                 {
                     return SendAsync(request, cancellationToken);
@@ -1262,21 +1196,21 @@ namespace {{ MediatorNamespace }}
 
         private async global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.IRequest request,
-            {{~ if HasManyVoidRequests ~}}
+            {{~ if HasManyUnitRequests ~}}
             object handlerObj,
             {{~ end ~}}
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            {{~ if HasVoidRequests ~}}
-            {{~ if HasManyVoidRequests ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IVoidMessageHandlerBase>(handlerObj);
+            {{~ if HasUnitRequests ~}}
+            {{~ if HasManyUnitRequests ~}}
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
             await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
             return;
             {{~ else ~}}
             switch (request)
             {
-                {{~ for message in IVoidRequestMessages ~}}
+                {{~ for message in IUnitRequestMessages ~}}
                 case {{ message.FullName }} r:
                 {
                     await Send(r, cancellationToken);
@@ -1456,12 +1390,12 @@ namespace {{ MediatorNamespace }}
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            {{~ if HasVoidCommands ~}}
-            {{~ if HasManyVoidCommands ~}}
-            var handlerObj = GetVoidCommandHandler(command);
-            if (handlerObj is global::{{ InternalsNamespace }}.IVoidCommandHandlerBase)
+            {{~ if HasUnitCommands ~}}
+            {{~ if HasManyUnitCommands ~}}
+            var handlerObj = GetCommandHandler(command);
+            if (handlerObj is global::{{ InternalsNamespace }}.ICommandHandlerBase<global::Mediator.Unit>)
             {
-                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IVoidCommandHandlerBase>(ref handlerObj);
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.ICommandHandlerBase<global::Mediator.Unit>>(ref handlerObj);
                 var valueTask = handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
                 return valueTask.IsCompletedSuccessfully ? default : new ValueTask(valueTask.AsTask());
             }
@@ -1469,7 +1403,7 @@ namespace {{ MediatorNamespace }}
             {{~ else ~}}
             switch (command)
             {
-                {{~ for message in IVoidCommandMessages ~}}
+                {{~ for message in IUnitCommandMessages ~}}
                 case {{ message.FullName }} r:
                 {
                     return SendAsync(command, cancellationToken);
@@ -1490,21 +1424,21 @@ namespace {{ MediatorNamespace }}
 
         private async global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.ICommand command,
-            {{~ if HasManyVoidCommands ~}}
+            {{~ if HasManyUnitCommands ~}}
             object handlerObj,
             {{~ end ~}}
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            {{~ if HasVoidCommands ~}}
-            {{~ if HasManyVoidCommands ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IVoidMessageHandlerBase>(handlerObj);
+            {{~ if HasUnitCommands ~}}
+            {{~ if HasManyUnitCommands ~}}
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
             await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
             return;
             {{~ else ~}}
             switch (command)
             {
-                {{~ for message in IVoidCommandMessages ~}}
+                {{~ for message in IUnitCommandMessages ~}}
                 case {{ message.FullName }} r:
                 {
                     await Send(r, cancellationToken);

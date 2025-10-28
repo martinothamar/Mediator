@@ -10,8 +10,6 @@ internal enum RequestMessageKind
     StreamRequest,
     StreamQuery,
     StreamCommand,
-    VoidCommand,
-    VoidRequest,
 }
 
 internal sealed record RequestMessageModel : SymbolMetadataModel
@@ -21,7 +19,8 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         ITypeSymbol responseSymbol,
         string messageType,
         RequestMessageHandlerModel? handler,
-        RequestMessageHandlerWrapperModel wrapperType
+        RequestMessageHandlerWrapperModel wrapperType,
+        bool hasResponse
     )
         : base(symbol)
     {
@@ -29,10 +28,8 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         MessageKind = messageType switch
         {
             "Request" => RequestMessageKind.Request,
-            "VoidRequest" => RequestMessageKind.VoidRequest,
             "Query" => RequestMessageKind.Query,
             "Command" => RequestMessageKind.Command,
-            "VoidCommand" => RequestMessageKind.VoidCommand,
             "StreamRequest" => RequestMessageKind.StreamRequest,
             "StreamQuery" => RequestMessageKind.StreamQuery,
             "StreamCommand" => RequestMessageKind.StreamCommand,
@@ -44,7 +41,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
                     or RequestMessageKind.StreamQuery
                     or RequestMessageKind.StreamCommand;
 
-        IsVoid = MessageKind is RequestMessageKind.VoidCommand or RequestMessageKind.VoidRequest;
+        HasResponse = hasResponse;
 
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();
@@ -54,9 +51,9 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         Handler = handler;
 
         var fullHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.TypeName}";
-        HandlerWrapperTypeNameWithGenericTypeArguments = IsVoid
-            ? $"{fullHandlerWrapperTypeName}<{FullName}>"
-            : $"{fullHandlerWrapperTypeName}<{FullName}, {ResponseFullName}>";
+        HandlerWrapperTypeNameWithGenericTypeArguments = HasResponse
+            ? $"{fullHandlerWrapperTypeName}<{FullName}, {ResponseFullName}>"
+            : $"{fullHandlerWrapperTypeName}<{FullName}>";
 
         var identifierFullName = symbol
             .GetTypeSymbolFullName(withGlobalPrefix: false, includeTypeParameters: false)
@@ -67,8 +64,8 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         MethodName = isStreaming ? "CreateStream" : "Send";
         ReturnType =
             isStreaming ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
-            : IsVoid ? $"global::System.Threading.Tasks.ValueTask"
-            : $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>";
+            : HasResponse ? $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>"
+            : $"global::System.Threading.Tasks.ValueTask";
     }
 
     public string MessageType { get; }
@@ -81,5 +78,5 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
     public string HandlerWrapperPropertyName { get; }
     public string MethodName { get; }
     public string ReturnType { get; }
-    public bool IsVoid { get; }
+    public bool HasResponse { get; }
 }

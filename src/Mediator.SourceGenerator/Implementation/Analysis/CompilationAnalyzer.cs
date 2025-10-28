@@ -120,10 +120,8 @@ internal sealed class CompilationAnalyzer
             {
                 new RequestMessageHandlerWrapperModel("Request", this),
                 new RequestMessageHandlerWrapperModel("StreamRequest", this),
-                new RequestMessageHandlerWrapperModel("VoidRequest", this),
                 new RequestMessageHandlerWrapperModel("Command", this),
                 new RequestMessageHandlerWrapperModel("StreamCommand", this),
-                new RequestMessageHandlerWrapperModel("VoidCommand", this),
                 new RequestMessageHandlerWrapperModel("Query", this),
                 new RequestMessageHandlerWrapperModel("StreamQuery", this),
             }.ToImmutableArray();
@@ -346,7 +344,8 @@ internal sealed class CompilationAnalyzer
                         m.ResponseSymbol,
                         m.MessageType,
                         m.Handler?.ToModel(),
-                        m.WrapperType
+                        m.WrapperType,
+                        !_symbolComparer.Equals(m.Symbol, _unitSymbol)
                     )
                 ),
                 ToModelsSortedByInheritanceDepth(_notificationMessages, m => m.ToModel()),

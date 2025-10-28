@@ -31,8 +31,8 @@ internal sealed record CompilationModel
 
         IRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         ICommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
-        IVoidRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
-        IVoidCommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IUnitRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
+        IUnitCommandMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         IQueryMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         IStreamRequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
         IStreamQueryMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
@@ -83,8 +83,8 @@ internal sealed record CompilationModel
 
         var iRequestMessages = new List<RequestMessageModel>();
         var iCommandMessages = new List<RequestMessageModel>();
-        var iVoidRequestMessages = new List<RequestMessageModel>();
-        var iVoidCommandMessages = new List<RequestMessageModel>();
+        var iUnitRequestMessages = new List<RequestMessageModel>();
+        var iUnitCommandMessages = new List<RequestMessageModel>();
         var iQueryMessages = new List<RequestMessageModel>();
         var iStreamRequestMessages = new List<RequestMessageModel>();
         var iStreamQueryMessages = new List<RequestMessageModel>();
@@ -98,10 +98,10 @@ internal sealed record CompilationModel
                 reqMessages.Add(r);
                 var list = r.MessageKind switch
                 {
-                    RequestMessageKind.Request => iRequestMessages,
-                    RequestMessageKind.Command => iCommandMessages,
-                    RequestMessageKind.VoidRequest => iVoidRequestMessages,
-                    RequestMessageKind.VoidCommand => iVoidCommandMessages,
+                    RequestMessageKind.Request when r.HasResponse => iRequestMessages,
+                    RequestMessageKind.Command when r.HasResponse => iCommandMessages,
+                    RequestMessageKind.Request when !r.HasResponse => iUnitRequestMessages,
+                    RequestMessageKind.Command when !r.HasResponse => iUnitCommandMessages,
                     RequestMessageKind.Query => iQueryMessages,
                     RequestMessageKind.StreamRequest => iStreamRequestMessages,
                     RequestMessageKind.StreamQuery => iStreamQueryMessages,
@@ -124,8 +124,8 @@ internal sealed record CompilationModel
 
         IRequestMessages = new(iRequestMessages);
         ICommandMessages = new(iCommandMessages);
-        IVoidCommandMessages = new(iVoidCommandMessages);
-        IVoidRequestMessages = new(iVoidRequestMessages);
+        IUnitCommandMessages = new(iUnitCommandMessages);
+        IUnitRequestMessages = new(iUnitRequestMessages);
         IQueryMessages = new(iQueryMessages);
         IStreamRequestMessages = new(iStreamRequestMessages);
         IStreamQueryMessages = new(iStreamQueryMessages);
@@ -134,24 +134,24 @@ internal sealed record CompilationModel
         HasRequests = iRequestMessages.Count > 0;
         HasCommands = iCommandMessages.Count > 0;
         HasQueries = iQueryMessages.Count > 0;
-        HasVoidRequests = iVoidRequestMessages.Count > 0;
-        HasVoidCommands = iVoidCommandMessages.Count > 0;
+        HasUnitRequests = iUnitRequestMessages.Count > 0;
+        HasUnitCommands = iUnitCommandMessages.Count > 0;
         HasStreamRequests = iStreamRequestMessages.Count > 0;
         HasStreamQueries = iStreamQueryMessages.Count > 0;
         HasStreamCommands = iStreamCommandMessages.Count > 0;
         HasNotifications = notificationMessages.Count > 0;
 
         HasManyRequests = iRequestMessages.Count > ManyMessagesTreshold;
-        HasManyVoidRequests = iVoidRequestMessages.Count > ManyMessagesTreshold;
+        HasManyUnitRequests = iUnitRequestMessages.Count > ManyMessagesTreshold;
         HasManyCommands = iCommandMessages.Count > ManyMessagesTreshold;
-        HasManyVoidCommands = iVoidCommandMessages.Count > ManyMessagesTreshold;
+        HasManyUnitCommands = iUnitCommandMessages.Count > ManyMessagesTreshold;
         HasManyQueries = iQueryMessages.Count > ManyMessagesTreshold;
         HasManyStreamRequests = iStreamRequestMessages.Count > ManyMessagesTreshold;
         HasManyStreamQueries = iStreamQueryMessages.Count > ManyMessagesTreshold;
         HasManyStreamCommands = iStreamCommandMessages.Count > ManyMessagesTreshold;
         HasManyNotifications = notificationMessages.Count > ManyMessagesTreshold;
 
-        HasAnyRequest = HasRequests || HasCommands || HasQueries || HasVoidCommands || HasVoidRequests;
+        HasAnyRequest = HasRequests || HasCommands || HasQueries || HasUnitCommands || HasUnitRequests;
         HasAnyStreamRequest = HasStreamRequests || HasStreamQueries || HasStreamCommands;
     }
 
@@ -185,8 +185,8 @@ internal sealed record CompilationModel
 
     public ImmutableEquatableArray<RequestMessageModel> IRequestMessages { get; }
     public ImmutableEquatableArray<RequestMessageModel> ICommandMessages { get; }
-    public ImmutableEquatableArray<RequestMessageModel> IVoidRequestMessages { get; }
-    public ImmutableEquatableArray<RequestMessageModel> IVoidCommandMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IUnitRequestMessages { get; }
+    public ImmutableEquatableArray<RequestMessageModel> IUnitCommandMessages { get; }
     public ImmutableEquatableArray<RequestMessageModel> IQueryMessages { get; }
 
     public ImmutableEquatableArray<RequestMessageModel> IStreamRequestMessages { get; }
@@ -194,9 +194,9 @@ internal sealed record CompilationModel
     public ImmutableEquatableArray<RequestMessageModel> IStreamCommandMessages { get; }
 
     public bool HasRequests { get; }
-    public bool HasVoidRequests { get; }
+    public bool HasUnitRequests { get; }
     public bool HasCommands { get; }
-    public bool HasVoidCommands { get; }
+    public bool HasUnitCommands { get; }
     public bool HasQueries { get; }
     public bool HasStreamRequests { get; }
     public bool HasStreamQueries { get; }
@@ -204,9 +204,9 @@ internal sealed record CompilationModel
     public bool HasNotifications { get; }
 
     public bool HasManyRequests { get; }
-    public bool HasManyVoidRequests { get; }
+    public bool HasManyUnitRequests { get; }
     public bool HasManyCommands { get; }
-    public bool HasManyVoidCommands { get; }
+    public bool HasManyUnitCommands { get; }
     public bool HasManyQueries { get; }
     public bool HasManyStreamRequests { get; }
     public bool HasManyStreamQueries { get; }
