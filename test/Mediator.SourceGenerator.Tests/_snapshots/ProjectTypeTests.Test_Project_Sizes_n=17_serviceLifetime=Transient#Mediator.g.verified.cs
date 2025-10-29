@@ -447,6 +447,15 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    internal interface IUnitMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface INotificationHandlerBase
     {
         global::System.Threading.Tasks.ValueTask Handle(
@@ -470,7 +479,6 @@ namespace Mediator.Internals
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
             global::Mediator.Mediator mediator,
-
             global::Mediator.IRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -545,11 +553,112 @@ namespace Mediator.Internals
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    internal interface IRequestHandlerBase : IUnitMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            global::Mediator.IRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    internal class UnitRequestHandlerWrapper<TRequest> where TRequest : global::Mediator.IRequest
+    {
+        private global::Mediator.Mediator _mediator = null!;
+
+        public UnitRequestHandlerWrapper<TRequest> Init(global::Mediator.Mediator mediator)
+        {
+            _mediator = mediator;
+            return this;
+        }
+
+        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var concreteHandler = _mediator.Services.GetRequiredService<global::Mediator.IRequestHandler<TRequest>>();
+            var handler = concreteHandler;
+
+            await handler.Handle(request, cancellationToken);
+            return default;
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class RequestHandlerWrapper<TRequest> : IRequestHandlerBase
+        where TRequest : global::Mediator.IRequest
+    {
+
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.Internals.UnitRequestHandlerWrapper<TRequest>>();
+            concreteHandler.Init(mediator);
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>>();
+            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>)concreteHandler.Handle;
+
+            global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[] pipelineBehavioursArray;
+            if (mediator.ServicesUnderlyingTypeIsArray)
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]>(
+                    pipelineBehaviours
+                );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
+                );
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
+            }
+            return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();
+        }
+
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            global::Mediator.IRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle(mediator, (TRequest)request, cancellationToken);
+        }
+
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle(mediator, (TRequest)request, cancellationToken);
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IStreamRequestHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
             global::Mediator.Mediator mediator,
-
             global::Mediator.IStreamRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -625,109 +734,10 @@ namespace Mediator.Internals
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    internal interface IVoidRequestHandlerBase : IMessageHandlerBase
-    {
-        global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            global::Mediator.Mediator mediator,
-            global::Mediator.IRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        );
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    internal interface IVoidRequestHandler<TRequest>  where TRequest : global::Mediator.IRequest
-    {
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        );
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    internal class VoidRequestHandler<TRequest>(global::System.IServiceProvider sp) : IVoidRequestHandler<TRequest>  where TRequest : global::Mediator.IRequest
-    {
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            await sp.GetRequiredService<global::Mediator.IRequestHandler<TRequest>>().Handle(request, cancellationToken);
-            return default;
-        }
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class VoidRequestHandlerWrapper<TRequest> : IVoidRequestHandlerBase
-        where TRequest : global::Mediator.IRequest
-    {
-
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            global::Mediator.Mediator mediator,
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var concreteHandler = mediator.Services.GetRequiredService<IVoidRequestHandler<TRequest>>();
-            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>>();
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>)concreteHandler.Handle;
-
-            global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[] pipelineBehavioursArray;
-            if (mediator.ServicesUnderlyingTypeIsArray)
-            {
-                global::System.Diagnostics.Debug.Assert(
-                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
-                );
-                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]>(
-                    pipelineBehaviours
-                );
-                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-                {
-                    var pipeline = pipelineBehavioursArray[i];
-                    var handlerCopy = handler;
-                    var pipelineCopy = pipeline;
-                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-                }
-            }
-            else
-            {
-                global::System.Diagnostics.Debug.Assert(
-                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
-                );
-                foreach (var pipeline in pipelineBehaviours.Reverse())
-                {
-                    var handlerCopy = handler;
-                    var pipelineCopy = pipeline;
-                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-                }
-            }
-            return handler(request, cancellationToken);
-        }
-
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            global::Mediator.Mediator mediator,
-            global::Mediator.IRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            return Handle(mediator, (TRequest)request, cancellationToken);
-        }
-
-        public async global::System.Threading.Tasks.ValueTask<object?> Handle(
-            global::Mediator.Mediator mediator,
-            object request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            return await Handle(mediator, (TRequest)request, cancellationToken);
-        }
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface ICommandHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
             global::Mediator.Mediator mediator,
-
             global::Mediator.ICommand<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -802,11 +812,112 @@ namespace Mediator.Internals
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    internal interface ICommandHandlerBase : IUnitMessageHandlerBase
+    {
+        global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            global::Mediator.ICommand request,
+            global::System.Threading.CancellationToken cancellationToken
+        );
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    internal class UnitCommandHandlerWrapper<TRequest> where TRequest : global::Mediator.ICommand
+    {
+        private global::Mediator.Mediator _mediator = null!;
+
+        public UnitCommandHandlerWrapper<TRequest> Init(global::Mediator.Mediator mediator)
+        {
+            _mediator = mediator;
+            return this;
+        }
+
+        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var concreteHandler = _mediator.Services.GetRequiredService<global::Mediator.ICommandHandler<TRequest>>();
+            var handler = concreteHandler;
+
+            await handler.Handle(request, cancellationToken);
+            return default;
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class CommandHandlerWrapper<TRequest> : ICommandHandlerBase
+        where TRequest : global::Mediator.ICommand
+    {
+
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.Internals.UnitCommandHandlerWrapper<TRequest>>();
+            concreteHandler.Init(mediator);
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>>();
+            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>)concreteHandler.Handle;
+
+            global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[] pipelineBehavioursArray;
+            if (mediator.ServicesUnderlyingTypeIsArray)
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
+                );
+                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]>(
+                    pipelineBehaviours
+                );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
+            }
+            else
+            {
+                global::System.Diagnostics.Debug.Assert(
+                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
+                );
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
+            }
+            return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();
+        }
+
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            global::Mediator.ICommand request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle(mediator, (TRequest)request, cancellationToken);
+        }
+
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            object request,
+            global::System.Threading.CancellationToken cancellationToken
+        )
+        {
+            return Handle(mediator, (TRequest)request, cancellationToken);
+        }
+    }
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IStreamCommandHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
             global::Mediator.Mediator mediator,
-
             global::Mediator.IStreamCommand<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -882,109 +993,10 @@ namespace Mediator.Internals
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    internal interface IVoidCommandHandlerBase : IMessageHandlerBase
-    {
-        global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            global::Mediator.Mediator mediator,
-            global::Mediator.ICommand request,
-            global::System.Threading.CancellationToken cancellationToken
-        );
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    internal interface IVoidCommandHandler<TRequest>  where TRequest : global::Mediator.ICommand
-    {
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        );
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    internal class VoidCommandHandler<TRequest>(global::System.IServiceProvider sp) : IVoidCommandHandler<TRequest>  where TRequest : global::Mediator.ICommand
-    {
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            await sp.GetRequiredService<global::Mediator.ICommandHandler<TRequest>>().Handle(request, cancellationToken);
-            return default;
-        }
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.Diagnostics.DebuggerStepThroughAttribute]
-    internal sealed class VoidCommandHandlerWrapper<TRequest> : IVoidCommandHandlerBase
-        where TRequest : global::Mediator.ICommand
-    {
-
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            global::Mediator.Mediator mediator,
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var concreteHandler = mediator.Services.GetRequiredService<IVoidCommandHandler<TRequest>>();
-            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>>();
-            var handler = (global::Mediator.MessageHandlerDelegate<TRequest, global::Mediator.Unit>)concreteHandler.Handle;
-
-            global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[] pipelineBehavioursArray;
-            if (mediator.ServicesUnderlyingTypeIsArray)
-            {
-                global::System.Diagnostics.Debug.Assert(
-                    pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
-                );
-                pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]>(
-                    pipelineBehaviours
-                );
-                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-                {
-                    var pipeline = pipelineBehavioursArray[i];
-                    var handlerCopy = handler;
-                    var pipelineCopy = pipeline;
-                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-                }
-            }
-            else
-            {
-                global::System.Diagnostics.Debug.Assert(
-                    pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, global::Mediator.Unit>[]
-                );
-                foreach (var pipeline in pipelineBehaviours.Reverse())
-                {
-                    var handlerCopy = handler;
-                    var pipelineCopy = pipeline;
-                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
-                }
-            }
-            return handler(request, cancellationToken);
-        }
-
-        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
-            global::Mediator.Mediator mediator,
-            global::Mediator.ICommand request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            return Handle(mediator, (TRequest)request, cancellationToken);
-        }
-
-        public async global::System.Threading.Tasks.ValueTask<object?> Handle(
-            global::Mediator.Mediator mediator,
-            object request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            return await Handle(mediator, (TRequest)request, cancellationToken);
-        }
-    }
-    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "4.0.0.0")]
     internal interface IQueryHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
             global::Mediator.Mediator mediator,
-
             global::Mediator.IQuery<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -1063,7 +1075,6 @@ namespace Mediator.Internals
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
             global::Mediator.Mediator mediator,
-
             global::Mediator.IStreamQuery<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -1201,9 +1212,9 @@ namespace Mediator.Internals
         public readonly bool ServicesUnderlyingTypeIsArray;
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> RequestHandlerWrappers;
-        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> VoidRequestHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> UnitRequestHandlerWrappers;
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> CommandHandlerWrappers;
-        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> VoidCommandHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> UnitCommandHandlerWrappers;
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> QueryHandlerWrappers;
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamRequestHandlerWrappers;
@@ -1345,9 +1356,9 @@ namespace Mediator.Internals
 
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
-            var voidRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var unitRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
-            var voidCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var unitCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest0), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest0, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest16), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest16, global::System.Int32>>());
@@ -1401,9 +1412,9 @@ namespace Mediator.Internals
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery11), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery11, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery10), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery10, global::System.Int32>>());
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
-            VoidRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(voidRequestHandlerTypes);
+            UnitRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(unitRequestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
-            VoidCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(voidCommandHandlerTypes);
+            UnitCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(unitCommandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
 
             var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);

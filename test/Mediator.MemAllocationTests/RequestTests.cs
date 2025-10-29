@@ -95,4 +95,29 @@ public class RequestTests
 
         Assert.Equal(0, afterBytes - beforeBytes);
     }
+
+    [Fact]
+    public void Test_Unit_Request_Handler()
+    {
+        var services = new ServiceCollection();
+
+        services.AddMediator();
+
+        using var sp = services.BuildServiceProvider(
+            new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
+        );
+        var mediator = sp.GetRequiredService<IMediator>();
+
+        var id = Guid.NewGuid();
+        var request = new SomeUnitRequestMemAllocTracking(id);
+
+        // Ensure everything is cached
+        mediator.Send(request); // Everything returns sync
+
+        var beforeBytes = Allocations.GetCurrentThreadAllocatedBytes();
+        mediator.Send(request); // Everything returns sync
+        var afterBytes = Allocations.GetCurrentThreadAllocatedBytes();
+
+        Assert.Equal(0, afterBytes - beforeBytes);
+    }
 }

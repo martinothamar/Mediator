@@ -184,14 +184,45 @@ namespace {{ InternalsNamespace }}
 
     {{~ if !wrapperType.HasResponse ~}}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
-    internal class {{wrapperType.UnitHandlerTypeName}}(global::System.IServiceProvider sp) where TRequest : global::Mediator.I{{ wrapperType.MessageType }}
+    internal class {{wrapperType.UnitHandlerTypeName}} where TRequest : global::Mediator.I{{ wrapperType.MessageType }}
     {
+        {{~ if ServiceLifetimeIsSingleton ~}}
+        private global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest> _rootHandler = null!;
+
+        public {{ wrapperType.UnitHandlerTypeName }} Init(
+            global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
+        )
+        {
+            var concreteHandler = sp.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest>>();
+            var handler = concreteHandler;
+
+            _rootHandler = handler;
+            return this;
+        }
+        {{~ else ~}}
+        private global::{{ MediatorNamespace }}.Mediator _mediator = null!;
+
+        public {{ wrapperType.UnitHandlerTypeName }} Init(global::{{ MediatorNamespace }}.Mediator mediator)
+        {
+            _mediator = mediator;
+            return this;
+        }
+        {{~ end ~}}
+
         public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
             TRequest request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            await sp.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest>>().Handle(request, cancellationToken);
+            {{~ if ServiceLifetimeIsSingleton ~}}
+            var handler = _rootHandler;
+            {{~ else ~}}
+            var concreteHandler = _mediator.Services.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest>>();
+            var handler = concreteHandler;
+            {{~ end ~}}
+
+            await handler.Handle(request, cancellationToken);
             return default;
         }
     }
@@ -212,6 +243,9 @@ namespace {{ InternalsNamespace }}
         )
         {
             var concreteHandler = sp.GetRequiredService<{{wrapperType.InterfaceHandlerTypeName}}>();
+            {{~ if !wrapperType.HasResponse ~}}
+            concreteHandler.Init(containerMetadata, sp);
+            {{~ end ~}}
             var pipelineBehaviours = sp.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
@@ -257,7 +291,10 @@ namespace {{ InternalsNamespace }}
             {{~ if ServiceLifetimeIsSingleton ~}}
             var handler = _rootHandler;
             {{~ else ~}}
-            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<{{wrapperType.InterfaceHandlerTypeName}}>();
+            {{~ if !wrapperType.HasResponse ~}}
+            concreteHandler.Init(mediator);
+            {{~ end ~}}
             var pipelineBehaviours = mediator.Services.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
@@ -291,7 +328,7 @@ namespace {{ InternalsNamespace }}
                 }
             }
             {{~ end ~}}
-            {{ wrapperType.ReturnHandler }}
+            return {{ wrapperType.ReturnHandler }}
         }
 
         public {{ wrapperType.ReturnTypeName }} Handle(
