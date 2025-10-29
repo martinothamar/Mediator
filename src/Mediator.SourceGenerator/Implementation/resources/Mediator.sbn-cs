@@ -872,7 +872,7 @@ namespace {{ MediatorNamespace }}
         }
         {{~ end ~}}
 
-        {{~ if HasManyRequests || HasManyUnitRequests ~}}
+        {{~ if HasManyRequests ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetRequestHandler(global::Mediator.IBaseRequest request)
@@ -883,13 +883,35 @@ namespace {{ MediatorNamespace }}
             return handler!;
         }
         {{~ end ~}}
-        {{~ if HasManyCommands || HasManyUnitCommands ~}}
+        {{~ if  HasManyUnitRequests ~}}
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetUnitRequestHandler(global::Mediator.IBaseRequest request)
+        {
+            ThrowIfNull(request, nameof(request));
+            if (!{{ ContainerMetadataField }}.UnitRequestHandlerWrappers.TryGetValue(request.GetType(), out var handler))
+                ThrowMissingHandler(request);
+            return handler!;
+        }
+        {{~ end ~}}
+        {{~ if HasManyCommands  ~}}
 
         [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private object GetCommandHandler(global::Mediator.IBaseCommand command)
         {
             ThrowIfNull(command, nameof(command));
             if (!{{ ContainerMetadataField }}.CommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
+                ThrowMissingHandler(command);
+            return handler!;
+        }
+        {{~ end ~}}
+        {{~ if HasManyUnitCommands ~}}
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetUnitCommandHandler(global::Mediator.IBaseCommand command)
+        {
+            ThrowIfNull(command, nameof(command));
+            if (!{{ ContainerMetadataField }}.UnitCommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
                 ThrowMissingHandler(command);
             return handler!;
         }
@@ -1229,12 +1251,12 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasUnitRequests ~}}
             {{~ if HasManyUnitRequests ~}}
-            var handlerObj = GetRequestHandler(request);
+            var handlerObj = GetUnitRequestHandler(request);
             if (handlerObj is global::{{ InternalsNamespace }}.IRequestHandlerBase<global::Mediator.Unit>)
             {
                 ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.IRequestHandlerBase<global::Mediator.Unit>>(ref handlerObj);
                 var valueTask = handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
-                return valueTask.IsCompletedSuccessfully ? default : new ValueTask(valueTask.AsTask());
+                return valueTask.IsCompletedSuccessfully ? default : new global::System.Threading.Tasks.ValueTask(valueTask.AsTask());
             }
             return SendAsync(request, handlerObj, cancellationToken);
             {{~ else ~}}
@@ -1269,9 +1291,8 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasUnitRequests ~}}
             {{~ if HasManyUnitRequests ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
-            await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
-            return;
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IUnitMessageHandlerBase>(handlerObj);
+            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
             {{~ else ~}}
             switch (request)
             {
@@ -1457,12 +1478,12 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasUnitCommands ~}}
             {{~ if HasManyUnitCommands ~}}
-            var handlerObj = GetCommandHandler(command);
+            var handlerObj = GetUnitCommandHandler(command);
             if (handlerObj is global::{{ InternalsNamespace }}.ICommandHandlerBase<global::Mediator.Unit>)
             {
                 ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::{{ InternalsNamespace }}.ICommandHandlerBase<global::Mediator.Unit>>(ref handlerObj);
                 var valueTask = handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
-                return valueTask.IsCompletedSuccessfully ? default : new ValueTask(valueTask.AsTask());
+                return valueTask.IsCompletedSuccessfully ? default : new global::System.Threading.Tasks.ValueTask(valueTask.AsTask());
             }
             return SendAsync(command, handlerObj, cancellationToken);
             {{~ else ~}}
@@ -1487,7 +1508,7 @@ namespace {{ MediatorNamespace }}
             {{~ end ~}}
         }
 
-        private async global::System.Threading.Tasks.ValueTask SendAsync(
+        private global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.ICommand command,
             {{~ if HasManyUnitCommands ~}}
             object handlerObj,
@@ -1497,29 +1518,27 @@ namespace {{ MediatorNamespace }}
         {
             {{~ if HasUnitCommands ~}}
             {{~ if HasManyUnitCommands ~}}
-            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IMessageHandlerBase>(handlerObj);
-            await handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
-            return;
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::{{ InternalsNamespace }}.IUnitMessageHandlerBase>(handlerObj);
+            return handler.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
             {{~ else ~}}
             switch (command)
             {
                 {{~ for message in IUnitCommandMessages ~}}
                 case {{ message.FullName }} r:
                 {
-                    await Send(r, cancellationToken);
-                    return;
+                    return Send(r, cancellationToken);
                 }
                 {{~ end ~}}
                 default:
                 {
                     ThrowInvalidCommand(command, nameof(command));
-                    return;
+                    return default;
                 }
             }
             {{~ end ~}}
             {{~ else ~}}
             ThrowInvalidCommand(command, nameof(command));
-            return;
+            return default;
             {{~ end ~}}
         }
 
