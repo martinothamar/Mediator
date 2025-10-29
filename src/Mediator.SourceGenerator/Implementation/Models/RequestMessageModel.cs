@@ -19,8 +19,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         ITypeSymbol responseSymbol,
         string messageType,
         RequestMessageHandlerModel? handler,
-        RequestMessageHandlerWrapperModel wrapperType,
-        bool hasResponse
+        RequestMessageHandlerWrapperModel wrapperType
     )
         : base(symbol)
     {
@@ -41,7 +40,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
                     or RequestMessageKind.StreamQuery
                     or RequestMessageKind.StreamCommand;
 
-        HasResponse = hasResponse;
+        HasResponse = !responseSymbol.Name.Equals("Unit", StringComparison.Ordinal);
 
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();
@@ -66,7 +65,7 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
             isStreaming ? $"global::System.Collections.Generic.IAsyncEnumerable<{ResponseFullName}>"
             : HasResponse ? $"global::System.Threading.Tasks.ValueTask<{ResponseFullName}>"
             : $"global::System.Threading.Tasks.ValueTask";
-        UnitHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.{wrapperType.UnitHandlerTypeName}";
+        UnitHandlerWrapperTypeName = $"{wrapperType.FullNamespace}.Unit{wrapperType.TypeName}<{FullName}>";
     }
 
     public string MessageType { get; }

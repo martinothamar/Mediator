@@ -1,3 +1,5 @@
+using System.Threading.Tasks.Sources;
+
 namespace Mediator.SourceGenerator;
 
 internal sealed class RequestMessageHandler : MessageHandler<RequestMessageHandler>

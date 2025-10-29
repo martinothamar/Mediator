@@ -42,7 +42,7 @@ internal sealed record RequestMessageHandlerWrapperModel
     public string InterfaceHandlerTypeName =>
         HasResponse
             ? $"global::Mediator.I{MessageType}Handler<TRequest, TResponse>"
-            : $"{FullNamespace}.Unit{MessageType}Handler<TRequest>";
+            : $"{FullNamespace}.Unit{MessageType}HandlerWrapper<TRequest>";
     public string ReturnTypeName =>
         IsStreaming ? "global::System.Collections.Generic.IAsyncEnumerable<TResponse>"
         : HasResponse ? "global::System.Threading.Tasks.ValueTask<TResponse>"
@@ -51,8 +51,19 @@ internal sealed record RequestMessageHandlerWrapperModel
         IsStreaming ? "global::System.Collections.Generic.IAsyncEnumerable<object?>"
         : HasResponse ? "global::System.Threading.Tasks.ValueTask<object?>"
         : "global::System.Threading.Tasks.ValueTask";
+
+    public string TaskReturnTypeNameWhenObject =>
+        HasResponse
+            ? "async global::System.Threading.Tasks.ValueTask<object?>"
+            : "global::System.Threading.Tasks.ValueTask";
+
     public string HandlerBase =>
         IsStreaming ? "IStreamMessageHandlerBase"
         : HasResponse ? "IMessageHandlerBase"
         : "IUnitMessageHandlerBase";
+
+    public string ReturnHandler =>
+        HasResponse
+            ? "return handler(request, cancellationToken);"
+            : "return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();";
 }

@@ -67,7 +67,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{ message.Handler.ServiceRegistration }}
             services.Add(new {{ SD }}(typeof({{message.InterfaceHandlerWrapperTypeWithGenericTypeArguments}}), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
             {{~ if !message.HasResponse ~}}
-            services.Add(new {{ SD }}(typeof({{message.UnitHandlerWrapperTypeName}}), {{ ServiceLifetime }}));
+            services.Add(new {{ SD }}(typeof({{ message.UnitHandlerWrapperTypeName }}),typeof({{ message.UnitHandlerWrapperTypeName }}), {{ ServiceLifetime }}));
             {{~ end ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
@@ -191,7 +191,7 @@ namespace {{ InternalsNamespace }}
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            await sp.GetRequiredService<global::Mediator.I{{ wrapperType.VoidMessageType }}Handler<TRequest>>().Handle(request, cancellationToken);
+            await sp.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest>>().Handle(request, cancellationToken);
             return default;
         }
     }
@@ -291,7 +291,7 @@ namespace {{ InternalsNamespace }}
                 }
             }
             {{~ end ~}}
-            return handler(request, cancellationToken);
+            {{ wrapperType.ReturnHandler }}
         }
 
         public {{ wrapperType.ReturnTypeName }} Handle(
@@ -318,7 +318,7 @@ namespace {{ InternalsNamespace }}
                 yield return el;
         }
         {{~ else ~}}
-        public async {{ wrapperType.ReturnTypeNameWhenObject }} Handle(
+        public {{ wrapperType.TaskReturnTypeNameWhenObject }} Handle(
             {{~ if !ServiceLifetimeIsSingleton ~}}
             global::{{ MediatorNamespace }}.Mediator mediator,
             {{~ end ~}}
@@ -326,7 +326,11 @@ namespace {{ InternalsNamespace }}
             global::System.Threading.CancellationToken cancellationToken
         )
         {
+            {{~ if wrapperType.HasResponse ~}}
             return await Handle({{ if !ServiceLifetimeIsSingleton; "mediator, "; end; }}(TRequest)request, cancellationToken);
+            {{~ else ~}}
+            return Handle({{ if !ServiceLifetimeIsSingleton; "mediator, "; end; }}(TRequest)request, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
     }
@@ -943,7 +947,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> {{ message.MethodName }}(
+        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask {{ message.MethodName }}(
             {{ message.FullName }} request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -987,7 +991,7 @@ namespace {{ MediatorNamespace }}
         /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> {{ message.MethodName }}(
+        {{ message.AccessibilityModifier }} global::System.Threading.Tasks.ValueTask {{ message.MethodName }}(
             {{ message.FullName }} command,
             global::System.Threading.CancellationToken cancellationToken = default
         )

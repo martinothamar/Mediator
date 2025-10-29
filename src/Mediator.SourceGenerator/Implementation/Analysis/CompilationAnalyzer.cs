@@ -346,8 +346,7 @@ internal sealed class CompilationAnalyzer
                         m.ResponseSymbol,
                         m.MessageType,
                         m.Handler?.ToModel(),
-                        m.WrapperType,
-                        !_symbolComparer.Equals(m.ResponseSymbol, _unitSymbol)
+                        m.WrapperType
                     )
                 ),
                 ToModelsSortedByInheritanceDepth(_notificationMessages, m => m.ToModel()),
