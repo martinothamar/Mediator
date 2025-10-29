@@ -226,15 +226,14 @@ namespace Mediator.Internals
             return this;
         }
 
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
             TRequest request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var handler = _rootHandler;
-
-            await handler.Handle(request, cancellationToken);
-            return default;
+             var handler = _rootHandler;
+             var task = handler.Handle(request, cancellationToken);
+             return task.IsCompletedSuccessfully ? global::Mediator.Unit.ValueTask : new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(task, global::Mediator.Unit.Value).AsValueTask();
         }
     }
 
@@ -292,7 +291,7 @@ namespace Mediator.Internals
         )
         {
             var handler = _rootHandler;
-            return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();
+            return new global::System.Threading.Tasks.ValueTask(handler(request, cancellationToken).AsTask());
         }
 
         public global::System.Threading.Tasks.ValueTask Handle(
@@ -502,15 +501,14 @@ namespace Mediator.Internals
             return this;
         }
 
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
             TRequest request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var handler = _rootHandler;
-
-            await handler.Handle(request, cancellationToken);
-            return default;
+             var handler = _rootHandler;
+             var task = handler.Handle(request, cancellationToken);
+             return task.IsCompletedSuccessfully ? global::Mediator.Unit.ValueTask : new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(task, global::Mediator.Unit.Value).AsValueTask();
         }
     }
 
@@ -568,7 +566,7 @@ namespace Mediator.Internals
         )
         {
             var handler = _rootHandler;
-            return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();
+            return new global::System.Threading.Tasks.ValueTask(handler(request, cancellationToken).AsTask());
         }
 
         public global::System.Threading.Tasks.ValueTask Handle(
@@ -1129,12 +1127,13 @@ namespace Mediator
             return default;
         }
 
-        private async global::System.Threading.Tasks.ValueTask SendAsync(
+        private global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.IRequest request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowInvalidRequest(request, nameof(request));
+            return default;
         }
 
         /// <summary>
@@ -1200,13 +1199,13 @@ namespace Mediator
             return default;
         }
 
-        private async global::System.Threading.Tasks.ValueTask SendAsync(
+        private global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.ICommand command,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowInvalidCommand(command, nameof(command));
-            return;
+            return default;
         }
 
         /// <summary>

@@ -59,10 +59,86 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::PingHandler), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::Ping, global::Pong>), typeof(global::PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::HumBuzzHandler), typeof(global::HumBuzzHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::HumBuzz>), typeof(global::HumBuzzHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::HumBuzz>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::HumBuzz>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::HumBuzz>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::HumBuzz>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SizzlePopHandler), typeof(global::SizzlePopHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::SizzlePop>), typeof(global::SizzlePopHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::SizzlePop>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::SizzlePop>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::SizzlePop>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::SizzlePop>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::ClickClackHandler), typeof(global::ClickClackHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::ClickClack>), typeof(global::ClickClackHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::ClickClack>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::ClickClack>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::ClickClack>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::ClickClack>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::RingRangHandler), typeof(global::RingRangHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::RingRang>), typeof(global::RingRangHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::RingRang>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::RingRang>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::RingRang>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::RingRang>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::HopSkipHandler), typeof(global::HopSkipHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::HopSkip>), typeof(global::HopSkipHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::HopSkip>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::HopSkip>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::HopSkip>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::HopSkip>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::BlipBlopHandler), typeof(global::BlipBlopHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::BlipBlop>), typeof(global::BlipBlopHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::BlipBlop>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::BlipBlop>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::BlipBlop>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::BlipBlop>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::MeowWoofHandler), typeof(global::MeowWoofHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::MeowWoof>), typeof(global::MeowWoofHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::MeowWoof>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::MeowWoof>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::MeowWoof>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::MeowWoof>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::QuackQuackHandler), typeof(global::QuackQuackHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::QuackQuack>), typeof(global::QuackQuackHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::QuackQuack>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::QuackQuack>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::QuackQuack>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::QuackQuack>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::CrashBoomHandler), typeof(global::CrashBoomHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::CrashBoom>), typeof(global::CrashBoomHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::CrashBoom>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::CrashBoom>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::CrashBoom>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::CrashBoom>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::BoomBangHandler), typeof(global::BoomBangHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::BoomBang>), typeof(global::BoomBangHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::BoomBang>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::BoomBang>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::BoomBang>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::BoomBang>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::WiggleWaggleHandler), typeof(global::WiggleWaggleHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::WiggleWaggle>), typeof(global::WiggleWaggleHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::WiggleWaggle>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::WiggleWaggle>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::WiggleWaggle>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::WiggleWaggle>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::DingDongHandler), typeof(global::DingDongHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::DingDong>), typeof(global::DingDongHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::DingDong>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::DingDong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::DingDong>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::DingDong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SnapCrackleHandler), typeof(global::SnapCrackleHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::SnapCrackle>), typeof(global::SnapCrackleHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::SnapCrackle>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::SnapCrackle>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::SnapCrackle>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::SnapCrackle>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::FlipFlopHandler), typeof(global::FlipFlopHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::FlipFlop>), typeof(global::FlipFlopHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::FlipFlop>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::FlipFlop>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::FlipFlop>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::FlipFlop>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::PingPongHandler), typeof(global::PingPongHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::PingPong>), typeof(global::PingPongHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitRequestHandlerWrapper<global::PingPong>),typeof(global::SimpleConsole.Internals.UnitRequestHandlerWrapper<global::PingPong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::PingPong>), typeof(global::SimpleConsole.Internals.RequestHandlerWrapper<global::PingPong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::PingPong>), typeof(global::PingPongHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::PingPong>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::PingPong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::PingPong>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::PingPong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TickTockHandler), typeof(global::TickTockHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TickTock>), typeof(global::TickTockHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::TickTock>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::TickTock>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::TickTock>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::TickTock>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::ZoomZapHandler), typeof(global::ZoomZapHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::ZoomZap>), typeof(global::ZoomZapHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::ZoomZap>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::ZoomZap>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZoomZap>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZoomZap>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::FooBarHandler), typeof(global::FooBarHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::FooBar>), typeof(global::FooBarHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::FooBar>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::FooBar>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::FooBar>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::FooBar>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::ZipZapHandler), typeof(global::ZipZapHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::ZipZap>), typeof(global::ZipZapHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::ZipZap>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::ZipZap>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZipZap>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZipZap>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::PeepBeepHandler), typeof(global::PeepBeepHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::PeepBeep>), typeof(global::PeepBeepHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::PeepBeep>),typeof(global::SimpleConsole.Internals.UnitCommandHandlerWrapper<global::PeepBeep>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::PeepBeep>), typeof(global::SimpleConsole.Internals.CommandHandlerWrapper<global::PeepBeep>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -222,15 +298,14 @@ namespace SimpleConsole.Internals
             return this;
         }
 
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
             TRequest request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var handler = _rootHandler;
-
-            await handler.Handle(request, cancellationToken);
-            return default;
+             var handler = _rootHandler;
+             var task = handler.Handle(request, cancellationToken);
+             return task.IsCompletedSuccessfully ? global::Mediator.Unit.ValueTask : new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(task, global::Mediator.Unit.Value).AsValueTask();
         }
     }
 
@@ -288,7 +363,7 @@ namespace SimpleConsole.Internals
         )
         {
             var handler = _rootHandler;
-            return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();
+            return new global::System.Threading.Tasks.ValueTask(handler(request, cancellationToken).AsTask());
         }
 
         public global::System.Threading.Tasks.ValueTask Handle(
@@ -498,15 +573,14 @@ namespace SimpleConsole.Internals
             return this;
         }
 
-        public async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
+        public global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> Handle(
             TRequest request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var handler = _rootHandler;
-
-            await handler.Handle(request, cancellationToken);
-            return default;
+             var handler = _rootHandler;
+             var task = handler.Handle(request, cancellationToken);
+             return task.IsCompletedSuccessfully ? global::Mediator.Unit.ValueTask : new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(task, global::Mediator.Unit.Value).AsValueTask();
         }
     }
 
@@ -564,7 +638,7 @@ namespace SimpleConsole.Internals
         )
         {
             var handler = _rootHandler;
-            return new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();
+            return new global::System.Threading.Tasks.ValueTask(handler(request, cancellationToken).AsTask());
         }
 
         public global::System.Threading.Tasks.ValueTask Handle(
@@ -920,7 +994,26 @@ namespace SimpleConsole.Internals
 
         public readonly global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong> Wrapper_For_Ping;
 
-        public readonly global::SimpleConsole.Internals.RequestHandlerWrapper<global::PingPong> Wrapper_For_PingPong;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::HumBuzz> Wrapper_For_HumBuzz;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::SizzlePop> Wrapper_For_SizzlePop;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::ClickClack> Wrapper_For_ClickClack;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::RingRang> Wrapper_For_RingRang;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::HopSkip> Wrapper_For_HopSkip;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::BlipBlop> Wrapper_For_BlipBlop;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::MeowWoof> Wrapper_For_MeowWoof;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::QuackQuack> Wrapper_For_QuackQuack;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::CrashBoom> Wrapper_For_CrashBoom;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::BoomBang> Wrapper_For_BoomBang;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::WiggleWaggle> Wrapper_For_WiggleWaggle;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::DingDong> Wrapper_For_DingDong;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::SnapCrackle> Wrapper_For_SnapCrackle;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::FlipFlop> Wrapper_For_FlipFlop;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::PingPong> Wrapper_For_PingPong;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::TickTock> Wrapper_For_TickTock;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZoomZap> Wrapper_For_ZoomZap;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::FooBar> Wrapper_For_FooBar;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZipZap> Wrapper_For_ZipZap;
+        public readonly global::SimpleConsole.Internals.CommandHandlerWrapper<global::PeepBeep> Wrapper_For_PeepBeep;
 
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
@@ -931,12 +1024,31 @@ namespace SimpleConsole.Internals
             NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
-            var unitRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
+            var unitRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
-            var unitCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var unitCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(20);
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             requestHandlerTypes.Add(typeof(global::Ping), sp.GetRequiredService<global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp));
-            unitRequestHandlerTypes.Add(typeof(global::PingPong), sp.GetRequiredService<global::SimpleConsole.Internals.RequestHandlerWrapper<global::PingPong>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::HumBuzz), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::HumBuzz>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::SizzlePop), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::SizzlePop>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::ClickClack), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::ClickClack>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::RingRang), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::RingRang>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::HopSkip), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::HopSkip>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::BlipBlop), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::BlipBlop>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::MeowWoof), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::MeowWoof>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::QuackQuack), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::QuackQuack>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::CrashBoom), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::CrashBoom>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::BoomBang), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::BoomBang>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::WiggleWaggle), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::WiggleWaggle>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::DingDong), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::DingDong>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::SnapCrackle), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::SnapCrackle>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::FlipFlop), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::FlipFlop>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::PingPong), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::PingPong>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::TickTock), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::TickTock>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::ZoomZap), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZoomZap>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::FooBar), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::FooBar>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::ZipZap), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZipZap>>().Init(this, sp));
+            unitCommandHandlerTypes.Add(typeof(global::PeepBeep), sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::PeepBeep>>().Init(this, sp));
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
             UnitRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(unitRequestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
@@ -955,7 +1067,26 @@ namespace SimpleConsole.Internals
 
             Wrapper_For_Ping = sp.GetRequiredService<global::SimpleConsole.Internals.RequestHandlerWrapper<global::Ping, global::Pong>>().Init(this, sp);
 
-            Wrapper_For_PingPong = sp.GetRequiredService<global::SimpleConsole.Internals.RequestHandlerWrapper<global::PingPong>>().Init(this, sp);
+            Wrapper_For_HumBuzz = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::HumBuzz>>().Init(this, sp);
+            Wrapper_For_SizzlePop = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::SizzlePop>>().Init(this, sp);
+            Wrapper_For_ClickClack = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::ClickClack>>().Init(this, sp);
+            Wrapper_For_RingRang = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::RingRang>>().Init(this, sp);
+            Wrapper_For_HopSkip = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::HopSkip>>().Init(this, sp);
+            Wrapper_For_BlipBlop = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::BlipBlop>>().Init(this, sp);
+            Wrapper_For_MeowWoof = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::MeowWoof>>().Init(this, sp);
+            Wrapper_For_QuackQuack = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::QuackQuack>>().Init(this, sp);
+            Wrapper_For_CrashBoom = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::CrashBoom>>().Init(this, sp);
+            Wrapper_For_BoomBang = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::BoomBang>>().Init(this, sp);
+            Wrapper_For_WiggleWaggle = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::WiggleWaggle>>().Init(this, sp);
+            Wrapper_For_DingDong = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::DingDong>>().Init(this, sp);
+            Wrapper_For_SnapCrackle = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::SnapCrackle>>().Init(this, sp);
+            Wrapper_For_FlipFlop = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::FlipFlop>>().Init(this, sp);
+            Wrapper_For_PingPong = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::PingPong>>().Init(this, sp);
+            Wrapper_For_TickTock = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::TickTock>>().Init(this, sp);
+            Wrapper_For_ZoomZap = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZoomZap>>().Init(this, sp);
+            Wrapper_For_FooBar = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::FooBar>>().Init(this, sp);
+            Wrapper_For_ZipZap = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::ZipZap>>().Init(this, sp);
+            Wrapper_For_PeepBeep = sp.GetRequiredService<global::SimpleConsole.Internals.CommandHandlerWrapper<global::PeepBeep>>().Init(this, sp);
         }
     }
 }
@@ -1010,7 +1141,7 @@ namespace SimpleConsole
         /// <summary>
         /// The total number of Mediator messages that were discovered.
         /// </summary>
-        public const int TotalMessages = 2;
+        public const int TotalMessages = 21;
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -1084,6 +1215,15 @@ namespace SimpleConsole
         }
 
 
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetUnitCommandHandler(global::Mediator.IBaseCommand command)
+        {
+            ThrowIfNull(command, nameof(command));
+            if (!_containerMetadata.Value.UnitCommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
+                ThrowMissingHandler(command);
+            return handler!;
+        }
+
 
         /// <summary>
         /// Send a request of type global::Ping.
@@ -1102,19 +1242,323 @@ namespace SimpleConsole
         }
 
         /// <summary>
-        /// Send a request of type global::PingPong.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
+        /// Send a command of type global::HumBuzz.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
         /// </summary>
-        /// <param name="request">Incoming request</param>
+        /// <param name="command">Incoming command</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask Send(
-            global::PingPong request,
+            global::HumBuzz command,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowIfNull(request, nameof(request));
-            return _containerMetadata.Value.Wrapper_For_PingPong.Handle(request, cancellationToken);
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_HumBuzz.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::SizzlePop.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::SizzlePop command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_SizzlePop.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::ClickClack.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::ClickClack command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_ClickClack.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::RingRang.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::RingRang command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_RingRang.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::HopSkip.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::HopSkip command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_HopSkip.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::BlipBlop.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::BlipBlop command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_BlipBlop.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::MeowWoof.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::MeowWoof command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_MeowWoof.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::QuackQuack.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::QuackQuack command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_QuackQuack.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::CrashBoom.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::CrashBoom command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_CrashBoom.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::BoomBang.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::BoomBang command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_BoomBang.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::WiggleWaggle.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::WiggleWaggle command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_WiggleWaggle.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::DingDong.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::DingDong command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_DingDong.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::SnapCrackle.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::SnapCrackle command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_SnapCrackle.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::FlipFlop.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::FlipFlop command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_FlipFlop.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::PingPong.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::PingPong command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_PingPong.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::TickTock.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::TickTock command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_TickTock.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::ZoomZap.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::ZoomZap command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_ZoomZap.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::FooBar.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::FooBar command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_FooBar.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::ZipZap.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::ZipZap command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_ZipZap.Handle(command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::PeepBeep.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Send(
+            global::PeepBeep command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Value.Wrapper_For_PeepBeep.Handle(command, cancellationToken);
         }
 
         /// <summary>
@@ -1184,38 +1628,17 @@ namespace SimpleConsole
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
-            {
-                case global::PingPong r:
-                {
-                    return SendAsync(request, cancellationToken);
-                }
-                default:
-                {
-                    ThrowInvalidRequest(request, nameof(request));
-                    return default;
-                }
-            }
+            ThrowInvalidRequest(request, nameof(request));
+            return default;
         }
 
-        private async global::System.Threading.Tasks.ValueTask SendAsync(
+        private global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.IRequest request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
-            {
-                case global::PingPong r:
-                {
-                    await Send(r, cancellationToken);
-                    return;
-                }
-                default:
-                {
-                    ThrowInvalidRequest(request, nameof(request));
-                    return;
-                }
-            }
+            ThrowInvalidRequest(request, nameof(request));
+            return default;
         }
 
         /// <summary>
@@ -1277,17 +1700,24 @@ namespace SimpleConsole
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowInvalidCommand(command, nameof(command));
-            return default;
+            var handlerObj = GetUnitCommandHandler(command);
+            if (handlerObj is global::SimpleConsole.Internals.ICommandHandlerBase<global::Mediator.Unit>)
+            {
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::SimpleConsole.Internals.ICommandHandlerBase<global::Mediator.Unit>>(ref handlerObj);
+                var valueTask = handler.Handle(command, cancellationToken);
+                return valueTask.IsCompletedSuccessfully ? default : new global::System.Threading.Tasks.ValueTask(valueTask.AsTask());
+            }
+            return SendAsync(command, handlerObj, cancellationToken);
         }
 
-        private async global::System.Threading.Tasks.ValueTask SendAsync(
+        private global::System.Threading.Tasks.ValueTask SendAsync(
             global::Mediator.ICommand command,
+            object handlerObj,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowInvalidCommand(command, nameof(command));
-            return;
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::SimpleConsole.Internals.IUnitMessageHandlerBase>(handlerObj);
+            return handler.Handle(command, cancellationToken);
         }
 
         /// <summary>
