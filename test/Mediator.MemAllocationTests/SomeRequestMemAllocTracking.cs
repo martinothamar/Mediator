@@ -10,10 +10,3 @@ public sealed class SomeRequestMemAllocTrackingHandler : IRequestHandler<SomeReq
 {
     public ValueTask<int> Handle(SomeRequestMemAllocTracking request, CancellationToken cancellationToken) => default;
 }
-
-public sealed record SomeUnitRequestMemAllocTracking(Guid Id) : IRequest;
-
-public sealed class SomeUnitRequestMemAllocTrackingHandler : IRequestHandler<SomeUnitRequestMemAllocTracking>
-{
-    public ValueTask Handle(SomeUnitRequestMemAllocTracking request, CancellationToken cancellationToken) => default;
-}

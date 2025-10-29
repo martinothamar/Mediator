@@ -5,52 +5,48 @@ using System.Threading.Tasks.Sources;
 
 namespace Mediator;
 
-public class ValueTaskWrapper<T> : IValueTaskSource
+public class ValueTaskWrapper<T> : IValueTaskSource<T>
 {
-    private readonly ValueTask<T> _inner;
-    private Action<object>? _continuation;
-    private object? _state;
+    private readonly ValueTask _original;
+    private readonly T _result;
+    private readonly ManualResetValueTaskSourceCore<T> _core;
 
-    public ValueTaskWrapper(ValueTask<T> inner)
+    public ValueTaskWrapper(ValueTask original, T result)
     {
-        _inner = inner;
+        _original = original;
+        _result = result;
+        _core = new ManualResetValueTaskSourceCore<T>();
+        _core.RunContinuationsAsynchronously = true;
+
+        MonitorOriginal();
     }
 
-    public ValueTask AsValueTask()
+    private async void MonitorOriginal()
     {
-        return new ValueTask(this, 0);
-    }
-
-    public void OnCompleted(
-        Action<object>? continuation,
-        object? state,
-        short token,
-        ValueTaskSourceOnCompletedFlags flags
-    )
-    {
-        _continuation = continuation;
-        _state = state;
-
-        _ = CompleteAsync();
-    }
-
-    private async Task CompleteAsync()
-    {
-        await _inner;
-
-        if (_state != null)
+        try
         {
-            _continuation?.Invoke(_state);
+            await _original;
+            _core.SetResult(_result);
+        }
+        catch (Exception ex)
+        {
+            _core.SetException(ex);
         }
     }
 
-    public void GetResult(short token) { }
-
-    public ValueTaskSourceStatus GetStatus(short token)
+    public ValueTask<T> AsValueTask()
     {
-        return _inner.IsCompletedSuccessfully ? ValueTaskSourceStatus.Succeeded
-            : _inner.IsFaulted ? ValueTaskSourceStatus.Faulted
-            : _inner.IsCanceled ? ValueTaskSourceStatus.Canceled
-            : ValueTaskSourceStatus.Pending;
+        return new ValueTask<T>(this, _core.Version);
     }
+
+    public T GetResult(short token) => _core.GetResult(token);
+
+    public ValueTaskSourceStatus GetStatus(short token) => _core.GetStatus(token);
+
+    public void OnCompleted(
+        Action<object?> continuation,
+        object? state,
+        short token,
+        ValueTaskSourceOnCompletedFlags flags
+    ) => _core.OnCompleted(continuation, state, token, flags);
 }

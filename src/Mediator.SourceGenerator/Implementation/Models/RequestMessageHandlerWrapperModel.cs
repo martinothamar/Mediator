@@ -65,5 +65,5 @@ internal sealed record RequestMessageHandlerWrapperModel
     public string ReturnHandler =>
         HasResponse
             ? "handler(request, cancellationToken);"
-            : "new global::Mediator.ValueTaskWrapper<global::Mediator.Unit>(handler(request,cancellationToken)).AsValueTask();";
+            : "new global::System.Threading.Tasks.ValueTask(handler(request, cancellationToken).AsTask());";
 }
