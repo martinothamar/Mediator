@@ -52,7 +52,9 @@ internal sealed record CompilationModel
         string? singletonServiceLifetime,
         bool isTestRun,
         bool configuredViaAttribute,
-        bool generateTypesAsInternal
+        bool generateTypesAsInternal,
+        string? cachingMode,
+        string? cachingModeShort
     )
     {
         MediatorNamespace = mediatorNamespace;
@@ -67,6 +69,10 @@ internal sealed record CompilationModel
         ServiceLifetimeIsSingleton = serviceLifetimeShort == "Singleton";
         ServiceLifetimeIsScoped = serviceLifetimeShort == "Scoped";
         ServiceLifetimeIsTransient = serviceLifetimeShort == "Transient";
+        CachingMode = cachingMode;
+        CachingModeShort = cachingModeShort;
+        CachingModeIsEager = cachingModeShort != "Lazy";
+        CachingModeIsLazy = cachingModeShort == "Lazy";
         ContainerMetadataField = ServiceLifetimeIsSingleton ? "_containerMetadata.Value" : "_containerMetadata";
         InternalsNamespace = $"{MediatorNamespace}.Internals";
         TotalMessages = requestMessages.Count + notificationMessages.Count;
@@ -156,6 +162,10 @@ internal sealed record CompilationModel
     public bool ServiceLifetimeIsSingleton { get; }
     public bool ServiceLifetimeIsScoped { get; }
     public bool ServiceLifetimeIsTransient { get; }
+    public string? CachingMode { get; }
+    public string? CachingModeShort { get; }
+    public bool CachingModeIsEager { get; }
+    public bool CachingModeIsLazy { get; }
     public string ContainerMetadataField { get; }
     public string InternalsNamespace { get; }
     public int TotalMessages { get; }
