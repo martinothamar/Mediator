@@ -451,3 +451,4 @@ $RECYCLE.BIN/
 
 dist/
 .mono/
+benchmarks/artifacts/

@@ -6,3 +6,250 @@ bench:
 
 bench-quick:
     dotnet run -c Release --project Mediator.Benchmarks/ -- --warmupCount 4 --iterationCount 4 --iterationTime 150
+
+_coldstart-build lifetime caching:
+    #!/bin/sh
+    set -eu
+    LIFETIME="{{lifetime}}"
+    LIFETIME_LOWER=$(echo "$LIFETIME" | tr '[:upper:]' '[:lower:]')
+    CACHING="{{caching}}"
+    CACHING_LOWER=$(echo "$CACHING" | tr '[:upper:]' '[:lower:]')
+    LIFETIME_DEFINE="Mediator_Lifetime_$LIFETIME"
+    CACHING_DEFINE="Mediator_CachingMode_$CACHING"
+    BASE_DEFINES="${LIFETIME_DEFINE}%3B${CACHING_DEFINE}"
+
+    echo "Building $LIFETIME / $CACHING variants..."
+
+    # Small project, JIT
+    dotnet publish Mediator.Benchmarks.ColdStart -c Release \
+      -p:ExtraDefineConstants="$BASE_DEFINES" \
+      -o "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-jit"
+
+    # Large project, JIT
+    dotnet publish Mediator.Benchmarks.ColdStart -c Release \
+      -p:ExtraDefineConstants="${BASE_DEFINES}%3BMediator_Large_Project" \
+      -o "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-jit"
+
+    # Small project, AOT
+    dotnet publish Mediator.Benchmarks.ColdStart -c Release \
+      -p:EnableAot=true -p:ExtraDefineConstants="$BASE_DEFINES" -r linux-x64 \
+      -o "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-aot"
+
+    # Large project, AOT
+    dotnet publish Mediator.Benchmarks.ColdStart -c Release \
+      -p:EnableAot=true -p:ExtraDefineConstants="${BASE_DEFINES}%3BMediator_Large_Project" -r linux-x64 \
+      -o "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-aot"
+
+coldstart-build-singleton-eager:
+    just _coldstart-build Singleton Eager
+
+coldstart-build-singleton-lazy:
+    just _coldstart-build Singleton Lazy
+
+coldstart-build-singleton:
+    just coldstart-build-singleton-eager
+    just coldstart-build-singleton-lazy
+
+coldstart-build-scoped-eager:
+    just _coldstart-build Scoped Eager
+
+coldstart-build-scoped-lazy:
+    just _coldstart-build Scoped Lazy
+
+coldstart-build-scoped:
+    just coldstart-build-scoped-eager
+    just coldstart-build-scoped-lazy
+
+coldstart-build-transient-eager:
+    just _coldstart-build Transient Eager
+
+coldstart-build-transient-lazy:
+    just _coldstart-build Transient Lazy
+
+coldstart-build-transient:
+    just coldstart-build-transient-eager
+    just coldstart-build-transient-lazy
+
+coldstart-build-baseline:
+    dotnet publish Mediator.Benchmarks.ColdStart -c Release \
+      -p:EnableAot=true -p:ExtraDefineConstants="Mediator_Baseline" -r linux-x64 \
+      -o "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot"
+
+coldstart-build-all:
+    just coldstart-build-singleton
+    just coldstart-build-scoped
+    just coldstart-build-transient
+    just coldstart-build-baseline
+
+coldstart-build: coldstart-build-singleton
+
+_coldstart-bench lifetime caching:
+    #!/bin/sh
+    set -eu
+
+    # Check if hyperfine is installed
+    if ! command -v hyperfine >/dev/null 2>&1; then
+        echo "Error: hyperfine is not installed."
+        echo "Please install it from: https://github.com/sharkdp/hyperfine"
+        exit 1
+    fi
+
+    LIFETIME="{{lifetime}}"
+    LIFETIME_LOWER=$(echo "$LIFETIME" | tr '[:upper:]' '[:lower:]')
+    CACHING="{{caching}}"
+    CACHING_LOWER=$(echo "$CACHING" | tr '[:upper:]' '[:lower:]')
+
+    # Check if all required binaries exist
+    missing=""
+    for binary in \
+        "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-jit/Mediator.Benchmarks.ColdStart" \
+        "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-jit/Mediator.Benchmarks.ColdStart" \
+        "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-aot/Mediator.Benchmarks.ColdStart" \
+        "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-aot/Mediator.Benchmarks.ColdStart"; do
+        if [ ! -f "$binary" ]; then
+            missing="$missing  - $binary\n"
+        fi
+    done
+
+    if [ -n "$missing" ]; then
+        echo "Error: The following binaries are missing for $LIFETIME / $CACHING:"
+        printf "%b" "$missing"
+        echo ""
+        echo "Please run 'just coldstart-build-$LIFETIME_LOWER-$CACHING_LOWER' first to build all variants."
+        exit 1
+    fi
+
+    mkdir -p artifacts
+
+    hyperfine --warmup 10 --runs 100 --shell=none \
+      --export-markdown "artifacts/coldstart-$LIFETIME_LOWER-$CACHING_LOWER-results.md" \
+      --command-name "Small/JIT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-jit/Mediator.Benchmarks.ColdStart" \
+      --command-name "Large/JIT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-jit/Mediator.Benchmarks.ColdStart" \
+      --command-name "Small/AOT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-aot/Mediator.Benchmarks.ColdStart" \
+      --command-name "Large/AOT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-aot/Mediator.Benchmarks.ColdStart"
+
+coldstart-singleton-eager:
+    just _coldstart-bench Singleton Eager
+
+coldstart-singleton-lazy:
+    just _coldstart-bench Singleton Lazy
+
+coldstart-singleton:
+    just coldstart-singleton-eager
+    just coldstart-singleton-lazy
+
+coldstart-scoped-eager:
+    just _coldstart-bench Scoped Eager
+
+coldstart-scoped-lazy:
+    just _coldstart-bench Scoped Lazy
+
+coldstart-scoped:
+    just coldstart-scoped-eager
+    just coldstart-scoped-lazy
+
+coldstart-transient-eager:
+    just _coldstart-bench Transient Eager
+
+coldstart-transient-lazy:
+    just _coldstart-bench Transient Lazy
+
+coldstart-transient:
+    just coldstart-transient-eager
+    just coldstart-transient-lazy
+
+coldstart-baseline:
+    #!/bin/sh
+    set -eu
+
+    # Check if hyperfine is installed
+    if ! command -v hyperfine >/dev/null 2>&1; then
+        echo "Error: hyperfine is not installed."
+        echo "Please install it from: https://github.com/sharkdp/hyperfine"
+        exit 1
+    fi
+
+    # Check if baseline binary exists
+    if [ ! -f "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" ]; then
+        echo "Error: Baseline binary is missing."
+        echo "Please run 'just coldstart-build-baseline' first."
+        exit 1
+    fi
+
+    mkdir -p artifacts
+
+    hyperfine --warmup 10 --runs 100 --shell=none \
+      --export-markdown "artifacts/coldstart-baseline-results.md" \
+      --command-name "Baseline" \
+      "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart"
+
+coldstart-all:
+    #!/bin/sh
+    set -eu
+
+    # Check if hyperfine is installed
+    if ! command -v hyperfine >/dev/null 2>&1; then
+        echo "Error: hyperfine is not installed."
+        echo "Please install it from: https://github.com/sharkdp/hyperfine"
+        exit 1
+    fi
+
+    # Check if all required binaries exist for all lifetimes and caching modes
+    missing=""
+
+    # Check baseline binary
+    if [ ! -f "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" ]; then
+        missing="$missing  - Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart\n"
+    fi
+
+    # Check all lifetime/caching combinations
+    for lifetime in singleton scoped transient; do
+        for caching in eager lazy; do
+            for variant in small-jit large-jit small-aot large-aot; do
+                binary="Mediator.Benchmarks.ColdStart/bin/$lifetime-$caching-$variant/Mediator.Benchmarks.ColdStart"
+                if [ ! -f "$binary" ]; then
+                    missing="$missing  - $binary\n"
+                fi
+            done
+        done
+    done
+
+    if [ -n "$missing" ]; then
+        echo "Error: The following binaries are missing:"
+        printf "%b" "$missing"
+        echo ""
+        echo "Please run 'just coldstart-build-all' first to build all variants."
+        exit 1
+    fi
+
+    mkdir -p artifacts
+
+    hyperfine --warmup 10 --runs 100 --shell=none \
+      --export-markdown artifacts/coldstart-all-results.md \
+      --command-name "Baseline" 'Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Eager/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-small-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Eager/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-large-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Eager/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Eager/Large/AOT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-large-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Lazy/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/singleton-lazy-small-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Lazy/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Lazy/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/singleton-lazy-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Singleton/Lazy/Large/AOT" 'Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Eager/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/scoped-eager-small-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Eager/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/scoped-eager-large-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Eager/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/scoped-eager-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Eager/Large/AOT" 'Mediator.Benchmarks.ColdStart/bin/scoped-eager-large-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Lazy/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/scoped-lazy-small-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Lazy/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/scoped-lazy-large-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Lazy/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/scoped-lazy-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Scoped/Lazy/Large/AOT" 'Mediator.Benchmarks.ColdStart/bin/scoped-lazy-large-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Eager/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/transient-eager-small-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Eager/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/transient-eager-large-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Eager/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/transient-eager-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Eager/Large/AOT" 'Mediator.Benchmarks.ColdStart/bin/transient-eager-large-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Lazy/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/transient-lazy-small-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Lazy/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/transient-lazy-large-jit/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Lazy/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/transient-lazy-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Transient/Lazy/Large/AOT" 'Mediator.Benchmarks.ColdStart/bin/transient-lazy-large-aot/Mediator.Benchmarks.ColdStart'
+
+coldstart: coldstart-singleton
