@@ -631,14 +631,12 @@ namespace SomeNamespace.Internals
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             using (var scope = sp.CreateScope())
             {
                 ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::SomeNamespace.Internals.IContainerProbe>() is global::SomeNamespace.Internals.IContainerProbe[];
             }
-
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);

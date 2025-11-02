@@ -738,14 +738,12 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7> Wrapper_For_TestCode_TestNotification7;
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16> Wrapper_For_TestCode_TestNotification16;
 
-
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             using (var scope = sp.CreateScope())
             {
                 ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
             }
-
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);

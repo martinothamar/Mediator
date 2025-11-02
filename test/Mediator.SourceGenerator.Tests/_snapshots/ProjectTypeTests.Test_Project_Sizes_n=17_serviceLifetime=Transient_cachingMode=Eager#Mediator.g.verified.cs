@@ -77,6 +77,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery0Handler), typeof(global::TestCode.TestStreamQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery0, global::System.Int32>), typeof(global::TestCode.TestStreamQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest16Handler), typeof(global::TestCode.TestStreamRequest16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest16, global::System.Int32>), typeof(global::TestCode.TestStreamRequest16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest16, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest16, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest15Handler), typeof(global::TestCode.TestStreamRequest15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest15, global::System.Int32>), typeof(global::TestCode.TestStreamRequest15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest15, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -86,12 +89,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest13Handler), typeof(global::TestCode.TestStreamRequest13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest13, global::System.Int32>), typeof(global::TestCode.TestStreamRequest13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest13, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest13, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery6Handler), typeof(global::TestCode.TestStreamQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery6, global::System.Int32>), typeof(global::TestCode.TestStreamQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest12Handler), typeof(global::TestCode.TestStreamRequest12Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest12, global::System.Int32>), typeof(global::TestCode.TestStreamRequest12Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest12, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest12, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest11Handler), typeof(global::TestCode.TestStreamRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest11, global::System.Int32>), typeof(global::TestCode.TestStreamRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest10Handler), typeof(global::TestCode.TestStreamRequest10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest10, global::System.Int32>), typeof(global::TestCode.TestStreamRequest10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest10, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest10, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -119,18 +122,21 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest2Handler), typeof(global::TestCode.TestStreamRequest2Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest2, global::System.Int32>), typeof(global::TestCode.TestStreamRequest2Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest2, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest2, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest11Handler), typeof(global::TestCode.TestStreamRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest11, global::System.Int32>), typeof(global::TestCode.TestStreamRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest1Handler), typeof(global::TestCode.TestStreamRequest1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest1, global::System.Int32>), typeof(global::TestCode.TestStreamRequest1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery6Handler), typeof(global::TestCode.TestStreamQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery6, global::System.Int32>), typeof(global::TestCode.TestStreamQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery7Handler), typeof(global::TestCode.TestStreamQuery7Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery7, global::System.Int32>), typeof(global::TestCode.TestStreamQuery7Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery7, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery7, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery8Handler), typeof(global::TestCode.TestStreamQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery8, global::System.Int32>), typeof(global::TestCode.TestStreamQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery9Handler), typeof(global::TestCode.TestStreamQuery9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery9, global::System.Int32>), typeof(global::TestCode.TestStreamQuery9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand14Handler), typeof(global::TestCode.TestStreamCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand14, global::System.Int32>), typeof(global::TestCode.TestStreamCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand13Handler), typeof(global::TestCode.TestStreamCommand13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand13, global::System.Int32>), typeof(global::TestCode.TestStreamCommand13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand13, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand13, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -158,9 +164,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand5Handler), typeof(global::TestCode.TestStreamCommand5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand5, global::System.Int32>), typeof(global::TestCode.TestStreamCommand5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand5, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand5, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery8Handler), typeof(global::TestCode.TestStreamQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery8, global::System.Int32>), typeof(global::TestCode.TestStreamQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest1Handler), typeof(global::TestCode.TestStreamRequest1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest1, global::System.Int32>), typeof(global::TestCode.TestStreamRequest1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand4Handler), typeof(global::TestCode.TestStreamCommand4Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand4, global::System.Int32>), typeof(global::TestCode.TestStreamCommand4Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand4, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand4, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -173,6 +179,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand0Handler), typeof(global::TestCode.TestStreamCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand0, global::System.Int32>), typeof(global::TestCode.TestStreamCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery16Handler), typeof(global::TestCode.TestStreamQuery16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery16, global::System.Int32>), typeof(global::TestCode.TestStreamQuery16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery16, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery16, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery15Handler), typeof(global::TestCode.TestStreamQuery15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery15, global::System.Int32>), typeof(global::TestCode.TestStreamQuery15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery15, global::System.Int32>), typeof(global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -197,12 +206,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest0Handler), typeof(global::TestCode.TestStreamRequest0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest0, global::System.Int32>), typeof(global::TestCode.TestStreamRequest0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand16Handler), typeof(global::TestCode.TestCommand16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand16, global::System.Int32>), typeof(global::TestCode.TestCommand16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand16, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand16, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand15Handler), typeof(global::TestCode.TestCommand15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand15, global::System.Int32>), typeof(global::TestCode.TestCommand15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand15, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand14Handler), typeof(global::TestCode.TestCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand14, global::System.Int32>), typeof(global::TestCode.TestCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery5Handler), typeof(global::TestCode.TestQuery5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery5, global::System.Int32>), typeof(global::TestCode.TestQuery5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery4Handler), typeof(global::TestCode.TestQuery4Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery4, global::System.Int32>), typeof(global::TestCode.TestQuery4Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery4, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery4, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -218,6 +230,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery0Handler), typeof(global::TestCode.TestQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery0, global::System.Int32>), typeof(global::TestCode.TestQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest16Handler), typeof(global::TestCode.TestRequest16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest16, global::System.Int32>), typeof(global::TestCode.TestRequest16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest16, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest16, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest15Handler), typeof(global::TestCode.TestRequest15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest15, global::System.Int32>), typeof(global::TestCode.TestRequest15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest15, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -227,15 +242,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest13Handler), typeof(global::TestCode.TestRequest13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest13, global::System.Int32>), typeof(global::TestCode.TestRequest13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest13, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest13, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery6Handler), typeof(global::TestCode.TestQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery6, global::System.Int32>), typeof(global::TestCode.TestQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest12Handler), typeof(global::TestCode.TestRequest12Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest12, global::System.Int32>), typeof(global::TestCode.TestRequest12Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest12, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest12, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery5Handler), typeof(global::TestCode.TestQuery5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery5, global::System.Int32>), typeof(global::TestCode.TestQuery5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest11Handler), typeof(global::TestCode.TestRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest11, global::System.Int32>), typeof(global::TestCode.TestRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest10Handler), typeof(global::TestCode.TestRequest10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest10, global::System.Int32>), typeof(global::TestCode.TestRequest10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest9Handler), typeof(global::TestCode.TestRequest9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest9, global::System.Int32>), typeof(global::TestCode.TestRequest9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest9, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest9, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -263,18 +278,21 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest1Handler), typeof(global::TestCode.TestRequest1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest1, global::System.Int32>), typeof(global::TestCode.TestRequest1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest1, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest1, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest10Handler), typeof(global::TestCode.TestRequest10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest10, global::System.Int32>), typeof(global::TestCode.TestRequest10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery6Handler), typeof(global::TestCode.TestQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery6, global::System.Int32>), typeof(global::TestCode.TestQuery6Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest11Handler), typeof(global::TestCode.TestRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest11, global::System.Int32>), typeof(global::TestCode.TestRequest11Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand15Handler), typeof(global::TestCode.TestStreamCommand15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand15, global::System.Int32>), typeof(global::TestCode.TestStreamCommand15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery7Handler), typeof(global::TestCode.TestQuery7Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery7, global::System.Int32>), typeof(global::TestCode.TestQuery7Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery7, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery7, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery8Handler), typeof(global::TestCode.TestQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery8, global::System.Int32>), typeof(global::TestCode.TestQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery9Handler), typeof(global::TestCode.TestQuery9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery9, global::System.Int32>), typeof(global::TestCode.TestQuery9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand14Handler), typeof(global::TestCode.TestCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand14, global::System.Int32>), typeof(global::TestCode.TestCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand13Handler), typeof(global::TestCode.TestCommand13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand13, global::System.Int32>), typeof(global::TestCode.TestCommand13Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand13, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand13, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -302,12 +320,12 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand5Handler), typeof(global::TestCode.TestCommand5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand5, global::System.Int32>), typeof(global::TestCode.TestCommand5Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand5, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand5, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery8Handler), typeof(global::TestCode.TestQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery8, global::System.Int32>), typeof(global::TestCode.TestQuery8Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand4Handler), typeof(global::TestCode.TestCommand4Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand4, global::System.Int32>), typeof(global::TestCode.TestCommand4Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand4, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand4, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand3Handler), typeof(global::TestCode.TestCommand3Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand3, global::System.Int32>), typeof(global::TestCode.TestCommand3Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand2Handler), typeof(global::TestCode.TestCommand2Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand2, global::System.Int32>), typeof(global::TestCode.TestCommand2Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand2, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand2, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -317,6 +335,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand0Handler), typeof(global::TestCode.TestCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand0, global::System.Int32>), typeof(global::TestCode.TestCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery16Handler), typeof(global::TestCode.TestQuery16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery16, global::System.Int32>), typeof(global::TestCode.TestQuery16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery16, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery16, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery15Handler), typeof(global::TestCode.TestQuery15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery15, global::System.Int32>), typeof(global::TestCode.TestQuery15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery15, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -335,33 +356,31 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery10Handler), typeof(global::TestCode.TestQuery10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery10, global::System.Int32>), typeof(global::TestCode.TestQuery10Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery10, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery10, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery9Handler), typeof(global::TestCode.TestQuery9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery9, global::System.Int32>), typeof(global::TestCode.TestQuery9Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>), typeof(global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand14Handler), typeof(global::TestCode.TestStreamCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand14, global::System.Int32>), typeof(global::TestCode.TestStreamCommand14Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand15Handler), typeof(global::TestCode.TestStreamCommand15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand15, global::System.Int32>), typeof(global::TestCode.TestStreamCommand15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand3Handler), typeof(global::TestCode.TestCommand3Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand3, global::System.Int32>), typeof(global::TestCode.TestCommand3Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>), typeof(global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand16Handler), typeof(global::TestCode.TestStreamCommand16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand16, global::System.Int32>), typeof(global::TestCode.TestStreamCommand16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand16, global::System.Int32>), typeof(global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand16, global::System.Int32>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers and wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register notification handlers
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification0Handler), typeof(global::TestCode.TestNotification0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
@@ -396,6 +415,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.TestNotification14>), GetRequiredService<global::TestCode.TestNotification14Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification15Handler), typeof(global::TestCode.TestNotification15Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.TestNotification15>), GetRequiredService<global::TestCode.TestNotification15Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification16Handler), typeof(global::TestCode.TestNotification16Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.TestNotification16>), GetRequiredService<global::TestCode.TestNotification16Handler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
 
             // Register the notification publisher that was configured
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
@@ -976,11 +997,12 @@ namespace Mediator.Internals
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest0, global::System.Int32> Wrapper_For_TestCode_TestRequest0;
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest16, global::System.Int32> Wrapper_For_TestCode_TestRequest16;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest15, global::System.Int32> Wrapper_For_TestCode_TestRequest15;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest14, global::System.Int32> Wrapper_For_TestCode_TestRequest14;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest13, global::System.Int32> Wrapper_For_TestCode_TestRequest13;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest12, global::System.Int32> Wrapper_For_TestCode_TestRequest12;
-        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32> Wrapper_For_TestCode_TestRequest11;
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32> Wrapper_For_TestCode_TestRequest10;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest9, global::System.Int32> Wrapper_For_TestCode_TestRequest9;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest8, global::System.Int32> Wrapper_For_TestCode_TestRequest8;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest7, global::System.Int32> Wrapper_For_TestCode_TestRequest7;
@@ -990,8 +1012,9 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest3, global::System.Int32> Wrapper_For_TestCode_TestRequest3;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest2, global::System.Int32> Wrapper_For_TestCode_TestRequest2;
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest1, global::System.Int32> Wrapper_For_TestCode_TestRequest1;
-        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32> Wrapper_For_TestCode_TestRequest10;
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32> Wrapper_For_TestCode_TestRequest11;
 
+        public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand16, global::System.Int32> Wrapper_For_TestCode_TestCommand16;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand15, global::System.Int32> Wrapper_For_TestCode_TestCommand15;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32> Wrapper_For_TestCode_TestCommand14;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand13, global::System.Int32> Wrapper_For_TestCode_TestCommand13;
@@ -1004,32 +1027,35 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand6, global::System.Int32> Wrapper_For_TestCode_TestCommand6;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand5, global::System.Int32> Wrapper_For_TestCode_TestCommand5;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand4, global::System.Int32> Wrapper_For_TestCode_TestCommand4;
-        public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32> Wrapper_For_TestCode_TestCommand3;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand2, global::System.Int32> Wrapper_For_TestCode_TestCommand2;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand1, global::System.Int32> Wrapper_For_TestCode_TestCommand1;
         public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32> Wrapper_For_TestCode_TestCommand0;
+        public readonly global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32> Wrapper_For_TestCode_TestCommand3;
 
+        public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32> Wrapper_For_TestCode_TestQuery5;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery4, global::System.Int32> Wrapper_For_TestCode_TestQuery4;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery3, global::System.Int32> Wrapper_For_TestCode_TestQuery3;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery2, global::System.Int32> Wrapper_For_TestCode_TestQuery2;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery1, global::System.Int32> Wrapper_For_TestCode_TestQuery1;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32> Wrapper_For_TestCode_TestQuery0;
-        public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32> Wrapper_For_TestCode_TestQuery5;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32> Wrapper_For_TestCode_TestQuery6;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery7, global::System.Int32> Wrapper_For_TestCode_TestQuery7;
+        public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32> Wrapper_For_TestCode_TestQuery9;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32> Wrapper_For_TestCode_TestQuery8;
+        public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery16, global::System.Int32> Wrapper_For_TestCode_TestQuery16;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery15, global::System.Int32> Wrapper_For_TestCode_TestQuery15;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery14, global::System.Int32> Wrapper_For_TestCode_TestQuery14;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery13, global::System.Int32> Wrapper_For_TestCode_TestQuery13;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery12, global::System.Int32> Wrapper_For_TestCode_TestQuery12;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery11, global::System.Int32> Wrapper_For_TestCode_TestQuery11;
         public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery10, global::System.Int32> Wrapper_For_TestCode_TestQuery10;
-        public readonly global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32> Wrapper_For_TestCode_TestQuery9;
 
+        public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest16, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest16;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest15, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest15;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest14, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest14;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest13, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest13;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest12, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest12;
+        public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest11;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest10, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest10;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest9, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest9;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest8, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest8;
@@ -1039,10 +1065,10 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest4, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest4;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest3, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest3;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest2, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest2;
-        public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest11;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest1;
         public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32> Wrapper_For_TestCode_TestStreamRequest0;
 
+        public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand14;
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand13, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand13;
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand12, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand12;
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand11, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand11;
@@ -1057,8 +1083,8 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand1, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand1;
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand0;
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand3, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand3;
-        public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand14;
         public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand15;
+        public readonly global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand16, global::System.Int32> Wrapper_For_TestCode_TestStreamCommand16;
 
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery5, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery5;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery4, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery4;
@@ -1068,8 +1094,9 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery0;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery6;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery7, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery7;
-        public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery9;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery8;
+        public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery9;
+        public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery16, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery16;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery15, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery15;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery14, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery14;
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery13, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery13;
@@ -1078,37 +1105,37 @@ namespace Mediator.Internals
         public readonly global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery10, global::System.Int32> Wrapper_For_TestCode_TestStreamQuery10;
 
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0> Wrapper_For_TestCode_TestNotification0;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1> Wrapper_For_TestCode_TestNotification1;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2> Wrapper_For_TestCode_TestNotification2;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3> Wrapper_For_TestCode_TestNotification3;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4> Wrapper_For_TestCode_TestNotification4;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5> Wrapper_For_TestCode_TestNotification5;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6> Wrapper_For_TestCode_TestNotification6;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7> Wrapper_For_TestCode_TestNotification7;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8> Wrapper_For_TestCode_TestNotification8;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9> Wrapper_For_TestCode_TestNotification9;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10> Wrapper_For_TestCode_TestNotification10;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11> Wrapper_For_TestCode_TestNotification11;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12> Wrapper_For_TestCode_TestNotification12;
-        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13> Wrapper_For_TestCode_TestNotification13;
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14> Wrapper_For_TestCode_TestNotification14;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13> Wrapper_For_TestCode_TestNotification13;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12> Wrapper_For_TestCode_TestNotification12;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11> Wrapper_For_TestCode_TestNotification11;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10> Wrapper_For_TestCode_TestNotification10;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9> Wrapper_For_TestCode_TestNotification9;
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15> Wrapper_For_TestCode_TestNotification15;
-
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8> Wrapper_For_TestCode_TestNotification8;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6> Wrapper_For_TestCode_TestNotification6;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5> Wrapper_For_TestCode_TestNotification5;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4> Wrapper_For_TestCode_TestNotification4;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3> Wrapper_For_TestCode_TestNotification3;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2> Wrapper_For_TestCode_TestNotification2;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1> Wrapper_For_TestCode_TestNotification1;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7> Wrapper_For_TestCode_TestNotification7;
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16> Wrapper_For_TestCode_TestNotification16;
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
 
-
-            var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
-            var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
-            var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
+            var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
+            var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
+            var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest0), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest0, global::System.Int32>>());
+            requestHandlerTypes.Add(typeof(global::TestCode.TestRequest16), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest16, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest15), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest15, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest14), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest14, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest13), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest13, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest12), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest12, global::System.Int32>>());
-            requestHandlerTypes.Add(typeof(global::TestCode.TestRequest11), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>>());
+            requestHandlerTypes.Add(typeof(global::TestCode.TestRequest10), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest9), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest9, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest8), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest8, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest7), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest7, global::System.Int32>>());
@@ -1118,7 +1145,8 @@ namespace Mediator.Internals
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest3), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest3, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest2), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest2, global::System.Int32>>());
             requestHandlerTypes.Add(typeof(global::TestCode.TestRequest1), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest1, global::System.Int32>>());
-            requestHandlerTypes.Add(typeof(global::TestCode.TestRequest10), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>>());
+            requestHandlerTypes.Add(typeof(global::TestCode.TestRequest11), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>>());
+            commandHandlerTypes.Add(typeof(global::TestCode.TestCommand16), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand16, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand15), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand15, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand14), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand13), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand13, global::System.Int32>>());
@@ -1131,37 +1159,40 @@ namespace Mediator.Internals
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand6), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand6, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand5), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand5, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand4), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand4, global::System.Int32>>());
-            commandHandlerTypes.Add(typeof(global::TestCode.TestCommand3), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand2), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand2, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand1), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand1, global::System.Int32>>());
             commandHandlerTypes.Add(typeof(global::TestCode.TestCommand0), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32>>());
+            commandHandlerTypes.Add(typeof(global::TestCode.TestCommand3), sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>>());
+            queryHandlerTypes.Add(typeof(global::TestCode.TestQuery5), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery4), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery4, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery3), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery3, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery2), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery2, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery1), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery1, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery0), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32>>());
-            queryHandlerTypes.Add(typeof(global::TestCode.TestQuery5), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery6), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery7), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery7, global::System.Int32>>());
+            queryHandlerTypes.Add(typeof(global::TestCode.TestQuery9), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery8), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32>>());
+            queryHandlerTypes.Add(typeof(global::TestCode.TestQuery16), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery16, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery15), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery15, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery14), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery14, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery13), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery13, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery12), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery12, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery11), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery11, global::System.Int32>>());
             queryHandlerTypes.Add(typeof(global::TestCode.TestQuery10), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery10, global::System.Int32>>());
-            queryHandlerTypes.Add(typeof(global::TestCode.TestQuery9), sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>>());
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
 
-            var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
-            var streamCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
-            var streamQueryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
+            var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
+            var streamCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
+            var streamQueryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
+            streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest16), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest16, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest15), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest15, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest14), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest14, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest13), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest13, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest12), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest12, global::System.Int32>>());
+            streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest11), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest10), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest10, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest9), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest9, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest8), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest8, global::System.Int32>>());
@@ -1171,9 +1202,9 @@ namespace Mediator.Internals
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest4), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest4, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest3), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest3, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest2), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest2, global::System.Int32>>());
-            streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest11), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest1), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32>>());
             streamRequestHandlerTypes.Add(typeof(global::TestCode.TestStreamRequest0), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32>>());
+            streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand14), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>>());
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand13), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand13, global::System.Int32>>());
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand12), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand12, global::System.Int32>>());
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand11), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand11, global::System.Int32>>());
@@ -1188,8 +1219,8 @@ namespace Mediator.Internals
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand1), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand1, global::System.Int32>>());
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand0), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>>());
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand3), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand3, global::System.Int32>>());
-            streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand14), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>>());
             streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand15), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32>>());
+            streamCommandHandlerTypes.Add(typeof(global::TestCode.TestStreamCommand16), sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand16, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery5), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery5, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery4), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery4, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery3), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery3, global::System.Int32>>());
@@ -1198,8 +1229,9 @@ namespace Mediator.Internals
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery0), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery6), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery7), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery7, global::System.Int32>>());
-            streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery9), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery8), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32>>());
+            streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery9), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32>>());
+            streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery16), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery16, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery15), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery15, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery14), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery14, global::System.Int32>>());
             streamQueryHandlerTypes.Add(typeof(global::TestCode.TestStreamQuery13), sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery13, global::System.Int32>>());
@@ -1210,31 +1242,33 @@ namespace Mediator.Internals
             StreamCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamCommandHandlerTypes);
             StreamQueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamQueryHandlerTypes);
 
-            var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(16);
+            var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(17);
             notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification0), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification1), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification2), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification3), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification4), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification5), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification6), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification7), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification8), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification9), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification10), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification11), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification12), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>>());
-            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification13), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>>());
             notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification14), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification13), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification12), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification11), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification10), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification9), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>>());
             notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification15), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification8), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification6), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification5), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification4), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification3), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification2), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification1), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification7), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>>());
+            notificationHandlerTypes.Add(typeof(global::TestCode.TestNotification16), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>>());
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
             Wrapper_For_TestCode_TestRequest0 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest0, global::System.Int32>>();
+            Wrapper_For_TestCode_TestRequest16 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest16, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest15 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest15, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest14 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest14, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest13 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest13, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest12 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest12, global::System.Int32>>();
-            Wrapper_For_TestCode_TestRequest11 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>>();
+            Wrapper_For_TestCode_TestRequest10 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest9 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest9, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest8 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest8, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest7 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest7, global::System.Int32>>();
@@ -1244,8 +1278,9 @@ namespace Mediator.Internals
             Wrapper_For_TestCode_TestRequest3 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest3, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest2 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest2, global::System.Int32>>();
             Wrapper_For_TestCode_TestRequest1 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest1, global::System.Int32>>();
-            Wrapper_For_TestCode_TestRequest10 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest10, global::System.Int32>>();
+            Wrapper_For_TestCode_TestRequest11 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest11, global::System.Int32>>();
 
+            Wrapper_For_TestCode_TestCommand16 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand16, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand15 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand15, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand14 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand14, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand13 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand13, global::System.Int32>>();
@@ -1258,32 +1293,35 @@ namespace Mediator.Internals
             Wrapper_For_TestCode_TestCommand6 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand6, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand5 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand5, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand4 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand4, global::System.Int32>>();
-            Wrapper_For_TestCode_TestCommand3 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand2 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand2, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand1 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand1, global::System.Int32>>();
             Wrapper_For_TestCode_TestCommand0 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32>>();
+            Wrapper_For_TestCode_TestCommand3 = sp.GetRequiredService<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand3, global::System.Int32>>();
 
+            Wrapper_For_TestCode_TestQuery5 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery4 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery4, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery3 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery3, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery2 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery2, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery1 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery1, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery0 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32>>();
-            Wrapper_For_TestCode_TestQuery5 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery5, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery6 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery6, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery7 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery7, global::System.Int32>>();
+            Wrapper_For_TestCode_TestQuery9 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery8 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery8, global::System.Int32>>();
+            Wrapper_For_TestCode_TestQuery16 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery16, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery15 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery15, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery14 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery14, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery13 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery13, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery12 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery12, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery11 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery11, global::System.Int32>>();
             Wrapper_For_TestCode_TestQuery10 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery10, global::System.Int32>>();
-            Wrapper_For_TestCode_TestQuery9 = sp.GetRequiredService<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery9, global::System.Int32>>();
 
+            Wrapper_For_TestCode_TestStreamRequest16 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest16, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest15 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest15, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest14 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest14, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest13 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest13, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest12 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest12, global::System.Int32>>();
+            Wrapper_For_TestCode_TestStreamRequest11 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest10 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest10, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest9 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest9, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest8 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest8, global::System.Int32>>();
@@ -1293,10 +1331,10 @@ namespace Mediator.Internals
             Wrapper_For_TestCode_TestStreamRequest4 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest4, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest3 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest3, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest2 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest2, global::System.Int32>>();
-            Wrapper_For_TestCode_TestStreamRequest11 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest11, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest1 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest1, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamRequest0 = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32>>();
 
+            Wrapper_For_TestCode_TestStreamCommand14 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamCommand13 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand13, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamCommand12 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand12, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamCommand11 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand11, global::System.Int32>>();
@@ -1311,8 +1349,8 @@ namespace Mediator.Internals
             Wrapper_For_TestCode_TestStreamCommand1 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand1, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamCommand0 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamCommand3 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand3, global::System.Int32>>();
-            Wrapper_For_TestCode_TestStreamCommand14 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand14, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamCommand15 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand15, global::System.Int32>>();
+            Wrapper_For_TestCode_TestStreamCommand16 = sp.GetRequiredService<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand16, global::System.Int32>>();
 
             Wrapper_For_TestCode_TestStreamQuery5 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery5, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery4 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery4, global::System.Int32>>();
@@ -1322,8 +1360,9 @@ namespace Mediator.Internals
             Wrapper_For_TestCode_TestStreamQuery0 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery6 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery6, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery7 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery7, global::System.Int32>>();
-            Wrapper_For_TestCode_TestStreamQuery9 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery8 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery8, global::System.Int32>>();
+            Wrapper_For_TestCode_TestStreamQuery9 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery9, global::System.Int32>>();
+            Wrapper_For_TestCode_TestStreamQuery16 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery16, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery15 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery15, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery14 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery14, global::System.Int32>>();
             Wrapper_For_TestCode_TestStreamQuery13 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery13, global::System.Int32>>();
@@ -1332,21 +1371,22 @@ namespace Mediator.Internals
             Wrapper_For_TestCode_TestStreamQuery10 = sp.GetRequiredService<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery10, global::System.Int32>>();
 
             Wrapper_For_TestCode_TestNotification0 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>>();
-            Wrapper_For_TestCode_TestNotification1 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>>();
-            Wrapper_For_TestCode_TestNotification2 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>>();
-            Wrapper_For_TestCode_TestNotification3 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>>();
-            Wrapper_For_TestCode_TestNotification4 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>>();
-            Wrapper_For_TestCode_TestNotification5 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>>();
-            Wrapper_For_TestCode_TestNotification6 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>>();
-            Wrapper_For_TestCode_TestNotification7 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>>();
-            Wrapper_For_TestCode_TestNotification8 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>>();
-            Wrapper_For_TestCode_TestNotification9 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>>();
-            Wrapper_For_TestCode_TestNotification10 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>>();
-            Wrapper_For_TestCode_TestNotification11 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>>();
-            Wrapper_For_TestCode_TestNotification12 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>>();
-            Wrapper_For_TestCode_TestNotification13 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>>();
             Wrapper_For_TestCode_TestNotification14 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>>();
+            Wrapper_For_TestCode_TestNotification13 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>>();
+            Wrapper_For_TestCode_TestNotification12 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>>();
+            Wrapper_For_TestCode_TestNotification11 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>>();
+            Wrapper_For_TestCode_TestNotification10 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>>();
+            Wrapper_For_TestCode_TestNotification9 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>>();
             Wrapper_For_TestCode_TestNotification15 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>>();
+            Wrapper_For_TestCode_TestNotification8 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>>();
+            Wrapper_For_TestCode_TestNotification6 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>>();
+            Wrapper_For_TestCode_TestNotification5 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>>();
+            Wrapper_For_TestCode_TestNotification4 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>>();
+            Wrapper_For_TestCode_TestNotification3 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>>();
+            Wrapper_For_TestCode_TestNotification2 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>>();
+            Wrapper_For_TestCode_TestNotification1 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>>();
+            Wrapper_For_TestCode_TestNotification7 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>>();
+            Wrapper_For_TestCode_TestNotification16 = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>>();
         }
     }
 }
@@ -1405,7 +1445,7 @@ namespace Mediator
         /// <summary>
         /// The total number of Mediator messages that were discovered.
         /// </summary>
-        public const int TotalMessages = 112;
+        public const int TotalMessages = 119;
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -1415,6 +1455,69 @@ namespace Mediator
             Services = sp;
         }
 
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetRequestHandler(global::Mediator.IBaseRequest request)
+        {
+            ThrowIfNull(request, nameof(request));
+            if (!_containerMetadata.RequestHandlerWrappers.TryGetValue(request.GetType(), out var handler))
+                ThrowMissingHandler(request);
+            return handler!;
+        }
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetCommandHandler(global::Mediator.IBaseCommand command)
+        {
+            ThrowIfNull(command, nameof(command));
+            if (!_containerMetadata.CommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
+                ThrowMissingHandler(command);
+            return handler!;
+        }
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetQueryHandler(global::Mediator.IBaseQuery query)
+        {
+            ThrowIfNull(query, nameof(query));
+            if (!_containerMetadata.QueryHandlerWrappers.TryGetValue(query.GetType(), out var handler))
+                ThrowMissingHandler(query);
+            return handler!;
+        }
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetStreamRequestHandler(global::Mediator.IBaseStreamRequest request)
+        {
+            ThrowIfNull(request, nameof(request));
+            if (!_containerMetadata.StreamRequestHandlerWrappers.TryGetValue(request.GetType(), out var handler))
+                ThrowMissingHandler(request);
+            return handler!;
+        }
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetStreamCommandHandler(global::Mediator.IBaseStreamCommand command)
+        {
+            ThrowIfNull(command, nameof(command));
+            if (!_containerMetadata.StreamCommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
+                ThrowMissingHandler(command);
+            return handler!;
+        }
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetStreamQueryHandler(global::Mediator.IBaseStreamQuery query)
+        {
+            ThrowIfNull(query, nameof(query));
+            if (!_containerMetadata.StreamQueryHandlerWrappers.TryGetValue(query.GetType(), out var handler))
+                ThrowMissingHandler(query);
+            return handler!;
+        }
+
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private object GetNotificationHandler(global::Mediator.INotification notification)
+        {
+            ThrowIfNull(notification, nameof(notification));
+            if (!_containerMetadata.NotificationHandlerWrappers.TryGetValue(notification.GetType(), out var handler))
+                ThrowMissingHandler(notification); // This shouldn't happen, wrappers for every notification type should be created here
+            return handler!;
+        }
 
 
         /// <summary>
@@ -1431,6 +1534,22 @@ namespace Mediator
         {
             ThrowIfNull(request, nameof(request));
             return _containerMetadata.Wrapper_For_TestCode_TestRequest0.Handle(this, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a request of type global::TestCode.TestRequest16.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
+            global::TestCode.TestRequest16 request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(request, nameof(request));
+            return _containerMetadata.Wrapper_For_TestCode_TestRequest16.Handle(this, request, cancellationToken);
         }
 
         /// <summary>
@@ -1498,19 +1617,19 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Send a request of type global::TestCode.TestRequest11.
+        /// Send a request of type global::TestCode.TestRequest10.
         /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         /// </summary>
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
-            global::TestCode.TestRequest11 request,
+            global::TestCode.TestRequest10 request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(request, nameof(request));
-            return _containerMetadata.Wrapper_For_TestCode_TestRequest11.Handle(this, request, cancellationToken);
+            return _containerMetadata.Wrapper_For_TestCode_TestRequest10.Handle(this, request, cancellationToken);
         }
 
         /// <summary>
@@ -1658,19 +1777,35 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Send a request of type global::TestCode.TestRequest10.
+        /// Send a request of type global::TestCode.TestRequest11.
         /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         /// </summary>
         /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
-            global::TestCode.TestRequest10 request,
+            global::TestCode.TestRequest11 request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(request, nameof(request));
-            return _containerMetadata.Wrapper_For_TestCode_TestRequest10.Handle(this, request, cancellationToken);
+            return _containerMetadata.Wrapper_For_TestCode_TestRequest11.Handle(this, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::TestCode.TestCommand16.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
+            global::TestCode.TestCommand16 command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Wrapper_For_TestCode_TestCommand16.Handle(this, command, cancellationToken);
         }
 
         /// <summary>
@@ -1866,22 +2001,6 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Send a command of type global::TestCode.TestCommand3.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
-        /// </summary>
-        /// <param name="command">Incoming command</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
-            global::TestCode.TestCommand3 command,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(command, nameof(command));
-            return _containerMetadata.Wrapper_For_TestCode_TestCommand3.Handle(this, command, cancellationToken);
-        }
-
-        /// <summary>
         /// Send a command of type global::TestCode.TestCommand2.
         /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
         /// </summary>
@@ -1927,6 +2046,38 @@ namespace Mediator
         {
             ThrowIfNull(command, nameof(command));
             return _containerMetadata.Wrapper_For_TestCode_TestCommand0.Handle(this, command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a command of type global::TestCode.TestCommand3.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
+            global::TestCode.TestCommand3 command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Wrapper_For_TestCode_TestCommand3.Handle(this, command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a query of type global::TestCode.TestQuery5.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
+        /// </summary>
+        /// <param name="query">Incoming query</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
+            global::TestCode.TestQuery5 query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(query, nameof(query));
+            return _containerMetadata.Wrapper_For_TestCode_TestQuery5.Handle(this, query, cancellationToken);
         }
 
         /// <summary>
@@ -2010,22 +2161,6 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Send a query of type global::TestCode.TestQuery5.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
-        /// </summary>
-        /// <param name="query">Incoming query</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
-            global::TestCode.TestQuery5 query,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(query, nameof(query));
-            return _containerMetadata.Wrapper_For_TestCode_TestQuery5.Handle(this, query, cancellationToken);
-        }
-
-        /// <summary>
         /// Send a query of type global::TestCode.TestQuery6.
         /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
         /// </summary>
@@ -2058,6 +2193,22 @@ namespace Mediator
         }
 
         /// <summary>
+        /// Send a query of type global::TestCode.TestQuery9.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
+        /// </summary>
+        /// <param name="query">Incoming query</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
+            global::TestCode.TestQuery9 query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(query, nameof(query));
+            return _containerMetadata.Wrapper_For_TestCode_TestQuery9.Handle(this, query, cancellationToken);
+        }
+
+        /// <summary>
         /// Send a query of type global::TestCode.TestQuery8.
         /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
         /// </summary>
@@ -2071,6 +2222,22 @@ namespace Mediator
         {
             ThrowIfNull(query, nameof(query));
             return _containerMetadata.Wrapper_For_TestCode_TestQuery8.Handle(this, query, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a query of type global::TestCode.TestQuery16.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
+        /// </summary>
+        /// <param name="query">Incoming query</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
+            global::TestCode.TestQuery16 query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(query, nameof(query));
+            return _containerMetadata.Wrapper_For_TestCode_TestQuery16.Handle(this, query, cancellationToken);
         }
 
         /// <summary>
@@ -2170,19 +2337,19 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Send a query of type global::TestCode.TestQuery9.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
+        /// Create a stream from request type global::TestCode.TestStreamRequest16.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         /// </summary>
-        /// <param name="query">Incoming query</param>
+        /// <param name="request">Incoming request</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<global::System.Int32> Send(
-            global::TestCode.TestQuery9 query,
+        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
+            global::TestCode.TestStreamRequest16 request,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            ThrowIfNull(query, nameof(query));
-            return _containerMetadata.Wrapper_For_TestCode_TestQuery9.Handle(this, query, cancellationToken);
+            ThrowIfNull(request, nameof(request));
+            return _containerMetadata.Wrapper_For_TestCode_TestStreamRequest16.Handle(this, request, cancellationToken);
         }
 
         /// <summary>
@@ -2247,6 +2414,22 @@ namespace Mediator
         {
             ThrowIfNull(request, nameof(request));
             return _containerMetadata.Wrapper_For_TestCode_TestStreamRequest12.Handle(this, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create a stream from request type global::TestCode.TestStreamRequest11.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
+            global::TestCode.TestStreamRequest11 request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(request, nameof(request));
+            return _containerMetadata.Wrapper_For_TestCode_TestStreamRequest11.Handle(this, request, cancellationToken);
         }
 
         /// <summary>
@@ -2394,22 +2577,6 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Create a stream from request type global::TestCode.TestStreamRequest11.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
-        /// </summary>
-        /// <param name="request">Incoming request</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
-            global::TestCode.TestStreamRequest11 request,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(request, nameof(request));
-            return _containerMetadata.Wrapper_For_TestCode_TestStreamRequest11.Handle(this, request, cancellationToken);
-        }
-
-        /// <summary>
         /// Create a stream from request type global::TestCode.TestStreamRequest1.
         /// Throws <see cref="global::System.ArgumentNullException"/> if request is null.
         /// </summary>
@@ -2439,6 +2606,22 @@ namespace Mediator
         {
             ThrowIfNull(request, nameof(request));
             return _containerMetadata.Wrapper_For_TestCode_TestStreamRequest0.Handle(this, request, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create a stream from command type global::TestCode.TestStreamCommand14.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
+            global::TestCode.TestStreamCommand14 command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Wrapper_For_TestCode_TestStreamCommand14.Handle(this, command, cancellationToken);
         }
 
         /// <summary>
@@ -2666,22 +2849,6 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Create a stream from command type global::TestCode.TestStreamCommand14.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
-        /// </summary>
-        /// <param name="command">Incoming command</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
-            global::TestCode.TestStreamCommand14 command,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(command, nameof(command));
-            return _containerMetadata.Wrapper_For_TestCode_TestStreamCommand14.Handle(this, command, cancellationToken);
-        }
-
-        /// <summary>
         /// Create a stream from command type global::TestCode.TestStreamCommand15.
         /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
         /// </summary>
@@ -2695,6 +2862,22 @@ namespace Mediator
         {
             ThrowIfNull(command, nameof(command));
             return _containerMetadata.Wrapper_For_TestCode_TestStreamCommand15.Handle(this, command, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create a stream from command type global::TestCode.TestStreamCommand16.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if command is null.
+        /// </summary>
+        /// <param name="command">Incoming command</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
+            global::TestCode.TestStreamCommand16 command,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(command, nameof(command));
+            return _containerMetadata.Wrapper_For_TestCode_TestStreamCommand16.Handle(this, command, cancellationToken);
         }
 
         /// <summary>
@@ -2826,6 +3009,22 @@ namespace Mediator
         }
 
         /// <summary>
+        /// Create a stream from query type global::TestCode.TestStreamQuery8.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
+        /// </summary>
+        /// <param name="query">Incoming query</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
+            global::TestCode.TestStreamQuery8 query,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(query, nameof(query));
+            return _containerMetadata.Wrapper_For_TestCode_TestStreamQuery8.Handle(this, query, cancellationToken);
+        }
+
+        /// <summary>
         /// Create a stream from query type global::TestCode.TestStreamQuery9.
         /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
         /// </summary>
@@ -2842,19 +3041,19 @@ namespace Mediator
         }
 
         /// <summary>
-        /// Create a stream from query type global::TestCode.TestStreamQuery8.
+        /// Create a stream from query type global::TestCode.TestStreamQuery16.
         /// Throws <see cref="global::System.ArgumentNullException"/> if query is null.
         /// </summary>
         /// <param name="query">Incoming query</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
         public global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32> CreateStream(
-            global::TestCode.TestStreamQuery8 query,
+            global::TestCode.TestStreamQuery16 query,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
             ThrowIfNull(query, nameof(query));
-            return _containerMetadata.Wrapper_For_TestCode_TestStreamQuery8.Handle(this, query, cancellationToken);
+            return _containerMetadata.Wrapper_For_TestCode_TestStreamQuery16.Handle(this, query, cancellationToken);
         }
 
         /// <summary>
@@ -2967,253 +3166,24 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
+            var handlerObj = GetRequestHandler(request);
+            if (handlerObj is global::Mediator.Internals.IRequestHandlerBase<TResponse>)
             {
-                case global::TestCode.TestRequest0 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest15 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest14 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest13 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest12 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest11 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest9 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest8 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest7 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest6 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest5 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest4 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest3 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest2 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest1 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                case global::TestCode.TestRequest10 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(request, cancellationToken);
-                }
-                default:
-                {
-                    ThrowInvalidRequest(request, nameof(request));
-                    return default;
-                }
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::Mediator.Internals.IRequestHandlerBase<TResponse>>(ref handlerObj);
+                return handler.Handle(this, request, cancellationToken);
             }
+            return SendAsync(request, handlerObj, cancellationToken);
         }
 
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.IRequest<TResponse> request,
+            object handlerObj,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
-            {
-                case global::TestCode.TestRequest0 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest15 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest14 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest13 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest12 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest11 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest9 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest8 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest7 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest6 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest5 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest4 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest3 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest2 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest1 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestRequest10 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                default:
-                {
-                    ThrowInvalidRequest(request, nameof(request));
-                    return default!;
-                }
-            }
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IMessageHandlerBase>(handlerObj);
+            var response = await handler.Handle(this, request, cancellationToken);
+            return global::System.Runtime.CompilerServices.Unsafe.As<object?, TResponse>(ref response);
         }
 
         /// <summary>
@@ -3230,93 +3200,25 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (request)
+            var handlerObj = GetStreamRequestHandler(request);
+            if (handlerObj is global::Mediator.Internals.IStreamRequestHandlerBase<TResponse>)
             {
-                case global::TestCode.TestStreamRequest15 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest14 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest13 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest12 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest10 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest9 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest8 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest7 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest6 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest5 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest4 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest3 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest2 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest11 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest1 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamRequest0 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                default:
-                {
-                    ThrowInvalidStreamRequest(request, nameof(request));
-                    return default!;
-                }
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::Mediator.Internals.IStreamRequestHandlerBase<TResponse>>(ref handlerObj);
+                return handler.Handle(this, request, cancellationToken);
+            }
+            return CreateStreamAsync(request, handlerObj, cancellationToken);
+        }
+
+        private async global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStreamAsync<TResponse>(
+            global::Mediator.IStreamRequest<TResponse> request,
+            object handlerObj,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IStreamMessageHandlerBase>(handlerObj);
+            await foreach (var r in handler.Handle(this, request, cancellationToken))
+            {
+                yield return (TResponse)r!;
             }
         }
 
@@ -3334,253 +3236,24 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (command)
+            var handlerObj = GetCommandHandler(command);
+            if (handlerObj is global::Mediator.Internals.ICommandHandlerBase<TResponse>)
             {
-                case global::TestCode.TestCommand15 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand14 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand13 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand12 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand11 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand10 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand9 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand8 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand7 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand6 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand5 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand4 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand3 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand2 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand1 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                case global::TestCode.TestCommand0 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(command, cancellationToken);
-                }
-                default:
-                {
-                    ThrowInvalidCommand(command, nameof(command));
-                    return default;
-                }
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::Mediator.Internals.ICommandHandlerBase<TResponse>>(ref handlerObj);
+                return handler.Handle(this, command, cancellationToken);
             }
+            return SendAsync(command, handlerObj, cancellationToken);
         }
 
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.ICommand<TResponse> command,
+            object handlerObj,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (command)
-            {
-                case global::TestCode.TestCommand15 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand14 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand13 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand12 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand11 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand10 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand9 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand8 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand7 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand6 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand5 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand4 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand3 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand2 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand1 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestCommand0 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                default:
-                {
-                    ThrowInvalidCommand(command, nameof(command));
-                    return default!;
-                }
-            }
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IMessageHandlerBase>(handlerObj);
+            var response = await handler.Handle(this, command, cancellationToken);
+            return global::System.Runtime.CompilerServices.Unsafe.As<object?, TResponse>(ref response);
         }
 
         /// <summary>
@@ -3597,93 +3270,25 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (command)
+            var handlerObj = GetStreamCommandHandler(command);
+            if (handlerObj is global::Mediator.Internals.IStreamCommandHandlerBase<TResponse>)
             {
-                case global::TestCode.TestStreamCommand13 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand12 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand11 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand10 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand9 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand8 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand7 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand6 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand5 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand4 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand2 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand1 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand0 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand3 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand14 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamCommand15 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                default:
-                {
-                    ThrowInvalidStreamCommand(command, nameof(command));
-                    return default!;
-                }
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::Mediator.Internals.IStreamCommandHandlerBase<TResponse>>(ref handlerObj);
+                return handler.Handle(this, command, cancellationToken);
+            }
+            return CreateStreamAsync(command, handlerObj, cancellationToken);
+        }
+
+        private async global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStreamAsync<TResponse>(
+            global::Mediator.IStreamCommand<TResponse> command,
+            object handlerObj,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IStreamMessageHandlerBase>(handlerObj);
+            await foreach (var r in handler.Handle(this, command, cancellationToken))
+            {
+                yield return (TResponse)r!;
             }
         }
 
@@ -3701,253 +3306,24 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (query)
+            var handlerObj = GetQueryHandler(query);
+            if (handlerObj is global::Mediator.Internals.IQueryHandlerBase<TResponse>)
             {
-                case global::TestCode.TestQuery4 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery3 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery2 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery1 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery0 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery5 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery6 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery7 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery8 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery15 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery14 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery13 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery12 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery11 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery10 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                case global::TestCode.TestQuery9 r:
-                {
-                    if (typeof(TResponse) == typeof(global::System.Int32))
-                    {
-                        var task = Send(r, cancellationToken);
-                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::System.Int32>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
-                    }
-                    return SendAsync(query, cancellationToken);
-                }
-                default:
-                {
-                    ThrowInvalidQuery(query, nameof(query));
-                    return default;
-                }
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::Mediator.Internals.IQueryHandlerBase<TResponse>>(ref handlerObj);
+                return handler.Handle(this, query, cancellationToken);
             }
+            return SendAsync(query, handlerObj, cancellationToken);
         }
 
         private async global::System.Threading.Tasks.ValueTask<TResponse> SendAsync<TResponse>(
             global::Mediator.IQuery<TResponse> query,
+            object handlerObj,
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (query)
-            {
-                case global::TestCode.TestQuery4 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery3 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery2 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery1 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery0 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery5 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery6 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery7 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery8 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery15 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery14 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery13 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery12 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery11 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery10 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                case global::TestCode.TestQuery9 r:
-                {
-                    var response = await Send(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Int32, TResponse>(ref response);
-                }
-                default:
-                {
-                    ThrowInvalidQuery(query, nameof(query));
-                    return default!;
-                }
-            }
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IMessageHandlerBase>(handlerObj);
+            var response = await handler.Handle(this, query, cancellationToken);
+            return global::System.Runtime.CompilerServices.Unsafe.As<object?, TResponse>(ref response);
         }
 
         /// <summary>
@@ -3964,93 +3340,25 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            switch (query)
+            var handlerObj = GetStreamQueryHandler(query);
+            if (handlerObj is global::Mediator.Internals.IStreamQueryHandlerBase<TResponse>)
             {
-                case global::TestCode.TestStreamQuery5 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery4 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery3 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery2 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery1 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery0 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery6 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery7 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery9 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery8 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery15 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery14 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery13 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery12 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery11 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                case global::TestCode.TestStreamQuery10 r:
-                {
-                    var task = CreateStream(r, cancellationToken);
-                    return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Collections.Generic.IAsyncEnumerable<global::System.Int32>, global::System.Collections.Generic.IAsyncEnumerable<TResponse>>(ref task);
-                }
-                default:
-                {
-                    ThrowInvalidStreamQuery(query, nameof(query));
-                    return default!;
-                }
+                ref var handler = ref global::System.Runtime.CompilerServices.Unsafe.As<object, global::Mediator.Internals.IStreamQueryHandlerBase<TResponse>>(ref handlerObj);
+                return handler.Handle(this, query, cancellationToken);
+            }
+            return CreateStreamAsync(query, handlerObj, cancellationToken);
+        }
+
+        private async global::System.Collections.Generic.IAsyncEnumerable<TResponse> CreateStreamAsync<TResponse>(
+            global::Mediator.IStreamQuery<TResponse> query,
+            object handlerObj,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IStreamMessageHandlerBase>(handlerObj);
+            await foreach (var r in handler.Handle(this, query, cancellationToken))
+            {
+                yield return (TResponse)r!;
             }
         }
 
@@ -4071,79 +3379,34 @@ namespace Mediator
             switch (message)
             {
                 case global::Mediator.IBaseRequest request:
-                    switch (request)
                     {
-                        case global::TestCode.TestRequest0 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest15 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest14 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest13 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest12 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest11 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest9 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest8 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest7 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest6 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest5 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest4 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest3 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest2 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest1 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestRequest10 r: return await Send(r, cancellationToken);
-                        default:
-                        {
-                            ThrowInvalidRequest(request, nameof(request));
-                            return default;
-                        }
+                        var handlerObj = GetRequestHandler(request);
+                        global::System.Diagnostics.Debug.Assert(
+                            handlerObj is global::Mediator.Internals.IMessageHandlerBase,
+                            $"Unexpected type: {handlerObj.GetType()}"
+                        );
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IMessageHandlerBase>(handlerObj);
+                        return await handler.Handle(this, request, cancellationToken);
                     }
                 case global::Mediator.IBaseCommand command:
-                    switch (command)
                     {
-                        case global::TestCode.TestCommand15 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand14 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand13 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand12 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand11 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand10 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand9 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand8 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand7 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand6 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand5 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand4 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand3 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand2 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand1 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestCommand0 r: return await Send(r, cancellationToken);
-                        default:
-                        {
-                            ThrowInvalidCommand(command, nameof(command));
-                            return default;
-                        }
+                        var handlerObj = GetCommandHandler(command);
+                        global::System.Diagnostics.Debug.Assert(
+                            handlerObj is global::Mediator.Internals.IMessageHandlerBase,
+                            $"Unexpected type: {handlerObj.GetType()}"
+                        );
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IMessageHandlerBase>(handlerObj);
+                        return await handler.Handle(this, command, cancellationToken);
                     }
                 case global::Mediator.IBaseQuery query:
-                    switch (query)
                     {
-                        case global::TestCode.TestQuery4 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery3 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery2 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery1 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery0 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery5 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery6 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery7 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery8 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery15 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery14 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery13 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery12 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery11 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery10 r: return await Send(r, cancellationToken);
-                        case global::TestCode.TestQuery9 r: return await Send(r, cancellationToken);
-                        default:
-                        {
-                            ThrowInvalidQuery(query, nameof(query));
-                            return default;
-                        }
+                        var handlerObj = GetQueryHandler(query);
+                        global::System.Diagnostics.Debug.Assert(
+                            handlerObj is global::Mediator.Internals.IMessageHandlerBase,
+                            $"Unexpected type: {handlerObj.GetType()}"
+                        );
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IMessageHandlerBase>(handlerObj);
+                        return await handler.Handle(this, query, cancellationToken);
                     }
                 default:
                     ThrowInvalidMessage(message, nameof(message));
@@ -4168,271 +3431,34 @@ namespace Mediator
             switch (message)
             {
                 case global::Mediator.IBaseStreamRequest request:
-                    switch (request)
                     {
-                        case global::TestCode.TestStreamRequest15 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest14 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest13 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest12 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest10 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest9 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest8 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest7 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest6 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest5 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest4 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest3 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest2 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest11 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest1 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamRequest0 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        default:
-                        {
-                            ThrowInvalidStreamMessage(message, nameof(message));
-                            return default!;
-                        }
+                        var handlerObj = GetStreamRequestHandler(request);
+                        global::System.Diagnostics.Debug.Assert(
+                            handlerObj is global::Mediator.Internals.IStreamMessageHandlerBase,
+                            $"Unexpected type: {handlerObj.GetType()}"
+                        );
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IStreamMessageHandlerBase>(handlerObj);
+                        return handler.Handle(this, request, cancellationToken);
                     }
                 case global::Mediator.IBaseStreamCommand command:
-                    switch (command)
                     {
-                        case global::TestCode.TestStreamCommand13 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand12 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand11 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand10 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand9 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand8 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand7 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand6 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand5 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand4 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand2 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand1 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand0 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand3 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand14 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamCommand15 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        default:
-                        {
-                            ThrowInvalidStreamMessage(message, nameof(message));
-                            return default!;
-                        }
+                        var handlerObj = GetStreamCommandHandler(command);
+                        global::System.Diagnostics.Debug.Assert(
+                            handlerObj is global::Mediator.Internals.IStreamMessageHandlerBase,
+                            $"Unexpected type: {handlerObj.GetType()}"
+                        );
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IStreamMessageHandlerBase>(handlerObj);
+                        return handler.Handle(this, command, cancellationToken);
                     }
                 case global::Mediator.IBaseStreamQuery query:
-                    switch (query)
                     {
-                        case global::TestCode.TestStreamQuery5 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery4 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery3 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery2 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery1 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery0 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery6 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery7 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery9 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery8 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery15 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery14 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery13 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery12 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery11 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        case global::TestCode.TestStreamQuery10 m:
-                        {
-                            var value = CreateStream(m, cancellationToken);
-                            return AsyncWrapper(value);
-                        }
-                        default:
-                        {
-                            ThrowInvalidStreamMessage(message, nameof(message));
-                            return default!;
-                        }
+                        var handlerObj = GetStreamQueryHandler(query);
+                        global::System.Diagnostics.Debug.Assert(
+                            handlerObj is global::Mediator.Internals.IStreamMessageHandlerBase,
+                            $"Unexpected type: {handlerObj.GetType()}"
+                        );
+                        var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.IStreamMessageHandlerBase>(handlerObj);
+                        return handler.Handle(this, query, cancellationToken);
                     }
                 default:
                     ThrowInvalidStreamMessage(message, nameof(message));
@@ -4465,22 +3491,16 @@ namespace Mediator
         {
             switch (notification)
             {
-                case global::TestCode.TestNotification0 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification1 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification2 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification3 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification4 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification5 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification6 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification7 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification8 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification9 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification10 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification11 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification12 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification13 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification14 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification15 n: return Publish(n, cancellationToken);
+                case global::Mediator.INotification n:
+                {
+                    var handlerObj = GetNotificationHandler(n);
+                    global::System.Diagnostics.Debug.Assert(
+                        handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                        $"Unexpected type: {handlerObj.GetType()}"
+                    );
+                    var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+                    return handler.Handle(this, n, cancellationToken);
+                }
                 default:
                 {
                     ThrowInvalidNotification(notification, nameof(notification));
@@ -4504,241 +3524,13 @@ namespace Mediator
         {
             ThrowIfNull(notification, nameof(notification));
 
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification0.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification1.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification1 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification1.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification2.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification2 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification2.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification3.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification3 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification3.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification4.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification4 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification4.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification5.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification5 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification5.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification6.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification6 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification6.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification7.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification7 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification7.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification8.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification8 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification8.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification9.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification9 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification9.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification10.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification10 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification10.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification11.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification11 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification11.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification12.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification12 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification12.Handle(this, notification, cancellationToken);
-        }
-
-        /// <summary>
-        /// Send a notification of type global::TestCode.TestNotification13.
-        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
-        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
-        /// </summary>
-        /// <param name="notification">Incoming message</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask Publish(
-            global::TestCode.TestNotification13 notification,
-            global::System.Threading.CancellationToken cancellationToken = default
-        )
-        {
-            ThrowIfNull(notification, nameof(notification));
-
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification13.Handle(this, notification, cancellationToken);
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
         }
 
         /// <summary>
@@ -4756,7 +3548,133 @@ namespace Mediator
         {
             ThrowIfNull(notification, nameof(notification));
 
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification14.Handle(this, notification, cancellationToken);
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification13.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification13 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification12.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification12 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification11.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification11 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification10.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification10 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification9.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification9 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
         }
 
         /// <summary>
@@ -4774,7 +3692,229 @@ namespace Mediator
         {
             ThrowIfNull(notification, nameof(notification));
 
-            return _containerMetadata.Wrapper_For_TestCode_TestNotification15.Handle(this, notification, cancellationToken);
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification8.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification8 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification6.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification6 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification5.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification5 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification4.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification4 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification3.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification3 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification2.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification2 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification1.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification1 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification7.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification7 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
+        }
+
+        /// <summary>
+        /// Send a notification of type global::TestCode.TestNotification16.
+        /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
+        /// Throws <see cref="global::System.AggregateException"/> if handlers throw exception(s).
+        /// </summary>
+        /// <param name="notification">Incoming message</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask Publish(
+            global::TestCode.TestNotification16 notification,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            ThrowIfNull(notification, nameof(notification));
+
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
         }
 
         /// <summary>
@@ -4792,30 +3932,13 @@ namespace Mediator
         )
             where TNotification : global::Mediator.INotification
         {
-            switch (notification)
-            {
-                case global::TestCode.TestNotification0 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification1 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification2 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification3 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification4 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification5 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification6 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification7 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification8 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification9 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification10 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification11 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification12 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification13 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification14 n: return Publish(n, cancellationToken);
-                case global::TestCode.TestNotification15 n: return Publish(n, cancellationToken);
-                default:
-                {
-                    ThrowInvalidNotification(notification, nameof(notification));
-                    return default;
-                }
-            }
+            var handlerObj = GetNotificationHandler(notification);
+            global::System.Diagnostics.Debug.Assert(
+                handlerObj is global::Mediator.Internals.INotificationHandlerBase,
+                $"Unexpected type: {handlerObj.GetType()}"
+            );
+            var handler = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.Internals.INotificationHandlerBase>(handlerObj);
+            return handler.Handle(this, notification, cancellationToken);
         }
 
 #if NETSTANDARD2_1_OR_GREATER

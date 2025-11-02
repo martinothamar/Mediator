@@ -1,4 +1,4 @@
-#if Mediator_Lifetime_Singleton || (!Mediator_Lifetime_Transient && !Mediator_Lifetime_Scoped)
+#if ((Mediator_Lifetime_Singleton || (!Mediator_Lifetime_Transient && !Mediator_Lifetime_Scoped)) && !Mediator_CachingMode_Lazy)
 
 using System.Linq;
 using System.Threading.Tasks;

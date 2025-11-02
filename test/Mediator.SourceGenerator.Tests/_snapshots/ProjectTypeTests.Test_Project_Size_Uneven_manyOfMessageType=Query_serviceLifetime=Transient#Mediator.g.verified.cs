@@ -738,11 +738,9 @@ namespace Mediator.Internals
 
         public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0> Wrapper_For_TestCode_TestNotification0;
 
-
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
