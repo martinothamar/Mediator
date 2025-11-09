@@ -175,10 +175,16 @@ public sealed class ProjectTypeTests
             "StreamCommand"
         )]
             string manyOfMessageType,
-        ServiceLifetime serviceLifetime
+        ServiceLifetime serviceLifetime,
+        [CombinatorialValues("Eager", "Lazy")] string cachingMode
     )
     {
-        var code = GenerateMessagesAndHandlers(1, serviceLifetime, manyOfMessageType: manyOfMessageType);
+        var code = GenerateMessagesAndHandlers(
+            1,
+            serviceLifetime,
+            cachingMode: cachingMode,
+            manyOfMessageType: manyOfMessageType
+        );
 
         var inputCompilation = Fixture.CreateLibrary(code);
 
@@ -189,8 +195,19 @@ public sealed class ProjectTypeTests
                 {
                     var model = result.Generator.CompilationModel;
                     Assert.NotNull(model);
+
+                    if (cachingMode == "Eager")
+                    {
+                        Assert.True(model.CachingModeIsEager);
+                        Assert.False(model.CachingModeIsLazy);
+                    }
+                    else
+                    {
+                        Assert.False(model.CachingModeIsEager);
+                        Assert.True(model.CachingModeIsLazy);
+                    }
                 }
             )
-            .UseParameters(manyOfMessageType, serviceLifetime);
+            .UseParameters(manyOfMessageType, serviceLifetime, cachingMode);
     }
 }

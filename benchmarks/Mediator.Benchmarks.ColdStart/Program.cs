@@ -20,29 +20,22 @@ var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 var mediator = provider.GetRequiredService<IMediator>();
 #endif
 
-#if Mediator_Large_Project
-var request = new TestRequest0();
-#else
-var request = new Ping(Guid.NewGuid());
-#endif
+var request = new Ping();
 
-await mediator.Send(request);
+var n = await mediator.Send(request);
 #else
-var request = new Ping(Guid.NewGuid());
+var request = new Ping();
 var handler = provider.GetRequiredService<PingHandler>();
-await handler.Handle(request, default);
+var n = await handler.Handle(request, default);
 #endif
 
+Console.WriteLine(n);
 return 0;
 
-#if !Mediator_Large_Project || Mediator_Baseline
-public sealed record Ping(Guid Id) : IRequest<Pong>;
+public sealed record Ping() : IRequest<int>;
 
-public sealed record Pong(Guid Id);
-
-public sealed class PingHandler : IRequestHandler<Ping, Pong>
+public sealed class PingHandler : IRequestHandler<Ping, int>
 {
-    public ValueTask<Pong> Handle(Ping request, CancellationToken cancellationToken) =>
-        new ValueTask<Pong>(new Pong(request.Id));
+    public ValueTask<int> Handle(Ping request, CancellationToken cancellationToken) =>
+        new ValueTask<int>(Random.Shared.Next());
 }
-#endif

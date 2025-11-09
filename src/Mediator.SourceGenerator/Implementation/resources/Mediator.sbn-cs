@@ -66,16 +66,17 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ for message in RequestMessages ~}}
             {{ message.Handler.ServiceRegistration }}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
-            services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ if CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
             services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
                 var servicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
-                return sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>().Init(servicesUnderlyingTypeIsArray, sp);
+                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp).Init(servicesUnderlyingTypeIsArray, sp);
             }, {{ SingletonServiceLifetime }}));
             {{~ else ~}}
-            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(), {{ SingletonServiceLifetime }}));
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
+            {{~ else ~}}
+            services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
@@ -83,17 +84,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register handlers and wrappers for notification messages
             {{~ for message in NotificationMessages ~}}
-            services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ if CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
             services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
                 var publisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
                 var servicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
-                return sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>().Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
             }, {{ SingletonServiceLifetime }}));
             {{~ else ~}}
-            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(), {{ SingletonServiceLifetime }}));
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
+            {{~ else ~}}
+            services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}

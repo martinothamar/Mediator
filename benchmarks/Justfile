@@ -71,9 +71,20 @@ coldstart-build-transient:
     just coldstart-build-transient-lazy
 
 coldstart-build-baseline:
+    #!/bin/sh
+    set -eu
+
+    if ! command -v clang >/dev/null 2>&1; then
+        echo "Error: clang is not installed."
+        exit 1
+    fi
+
     dotnet publish Mediator.Benchmarks.ColdStart -c Release \
       -p:EnableAot=true -p:ExtraDefineConstants="Mediator_Baseline" -r linux-x64 \
       -o "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot"
+
+    mkdir -p bin/
+    clang -O3 -static coldstart_baseline.c -o bin/coldstart_baseline_c
 
 coldstart-build-all:
     just coldstart-build-singleton
@@ -87,7 +98,6 @@ _coldstart-bench lifetime caching:
     #!/bin/sh
     set -eu
 
-    # Check if hyperfine is installed
     if ! command -v hyperfine >/dev/null 2>&1; then
         echo "Error: hyperfine is not installed."
         echo "Please install it from: https://github.com/sharkdp/hyperfine"
@@ -99,8 +109,15 @@ _coldstart-bench lifetime caching:
     CACHING="{{caching}}"
     CACHING_LOWER=$(echo "$CACHING" | tr '[:upper:]' '[:lower:]')
 
-    # Check if all required binaries exist
     missing=""
+
+    if [ ! -f "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" ]; then
+        missing="$missing  - Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart\n"
+    fi
+    if [ ! -f "bin/coldstart_baseline_c" ]; then
+        missing="$missing  - bin/coldstart_baseline_c\n"
+    fi
+
     for binary in \
         "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-jit/Mediator.Benchmarks.ColdStart" \
         "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-jit/Mediator.Benchmarks.ColdStart" \
@@ -121,8 +138,10 @@ _coldstart-bench lifetime caching:
 
     mkdir -p artifacts
 
-    hyperfine --warmup 10 --runs 100 --shell=none \
+    hyperfine --warmup 50 --min-runs 500 --time-unit millisecond --sort command --shell=none \
       --export-markdown "artifacts/coldstart-$LIFETIME_LOWER-$CACHING_LOWER-results.md" \
+      --command-name "Baseline C" "bin/coldstart_baseline_c" \
+      --command-name "Baseline Native AOT" "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" \
       --command-name "Small/JIT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-jit/Mediator.Benchmarks.ColdStart" \
       --command-name "Large/JIT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-large-jit/Mediator.Benchmarks.ColdStart" \
       --command-name "Small/AOT" "Mediator.Benchmarks.ColdStart/bin/$LIFETIME_LOWER-$CACHING_LOWER-small-aot/Mediator.Benchmarks.ColdStart" \
@@ -162,47 +181,49 @@ coldstart-baseline:
     #!/bin/sh
     set -eu
 
-    # Check if hyperfine is installed
     if ! command -v hyperfine >/dev/null 2>&1; then
         echo "Error: hyperfine is not installed."
         echo "Please install it from: https://github.com/sharkdp/hyperfine"
         exit 1
     fi
 
-    # Check if baseline binary exists
     if [ ! -f "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" ]; then
-        echo "Error: Baseline binary is missing."
+        echo "Error: Baseline Native AOT binary is missing."
+        echo "Please run 'just coldstart-build-baseline' first."
+        exit 1
+    fi
+    if [ ! -f "bin/coldstart_baseline_c" ]; then
+        echo "Error: Baseline C binary is missing."
         echo "Please run 'just coldstart-build-baseline' first."
         exit 1
     fi
 
     mkdir -p artifacts
 
-    hyperfine --warmup 10 --runs 100 --shell=none \
+    hyperfine --warmup 200 --time-unit millisecond --sort command --shell=none \
       --export-markdown "artifacts/coldstart-baseline-results.md" \
-      --command-name "Baseline" \
-      "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart"
+      --command-name "Baseline C" "bin/coldstart_baseline_c" \
+      --command-name "Baseline Native AOT" "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart"
 
 coldstart-all:
     #!/bin/sh
     set -eu
 
-    # Check if hyperfine is installed
     if ! command -v hyperfine >/dev/null 2>&1; then
         echo "Error: hyperfine is not installed."
         echo "Please install it from: https://github.com/sharkdp/hyperfine"
         exit 1
     fi
 
-    # Check if all required binaries exist for all lifetimes and caching modes
     missing=""
 
-    # Check baseline binary
     if [ ! -f "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" ]; then
         missing="$missing  - Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart\n"
     fi
+    if [ ! -f "bin/coldstart_baseline_c" ]; then
+        missing="$missing  - bin/coldstart_baseline_c\n"
+    fi
 
-    # Check all lifetime/caching combinations
     for lifetime in singleton scoped transient; do
         for caching in eager lazy; do
             for variant in small-jit large-jit small-aot large-aot; do
@@ -224,9 +245,10 @@ coldstart-all:
 
     mkdir -p artifacts
 
-    hyperfine --warmup 10 --runs 100 --shell=none \
+    hyperfine --warmup 50 --min-runs 500 --time-unit millisecond --sort command --shell=none \
       --export-markdown artifacts/coldstart-all-results.md \
-      --command-name "Baseline" 'Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart' \
+      --command-name "Baseline C" 'bin/coldstart_baseline_c' \
+      --command-name "Baseline Native AOT" 'Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart' \
       --command-name "Singleton/Eager/Small/JIT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-small-jit/Mediator.Benchmarks.ColdStart' \
       --command-name "Singleton/Eager/Large/JIT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-large-jit/Mediator.Benchmarks.ColdStart' \
       --command-name "Singleton/Eager/Small/AOT" 'Mediator.Benchmarks.ColdStart/bin/singleton-eager-small-aot/Mediator.Benchmarks.ColdStart' \
