@@ -5,6 +5,27 @@
 namespace Mediator
 {
     /// <summary>
+    /// Specifies the caching mode for Mediator initialization.
+    /// Initialization consists of building fast lookups for resolving handlers
+    /// and pre-building the message pipelines.
+    /// </summary>
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    {{ TypeAccessibility }} enum CachingMode
+    {
+        /// <summary>
+        /// Eagerly initialize on first Mediator access.
+        /// Best for long-running throughput-optimized scenarios where startup cost is amortized.
+        /// </summary>
+        Eager = 0,
+
+        /// <summary>
+        /// Lazily initialize handler wrappers on demand as messages are processed.
+        /// Best for cold start scenarios (e.g., serverless, Native AOT) where minimal initialization is preferred.
+        /// </summary>
+        Lazy = 1,
+    }
+
+    /// <summary>
     /// Provide options for the Mediator source generator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
@@ -51,5 +72,12 @@ namespace Mediator
         /// When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
         /// </summary>
         public global::System.Collections.Generic.IReadOnlyList<global::System.Type> StreamPipelineBehaviors { get; set; } = new global::System.Type[0];
+
+        /// <summary>
+        /// The caching mode for Mediator initialization.
+        /// When set to <see cref="global::Mediator.CachingMode.Eager" /> (default), all initialization is done on first Mediator access.
+        /// When set to <see cref="global::Mediator.CachingMode.Lazy" />, initialization is done on demand as messages are processed.
+        /// </summary>
+        public global::Mediator.CachingMode CachingMode { get; set; } = global::Mediator.CachingMode.Eager;
     }
 }

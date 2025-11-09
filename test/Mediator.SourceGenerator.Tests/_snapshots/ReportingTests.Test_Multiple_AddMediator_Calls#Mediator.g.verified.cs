@@ -631,14 +631,12 @@ namespace Mediator.Internals
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
-
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             using (var scope = sp.CreateScope())
             {
                 ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
             }
-
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
@@ -673,6 +671,17 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
+        private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
+        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = Services.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                return _notificationPublisher!;
+            }
+        }
         private global::Mediator.Internals.ContainerMetadata? _containerMetadataStorage;
         private global::Mediator.Internals.ContainerMetadata _containerMetadata
         {
@@ -686,17 +695,6 @@ namespace Mediator
                     return containerMetadata;
                 }
                 return _containerMetadataStorage;
-            }
-        }
-        private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
-        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
-        {
-            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                if (_notificationPublisher == null)
-                    _notificationPublisher = Services.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                return _notificationPublisher!;
             }
         }
         internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;

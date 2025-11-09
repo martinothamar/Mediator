@@ -21,4 +21,14 @@ using Microsoft.Extensions.DependencyInjection;
     ,
     NotificationPublisherType = typeof(ForeachAwaitPublisher)
 #endif
+#if Mediator_CachingMode_Lazy
+    ,
+    CachingMode = CachingMode.Lazy
+#elif Mediator_CachingMode_Eager
+    ,
+    CachingMode = CachingMode.Eager
+#else
+    ,
+    CachingMode = CachingMode.Eager
+#endif
 )]

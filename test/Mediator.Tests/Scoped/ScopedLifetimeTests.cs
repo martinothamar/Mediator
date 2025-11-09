@@ -18,8 +18,8 @@ public sealed class ScopedLifetimeTests
     {
         var (sp, _) = Fixture.GetMediator(createScope: true);
 
-        var handler1 = sp.GetRequiredService<SomeRequestHandler>();
-        var handler2 = sp.GetRequiredService<SomeRequestHandler>();
+        var handler1 = sp.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
+        var handler2 = sp.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
         Assert.Equal(handler1, handler2);
@@ -42,8 +42,8 @@ public sealed class ScopedLifetimeTests
         await using (var scope1 = sp.CreateAsyncScope())
         {
             mediator1 = scope1.ServiceProvider.GetRequiredService<IMediator>();
-            var handler1 = scope1.ServiceProvider.GetRequiredService<SomeRequestHandler>();
-            var handler2 = scope1.ServiceProvider.GetRequiredService<SomeRequestHandler>();
+            var handler1 = scope1.ServiceProvider.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
+            var handler2 = scope1.ServiceProvider.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
 
             await mediator1.Send(new SomeRequest(Guid.NewGuid()));
 
@@ -68,7 +68,7 @@ public sealed class ScopedLifetimeTests
 
         services.AddMediator();
 
-        SomeRequestHandler handler;
+        IRequestHandler<SomeRequest, SomeResponse> handler;
         await using (
             var sp = services.BuildServiceProvider(
                 new ServiceProviderOptions() { ValidateOnBuild = true, ValidateScopes = true }
@@ -78,18 +78,18 @@ public sealed class ScopedLifetimeTests
             await using (var scope = sp.CreateAsyncScope())
             {
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                handler = scope.ServiceProvider.GetRequiredService<SomeRequestHandler>();
+                handler = scope.ServiceProvider.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
 
                 await mediator.Send(new SomeRequest(Guid.NewGuid()));
 
                 Assert.NotNull(handler);
-                Assert.False(handler.Disposed);
+                Assert.False(((SomeRequestHandler)handler).Disposed);
             }
 
-            Assert.True(handler.Disposed);
+            Assert.True(((SomeRequestHandler)handler).Disposed);
         }
 
-        Assert.True(handler.Disposed);
+        Assert.True(((SomeRequestHandler)handler).Disposed);
     }
 
     [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Scoped ? "Only tested for Scoped lifetime" : null)]

@@ -8,9 +8,10 @@ Naming convention:
 * `<name>_IMediator`: call through the `IMediator` interface in this library
 * `<name>_MediatR`: the [MediatR](https://github.com/jbogard/MediatR) library
 
-All benchmarks are parameterized with
+Benchmarks may be parameterized with
 * ServiceLifetime (`Transient`, `Scoped`, `Singleton`)
 * Project type (small = ~10 messages, large = ~700 messages)
+* CachingMode (`Eager`, `Lazy`) - controls when handler initialization occurs
 
 ### Comparison
 
@@ -533,3 +534,46 @@ AMD Ryzen 5 5600X, 1 CPU, 12 logical and 6 physical cores
 | Cold   | Large       | Scoped          | 60.706 ms | 1.1644 ms | 1.4726 ms | 1000.0000 | 500.0000 |       - |  23.71 MB |
 | Cold   | Large       | Transient       | 61.231 ms | 1.1778 ms | 0.9835 ms | 1000.0000 | 500.0000 |       - |  23.75 MB |
 | Cold   | Large       | Singleton       | 64.621 ms | 1.2744 ms | 2.7158 ms | 1000.0000 | 500.0000 |       - |  23.67 MB |
+
+
+### Cold Start Performance
+
+This benchmark measures the time from process start to first message sent, comparing the impact of `CachingMode` (`Eager` vs `Lazy`) across different configurations.
+This is particularly important for serverless/cloud functions, Native AOT deployments, and other scenarios where startup time matters.
+
+Hardware: `AMD Ryzen 9 9950X3D, 1 CPU, 32 logical and 16 physical cores`
+
+- Baseline C is a statically linked "Hello World" executable
+- Baseline Native AOT is a C# application compiled with Native AOT that manually invokes the handler (no Mediator involved)
+
+If cold start performance matters to you, it is important to make your own benchmarks based on your own hardware/config/runtime.
+These benchmarks are run using `hyperfine`.
+
+| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
+|:---|---:|---:|---:|---:|
+| `Baseline C` | 0.1 ± 0.0 | 0.1 | 1.7 | 1.00 |
+| `Baseline Native AOT` | 1.5 ± 0.1 | 1.3 | 2.3 | 15.48 ± 3.32 |
+| `Singleton/Eager/Small/JIT` | 44.8 ± 4.2 | 32.6 | 56.0 | 468.41 ± 107.67 |
+| `Singleton/Eager/Large/JIT` | 117.7 ± 5.2 | 103.8 | 129.7 | 1231.10 ± 263.95 |
+| `Singleton/Eager/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.7 | 16.78 ± 3.60 |
+| `Singleton/Eager/Large/AOT` | 20.1 ± 0.7 | 18.5 | 24.0 | 209.84 ± 44.63 |
+| `Singleton/Lazy/Small/JIT` | 43.5 ± 4.4 | 30.4 | 54.6 | 455.46 ± 105.86 |
+| `Singleton/Lazy/Large/JIT` | 78.5 ± 5.1 | 63.8 | 97.1 | 821.00 ± 180.23 |
+| `Singleton/Lazy/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.6 | 16.48 ± 3.53 |
+| `Singleton/Lazy/Large/AOT` | 3.5 ± 0.2 | 3.1 | 5.7 | 36.97 ± 8.02 |
+| `Scoped/Eager/Small/JIT` | 46.6 ± 4.5 | 32.8 | 57.0 | 487.72 ± 112.47 |
+| `Scoped/Eager/Large/JIT` | 77.1 ± 4.7 | 64.6 | 93.6 | 807.15 ± 176.47 |
+| `Scoped/Eager/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.6 | 16.74 ± 3.59 |
+| `Scoped/Eager/Large/AOT` | 5.9 ± 0.3 | 5.1 | 6.7 | 61.51 ± 13.19 |
+| `Scoped/Lazy/Small/JIT` | 45.7 ± 3.9 | 33.3 | 55.6 | 477.84 ± 108.13 |
+| `Scoped/Lazy/Large/JIT` | 79.6 ± 4.6 | 66.0 | 92.8 | 832.73 ± 181.33 |
+| `Scoped/Lazy/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.4 | 16.49 ± 3.53 |
+| `Scoped/Lazy/Large/AOT` | 3.3 ± 0.2 | 2.8 | 4.6 | 34.81 ± 7.52 |
+| `Transient/Eager/Small/JIT` | 45.5 ± 4.6 | 31.1 | 56.9 | 475.99 ± 110.81 |
+| `Transient/Eager/Large/JIT` | 75.5 ± 4.8 | 62.0 | 88.3 | 789.50 ± 173.02 |
+| `Transient/Eager/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.9 | 16.85 ± 3.65 |
+| `Transient/Eager/Large/AOT` | 5.9 ± 0.3 | 5.0 | 7.4 | 61.24 ± 13.16 |
+| `Transient/Lazy/Small/JIT` | 44.2 ± 4.0 | 32.3 | 55.5 | 462.39 ± 105.78 |
+| `Transient/Lazy/Large/JIT` | 78.5 ± 4.9 | 64.3 | 96.3 | 821.05 ± 179.87 |
+| `Transient/Lazy/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.3 | 16.49 ± 3.53 |
+| `Transient/Lazy/Large/AOT` | 3.4 ± 0.2 | 3.0 | 4.2 | 35.17 ± 7.56 |

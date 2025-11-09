@@ -98,7 +98,7 @@ public class BasicHandlerTests
 
         var id = Guid.NewGuid();
 
-        var requestHandler = sp.GetRequiredService<SomeRequestWithoutResponseHandler>();
+        var requestHandler = sp.GetRequiredService<IRequestHandler<SomeRequestWithoutResponse, Unit>>();
         await mediator!.Send(new SomeRequestWithoutResponse(id));
         Assert.NotNull(requestHandler);
         Assert.Contains(id, SomeRequestWithoutResponseHandler.Ids);
@@ -172,7 +172,7 @@ public class BasicHandlerTests
 
         var id = Guid.NewGuid();
 
-        var commandHandler = sp.GetRequiredService<SomeCommandHandler>();
+        var commandHandler = sp.GetRequiredService<ICommandHandler<SomeCommand, SomeResponse>>();
         var response = await mediator.Send(new SomeCommand(id));
         Assert.NotNull(commandHandler);
         Assert.Contains(id, SomeCommandHandler.Ids);
@@ -236,7 +236,7 @@ public class BasicHandlerTests
 
         var id = Guid.NewGuid();
 
-        var commandHandler = sp.GetRequiredService<SomeCommandWithoutResponseHandler>();
+        var commandHandler = sp.GetRequiredService<ICommandHandler<SomeCommandWithoutResponse, Unit>>();
         Assert.NotNull(commandHandler);
         await mediator.Send(new SomeCommandWithoutResponse(id));
         Assert.Contains(id, SomeCommandWithoutResponseHandler.Ids);
@@ -252,7 +252,7 @@ public class BasicHandlerTests
         var command = new SomeStructCommand(id);
         var addr = *(long*)&command;
 
-        var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
+        var commandHandler = sp.GetRequiredService<ICommandHandler<SomeStructCommand, Unit>>();
         Assert.NotNull(commandHandler);
 #pragma warning disable xUnit1031
         mediator.Send(command).GetAwaiter().GetResult();
@@ -271,7 +271,7 @@ public class BasicHandlerTests
         var command = new SomeStructCommand(id);
         var addr = *(long*)&command;
 
-        var commandHandler = sp.GetRequiredService<SomeStructCommandHandler>();
+        var commandHandler = sp.GetRequiredService<ICommandHandler<SomeStructCommand, Unit>>();
 #pragma warning disable xUnit1031
         concrete.Send(command).GetAwaiter().GetResult();
 #pragma warning restore xUnit1031
@@ -409,7 +409,7 @@ public class BasicHandlerTests
 
         var id = Guid.NewGuid();
 
-        var handler = sp.GetRequiredService<SomeStaticClass.SomeStaticNestedHandler>();
+        var handler = sp.GetRequiredService<IRequestHandler<SomeStaticClass.SomeStaticNestedRequest, SomeResponse>>();
         var response = await mediator!.Send(new SomeStaticClass.SomeStaticNestedRequest(id));
         Assert.NotNull(handler);
         Assert.NotNull(response);
@@ -424,7 +424,7 @@ public class BasicHandlerTests
 
         var id = Guid.NewGuid();
 
-        var handler = sp.GetRequiredService<SomeOtherClass.SomeNestedHandler>();
+        var handler = sp.GetRequiredService<IRequestHandler<SomeOtherClass.SomeNestedRequest, SomeResponse>>();
         var response = await mediator!.Send(new SomeOtherClass.SomeNestedRequest(id));
         Assert.NotNull(handler);
         Assert.NotNull(response);

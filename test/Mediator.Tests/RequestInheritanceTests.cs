@@ -91,7 +91,7 @@ public sealed class RequestInheritanceTests
         Assert.Equal(idForN, responseWithN.Id);
         Assert.Equal(3, responseWithN.N);
 
-        var handler = sp.GetRequiredService<CreateHandler>();
+        var handler = sp.GetRequiredService<IRequestHandler<CreateRequest, CreateResponse>>();
         Assert.NotNull(handler);
         Assert.Contains(id, CreateHandler.Ids);
         Assert.Contains(idForN, CreateHandler.IdsForN);

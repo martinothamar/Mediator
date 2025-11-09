@@ -9,7 +9,8 @@ public sealed class ProjectTypeTests
 {
     private static string GenerateMessagesAndHandlers(
         int n,
-        ServiceLifetime serviceLifetime,
+        ServiceLifetime? serviceLifetime = null,
+        string? cachingMode = null,
         string manyOfMessageType = ""
     )
     {
@@ -33,10 +34,32 @@ public sealed class ProjectTypeTests
 
                     services.AddMediator(options =>
                     {
+            """
+        );
+
+        if (serviceLifetime is not null)
+        {
+            code.AppendLine(
+                $$"""
                         options.ServiceLifetime = ServiceLifetime.{{serviceLifetime}};
-                    });
+                """
+            );
+        }
+
+        if (cachingMode is not null)
+        {
+            code.AppendLine(
+                $$"""
+                        options.CachingMode = CachingMode.{{cachingMode}};
+                """
+            );
+        }
+
+        code.AppendLine(
+            """
+                        });
+                    }
                 }
-            }
 
             """
         );
@@ -91,9 +114,13 @@ public sealed class ProjectTypeTests
     }
 
     [Theory, CombinatorialData]
-    public async Task Test_Project_Sizes([CombinatorialValues(16, 17)] int n, ServiceLifetime serviceLifetime)
+    public async Task Test_Project_Sizes(
+        [CombinatorialValues(16, 17)] int n,
+        ServiceLifetime serviceLifetime,
+        [CombinatorialValues("Eager", "Lazy")] string cachingMode
+    )
     {
-        var code = GenerateMessagesAndHandlers(n, serviceLifetime);
+        var code = GenerateMessagesAndHandlers(n, serviceLifetime, cachingMode: cachingMode);
 
         var inputCompilation = Fixture.CreateLibrary(code);
 
@@ -120,9 +147,20 @@ public sealed class ProjectTypeTests
                     Assert.True(model.HasStreamQueries);
                     Assert.True(model.HasStreamCommands);
                     Assert.True(model.HasNotifications);
+
+                    if (cachingMode == "Eager")
+                    {
+                        Assert.True(model.CachingModeIsEager);
+                        Assert.False(model.CachingModeIsLazy);
+                    }
+                    else
+                    {
+                        Assert.False(model.CachingModeIsEager);
+                        Assert.True(model.CachingModeIsLazy);
+                    }
                 }
             )
-            .UseParameters(n, serviceLifetime);
+            .UseParameters(n, serviceLifetime, cachingMode);
     }
 
     [Theory, CombinatorialData]
@@ -137,10 +175,16 @@ public sealed class ProjectTypeTests
             "StreamCommand"
         )]
             string manyOfMessageType,
-        ServiceLifetime serviceLifetime
+        ServiceLifetime serviceLifetime,
+        [CombinatorialValues("Eager", "Lazy")] string cachingMode
     )
     {
-        var code = GenerateMessagesAndHandlers(1, serviceLifetime, manyOfMessageType);
+        var code = GenerateMessagesAndHandlers(
+            1,
+            serviceLifetime,
+            cachingMode: cachingMode,
+            manyOfMessageType: manyOfMessageType
+        );
 
         var inputCompilation = Fixture.CreateLibrary(code);
 
@@ -151,8 +195,19 @@ public sealed class ProjectTypeTests
                 {
                     var model = result.Generator.CompilationModel;
                     Assert.NotNull(model);
+
+                    if (cachingMode == "Eager")
+                    {
+                        Assert.True(model.CachingModeIsEager);
+                        Assert.False(model.CachingModeIsLazy);
+                    }
+                    else
+                    {
+                        Assert.False(model.CachingModeIsEager);
+                        Assert.True(model.CachingModeIsLazy);
+                    }
                 }
             )
-            .UseParameters(manyOfMessageType, serviceLifetime);
+            .UseParameters(manyOfMessageType, serviceLifetime, cachingMode);
     }
 }

@@ -64,16 +64,36 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
-            {{ message.Handler.ServiceRegistration }}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
+            {{~ if CachingModeIsLazy ~}}
+            {{~ if ServiceLifetimeIsSingleton ~}}
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
+                return new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}().Init(sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(), sp);
+            }, {{ SingletonServiceLifetime }}));
+            {{~ else ~}}
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), _ => new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}(), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
+            {{~ else ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size NotificationMessages) > 0 ~}}
 
             // Register handlers and wrappers for notification messages
             {{~ for message in NotificationMessages ~}}
+            {{~ if CachingModeIsLazy ~}}
+            {{~ if ServiceLifetimeIsSingleton ~}}
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
+                var publisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                return new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}().Init(publisher, sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(), sp);
+            }, {{ SingletonServiceLifetime }}));
+            {{~ else ~}}
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), _ => new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}(), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
+            {{~ else ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
+            {{~ end ~}}
             {{~ end ~}}
             {{~ end ~}}
             {{~ if (object.size NotificationMessageHandlers) > 0 ~}}
@@ -312,12 +332,22 @@ namespace {{ InternalsNamespace }}
         private {{ NotificationPublisherType.FullName }} _publisher = null!;
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
+        {{~ if CachingModeIsLazy ~}}
+        public NotificationHandlerWrapper<TNotification> Init(
+            {{ NotificationPublisherType.FullName }} publisher,
+            global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
+            global::System.IServiceProvider sp
+        )
+        {
+            _publisher = publisher;
+        {{~ else ~}}
         public NotificationHandlerWrapper<TNotification> Init(
             global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
             _publisher = containerMetadata.NotificationPublisher;
+        {{~ end ~}}
             var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
             if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
@@ -411,6 +441,7 @@ namespace {{ InternalsNamespace }}
     internal sealed class ContainerMetadata
     {
         public readonly bool ServicesUnderlyingTypeIsArray;
+        {{~ if !CachingModeIsLazy ~}}
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> RequestHandlerWrappers;
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> CommandHandlerWrappers;
@@ -463,9 +494,10 @@ namespace {{ InternalsNamespace }}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
-
         {{~ if ServiceLifetimeIsSingleton ~}}
+
         public readonly {{ NotificationPublisherType.FullName }} NotificationPublisher;
+        {{~ end ~}}
         {{~ end ~}}
 
         public ContainerMetadata(global::System.IServiceProvider sp)
@@ -478,8 +510,9 @@ namespace {{ InternalsNamespace }}
             {{~ else ~}}
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
             {{~ end ~}}
-
+            {{~ if !CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
+
             NotificationPublisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
             {{~ end ~}}
 
@@ -562,6 +595,7 @@ namespace {{ InternalsNamespace }}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
             {{~ end ~}}
+            {{~ end ~}}
         }
     }
 }
@@ -580,6 +614,21 @@ namespace {{ MediatorNamespace }}
     {
         internal readonly global::System.IServiceProvider Services;
         {{~ if ServiceLifetimeIsSingleton ~}}
+        {{~ if CachingModeIsLazy ~}}
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata;
+        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                return _notificationPublisher!;
+            }
+        }
+        internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;
+        {{~ else ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
         private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
         internal {{ NotificationPublisherType.FullName }} NotificationPublisher
@@ -603,7 +652,33 @@ namespace {{ MediatorNamespace }}
                 return _servicesUnderlyingTypeIsArray!.Value;
             }
         }
+        {{~ end ~}}
         {{~ else ~}}
+        {{~ if CachingModeIsLazy ~}}
+        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                return _notificationPublisher!;
+            }
+        }
+        {{~ else ~}}
+        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                return _notificationPublisher!;
+            }
+        }
+        {{~ end ~}}
         private global::{{ InternalsNamespace }}.ContainerMetadata? _containerMetadataStorage;
         private global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata
         {
@@ -617,17 +692,6 @@ namespace {{ MediatorNamespace }}
                     return containerMetadata;
                 }
                 return _containerMetadataStorage;
-            }
-        }
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
-        {
-            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                if (_notificationPublisher == null)
-                    _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
-                return _notificationPublisher!;
             }
         }
         internal bool ServicesUnderlyingTypeIsArray => {{ ContainerMetadataField }}.ServicesUnderlyingTypeIsArray;
@@ -655,13 +719,17 @@ namespace {{ MediatorNamespace }}
         {
             Services = sp;
             {{~ if ServiceLifetimeIsSingleton ~}}
+            {{~ if CachingModeIsLazy ~}}
+            _containerMetadata = sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>();
+            {{~ else ~}}
             _containerMetadata = new FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator>(
                 self => self.Services.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(),
                 this
             );
             {{~ end ~}}
+            {{~ end ~}}
         }
-        {{~ if ServiceLifetimeIsSingleton ~}}
+        {{~ if ServiceLifetimeIsSingleton && !CachingModeIsLazy ~}}
 
         {{ if IsTestRun; "internal"; else; "private"; end; }} struct FastLazyValue<T, TArg>
         {
@@ -772,9 +840,16 @@ namespace {{ MediatorNamespace }}
         private object GetRequestHandler(global::Mediator.IBaseRequest request)
         {
             ThrowIfNull(request, nameof(request));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(request.GetType());
+            if (handler == null)
+                ThrowMissingHandler(request);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.RequestHandlerWrappers.TryGetValue(request.GetType(), out var handler))
                 ThrowMissingHandler(request);
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ if HasManyCommands ~}}
@@ -783,9 +858,16 @@ namespace {{ MediatorNamespace }}
         private object GetCommandHandler(global::Mediator.IBaseCommand command)
         {
             ThrowIfNull(command, nameof(command));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(command.GetType());
+            if (handler == null)
+                ThrowMissingHandler(command);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.CommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
                 ThrowMissingHandler(command);
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ if HasManyQueries ~}}
@@ -794,9 +876,16 @@ namespace {{ MediatorNamespace }}
         private object GetQueryHandler(global::Mediator.IBaseQuery query)
         {
             ThrowIfNull(query, nameof(query));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(query.GetType());
+            if (handler == null)
+                ThrowMissingHandler(query);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.QueryHandlerWrappers.TryGetValue(query.GetType(), out var handler))
                 ThrowMissingHandler(query);
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ if HasManyStreamRequests ~}}
@@ -805,9 +894,16 @@ namespace {{ MediatorNamespace }}
         private object GetStreamRequestHandler(global::Mediator.IBaseStreamRequest request)
         {
             ThrowIfNull(request, nameof(request));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(request.GetType());
+            if (handler == null)
+                ThrowMissingHandler(request);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.StreamRequestHandlerWrappers.TryGetValue(request.GetType(), out var handler))
                 ThrowMissingHandler(request);
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ if HasManyStreamCommands ~}}
@@ -816,9 +912,16 @@ namespace {{ MediatorNamespace }}
         private object GetStreamCommandHandler(global::Mediator.IBaseStreamCommand command)
         {
             ThrowIfNull(command, nameof(command));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(command.GetType());
+            if (handler == null)
+                ThrowMissingHandler(command);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.StreamCommandHandlerWrappers.TryGetValue(command.GetType(), out var handler))
                 ThrowMissingHandler(command);
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ if HasManyStreamQueries ~}}
@@ -827,9 +930,16 @@ namespace {{ MediatorNamespace }}
         private object GetStreamQueryHandler(global::Mediator.IBaseStreamQuery query)
         {
             ThrowIfNull(query, nameof(query));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(query.GetType());
+            if (handler == null)
+                ThrowMissingHandler(query);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.StreamQueryHandlerWrappers.TryGetValue(query.GetType(), out var handler))
                 ThrowMissingHandler(query);
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ if HasManyNotifications ~}}
@@ -838,9 +948,16 @@ namespace {{ MediatorNamespace }}
         private object GetNotificationHandler(global::Mediator.INotification notification)
         {
             ThrowIfNull(notification, nameof(notification));
+            {{~ if CachingModeIsLazy ~}}
+            var handler = Services.GetService(notification.GetType());
+            if (handler == null)
+                ThrowMissingHandler(notification);
+            return handler!;
+            {{~ else ~}}
             if (!{{ ContainerMetadataField }}.NotificationHandlerWrappers.TryGetValue(notification.GetType(), out var handler))
                 ThrowMissingHandler(notification); // This shouldn't happen, wrappers for every notification type should be created here
             return handler!;
+            {{~ end ~}}
         }
         {{~ end ~}}
 
@@ -863,7 +980,15 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(request, nameof(request));
             {{~ end ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(request);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
+            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in ICommandMessages ~}}
@@ -885,7 +1010,15 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(command, nameof(command));
             {{~ end ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(command);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
+            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IQueryMessages ~}}
@@ -907,7 +1040,15 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(query, nameof(query));
             {{~ end ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(query);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
+            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IStreamRequestMessages ~}}
@@ -929,7 +1070,15 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(request, nameof(request));
             {{~ end ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(request);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
+            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}request, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IStreamCommandMessages ~}}
@@ -951,7 +1100,15 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(command, nameof(command));
             {{~ end ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(command);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
+            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}command, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
         {{~ for message in IStreamQueryMessages ~}}
@@ -973,7 +1130,15 @@ namespace {{ MediatorNamespace }}
             {{~ if message.IsClass ~}}
             ThrowIfNull(query, nameof(query));
             {{~ end ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(query);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
+            {{~ else ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}query, cancellationToken);
+            {{~ end ~}}
         }
         {{~ end ~}}
 
@@ -1716,7 +1881,13 @@ namespace {{ MediatorNamespace }}
             ThrowIfNull(notification, nameof(notification));
             {{~ end ~}}
 
-            {{~ if ServiceLifetimeIsSingleton || !HasManyNotifications ~}}
+            {{~ if CachingModeIsLazy ~}}
+            var wrapperObj = Services.GetService(typeof({{ message.FullName }}));
+            var wrapper = wrapperObj as {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }};
+            if (wrapper == null)
+                ThrowMissingHandler(notification);
+            return wrapper!.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}notification, cancellationToken);
+            {{~ else if ServiceLifetimeIsSingleton || !HasManyNotifications ~}}
             return {{ ContainerMetadataField }}.{{ message.HandlerWrapperPropertyName }}.Handle({{ if !ServiceLifetimeIsSingleton; "this, "; end; }}notification, cancellationToken);
             {{~ else ~}}
             var handlerObj = GetNotificationHandler(notification);
