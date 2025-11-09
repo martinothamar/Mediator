@@ -1,9 +1,15 @@
+# /// script
+# dependencies = ["pandas", "tabulate"]
+# requires-python = ">=3.14"
+# ///
 import pandas as pd
 import sys
 
 # Small script to compare "Comparison" benchmark results.
 # Since the result set is pretty large, it's useful to merge before and after
 # tables to compute some differences and make it easier to read.
+# Usage:
+#   uv run cmp.py before-results.csv after-results.csv
 
 if __name__ == '__main__':
     main = pd.read_csv(sys.argv[1], sep=',')
