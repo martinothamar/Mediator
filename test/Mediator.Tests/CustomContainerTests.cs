@@ -90,7 +90,7 @@ public class CustomContainerTests
 
         var id = Guid.NewGuid();
 
-        var commandHandler = sp.GetRequiredService<SomeCommandHandler>();
+        var commandHandler = sp.GetRequiredService<ICommandHandler<SomeCommand, SomeResponse>>();
         var response = await mediator.Send(new SomeCommand(id));
         Assert.NotNull(commandHandler);
         Assert.Contains(id, SomeCommandHandler.Ids);

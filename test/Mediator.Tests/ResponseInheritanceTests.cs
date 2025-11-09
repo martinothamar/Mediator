@@ -161,7 +161,7 @@ public sealed class ResponseInheritanceTests
     {
         var (sp, mediator) = Fixture.GetMediator();
 
-        var handler = sp.GetRequiredService<CreateHandler>();
+        var handler = sp.GetRequiredService<ICommandHandler<CreateCommandRequest, CreateResponse>>();
         Assert.NotNull(handler);
 
         var ids = new List<Guid>();

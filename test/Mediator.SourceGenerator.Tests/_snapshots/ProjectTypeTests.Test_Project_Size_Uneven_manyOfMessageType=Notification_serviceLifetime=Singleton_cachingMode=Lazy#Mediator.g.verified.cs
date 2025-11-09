@@ -56,128 +56,99 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers for request messages
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest0Handler), typeof(global::TestCode.TestRequest0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.TestRequest0, global::System.Int32>), typeof(global::TestCode.TestRequest0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestRequest0), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest0, global::System.Int32>>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.TestRequest0, global::System.Int32>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery0Handler), typeof(global::TestCode.TestQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IQueryHandler<global::TestCode.TestQuery0, global::System.Int32>), typeof(global::TestCode.TestQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestQuery0), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32>>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.QueryHandlerWrapper<global::TestCode.TestQuery0, global::System.Int32>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand0Handler), typeof(global::TestCode.TestCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ICommandHandler<global::TestCode.TestCommand0, global::System.Int32>), typeof(global::TestCode.TestCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestCommand0), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32>>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.CommandHandlerWrapper<global::TestCode.TestCommand0, global::System.Int32>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest0Handler), typeof(global::TestCode.TestStreamRequest0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.TestStreamRequest0, global::System.Int32>), typeof(global::TestCode.TestStreamRequest0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamRequest0), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32>>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.TestStreamRequest0, global::System.Int32>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery0Handler), typeof(global::TestCode.TestStreamQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamQueryHandler<global::TestCode.TestStreamQuery0, global::System.Int32>), typeof(global::TestCode.TestStreamQuery0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamQuery0), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32>>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.StreamQueryHandlerWrapper<global::TestCode.TestStreamQuery0, global::System.Int32>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand0Handler), typeof(global::TestCode.TestStreamCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamCommandHandler<global::TestCode.TestStreamCommand0, global::System.Int32>), typeof(global::TestCode.TestStreamCommand0Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestStreamCommand0), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.StreamCommandHandlerWrapper<global::TestCode.TestStreamCommand0, global::System.Int32>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers and wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification0), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification14), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification13), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification12), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification11), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification10), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification9), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification15), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification8), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification6), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification5), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification4), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification3), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification2), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification1), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification7), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification16), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register notification handlers
@@ -223,6 +194,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // Register internal components
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 
@@ -276,7 +248,7 @@ namespace Mediator.Internals
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public RequestHandlerWrapper<TRequest, TResponse> Init(
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -285,7 +257,7 @@ namespace Mediator.Internals
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
@@ -356,7 +328,7 @@ namespace Mediator.Internals
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -365,7 +337,7 @@ namespace Mediator.Internals
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
@@ -437,7 +409,7 @@ namespace Mediator.Internals
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public CommandHandlerWrapper<TRequest, TResponse> Init(
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -446,7 +418,7 @@ namespace Mediator.Internals
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
@@ -517,7 +489,7 @@ namespace Mediator.Internals
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -526,7 +498,7 @@ namespace Mediator.Internals
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
@@ -598,7 +570,7 @@ namespace Mediator.Internals
         private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public QueryHandlerWrapper<TRequest, TResponse> Init(
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -607,7 +579,7 @@ namespace Mediator.Internals
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
@@ -678,7 +650,7 @@ namespace Mediator.Internals
         private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
         public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
@@ -687,7 +659,7 @@ namespace Mediator.Internals
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
@@ -754,13 +726,13 @@ namespace Mediator.Internals
 
         public NotificationHandlerWrapper<TNotification> Init(
             global::Mediator.ForeachAwaitPublisher publisher,
-            bool servicesUnderlyingTypeIsArray,
+            global::Mediator.Internals.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
             _publisher = publisher;
             var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
-            if (servicesUnderlyingTypeIsArray)
+            if (containerMetadata.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     handlers is global::Mediator.INotificationHandler<TNotification>[],
@@ -810,6 +782,19 @@ namespace Mediator.Internals
     internal interface IContainerProbe { }
     internal sealed class ContainerProbe0 : IContainerProbe { }
     internal sealed class ContainerProbe1 : IContainerProbe { }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class ContainerMetadata
+    {
+        public readonly bool ServicesUnderlyingTypeIsArray;
+
+        public ContainerMetadata(global::System.IServiceProvider sp)
+        {
+            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
+        }
+    }
 }
 
 namespace Mediator
@@ -825,8 +810,7 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private readonly bool _servicesUnderlyingTypeIsArray;
-        internal bool ServicesUnderlyingTypeIsArray => _servicesUnderlyingTypeIsArray;
+        private global::Mediator.Internals.ContainerMetadata _containerMetadata;
         private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
         internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
         {
@@ -838,6 +822,7 @@ namespace Mediator
                 return _notificationPublisher!;
             }
         }
+        internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;
 
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
@@ -860,7 +845,7 @@ namespace Mediator
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            _servicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
+            _containerMetadata = sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>();
         }
 
 

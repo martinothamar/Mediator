@@ -56,7 +56,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers for request messages
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::InternalMessages.Application.PingHandler), typeof(global::InternalMessages.Application.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), typeof(global::InternalMessages.Application.PingHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::InternalMessages.Domain.Ping, global::InternalMessages.Domain.Pong>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 

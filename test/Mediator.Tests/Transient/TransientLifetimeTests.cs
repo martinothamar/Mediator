@@ -22,8 +22,8 @@ public sealed class TransientLifetimeTests
 
         var (sp, _) = Fixture.GetMediator();
 
-        var handler1 = sp.GetRequiredService<TransientTestRequestHandler>();
-        var handler2 = sp.GetRequiredService<TransientTestRequestHandler>();
+        var handler1 = sp.GetRequiredService<IRequestHandler<TransientTest, SomeResponse>>();
+        var handler2 = sp.GetRequiredService<IRequestHandler<TransientTest, SomeResponse>>();
 
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);

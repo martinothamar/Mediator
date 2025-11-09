@@ -668,6 +668,17 @@ namespace Mediator2
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
+        private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
+        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = Services.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                return _notificationPublisher!;
+            }
+        }
         private global::Mediator2.Internals.ContainerMetadata? _containerMetadataStorage;
         private global::Mediator2.Internals.ContainerMetadata _containerMetadata
         {
@@ -681,17 +692,6 @@ namespace Mediator2
                     return containerMetadata;
                 }
                 return _containerMetadataStorage;
-            }
-        }
-        private global::Mediator.ForeachAwaitPublisher? _notificationPublisher;
-        internal global::Mediator.ForeachAwaitPublisher NotificationPublisher
-        {
-            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                if (_notificationPublisher == null)
-                    _notificationPublisher = Services.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-                return _notificationPublisher!;
             }
         }
         internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;

@@ -73,7 +73,8 @@ internal sealed record CompilationModel
         CachingModeShort = cachingModeShort;
         CachingModeIsEager = cachingModeShort != "Lazy";
         CachingModeIsLazy = cachingModeShort == "Lazy";
-        ContainerMetadataField = ServiceLifetimeIsSingleton ? "_containerMetadata.Value" : "_containerMetadata";
+        ContainerMetadataField =
+            ServiceLifetimeIsSingleton && CachingModeIsEager ? "_containerMetadata.Value" : "_containerMetadata";
         InternalsNamespace = $"{MediatorNamespace}.Internals";
         TotalMessages = requestMessages.Count + notificationMessages.Count;
         NotificationPublisherType = notificationPublisherType;

@@ -64,16 +64,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register handlers for request messages
             {{~ for message in RequestMessages ~}}
-            {{ message.Handler.ServiceRegistration }}
             services.Add(new {{ SD }}(typeof(global::Mediator.I{{ message.MessageType }}Handler<{{ message.FullName }}, {{ message.ResponseFullName }}>), typeof({{ message.Handler.FullName }}), {{ ServiceLifetime }}));
             {{~ if CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
             services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp).Init(servicesUnderlyingTypeIsArray, sp);
+                return new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}().Init(sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(), sp);
             }, {{ SingletonServiceLifetime }}));
             {{~ else ~}}
-            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp), {{ SingletonServiceLifetime }}));
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), _ => new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}(), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
             {{~ else ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
@@ -88,11 +86,10 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ if ServiceLifetimeIsSingleton ~}}
             services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
                 var publisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
-                var servicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
-                return global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp).Init(publisher, servicesUnderlyingTypeIsArray, sp);
+                return new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}().Init(publisher, sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(), sp);
             }, {{ SingletonServiceLifetime }}));
             {{~ else ~}}
-            services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => global::Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(sp), {{ SingletonServiceLifetime }}));
+            services.Add(new {{ SD }}(typeof({{ message.FullName }}), _ => new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}(), {{ SingletonServiceLifetime }}));
             {{~ end ~}}
             {{~ else ~}}
             services.Add(new {{ SD }}(typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), typeof({{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}), {{ SingletonServiceLifetime }}));
@@ -130,9 +127,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // Register internal components
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
-            {{~ if !CachingModeIsLazy ~}}
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
-            {{~ end ~}}
 
             return services;
 
@@ -201,28 +196,17 @@ namespace {{ InternalsNamespace }}
         {{~ if ServiceLifetimeIsSingleton ~}}
         private {{ wrapperType.MessageHandlerDelegateName }} _rootHandler = null!;
 
-        {{~ if CachingModeIsLazy ~}}
-        public {{ wrapperType.TypeNameWithGenericParameters }} Init(
-            bool servicesUnderlyingTypeIsArray,
-            global::System.IServiceProvider sp
-        )
-        {{~ else ~}}
         public {{ wrapperType.TypeNameWithGenericParameters }} Init(
             global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
-        {{~ end ~}}
         {
             var concreteHandler = sp.GetRequiredService<global::Mediator.I{{ wrapperType.MessageType }}Handler<TRequest, TResponse>>();
             var pipelineBehaviours = sp.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
 
             {{ wrapperType.PipelineHandlerTypeName }}[] pipelineBehavioursArray;
-            {{~ if CachingModeIsLazy ~}}
-            if (servicesUnderlyingTypeIsArray)
-            {{~ else ~}}
             if (containerMetadata.ServicesUnderlyingTypeIsArray)
-            {{~ end ~}}
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is {{ wrapperType.PipelineHandlerTypeName }}[]
@@ -351,13 +335,11 @@ namespace {{ InternalsNamespace }}
         {{~ if CachingModeIsLazy ~}}
         public NotificationHandlerWrapper<TNotification> Init(
             {{ NotificationPublisherType.FullName }} publisher,
-            bool servicesUnderlyingTypeIsArray,
+            global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
         {
             _publisher = publisher;
-            var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
-            if (servicesUnderlyingTypeIsArray)
         {{~ else ~}}
         public NotificationHandlerWrapper<TNotification> Init(
             global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
@@ -365,9 +347,9 @@ namespace {{ InternalsNamespace }}
         )
         {
             _publisher = containerMetadata.NotificationPublisher;
+        {{~ end ~}}
             var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
             if (containerMetadata.ServicesUnderlyingTypeIsArray)
-        {{~ end ~}}
             {
                 global::System.Diagnostics.Debug.Assert(
                     handlers is global::Mediator.INotificationHandler<TNotification>[],
@@ -452,7 +434,6 @@ namespace {{ InternalsNamespace }}
     internal interface IContainerProbe { }
     internal sealed class ContainerProbe0 : IContainerProbe { }
     internal sealed class ContainerProbe1 : IContainerProbe { }
-    {{~ if !CachingModeIsLazy ~}}
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -460,6 +441,7 @@ namespace {{ InternalsNamespace }}
     internal sealed class ContainerMetadata
     {
         public readonly bool ServicesUnderlyingTypeIsArray;
+        {{~ if !CachingModeIsLazy ~}}
 
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> RequestHandlerWrappers;
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> CommandHandlerWrappers;
@@ -516,6 +498,7 @@ namespace {{ InternalsNamespace }}
 
         public readonly {{ NotificationPublisherType.FullName }} NotificationPublisher;
         {{~ end ~}}
+        {{~ end ~}}
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
@@ -527,6 +510,7 @@ namespace {{ InternalsNamespace }}
             {{~ else ~}}
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
             {{~ end ~}}
+            {{~ if !CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
 
             NotificationPublisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
@@ -611,9 +595,9 @@ namespace {{ InternalsNamespace }}
             {{ message.HandlerWrapperPropertyName }} = sp.GetRequiredService<{{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}>(){{ if ServiceLifetimeIsSingleton; ".Init(this, sp)"; end; }};
             {{~ end ~}}
             {{~ end ~}}
+            {{~ end ~}}
         }
     }
-    {{~ end ~}}
 }
 
 namespace {{ MediatorNamespace }}
@@ -631,8 +615,7 @@ namespace {{ MediatorNamespace }}
         internal readonly global::System.IServiceProvider Services;
         {{~ if ServiceLifetimeIsSingleton ~}}
         {{~ if CachingModeIsLazy ~}}
-        private readonly bool _servicesUnderlyingTypeIsArray;
-        internal bool ServicesUnderlyingTypeIsArray => _servicesUnderlyingTypeIsArray;
+        {{ if IsTestRun }}internal{{ else }}private{{ end }} global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata;
         private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
         internal {{ NotificationPublisherType.FullName }} NotificationPublisher
         {
@@ -644,6 +627,7 @@ namespace {{ MediatorNamespace }}
                 return _notificationPublisher!;
             }
         }
+        internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;
         {{~ else ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
         private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
@@ -671,8 +655,6 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ else ~}}
         {{~ if CachingModeIsLazy ~}}
-        private readonly bool _servicesUnderlyingTypeIsArray;
-        internal bool ServicesUnderlyingTypeIsArray => _servicesUnderlyingTypeIsArray;
         private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
         internal {{ NotificationPublisherType.FullName }} NotificationPublisher
         {
@@ -685,6 +667,18 @@ namespace {{ MediatorNamespace }}
             }
         }
         {{~ else ~}}
+        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_notificationPublisher == null)
+                    _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                return _notificationPublisher!;
+            }
+        }
+        {{~ end ~}}
         private global::{{ InternalsNamespace }}.ContainerMetadata? _containerMetadataStorage;
         private global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata
         {
@@ -700,19 +694,7 @@ namespace {{ MediatorNamespace }}
                 return _containerMetadataStorage;
             }
         }
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
-        {
-            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                if (_notificationPublisher == null)
-                    _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
-                return _notificationPublisher!;
-            }
-        }
         internal bool ServicesUnderlyingTypeIsArray => {{ ContainerMetadataField }}.ServicesUnderlyingTypeIsArray;
-        {{~ end ~}}
         {{~ end ~}}
 
         /// <summary>
@@ -736,10 +718,10 @@ namespace {{ MediatorNamespace }}
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            {{~ if CachingModeIsLazy ~}}
-            _servicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
-            {{~ else ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
+            {{~ if CachingModeIsLazy ~}}
+            _containerMetadata = sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>();
+            {{~ else ~}}
             _containerMetadata = new FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator>(
                 self => self.Services.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(),
                 this
@@ -747,7 +729,7 @@ namespace {{ MediatorNamespace }}
             {{~ end ~}}
             {{~ end ~}}
         }
-        {{~ if !CachingModeIsLazy && ServiceLifetimeIsSingleton ~}}
+        {{~ if ServiceLifetimeIsSingleton && !CachingModeIsLazy ~}}
 
         {{ if IsTestRun; "internal"; else; "private"; end; }} struct FastLazyValue<T, TArg>
         {
