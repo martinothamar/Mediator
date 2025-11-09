@@ -330,11 +330,13 @@ services.AddMediator((MediatorOptions options) =>
     options.Assemblies = [typeof(...)];
     options.PipelineBehaviors = [];
     options.StreamPipelineBehaviors = [];
+    // Only available from v3.1:
+    options.CachingMode = CachingMode.Eager;
 });
 
 // or
 
-[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Singleton)]
+[assembly: MediatorOptions(Namespace = "SimpleConsole.Mediator", ServiceLifetime = ServiceLifetime.Singleton, CachingMode = CachingMode.Eager)]
 ```
 
 * `Namespace` - where the `IMediator` implementation is generated
@@ -347,6 +349,9 @@ services.AddMediator((MediatorOptions options) =>
 * `Assemblies` - which assemblies the source generator should scan for messages and handlers. When not used the source generator will scan all references assemblies (same behavior as v2)
 * `PipelineBehaviors`/`StreamPipelineBehaviors` - ordered array of types used for the pipeline
   * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT. You can also manually add pipeline behaviors to the DI container if you are not doing AoT compilation.
+* `CachingMode` - controls when Mediator initialization occurs
+  * `Eager` (default) - all handler wrappers and lookups are initialized on first Mediator access, best for long-running applications where startup cost is amortized
+  * `Lazy` - handler wrappers are initialized on-demand as messages are processed, best for cold start scenarios (serverless, Native AOT) where minimal initialization is preferred
 
 Note that since parsing of these options is done during compilation/source generation, all values must be compile time constants.
 In addition, since some types are not valid attributes parameter types (such as arrays/lists), some configuration is only available through `AddMediator`/`MediatorOptions` and not the assembly attribute.
