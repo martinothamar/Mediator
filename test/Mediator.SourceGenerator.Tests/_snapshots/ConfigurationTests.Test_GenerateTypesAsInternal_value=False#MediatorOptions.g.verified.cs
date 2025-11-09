@@ -7,7 +7,7 @@ namespace Mediator
 {
     /// <summary>
     /// Specifies the caching mode for Mediator initialization.
-    /// Initialization constists of building fast lookups for resolving handlers
+    /// Initialization consists of building fast lookups for resolving handlers
     /// and pre-building the message pipelines.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
