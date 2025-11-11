@@ -32,7 +32,7 @@ public class HandlerInjectsMediatorTests
         Assert.NotNull(mediator);
 
         var id = Guid.NewGuid();
-        await mediator.Send(new Request(id));
+        await mediator.Send(new Request(id), TestContext.Current.CancellationToken);
         Assert.Contains(id, Handler.Ids);
     }
 }

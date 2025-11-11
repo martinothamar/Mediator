@@ -12,6 +12,7 @@ public class BasicTests
     [Fact]
     public async Task Test_StreamPostProcessor()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<PostProcessingState>();
@@ -26,7 +27,7 @@ public class BasicTests
         Assert.NotNull(state);
 
         int counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id), ct))
         {
             Assert.Equal(id, response.Id);
             counter++;

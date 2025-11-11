@@ -54,7 +54,7 @@ public class NonSyncNotificationHandlerTests
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
         var timestampBefore = Stopwatch.GetTimestamp();
-        await mediator.Publish(new SomeNonSyncNotification(id));
+        await mediator.Publish(new SomeNonSyncNotification(id), TestContext.Current.CancellationToken);
         var timestampAfter = Stopwatch.GetTimestamp();
 
         AssertInstanceIdCount(1, handler1.InstanceIds, id, timestampBefore, timestampAfter);

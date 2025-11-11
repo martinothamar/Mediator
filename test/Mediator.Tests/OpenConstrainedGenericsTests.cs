@@ -79,10 +79,10 @@ public sealed class OpenConstrainedGenericsTests
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
 
-        await mediator.Publish(notification1);
+        await mediator.Publish(notification1, TestContext.Current.CancellationToken);
         Assert.Contains(notification1.Id, SomeGenericConstrainedNotificationHandler<SomeNotification>.Ids);
 
-        await mediator.Publish(notification2);
+        await mediator.Publish(notification2, TestContext.Current.CancellationToken);
         Assert.Contains(notification2.Id, SomeGenericConstrainedNotificationHandler<SomeOtherNotification>.Ids);
     }
 
@@ -94,7 +94,7 @@ public sealed class OpenConstrainedGenericsTests
         var id = Guid.NewGuid();
         var notification = new SomeNotificationWithoutConcreteHandler(id);
 
-        await mediator.Publish(notification);
+        await mediator.Publish(notification, TestContext.Current.CancellationToken);
 
         var handler = (CatchAllPolymorphicNotificationHandler)
             sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
@@ -111,7 +111,7 @@ public sealed class OpenConstrainedGenericsTests
         var id = Guid.NewGuid();
         var notification = new SomeNotificationWithoutConcreteHandler(id);
 
-        await mediator.Publish((object)notification);
+        await mediator.Publish((object)notification, TestContext.Current.CancellationToken);
 
         var handler = (CatchAllPolymorphicNotificationHandler)
             sp.GetRequiredService<INotificationHandler<SomeNotificationWithoutConcreteHandler>>();
@@ -123,6 +123,7 @@ public sealed class OpenConstrainedGenericsTests
     [Fact]
     public async Task Test_Constrained_Generic_Argument_Pipeline()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(SomeGenericConstrainedPipeline<,>));
@@ -131,10 +132,10 @@ public sealed class OpenConstrainedGenericsTests
         var request = new SomeRequest(Guid.NewGuid());
         var command = new SomeCommand(Guid.NewGuid());
 
-        var response = await mediator.Send(command);
+        var response = await mediator.Send(command, ct);
         Assert.Equal(command.Id, response.Id);
 
-        response = await mediator.Send(request);
+        response = await mediator.Send(request, ct);
         Assert.NotEqual(command.Id, response.Id);
         Assert.NotEqual(default, response.Id);
     }

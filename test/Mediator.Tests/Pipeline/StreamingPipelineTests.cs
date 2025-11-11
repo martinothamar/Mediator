@@ -10,6 +10,7 @@ public sealed class StreamingPipelineTests
     [Fact]
     public async Task Test_Pipeline()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<IStreamPipelineBehavior<SomeStreamingQuery, SomeResponse>, SomeStreamingPipeline>();
@@ -18,7 +19,7 @@ public sealed class StreamingPipelineTests
         var id = Guid.NewGuid();
 
         int counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(id)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(id), ct))
         {
             Assert.Equal(id, response.Id);
             Assert.Equal(1, response.SomeStreamingData);
@@ -29,6 +30,7 @@ public sealed class StreamingPipelineTests
     [Fact]
     public async Task Test_Generic_Pipeline()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<GenericPipelineState>();
@@ -42,7 +44,7 @@ public sealed class StreamingPipelineTests
         Assert.Equal(default, pipelineState.Id);
         Assert.Equal(default, pipelineState.Message);
 
-        await foreach (var response in mediator.CreateStream(query))
+        await foreach (var response in mediator.CreateStream(query, ct))
         {
             Assert.Equal(query.Id, pipelineState.Id);
             Assert.Equal(query, pipelineState.Message);

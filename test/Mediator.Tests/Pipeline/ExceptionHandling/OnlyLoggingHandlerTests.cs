@@ -21,7 +21,9 @@ public class OnlyLoggingHandlerTests
         var state = sp.GetRequiredService<State>();
         Assert.NotNull(state);
 
-        await Assert.ThrowsAsync<NotImplementedException>(async () => await mediator.Send(new ErroringRequest(id)));
+        await Assert.ThrowsAsync<NotImplementedException>(async () =>
+            await mediator.Send(new ErroringRequest(id), TestContext.Current.CancellationToken)
+        );
         Assert.Equal(typeof(NotImplementedException), state?.Exception?.GetType());
     }
 

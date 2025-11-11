@@ -11,6 +11,7 @@ public class GenericConstrainedTests
     [Fact]
     public async Task Test_StreamPreProcessor()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<PreProcessingState>();
@@ -26,7 +27,7 @@ public class GenericConstrainedTests
         Assert.NotNull(state);
 
         int counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id), ct))
         {
             Assert.Equal(id, response.Id);
             counter++;
@@ -36,7 +37,7 @@ public class GenericConstrainedTests
         Assert.Equal(2, state.Calls);
 
         counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(queryId)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(queryId), ct))
         {
             Assert.Equal(queryId, response.Id);
             counter++;
@@ -46,7 +47,7 @@ public class GenericConstrainedTests
         Assert.Equal(2, state.Calls); // Query doesn't match the constraint
 
         counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id), ct))
         {
             Assert.Equal(id, response.Id);
             counter++;

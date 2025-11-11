@@ -58,7 +58,7 @@ public sealed class AbstractNotificationHandlerTests
 
         var id = Guid.NewGuid();
 
-        await mediator.Publish(new NotificationWithAbstractHandler(id));
+        await mediator.Publish(new NotificationWithAbstractHandler(id), TestContext.Current.CancellationToken);
 
         var handler1 = sp.GetRequiredService<ConcreteNotificationHandler>();
         var handler2 = sp.GetRequiredService<ConcreteNotificationHandler2>();
