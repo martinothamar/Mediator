@@ -10,7 +10,7 @@ on:
       - "img/**"
       - "benchmarks/**"
       - "samples/**"
-      - "*.sln"
+      - "*.slnx"
   pull_request:
     branches: [main]
 
@@ -23,6 +23,13 @@ jobs:
         publisher: [ForeachAwait, TaskWhenAll]
         size: [Default, Large]
         cachingMode: [Eager, Lazy]
+        dotnet:
+          - sdk: '8.0.x'
+            framework: net8.0
+          - sdk: '9.0.x'
+            framework: net9.0
+          - sdk: '10.0.x'
+            framework: net10.0
 
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -32,10 +39,9 @@ jobs:
           fetch-depth: 0 # depth is needed for nbgv
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
-          include-prerelease: false
+          dotnet-version: ${{ matrix.dotnet.sdk }}
 
       - uses: actions/cache@v3
         with:
@@ -48,13 +54,56 @@ jobs:
         run: dotnet restore
 
       - name: Clean
-        run: dotnet clean -v m
+        run: dotnet clean -v m -f ${{ matrix.dotnet.framework }}
 
       - name: Build Mediator.Tests
-        run: dotnet build --no-restore -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}%3BMediator_${{matrix.size}}_Project%3BMediator_CachingMode_${{ matrix.cachingMode }}\" -v m ./test/Mediator.Tests/
+        run: dotnet build --no-restore -f ${{ matrix.dotnet.framework }} -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}%3BMediator_${{matrix.size}}_Project%3BMediator_CachingMode_${{ matrix.cachingMode }}\" -v m ./test/Mediator.Tests/
 
       - name: Test Mediator.Tests
-        run: dotnet test --no-restore --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
+        run: dotnet test --no-restore -f ${{ matrix.dotnet.framework }} --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
+
+  test-memory:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet:
+          - sdk: '8.0.x'
+            framework: net8.0
+          - sdk: '9.0.x'
+            framework: net9.0
+          - sdk: '10.0.x'
+            framework: net10.0
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet.sdk }}
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Clean
+        run: dotnet clean -v m -f ${{ matrix.dotnet.framework }}
+
+      - name: Build Mediator.Tests
+        run: dotnet build --no-restore -f ${{ matrix.dotnet.framework }} -v m ./test/Mediator.MemAllocationTests
+
+      - name: Test Mediator.Tests
+        run: dotnet test --no-restore -f ${{ matrix.dotnet.framework }} --no-build --logger "console;verbosity=detailed" ./test/Mediator.MemAllocationTests
 
   samples-net:
     runs-on: ubuntu-latest
@@ -70,10 +119,9 @@ jobs:
           fetch-depth: 0 # depth is needed for nbgv
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
-          include-prerelease: false
+          global-json-file: global.json
 
       - uses: actions/cache@v3
         with:
@@ -99,10 +147,9 @@ jobs:
           fetch-depth: 0 # depth is needed for nbgv
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
-          include-prerelease: false
+          global-json-file: global.json
 
       - uses: actions/cache@v3
         with:
@@ -115,7 +162,7 @@ jobs:
         run: dotnet publish -r linux-x64 -c Release
 
       - name: Run
-        run: ./bin/Release/net8.0/linux-x64/ConsoleAOT
+        run: ./bin/Release/net10.0/linux-x64/ConsoleAOT
 
   samples-netfx:
     runs-on: windows-latest
@@ -174,10 +221,9 @@ jobs:
           fetch-depth: 0 # depth is needed for nbgv
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "8.0.x"
-          include-prerelease: false
+          global-json-file: global.json
 
       - uses: dotnet/nbgv@master
         with:

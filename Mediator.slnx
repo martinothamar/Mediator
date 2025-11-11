@@ -1,0 +1,77 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/benchmarks/">
+    <File Path="benchmarks/README.md" />
+    <Project Path="benchmarks/Mediator.Benchmarks.ColdStart/Mediator.Benchmarks.ColdStart.csproj" />
+    <Project Path="benchmarks/Mediator.Benchmarks/Mediator.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Showcase/Showcase.csproj" />
+  </Folder>
+  <Folder Name="/samples/apps/">
+    <Project Path="samples/apps/ASPNET_Core/ASPNET_Core.csproj" />
+  </Folder>
+  <Folder Name="/samples/apps/ASPNET_CORE_Blazor/">
+    <Project Path="samples/apps/ASPNET_CORE_Blazor/AspNetCoreBlazor.Client/AspNetCoreBlazor.Client.csproj" />
+    <Project Path="samples/apps/ASPNET_CORE_Blazor/AspNetCoreBlazor/AspNetCoreBlazor.csproj" />
+  </Folder>
+  <Folder Name="/samples/apps/ASPNET_Core_CleanArchitecture/">
+    <File Path="samples/apps/ASPNET_Core_CleanArchitecture/README.md" />
+    <Project Path="samples/apps/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Api/AspNetCoreSample.Api.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Application/AspNetCoreSample.Application.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Domain/AspNetCoreSample.Domain.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_CleanArchitecture/AspNetCoreSample.Infrastructure/AspNetCoreSample.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/samples/apps/ASPNET_Core_Indirect/">
+    <File Path="samples/apps/ASPNET_Core_Indirect/get-weather-forecast.http" />
+    <File Path="samples/apps/ASPNET_Core_Indirect/README.md" />
+    <Project Path="samples/apps/ASPNET_Core_Indirect/AspNetCoreIndirect.Application/AspNetCoreIndirect.Application.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_Indirect/AspNetCoreIndirect.BaseClasses/AspNetCoreIndirect.BaseClasses.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_Indirect/AspNetCoreIndirect.Implementations/AspNetCoreIndirect.Implementations.csproj" />
+  </Folder>
+  <Folder Name="/samples/apps/InternalMessages/">
+    <Project Path="samples/apps/InternalMessages/InternalMessages.Api/InternalMessages.Api.csproj" />
+    <Project Path="samples/apps/InternalMessages/InternalMessages.Application/InternalMessages.Application.csproj" />
+    <Project Path="samples/apps/InternalMessages/InternalMessages.Domain/InternalMessages.Domain.csproj" />
+  </Folder>
+  <Folder Name="/samples/basic/">
+    <Project Path="samples/basic/Console/Console.csproj" />
+    <Project Path="samples/basic/ConsoleAOT/ConsoleAOT.csproj" />
+    <Project Path="samples/basic/NotificationPublisher/NotificationPublisher.csproj" />
+    <Project Path="samples/basic/Notifications/Notifications.csproj" />
+    <Project Path="samples/basic/Streaming/Streaming.csproj" />
+  </Folder>
+  <Folder Name="/samples/use-cases/">
+    <Project Path="samples/use-cases/Autofac_DI/Autofac_DI.csproj" />
+    <Project Path="samples/use-cases/MassTransitIntegration/MassTransitIntegration.csproj" />
+    <Project Path="samples/use-cases/RequestScopedState/RequestScopedState.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj" />
+    <Project Path="src/Mediator/Mediator.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <File Path="test/Directory.Build.props" />
+    <Project Path="test/Mediator.MemAllocationTests/Mediator.MemAllocationTests.csproj" />
+    <Project Path="test/Mediator.SmokeTestConsole/Mediator.SmokeTestConsole.csproj" />
+    <Project Path="test/Mediator.SourceGenerator.Tests/Mediator.SourceGenerator.Tests.csproj" />
+    <Project Path="test/Mediator.Tests/Mediator.Tests.csproj" />
+  </Folder>
+  <Folder Name="/_files/">
+    <File Path=".csharpierrc.json" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="NuGet.config" />
+    <File Path="README.md" />
+    <File Path="version.json" />
+  </Folder>
+</Solution>
