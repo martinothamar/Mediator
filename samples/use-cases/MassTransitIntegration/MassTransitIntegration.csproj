@@ -15,6 +15,7 @@
     <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageReference Include="MassTransit" Version="8.5.5" />
   </ItemGroup>
   <!-- Use Mediator from local git repo -->

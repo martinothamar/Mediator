@@ -6,6 +6,10 @@ using Mediator;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddMediator(
     (MediatorOptions options) =>
     {
@@ -28,6 +32,9 @@ builder.Services.AddSingleton<Db>();
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.MapPost(
     "/weather/update",
     async (IBus bus, string city, int temperature) =>
@@ -36,6 +43,7 @@ app.MapPost(
         return Results.Ok($"Weather update published for {city}.");
     }
 );
+
 app.Run();
 
 namespace App
