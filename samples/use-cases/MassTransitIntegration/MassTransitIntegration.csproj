@@ -15,7 +15,7 @@
     <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="8.4.1-develop.2255" />
+    <PackageReference Include="MassTransit" Version="8.5.5" />
   </ItemGroup>
   <!-- Use Mediator from local git repo -->
   <ItemGroup>

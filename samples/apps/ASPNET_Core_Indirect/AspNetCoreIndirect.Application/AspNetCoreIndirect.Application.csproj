@@ -15,7 +15,7 @@
     <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AspNetCoreIndirect.Implementations\AspNetCoreIndirect.Implementations.csproj" />

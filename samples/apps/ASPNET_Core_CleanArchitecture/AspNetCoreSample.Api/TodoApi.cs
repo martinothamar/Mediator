@@ -42,7 +42,7 @@ public static class TodoApi
     }
 }
 
-public sealed record TodoItemDto(string Title, string Text, bool Done);
+public sealed record TodoItemDto(Guid Id, string Title, string Text, bool Done);
 
 public sealed record AddTodoItemDto(string Title, string Text);
 
