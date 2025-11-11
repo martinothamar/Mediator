@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using JetBrains.dotMemoryUnit;
 using JetBrains.dotMemoryUnit.Kernel;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
 
 namespace Mediator.MemAllocationTests;
 

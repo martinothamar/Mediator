@@ -53,13 +53,13 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Fixie.TestAdapter" Version="3.2.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-    <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.assert" Version="2.9.3" />
-    <PackageVersion Include="Xunit.Combinatorial" Version="1.6.24" />
+    <PackageVersion Include="xunit.v3" Version="3.2.0" />
+    <PackageVersion Include="xunit.v3.assert" Version="3.2.0" />
+    <PackageVersion Include="Xunit.Combinatorial" Version="2.0.24" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="JetBrains.DotMemoryUnit" Version="3.2.20220510" />
-    <PackageVersion Include="Verify.Xunit" Version="31.5.3" />
+    <PackageVersion Include="Verify.XunitV3" Version="31.5.3" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.1.2" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
   </ItemGroup>

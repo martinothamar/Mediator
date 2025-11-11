@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
-    <PackageReference Include="xunit.assert" />
+    <PackageReference Include="xunit.v3.assert" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference

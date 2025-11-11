@@ -1,24 +1,15 @@
 #if Mediator_Lifetime_Scoped
 
-using Xunit.Abstractions;
-using Xunit.Sdk;
-
-[assembly: TestFramework("Mediator.Tests.Framework", "Mediator.Tests")]
+using System.Runtime.CompilerServices;
 
 namespace Mediator.Tests;
 
-public class Framework : XunitTestFramework
+internal static class ScopedLifetimeInitializer
 {
-    public Framework(IMessageSink messageSink)
-        : base(messageSink)
+    [ModuleInitializer]
+    internal static void Initialize()
     {
         Fixture.CreateServiceScope = true;
-    }
-
-    public new void Dispose()
-    {
-        // Place tear down code here
-        base.Dispose();
     }
 }
 
