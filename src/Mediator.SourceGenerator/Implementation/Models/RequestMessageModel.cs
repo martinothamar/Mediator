@@ -36,9 +36,9 @@ internal sealed record RequestMessageModel : SymbolMetadataModel
         };
         var isStreaming =
             MessageKind
-                is RequestMessageKind.StreamRequest
-                    or RequestMessageKind.StreamQuery
-                    or RequestMessageKind.StreamCommand;
+            is RequestMessageKind.StreamRequest
+                or RequestMessageKind.StreamQuery
+                or RequestMessageKind.StreamCommand;
 
         ResponseIsValueType = responseSymbol.IsValueType;
         ResponseFullName = responseSymbol.GetTypeSymbolFullName();

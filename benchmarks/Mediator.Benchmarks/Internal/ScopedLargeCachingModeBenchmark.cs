@@ -25,15 +25,13 @@ public class ScopedLargeCachingModeBenchmark
                 from aotMode in aot
                 select Job
                     .Default.WithRuntime(aotMode ? NativeAotRuntime.Net80 : CoreRuntime.Core80)
-                    .WithArguments(
-                        [
-                            new MsBuildArgument(
-                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + $"%3BMediator_CachingMode_{cachingMode}"
-                                    + (largeProject ? "%3BMediator_Large_Project" : "")
-                            ),
-                        ]
-                    )
+                    .WithArguments([
+                        new MsBuildArgument(
+                            $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                + $"%3BMediator_CachingMode_{cachingMode}"
+                                + (largeProject ? "%3BMediator_Large_Project" : "")
+                        ),
+                    ])
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
                     .WithEnvironmentVariable("CachingMode", cachingMode)

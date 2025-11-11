@@ -116,15 +116,13 @@ public class NotificationBenchmarks
                 from publisher in publishers
                 from largeProject in largeProjectOptions
                 select Job
-                    .Default.WithArguments(
-                        [
-                            new MsBuildArgument(
-                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + $"%3BMediator_Publisher_{publisher}"
-                                    + (largeProject ? $"%3BMediator_Large_Project" : "")
-                            ),
-                        ]
-                    )
+                    .Default.WithArguments([
+                        new MsBuildArgument(
+                            $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                + $"%3BMediator_Publisher_{publisher}"
+                                + (largeProject ? $"%3BMediator_Large_Project" : "")
+                        ),
+                    ])
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("NotificationPublisherName", $"{publisher}Publisher")
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")

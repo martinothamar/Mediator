@@ -76,14 +76,12 @@ public class ComparisonBenchmarks
                 from lifetime in lifetimes
                 from largeProject in largeProjectOptions
                 select Job
-                    .Default.WithArguments(
-                        [
-                            new MsBuildArgument(
-                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + (largeProject ? $"%3BMediator_Large_Project" : "")
-                            ),
-                        ]
-                    )
+                    .Default.WithArguments([
+                        new MsBuildArgument(
+                            $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                + (largeProject ? $"%3BMediator_Large_Project" : "")
+                        ),
+                    ])
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
                     .WithCustomBuildConfiguration($"{lifetime}/{largeProject}")
