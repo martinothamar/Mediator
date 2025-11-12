@@ -26,8 +26,7 @@ public class HeadlineBenchmarks
                     ])
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
-                    .WithCustomBuildConfiguration($"{lifetime}/{largeProject}")
-                    .WithId($"{lifetime}/{largeProject}");
+                    .WithCustomBuildConfiguration($"{lifetime}/{largeProject}");
 
             Config = ManualConfig
                 .CreateEmpty()

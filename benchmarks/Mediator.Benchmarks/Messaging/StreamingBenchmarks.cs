@@ -53,14 +53,14 @@ public class StreamingBenchmarks
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
                     .WithCustomBuildConfiguration($"{lifetime}/{largeProject}")
-                    .WithId($"{lifetime}/{largeProject}");
+                    .WithId($"{lifetime}_{largeProject}");
 
             Config = ManualConfig
                 .CreateEmpty()
                 .AddJob(jobs.ToArray())
-                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
+                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('_')[0]))
                 .AddColumn(
-                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[1] == "True" ? "Large" : "Small")
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('_')[1] == "True" ? "Large" : "Small")
                 )
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
                 .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)
