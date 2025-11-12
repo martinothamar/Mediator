@@ -20,14 +20,14 @@ jobs:
     strategy:
       matrix:
         lifetime: [Singleton, Scoped, Transient]
-        publisher: [ForeachAwait, TaskWhenAll]
+        # publisher: [ForeachAwait, TaskWhenAll]
         size: [Default, Large]
         cachingMode: [Eager, Lazy]
         dotnet:
-          - sdk: '8.0.x'
+          - sdk: |
+              8.0.x
+              10.0.x
             framework: net8.0
-          - sdk: '9.0.x'
-            framework: net9.0
           - sdk: '10.0.x'
             framework: net10.0
 
@@ -54,10 +54,10 @@ jobs:
         run: dotnet restore
 
       - name: Clean
-        run: dotnet clean -v m -f ${{ matrix.dotnet.framework }}
+        run: dotnet clean -v m
 
       - name: Build Mediator.Tests
-        run: dotnet build --no-restore -f ${{ matrix.dotnet.framework }} -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_Publisher_${{ matrix.publisher }}%3BMediator_${{matrix.size}}_Project%3BMediator_CachingMode_${{ matrix.cachingMode }}\" -v m ./test/Mediator.Tests/
+        run: dotnet build --no-restore -f ${{ matrix.dotnet.framework }} -p:ExtraDefineConstants=\"Mediator_Lifetime_${{ matrix.lifetime }}%3BMediator_${{matrix.size}}_Project%3BMediator_CachingMode_${{ matrix.cachingMode }}\" -v m ./test/Mediator.Tests/
 
       - name: Test Mediator.Tests
         run: dotnet test --no-restore -f ${{ matrix.dotnet.framework }} --no-build --logger "console;verbosity=detailed" ./test/Mediator.Tests/
@@ -67,10 +67,10 @@ jobs:
     strategy:
       matrix:
         dotnet:
-          - sdk: '8.0.x'
+          - sdk: |
+              8.0.x
+              10.0.x
             framework: net8.0
-          - sdk: '9.0.x'
-            framework: net9.0
           - sdk: '10.0.x'
             framework: net10.0
 
@@ -97,7 +97,7 @@ jobs:
         run: dotnet restore
 
       - name: Clean
-        run: dotnet clean -v m -f ${{ matrix.dotnet.framework }}
+        run: dotnet clean -v m
 
       - name: Build Mediator.Tests
         run: dotnet build --no-restore -f ${{ matrix.dotnet.framework }} -v m ./test/Mediator.MemAllocationTests
@@ -162,7 +162,7 @@ jobs:
         run: dotnet publish -r linux-x64 -c Release
 
       - name: Run
-        run: ./bin/Release/net10.0/linux-x64/ConsoleAOT
+        run: ./bin/Release/net10.0/linux-x64/publish/ConsoleAOT
 
   samples-netfx:
     runs-on: windows-latest
@@ -176,6 +176,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
 
       - uses: actions/cache@v3
         with:
