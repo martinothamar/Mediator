@@ -56,11 +56,31 @@ jobs:
     with:
       checkout-ref: ${{ github.event.pull_request.head.sha }}
 
+  formatting:
+    name: Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Check formatting
+        run: dotnet csharpier check .
+
   # Summary job to use as required check
   all-tests-pass:
     name: All tests pass
     if: always()
-    needs: [build, test-memory, samples-showcase, samples-aot, samples-netfx]
+    needs: [build, test-memory, samples-showcase, samples-aot, samples-netfx, formatting]
     runs-on: ubuntu-latest
     steps:
       - name: Check for failures

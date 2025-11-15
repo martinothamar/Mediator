@@ -28,6 +28,7 @@ on:
 
 jobs:
   build-and-test:
+    name: Tests ${{ inputs.dotnet-framework }}/${{ inputs.lifetime }}/${{ inputs.size }}/${{ inputs.publisher }}/${{ inputs.cachingMode }}
     runs-on: ubuntu-latest
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages

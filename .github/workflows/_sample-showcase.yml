@@ -15,6 +15,7 @@ on:
 
 jobs:
   sample-showcase:
+    name: Sample - Showcase ${{ inputs.dotnet-framework }}
     runs-on: ubuntu-latest
     defaults:
       run:

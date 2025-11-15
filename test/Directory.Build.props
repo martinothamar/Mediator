@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DefineConstants Condition="'$(ExtraDefineConstants)' != ''">$(DefineConstants);$(ExtraDefineConstants)</DefineConstants>
+    <DefineConstants Condition="'$(ExtraDefineConstants)' != ''"
+      >$(DefineConstants);$(ExtraDefineConstants)</DefineConstants
+    >
   </PropertyGroup>
 </Project>

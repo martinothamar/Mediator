@@ -19,7 +19,14 @@ clean:
     dotnet build-server shutdown
 
 restore:
+    dotnet tool restore
     dotnet restore -v q
+
+format:
+    dotnet csharpier format .
+
+format-check:
+    dotnet csharpier check .
 
 # Main test recipe - matches CI workflow
 test: restore test-sourcegen test-memory test-matrix
