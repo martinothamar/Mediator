@@ -61,7 +61,7 @@ test-matrix:
 # Helper recipe for individual configuration testing
 _test-config framework lifetime publisher size cachingMode:
     @echo "Testing {{framework}} - {{lifetime}}/{{publisher}}/{{size}}/{{cachingMode}}"
-    dotnet clean -v q -f {{framework}} ./test/Mediator.Tests/
+    dotnet clean -v q ./test/Mediator.Tests/
     dotnet build --no-restore -f {{framework}} -p:ExtraDefineConstants=\"Mediator_Lifetime_{{lifetime}}%3BMediator_Publisher_{{publisher}}%3BMediator_{{size}}_Project%3BMediator_CachingMode_{{cachingMode}}\" -v q ./test/Mediator.Tests/
     dotnet test --no-restore --no-build -f {{framework}} ./test/Mediator.Tests/
 

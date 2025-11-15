@@ -1,0 +1,133 @@
+name: PR Test Full
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  check-permissions:
+    name: Check permissions and trigger
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/test-full')
+    runs-on: ubuntu-latest
+    outputs:
+      authorized: ${{ steps.check.outputs.authorized }}
+      pr-number: ${{ github.event.issue.number }}
+      pr-sha: ${{ steps.pr-info.outputs.sha }}
+      pr-ref: ${{ steps.pr-info.outputs.ref }}
+      pr-open: ${{ steps.pr-info.outputs.open }}
+      comment-id: ${{ steps.check.outputs.comment-id }}
+    steps:
+      - name: Get PR information
+        id: pr-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            core.setOutput('sha', pr.data.head.sha);
+            core.setOutput('ref', pr.data.head.ref);
+            core.setOutput('open', pr.data.state === 'open');
+
+            if (pr.data.state !== 'open') {
+              core.warning(`PR is ${pr.data.state}, not open. Tests will not run.`);
+            }
+
+      - name: Check if user has write permission
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = context.payload.comment.user.login;
+            const prOpen = '${{ steps.pr-info.outputs.open }}' === 'true';
+
+            try {
+              const permission = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: username
+              });
+
+              const userPermission = permission.data.permission;
+              const hasWriteAccess = ['admin', 'write', 'maintain'].includes(userPermission);
+
+              core.setOutput('authorized', hasWriteAccess);
+
+              if (!hasWriteAccess) {
+                core.warning(`User ${username} has ${userPermission} permission - not authorized`);
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: `@${username} You don't have permission to trigger tests. Only users with write access can use the \`/test-full\` command.`
+                });
+                return;
+              }
+
+              if (!prOpen) {
+                core.warning('PR is closed - tests will not run');
+
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: `@${username} Cannot run tests on a closed PR. Please reopen the PR if you need to run tests.`
+                });
+                return;
+              }
+
+              core.info(`User ${username} has ${userPermission} permission - authorized`);
+
+              // Post acknowledgment comment
+              const comment = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `@${username} Starting test suite... [View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+              });
+
+              core.setOutput('comment-id', comment.data.id);
+            } catch (error) {
+              core.setFailed(`Failed to check permissions: ${error.message}`);
+              core.setOutput('authorized', false);
+            }
+
+  run-tests:
+    name: Run test suite
+    needs: check-permissions
+    if: needs.check-permissions.outputs.authorized == 'true' && needs.check-permissions.outputs.pr-open == 'true'
+    uses: ./.github/workflows/test-suite.yml
+    with:
+      checkout-ref: ${{ needs.check-permissions.outputs.pr-sha }}
+
+  post-results:
+    name: Update test results
+    needs: [check-permissions, run-tests]
+    if: always() && needs.check-permissions.outputs.authorized == 'true' && needs.check-permissions.outputs.pr-open == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update comment with results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commentId = ${{ needs.check-permissions.outputs.comment-id }};
+            const result = '${{ needs.run-tests.result }}';
+
+            let statusLine = '';
+            if (result === 'success') {
+              statusLine = '✅ All tests passed!';
+            } else if (result === 'failure') {
+              statusLine = '❌ Tests failed. Please review the failures.';
+            } else if (result === 'cancelled') {
+              statusLine = '⚠️ Test run was cancelled.';
+            }
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body: `Completed test suite - [View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\n${statusLine}`
+            });

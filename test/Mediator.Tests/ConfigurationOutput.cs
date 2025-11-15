@@ -24,10 +24,12 @@ public class ConfigurationOutput
         output.WriteLine("------------------------------------------------------------------------------");
         output.WriteLine("Mediator configuration:");
         output.WriteLine($" ServiceLifetime: {Mediator.ServiceLifetime}");
+        output.WriteLine($" CachingMode: {Mediator.CachingMode}");
         output.WriteLine(
             $" NotificationPublisherType: {publisher.GetType().FullName} ({Mediator.NotificationPublisherName})"
         );
         output.WriteLine($" Message count: {Mediator.TotalMessages}");
+        output.WriteLine($" CrossedManyMessagesThreshold: {Mediator.CrossedManyMessagesThreshold}");
         output.WriteLine("------------------------------------------------------------------------------");
         output.WriteLine("");
     }

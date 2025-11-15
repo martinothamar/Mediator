@@ -1,0 +1,71 @@
+name: Build and Test
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        required: true
+        type: string
+      lifetime:
+        required: true
+        type: string
+      publisher:
+        required: false
+        type: string
+        default: ''
+      size:
+        required: true
+        type: string
+      cachingMode:
+        required: true
+        type: string
+      dotnet-sdk:
+        required: true
+        type: string
+      dotnet-framework:
+        required: true
+        type: string
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-sdk }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Clean
+        run: dotnet clean -v m
+
+      - name: Build Mediator.Tests
+        run: |
+          DEFINES="Mediator_Lifetime_${{ inputs.lifetime }}%3BMediator_${{ inputs.size }}_Project%3BMediator_CachingMode_${{ inputs.cachingMode }}"
+          if [ -n "${{ inputs.publisher }}" ]; then
+            DEFINES="${DEFINES}%3BMediator_Publisher_${{ inputs.publisher }}"
+          fi
+          dotnet build --no-restore -f ${{ inputs.dotnet-framework }} \
+            -p:ExtraDefineConstants=\"${DEFINES}\" \
+            -v m ./test/Mediator.Tests/
+
+      - name: Test Mediator.Tests
+        run: |
+          dotnet test --no-restore -f ${{ inputs.dotnet-framework }} --no-build \
+            --logger "console;verbosity=detailed" ./test/Mediator.Tests/

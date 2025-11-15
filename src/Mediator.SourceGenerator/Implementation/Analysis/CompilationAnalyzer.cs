@@ -109,6 +109,32 @@ internal sealed class CompilationAnalyzer
 
     private bool ConfiguredViaConfiguration { get; set; }
 
+    private int MessageCountThreshold
+    {
+        get
+        {
+            var symbolNames = new HashSet<string>(
+                _context
+                    .Compilation.SyntaxTrees.Select(tree => tree.Options as CSharpParseOptions)
+                    .Where(options => options is not null)
+                    .SelectMany(options => options!.PreprocessorSymbolNames)
+            );
+
+            // If we compile using Mediator_Default_Project it means
+            // we've parameterized test run between
+            // - Mediator_Default_Project
+            // - Mediator_Large_Project
+            // where the intention is to have tests cover both paths
+            // in terms of the differences in generated code
+            if (symbolNames.Contains("Mediator_Default_Project"))
+                return 100_000;
+
+            // Found during benchmarking in .NET 8/3.0.0 version
+            // of this library
+            return 16;
+        }
+    }
+
     public CompilationAnalyzer(in CompilationAnalyzerContext context)
     {
         _context = context;
@@ -404,7 +430,8 @@ internal sealed class CompilationAnalyzer
                 ConfiguredViaAttribute,
                 GenerateTypesAsInternal,
                 CachingMode,
-                CachingModeShort
+                CachingModeShort,
+                MessageCountThreshold
             );
 
             return model;

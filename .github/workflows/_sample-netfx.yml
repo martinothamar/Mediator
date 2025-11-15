@@ -1,0 +1,49 @@
+name: Sample - .NET Framework
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        required: true
+        type: string
+
+jobs:
+  sample-netfx:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: .\samples\basic\NetFramework\
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ hashFiles('global.json') }}-
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore Packages
+        run: msbuild Console.sln -t:Restore
+
+      - name: Build solution
+        run: msbuild Console.sln -t:Rebuild
+
+      - name: Run Console
+        run: .\Console\bin\Debug\Console.NetFramework.exe
