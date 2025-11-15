@@ -15,6 +15,7 @@ on:
 
 jobs:
   test-memory:
+    name: Memory Allocation Tests ${{ inputs.dotnet-framework }}
     runs-on: ubuntu-latest
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages

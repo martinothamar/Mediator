@@ -9,6 +9,7 @@ on:
 
 jobs:
   sample-netfx:
+    name: Sample - .NET Framework
     runs-on: windows-latest
     defaults:
       run:
