@@ -1,4 +1,3 @@
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/martinothamar/Mediator/build.yml?branch=main)](https://github.com/martinothamar/Mediator/actions)
 [![GitHub](https://img.shields.io/github/license/martinothamar/Mediator?style=flat-square)](https://github.com/martinothamar/Mediator/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/nuget/dt/mediator.abstractions?style=flat-square)](https://www.nuget.org/packages/Mediator.Abstractions/)<br/>
 [![Abstractions NuGet current](https://img.shields.io/nuget/v/Mediator.Abstractions?label=Mediator.Abstractions)](https://www.nuget.org/packages/Mediator.Abstractions)
