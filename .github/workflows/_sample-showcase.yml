@@ -1,0 +1,43 @@
+name: Sample - Showcase
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        required: true
+        type: string
+      dotnet-sdk:
+        required: true
+        type: string
+      dotnet-framework:
+        required: true
+        type: string
+
+jobs:
+  sample-showcase:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./samples/Showcase
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-sdk }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-
+
+      - name: Run
+        run: dotnet run -f ${{ inputs.dotnet-framework }}

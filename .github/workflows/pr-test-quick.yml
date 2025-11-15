@@ -1,0 +1,74 @@
+name: PR Test Quick
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    strategy:
+      max-parallel: 16
+      matrix:
+        lifetime: [Singleton, Scoped, Transient]
+        size: [Default, Large]
+        cachingMode: [Eager, Lazy]
+        dotnet:
+          - sdk: '10.0.x'
+            framework: net10.0
+    uses: ./.github/workflows/_build-and-test.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      lifetime: ${{ matrix.lifetime }}
+      size: ${{ matrix.size }}
+      cachingMode: ${{ matrix.cachingMode }}
+      dotnet-sdk: ${{ matrix.dotnet.sdk }}
+      dotnet-framework: ${{ matrix.dotnet.framework }}
+
+  test-memory:
+    strategy:
+      max-parallel: 16
+      matrix:
+        dotnet:
+          - sdk: '10.0.x'
+            framework: net10.0
+    uses: ./.github/workflows/_test-memory.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      dotnet-sdk: ${{ matrix.dotnet.sdk }}
+      dotnet-framework: ${{ matrix.dotnet.framework }}
+
+  samples-showcase:
+    uses: ./.github/workflows/_sample-showcase.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      dotnet-sdk: '10.0.x'
+      dotnet-framework: net10.0
+
+  samples-aot:
+    uses: ./.github/workflows/_sample-aot.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      dotnet-sdk: '10.0.x'
+      dotnet-framework: net10.0
+
+  samples-netfx:
+    uses: ./.github/workflows/_sample-netfx.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+
+  # Summary job to use as required check
+  all-tests-pass:
+    name: All tests pass
+    if: always()
+    needs: [build, test-memory, samples-showcase, samples-aot, samples-netfx]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for failures
+        if: |
+          contains(needs.*.result, 'failure') ||
+          contains(needs.*.result, 'cancelled')
+        run: |
+          echo "One or more jobs failed or were cancelled"
+          exit 1
+      - name: Success
+        run: echo "All tests passed successfully"

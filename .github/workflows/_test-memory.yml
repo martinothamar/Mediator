@@ -1,0 +1,49 @@
+name: Memory Allocation Tests
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        required: true
+        type: string
+      dotnet-sdk:
+        required: true
+        type: string
+      dotnet-framework:
+        required: true
+        type: string
+
+jobs:
+  test-memory:
+    runs-on: ubuntu-latest
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-sdk }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Clean
+        run: dotnet clean -v m
+
+      - name: Build Mediator.MemAllocationTests
+        run: dotnet build --no-restore -f ${{ inputs.dotnet-framework }} -v m ./test/Mediator.MemAllocationTests
+
+      - name: Test Mediator.MemAllocationTests
+        run: dotnet test --no-restore -f ${{ inputs.dotnet-framework }} --no-build --logger "console;verbosity=detailed" ./test/Mediator.MemAllocationTests

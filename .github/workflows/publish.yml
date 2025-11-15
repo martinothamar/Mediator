@@ -1,0 +1,68 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-suite:
+    uses: ./.github/workflows/test-suite.yml
+    with:
+      checkout-ref: ${{ github.sha }}
+
+  publish:
+    if: ${{ always() }}
+    needs: [test-suite]
+    runs-on: ubuntu-latest
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - name: Check for failures
+        run: exit 1
+        if: >-
+          ${{
+               contains(needs.*.result, 'failure')
+            || contains(needs.*.result, 'cancelled')
+            || contains(needs.*.result, 'skipped')
+          }}
+
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: dotnet/nbgv@master
+        with:
+          setAllVars: true
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ hashFiles('global.json') }}-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Clean
+        run: dotnet clean -v m
+
+      - name: Build
+        run: dotnet build --no-restore -c Release
+
+      - name: Test
+        run: dotnet test --no-restore --no-build -c Release --logger "console;verbosity=detailed"
+
+      - name: Pack
+        run: |
+          dotnet pack src/Mediator/Mediator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/ && \
+          dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
+
+      - name: Push to NuGet
+        if: ${{ success() }}
+        run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
