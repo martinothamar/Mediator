@@ -44,28 +44,29 @@ public sealed class PolymorphicDispatchTests
         var handler = sp.GetRequiredService<SomePolymorphicNotificationHandler>();
         Assert.NotNull(handler);
 
-        await mediator.Publish(notification1);
+        await mediator.Publish(notification1, TestContext.Current.CancellationToken);
         Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler.InstanceIds, notification1.Id);
 
-        await mediator.Publish(notification2);
+        await mediator.Publish(notification2, TestContext.Current.CancellationToken);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
 
         // Polymorphic dispatch does not work with structs because
         // `SomePolymorphicNotificationHandler` is not convertible to `INotificationHandler<SomeThirdNotification>`, but
         // `SomePolymorphicNotificationHandler` is in fact convertible to `INotificationHandler<SomeOtherNotification>`
-        await mediator.Publish(notification3);
+        await mediator.Publish(notification3, TestContext.Current.CancellationToken);
         Assert.DoesNotContain(notification3.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(0, handler.InstanceIds, notification3.Id);
 
-        await mediator.Publish(notification1);
+        await mediator.Publish(notification1, TestContext.Current.CancellationToken);
         AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
 
     [Fact]
     public async Task Test_Multiple_Notification_Handlers_With_Object_Notification()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var notification1 = new SomeNotification(Guid.NewGuid());
@@ -75,19 +76,19 @@ public sealed class PolymorphicDispatchTests
         var handler = sp.GetRequiredService<SomePolymorphicNotificationHandler>();
         Assert.NotNull(handler);
 
-        await mediator.Publish((object)notification1);
+        await mediator.Publish((object)notification1, ct);
         Assert.Contains(notification1.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler.InstanceIds, notification1.Id);
 
-        await mediator.Publish((object)notification2);
+        await mediator.Publish((object)notification2, ct);
         Assert.Contains(notification2.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler.InstanceIds, notification2.Id);
 
-        await mediator.Publish(notification3);
+        await mediator.Publish(notification3, ct);
         Assert.DoesNotContain(notification3.Id, SomePolymorphicNotificationHandler.Ids);
         AssertInstanceIdCount(0, handler.InstanceIds, notification3.Id);
 
-        await mediator.Publish(notification1);
+        await mediator.Publish(notification1, ct);
         AssertInstanceIdCount(2, handler.InstanceIds, notification1.Id);
     }
 }

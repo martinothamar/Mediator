@@ -6,6 +6,8 @@ using Mediator;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddOpenApi();
+
 builder.Services.AddMediator(
     (MediatorOptions options) =>
     {
@@ -28,14 +30,21 @@ builder.Services.AddSingleton<Db>();
 
 var app = builder.Build();
 
+app.MapOpenApi();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "v1");
+});
+
 app.MapPost(
-    "/weather/update",
+    "/weather/update/{city}/{temperature:int}",
     async (IBus bus, string city, int temperature) =>
     {
         await bus.Publish(new WeatherUpdated(city, temperature));
         return Results.Ok($"Weather update published for {city}.");
     }
 );
+
 app.Run();
 
 namespace App

@@ -11,6 +11,7 @@ public class ConcreteTests
     [Fact]
     public async Task Test_StreamPreProcessor()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<PreProcessingState>();
@@ -32,7 +33,7 @@ public class ConcreteTests
         Assert.NotNull(state);
 
         int counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingRequest(id), ct))
         {
             Assert.Equal(id, response.Id);
             counter++;
@@ -44,7 +45,7 @@ public class ConcreteTests
 
         // Test with SomeStreamingQuery - should not trigger the concrete preprocessors
         counter = 0;
-        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(queryId)))
+        await foreach (var response in mediator.CreateStream(new SomeStreamingQuery(queryId), ct))
         {
             Assert.Equal(queryId, response.Id);
             counter++;

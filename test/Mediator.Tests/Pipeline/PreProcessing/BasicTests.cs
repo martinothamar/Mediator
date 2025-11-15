@@ -11,6 +11,7 @@ public class BasicTests
     [Fact]
     public async Task Test_PreProcessor()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<PreProcessingState>();
@@ -24,12 +25,12 @@ public class BasicTests
         var state = sp.GetRequiredService<PreProcessingState>();
 
         Assert.NotNull(state);
-        var response = await mediator.Send(new SomeRequest(id));
+        var response = await mediator.Send(new SomeRequest(id), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(id, state!.Id);
         Assert.Equal(2, state.Calls);
 
-        response = await mediator.Send(new SomeQuery(queryId));
+        response = await mediator.Send(new SomeQuery(queryId), ct);
         Assert.Equal(queryId, response.Id);
         Assert.Equal(queryId, state!.Id);
         Assert.Equal(4, state.Calls);

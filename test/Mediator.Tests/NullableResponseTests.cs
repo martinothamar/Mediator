@@ -18,15 +18,16 @@ public class NullableResponseTests
     [Fact]
     public async Task Test_Request_With_Nullable_Response()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
 
-        var response = await mediator.Send(new RequestWithNullableResponse(id));
+        var response = await mediator.Send(new RequestWithNullableResponse(id), ct);
         Assert.Null(response);
 
-        var response2 = await concrete.Send(new RequestWithNullableResponse(id));
+        var response2 = await concrete.Send(new RequestWithNullableResponse(id), ct);
         Assert.Null(response2);
     }
 }

@@ -15,18 +15,27 @@ builder.Services.AddMediator(
     }
 );
 
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
+app.MapOpenApi();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "v1");
+});
+
 app.MapGet(
-    "/",
-    async ([FromServices] Foo.Generated.Mediator mediator) =>
-    {
-        var id = Guid.NewGuid();
-        var request = new Ping(id);
-        var response = await mediator.Send(request);
-        return Results.Ok(response);
-    }
-);
+        "/ping",
+        async ([FromServices] Foo.Generated.Mediator mediator) =>
+        {
+            var id = Guid.NewGuid();
+            var request = new Ping(id);
+            var response = await mediator.Send(request);
+            return Results.Ok(response);
+        }
+    )
+    .WithName("Ping");
 
 app.Run();
 

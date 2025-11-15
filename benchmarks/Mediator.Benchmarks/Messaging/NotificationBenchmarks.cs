@@ -116,28 +116,26 @@ public class NotificationBenchmarks
                 from publisher in publishers
                 from largeProject in largeProjectOptions
                 select Job
-                    .Default.WithArguments(
-                        [
-                            new MsBuildArgument(
-                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + $"%3BMediator_Publisher_{publisher}"
-                                    + (largeProject ? $"%3BMediator_Large_Project" : "")
-                            ),
-                        ]
-                    )
+                    .Default.WithArguments([
+                        new MsBuildArgument(
+                            $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                + $"%3BMediator_Publisher_{publisher}"
+                                + (largeProject ? $"%3BMediator_Large_Project" : "")
+                        ),
+                    ])
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("NotificationPublisherName", $"{publisher}Publisher")
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
                     .WithCustomBuildConfiguration($"{lifetime}/{publisher}/{largeProject}")
-                    .WithId($"{lifetime}/{publisher}/{largeProject}");
+                    .WithId($"{lifetime}_{publisher}_{largeProject}");
 
             Config = ManualConfig
                 .CreateEmpty()
                 .AddJob(jobs.ToArray())
-                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('/')[0]))
-                .AddColumn(new CustomColumn("NotificationPublisher", (_, c) => c.Job.Id.Split('/')[1]))
+                .AddColumn(new CustomColumn("ServiceLifetime", (_, c) => c.Job.Id.Split('_')[0]))
+                .AddColumn(new CustomColumn("NotificationPublisher", (_, c) => c.Job.Id.Split('_')[1]))
                 .AddColumn(
-                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[2] == "True" ? "Large" : "Small")
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('_')[2] == "True" ? "Large" : "Small")
                 )
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
                 .HideColumns(Column.Arguments, Column.EnvironmentVariables, Column.BuildConfiguration, Column.Job)

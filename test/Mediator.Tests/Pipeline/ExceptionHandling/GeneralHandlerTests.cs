@@ -10,6 +10,7 @@ public class GeneralHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<State>();
@@ -21,7 +22,7 @@ public class GeneralHandlerTests
         var state = sp.GetRequiredService<State>();
         Assert.NotNull(state);
 
-        var response = await mediator.Send(new ErroringRequest(id));
+        var response = await mediator.Send(new ErroringRequest(id), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(typeof(NotImplementedException), state?.Exception?.GetType());
     }

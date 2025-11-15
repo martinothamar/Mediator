@@ -95,13 +95,14 @@ public class MultipleHandlersTests
     [Fact]
     public async Task Multiple_Notification_Handlers_One_Class()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id0 = Guid.NewGuid();
         var id1 = Guid.NewGuid();
 
-        await mediator.Publish(new Notification0(id0));
-        await mediator.Publish(new Notification1(id1));
+        await mediator.Publish(new Notification0(id0), ct);
+        await mediator.Publish(new Notification1(id1), ct);
 
         Assert.Equal(2, NotificationHandler.InstanceIds.Count);
         Assert.Equal(1, NotificationHandler.InstanceIds[id0]);
@@ -111,13 +112,14 @@ public class MultipleHandlersTests
     [Fact]
     public async Task Multiple_Request_Handlers_One_Class()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id0 = Guid.NewGuid();
         var id1 = Guid.NewGuid();
 
-        _ = await mediator.Send(new Request0(id0));
-        _ = await mediator.Send(new Request1(id1));
+        _ = await mediator.Send(new Request0(id0), ct);
+        _ = await mediator.Send(new Request1(id1), ct);
 
         Assert.Equal(2, RequestHandler.InstanceIds.Count);
         Assert.Equal(1, RequestHandler.InstanceIds[id0]);
@@ -127,6 +129,7 @@ public class MultipleHandlersTests
     [Fact]
     public async Task Multiple_Handlers_One_Class()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id0 = Guid.NewGuid();
@@ -134,10 +137,10 @@ public class MultipleHandlersTests
         var id2 = Guid.NewGuid();
         var id3 = Guid.NewGuid();
 
-        _ = await mediator.Send(new Request2(id0));
-        _ = await mediator.Send(new Request3(id1));
-        await mediator.Publish(new Notification2(id2));
-        await mediator.Publish(new Notification3(id3));
+        _ = await mediator.Send(new Request2(id0), ct);
+        _ = await mediator.Send(new Request3(id1), ct);
+        await mediator.Publish(new Notification2(id2), ct);
+        await mediator.Publish(new Notification3(id3), ct);
 
         Assert.Equal(4, MultipleHandlers.InstanceIds.Count);
         Assert.Equal(1, MultipleHandlers.InstanceIds[id0]);

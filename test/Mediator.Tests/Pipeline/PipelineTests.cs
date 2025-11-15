@@ -22,7 +22,7 @@ public sealed class PipelineTests
             sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is SomePipeline)
             as SomePipeline;
         Assert.NotNull(pipelineStep);
-        var response = await mediator.Send(new SomeRequest(id));
+        var response = await mediator.Send(new SomeRequest(id), TestContext.Current.CancellationToken);
         Assert.Equal(id, response.Id);
         Assert.Equal(id, pipelineStep!.Id);
     }
@@ -41,7 +41,7 @@ public sealed class PipelineTests
             sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Single(s => s is SomePipeline)
             as SomePipeline;
         Assert.NotNull(pipelineStep);
-        var response = await mediator.Send(new SomeRequest(id));
+        var response = await mediator.Send(new SomeRequest(id), TestContext.Current.CancellationToken);
         Assert.Equal(id, response.Id);
         Assert.True(response.ReturnedEarly);
         Assert.NotEqual(id, pipelineStep!.Id);
@@ -50,6 +50,7 @@ public sealed class PipelineTests
     [Fact]
     public async Task Test_Generic_Pipeline()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<GenericPipelineState>();
@@ -67,23 +68,23 @@ public sealed class PipelineTests
         Assert.Equal(default, pipelineState.Id);
         Assert.Equal(default, pipelineState.Message);
 
-        _ = await mediator.Send(request);
+        _ = await mediator.Send(request, ct);
         Assert.Equal(request.Id, pipelineState.Id);
         Assert.Equal(request, pipelineState.Message);
 
-        await mediator.Send(requestWithoutResponse);
+        await mediator.Send(requestWithoutResponse, ct);
         Assert.Equal(requestWithoutResponse.Id, pipelineState.Id);
         Assert.Equal(requestWithoutResponse, pipelineState.Message);
 
-        _ = await mediator.Send(command);
+        _ = await mediator.Send(command, ct);
         Assert.Equal(command.Id, pipelineState.Id);
         Assert.Equal(command, pipelineState.Message);
 
-        await mediator.Send(commandWithoutResponse);
+        await mediator.Send(commandWithoutResponse, ct);
         Assert.Equal(commandWithoutResponse.Id, pipelineState.Id);
         Assert.Equal(commandWithoutResponse, pipelineState.Message);
 
-        _ = await mediator.Send(query);
+        _ = await mediator.Send(query, ct);
         Assert.Equal(query.Id, pipelineState.Id);
         Assert.Equal(query, pipelineState.Message);
     }
@@ -91,6 +92,7 @@ public sealed class PipelineTests
     [Fact]
     public async Task Test_Command_Specific_Pipeline()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton(typeof(IPipelineBehavior<,>), typeof(CommandSpecificPipeline<,>));
@@ -98,12 +100,12 @@ public sealed class PipelineTests
 
         var id = Guid.NewGuid();
 
-        var response = await mediator.Send(new SomeCommand(id));
+        var response = await mediator.Send(new SomeCommand(id), ct);
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
         Assert.Equal(1, CommandSpecificPipeline<SomeCommand, SomeResponse>.CallCount);
 
-        await mediator.Send(new SomeCommandWithoutResponse(id));
+        await mediator.Send(new SomeCommandWithoutResponse(id), ct);
         Assert.Equal(1, CommandSpecificPipeline<SomeCommandWithoutResponse, Unit>.CallCount);
     }
 
@@ -119,7 +121,7 @@ public sealed class PipelineTests
 
         var id = Guid.NewGuid();
 
-        var response = await mediator.Send(new SomeRequest(id));
+        var response = await mediator.Send(new SomeRequest(id), TestContext.Current.CancellationToken);
 
         var pipelineSteps = sp.GetServices<IPipelineBehavior<SomeRequest, SomeResponse>>().Cast<IPipelineTestData>();
 

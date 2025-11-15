@@ -10,6 +10,7 @@ public class ConcreteExceptionHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<State>();
@@ -21,11 +22,11 @@ public class ConcreteExceptionHandlerTests
         var state = sp.GetRequiredService<State>();
         Assert.NotNull(state);
 
-        var response = await mediator.Send(new ErroringRequest(id, 0));
+        var response = await mediator.Send(new ErroringRequest(id, 0), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(typeof(NotImplementedException), state?.Exception?.GetType());
 
-        await Assert.ThrowsAsync<ArgumentException>(async () => await mediator.Send(new ErroringRequest(id, 1)));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await mediator.Send(new ErroringRequest(id, 1), ct));
     }
 
     public sealed class State

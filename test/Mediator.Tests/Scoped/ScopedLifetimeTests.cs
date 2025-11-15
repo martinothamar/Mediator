@@ -28,6 +28,7 @@ public sealed class ScopedLifetimeTests
     [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Scoped ? "Only tested for Scoped lifetime" : null)]
     public async Task Test_Returns_Different_Instances_From_Different_Scopes()
     {
+        var ct = TestContext.Current.CancellationToken;
         var services = new ServiceCollection();
 
         services.AddMediator();
@@ -45,7 +46,7 @@ public sealed class ScopedLifetimeTests
             var handler1 = scope1.ServiceProvider.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
             var handler2 = scope1.ServiceProvider.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
 
-            await mediator1.Send(new SomeRequest(Guid.NewGuid()));
+            await mediator1.Send(new SomeRequest(Guid.NewGuid()), ct);
 
             Assert.NotNull(handler1);
             Assert.NotNull(handler2);
@@ -64,6 +65,7 @@ public sealed class ScopedLifetimeTests
     [Fact(Skip = Mediator.ServiceLifetime != ServiceLifetime.Scoped ? "Only tested for Scoped lifetime" : null)]
     public async Task Test_Disposes_Handler_Correctly()
     {
+        var ct = TestContext.Current.CancellationToken;
         var services = new ServiceCollection();
 
         services.AddMediator();
@@ -80,7 +82,7 @@ public sealed class ScopedLifetimeTests
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                 handler = scope.ServiceProvider.GetRequiredService<IRequestHandler<SomeRequest, SomeResponse>>();
 
-                await mediator.Send(new SomeRequest(Guid.NewGuid()));
+                await mediator.Send(new SomeRequest(Guid.NewGuid()), ct);
 
                 Assert.NotNull(handler);
                 Assert.False(((SomeRequestHandler)handler).Disposed);

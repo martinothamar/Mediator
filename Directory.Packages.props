@@ -4,9 +4,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Benchmarking -->
-    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
-    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.14.0" />
-    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.14.0" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.6" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.6" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotTrace" Version="0.15.6" />
 
     <!-- Other libs -->
     <PackageVersion Include="MediatR" Version="12.5.0" />
@@ -20,29 +20,32 @@
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(DotNetVersion)" />
     <PackageVersion Include="System.Collections.Immutable" Version="$(DotNetVersion)" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(DotNetVersion)" />
-    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-    <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
+    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
+    <PackageVersion Include="System.Linq.Async" Version="6.0.3" />
 
     <!-- Roslyn / MSBuild -->
-    <PackageVersion Include="Microsoft.Build.Locator" Version="1.7.8" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.1.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.1.0" />
+    <PackageVersion Include="Microsoft.Build.Locator" Version="1.10.12" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageVersion Include="Buildalyzer.Workspaces" Version="7.1.0" />
 
     <!-- Templating -->
-    <PackageVersion Include="Scriban" Version="6.2.0" />
+    <PackageVersion Include="Scriban" Version="6.5.0" />
 
     <!-- Build -->
-    <GlobalPackageReference Include="CSharpier.MsBuild" Version="1.1.1">
+    <GlobalPackageReference Include="CSharpier.MsBuild" Version="1.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </GlobalPackageReference>
-    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.4.255" />
-    <PackageVersion Include="DotNet.ReproducibleBuilds" Version="1.1.1" />
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.9.50" />
+    <PackageVersion Include="DotNet.ReproducibleBuilds" Version="1.2.39" />
 
     <!-- NuGet -->
     <PackageVersion Include="NuGet.ProjectModel" Version="6.9.1" />
@@ -50,16 +53,16 @@
     <PackageVersion Include="NuGet.Packaging" Version="6.9.1" />
 
     <!-- Testing -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Fixie.TestAdapter" Version="3.2.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-    <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.assert" Version="2.9.3" />
-    <PackageVersion Include="Xunit.Combinatorial" Version="1.6.24" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+    <PackageVersion Include="xunit.v3" Version="3.2.0" />
+    <PackageVersion Include="xunit.v3.assert" Version="3.2.0" />
+    <PackageVersion Include="Xunit.Combinatorial" Version="2.0.24" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="JetBrains.DotMemoryUnit" Version="3.2.20220510" />
-    <PackageVersion Include="Verify.Xunit" Version="29.4.0" />
+    <PackageVersion Include="Verify.XunitV3" Version="31.5.3" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.1.2" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
   </ItemGroup>

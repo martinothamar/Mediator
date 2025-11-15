@@ -18,6 +18,7 @@ public partial class SmokeTests
     [InlineData(1L << 10)]
     public async Task Test_Concurrent_Messages(long concurrency)
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -29,7 +30,7 @@ public partial class SmokeTests
         var threads = new Task[concurrency];
         for (int i = 0; i < concurrency; i++)
         {
-            threads[i] = Task.Run(Thread);
+            threads[i] = Task.Run(Thread, ct);
         }
 
         start.SetResult();
@@ -42,7 +43,7 @@ public partial class SmokeTests
             const int count = 1000;
             for (int i = 0; i < count; i++)
             {
-                var response = await concrete.Send(message);
+                var response = await concrete.Send(message, ct);
                 Assert.Equal(id, response.Id);
             }
         }

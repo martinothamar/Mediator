@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using JetBrains.dotMemoryUnit;
 using JetBrains.dotMemoryUnit.Kernel;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
 
 namespace Mediator.MemAllocationTests;
 
@@ -42,9 +41,10 @@ public class RequestTests
 
         var id = Guid.NewGuid();
         var request = new SomeRequestMemAllocTracking(id);
+        var cancellationToken = TestContext.Current.CancellationToken;
 
         // Ensure everything is cached
-        await mediator.Send(request);
+        await mediator.Send(request, cancellationToken);
         GC.Collect();
         GC.WaitForPendingFinalizers();
         GC.WaitForFullGCComplete();
@@ -52,7 +52,7 @@ public class RequestTests
 
         var checkpoint = dotMemory.Check();
         var beforeBytes = GC.GetAllocatedBytesForCurrentThread();
-        await mediator.Send(request);
+        await mediator.Send(request, cancellationToken);
         var afterBytes = GC.GetAllocatedBytesForCurrentThread();
 
         Assert.Equal(0, afterBytes - beforeBytes);
@@ -85,13 +85,17 @@ public class RequestTests
 
         var id = Guid.NewGuid();
         var request = new SomeRequestMemAllocTracking(id);
+        var cancellationToken = TestContext.Current.CancellationToken;
 
+        // We suppress here since we know that this isn't blocking
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
         // Ensure everything is cached
-        mediator.Send(request); // Everything returns sync
+        mediator.Send(request, cancellationToken).GetAwaiter().GetResult();
 
         var beforeBytes = Allocations.GetCurrentThreadAllocatedBytes();
-        mediator.Send(request); // Everything returns sync
+        mediator.Send(request, cancellationToken).GetAwaiter().GetResult();
         var afterBytes = Allocations.GetCurrentThreadAllocatedBytes();
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
 
         Assert.Equal(0, afterBytes - beforeBytes);
     }

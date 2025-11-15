@@ -36,18 +36,19 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Request_Handler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
 
-        var response = await mediator.Send(new SomeRequest(id));
+        var response = await mediator.Send(new SomeRequest(id), cancellationToken);
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
-        response = await mediator.Send((object)new SomeRequest(id)) as SomeResponse;
+        response = await mediator.Send((object)new SomeRequest(id), cancellationToken) as SomeResponse;
         Assert.NotNull(response);
         Assert.Equal(id, response?.Id);
-        response = await concrete.Send(new SomeRequest(id));
+        response = await concrete.Send(new SomeRequest(id), cancellationToken);
         Assert.NotNull(response);
         Assert.Equal(id, response?.Id);
     }
@@ -55,17 +56,23 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Request_Handler_Null_Input()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IRequest<SomeResponse>)null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeRequest)null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.Send((IRequest<SomeResponse>)null!, cancellationToken)
+        );
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!, cancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await concrete.Send((SomeRequest)null!, cancellationToken)
+        );
     }
 
     [Fact]
     public async Task Test_Request_Handler_NonNull_NonRequest()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -73,12 +80,13 @@ public class BasicHandlerTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message, cancellationToken));
     }
 
     [Fact]
     public async Task Test_Request_NonNull_NoHandler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -86,20 +94,27 @@ public class BasicHandlerTests
 
         var request = new SomeRequestWithoutHandler(id);
 
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send((object)request));
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(request));
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await concrete.Send(request));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.Send((object)request, cancellationToken)
+        );
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.Send(request, cancellationToken)
+        );
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await concrete.Send(request, cancellationToken)
+        );
     }
 
     [Fact]
     public async Task Test_RequestWithoutResponse_Handler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
 
         var requestHandler = sp.GetRequiredService<IRequestHandler<SomeRequestWithoutResponse, Unit>>();
-        await mediator!.Send(new SomeRequestWithoutResponse(id));
+        await mediator!.Send(new SomeRequestWithoutResponse(id), cancellationToken);
         Assert.NotNull(requestHandler);
         Assert.Contains(id, SomeRequestWithoutResponseHandler.Ids);
     }
@@ -107,18 +122,19 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Query_Handler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
 
-        var response = await mediator.Send(new SomeQuery(id));
+        var response = await mediator.Send(new SomeQuery(id), cancellationToken);
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
-        response = await mediator.Send((object)new SomeQuery(id)) as SomeResponse;
+        response = await mediator.Send((object)new SomeQuery(id), cancellationToken) as SomeResponse;
         Assert.NotNull(response);
         Assert.Equal(id, response?.Id);
-        response = await concrete.Send(new SomeQuery(id));
+        response = await concrete.Send(new SomeQuery(id), cancellationToken);
         Assert.NotNull(response);
         Assert.Equal(id, response?.Id);
     }
@@ -126,19 +142,25 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Query_Handler_Null_Input()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
 
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((IQuery<SomeResponse>)null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeQuery)null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.Send((IQuery<SomeResponse>)null!, cancellationToken)
+        );
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!, cancellationToken));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await concrete.Send((SomeQuery)null!, cancellationToken)
+        );
     }
 
     [Fact]
     public async Task Test_Query_Handler_NonNull_NonQuery()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -146,12 +168,13 @@ public class BasicHandlerTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message, ct));
     }
 
     [Fact]
     public async Task Test_Query_NonNull_NoHandler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -159,30 +182,37 @@ public class BasicHandlerTests
 
         var query = new SomeQueryWithoutHandler(id);
 
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send((object)query));
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(query));
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await concrete.Send(query));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.Send((object)query, cancellationToken)
+        );
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.Send(query, cancellationToken)
+        );
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await concrete.Send(query, cancellationToken)
+        );
     }
 
     [Fact]
     public async Task Test_Command_Handler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
 
         var commandHandler = sp.GetRequiredService<ICommandHandler<SomeCommand, SomeResponse>>();
-        var response = await mediator.Send(new SomeCommand(id));
+        var response = await mediator.Send(new SomeCommand(id), cancellationToken);
         Assert.NotNull(commandHandler);
         Assert.Contains(id, SomeCommandHandler.Ids);
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
-        response = await mediator.Send((object)new SomeCommand(id)) as SomeResponse;
+        response = await mediator.Send((object)new SomeCommand(id), cancellationToken) as SomeResponse;
         Assert.Contains(id, SomeCommandHandler.Ids);
         Assert.NotNull(response);
         Assert.Equal(id, response?.Id);
-        response = await concrete.Send(new SomeCommand(id));
+        response = await concrete.Send(new SomeCommand(id), cancellationToken);
         Assert.Contains(id, SomeCommandHandler.Ids);
         Assert.NotNull(response);
         Assert.Equal(id, response?.Id);
@@ -191,19 +221,23 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Command_Handler_Null_Input()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
         var id = Guid.NewGuid();
 
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send((ICommand<SomeResponse>)null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeCommand)null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.Send((ICommand<SomeResponse>)null!, ct)
+        );
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Send(null!, ct));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Send((SomeCommand)null!, ct));
     }
 
     [Fact]
     public async Task Test_Command_Handler_NonNull_NonCommand()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -211,12 +245,13 @@ public class BasicHandlerTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Send(message, ct));
     }
 
     [Fact]
     public async Task Test_Command_NonNull_NoHandler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -224,27 +259,35 @@ public class BasicHandlerTests
 
         var command = new SomeCommandWithoutHandler(id);
 
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send((object)command));
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await mediator.Send(command));
-        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () => await concrete.Send(command));
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.Send((object)command, cancellationToken)
+        );
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await mediator.Send(command, cancellationToken)
+        );
+        await Assert.ThrowsAsync<MissingMessageHandlerException>(async () =>
+            await concrete.Send(command, cancellationToken)
+        );
     }
 
     [Fact]
     public async Task Test_CommandWithoutResponse_Handler()
     {
+        var cancellationToken = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
 
         var commandHandler = sp.GetRequiredService<ICommandHandler<SomeCommandWithoutResponse, Unit>>();
         Assert.NotNull(commandHandler);
-        await mediator.Send(new SomeCommandWithoutResponse(id));
+        await mediator.Send(new SomeCommandWithoutResponse(id), cancellationToken);
         Assert.Contains(id, SomeCommandWithoutResponseHandler.Ids);
     }
 
     [Fact]
     public unsafe void Test_StructCommand_Handler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -255,7 +298,7 @@ public class BasicHandlerTests
         var commandHandler = sp.GetRequiredService<ICommandHandler<SomeStructCommand, Unit>>();
         Assert.NotNull(commandHandler);
 #pragma warning disable xUnit1031
-        mediator.Send(command).GetAwaiter().GetResult();
+        mediator.Send(command, ct).GetAwaiter().GetResult();
 #pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
@@ -264,6 +307,7 @@ public class BasicHandlerTests
     [Fact]
     public unsafe void Test_StructCommand_Handler_Concrete()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -273,7 +317,7 @@ public class BasicHandlerTests
 
         var commandHandler = sp.GetRequiredService<ICommandHandler<SomeStructCommand, Unit>>();
 #pragma warning disable xUnit1031
-        concrete.Send(command).GetAwaiter().GetResult();
+        concrete.Send(command, ct).GetAwaiter().GetResult();
 #pragma warning restore xUnit1031
         Assert.Contains(id, SomeStructCommandHandler.Ids);
         Assert.Contains(addr, SomeStructCommandHandler.Addresses);
@@ -282,13 +326,14 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Notification_Handler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
 
         var notificationHandler = sp.GetRequiredService<SomeNotificationHandler>();
         Assert.NotNull(notificationHandler);
-        await mediator.Publish(new SomeNotification(id));
+        await mediator.Publish(new SomeNotification(id), ct);
         Assert.Contains(id, SomeNotificationHandler.Ids);
         AssertInstanceIdCount(1, notificationHandler.InstanceIds, id);
 
@@ -299,6 +344,7 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Struct_Notification_Handler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -312,7 +358,7 @@ public class BasicHandlerTests
         var notificationHandler = sp.GetRequiredService<SomeStructNotificationHandler>();
         Assert.NotNull(notificationHandler);
 
-        await concrete.Publish(notification);
+        await concrete.Publish(notification, ct);
         Assert.Contains(id, SomeStructNotificationHandler.Ids);
         AssertInstanceIdCount(1, notificationHandler.InstanceIds, id);
     }
@@ -320,13 +366,14 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_INotification_Handler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
 
         var notificationHandler = sp.GetRequiredService<SomeNotificationHandler>();
         Assert.NotNull(notificationHandler);
-        await mediator.Publish<INotification>(new SomeNotification(id));
+        await mediator.Publish<INotification>(new SomeNotification(id), ct);
         Assert.Contains(id, SomeNotificationHandler.Ids);
         AssertInstanceIdCount(1, notificationHandler.InstanceIds, id);
 
@@ -337,6 +384,7 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Notification_Handler_Null_Input()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -344,10 +392,14 @@ public class BasicHandlerTests
 
         var notificationHandler = sp.GetRequiredService<SomeNotificationHandler>();
         Assert.NotNull(notificationHandler);
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish<INotification>(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish<SomeNotification>(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish(null!));
-        await Assert.ThrowsAsync<ArgumentNullException>(async () => await concrete.Publish((SomeNotification)null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish<INotification>(null!, ct));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await mediator.Publish<SomeNotification>(null!, ct)
+        );
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await mediator.Publish(null!, ct));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await concrete.Publish((SomeNotification)null!, ct)
+        );
         Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
         AssertInstanceIdCount(0, notificationHandler.InstanceIds, id);
     }
@@ -355,6 +407,7 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Notification_Handler_NonNull_NonNotification()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
         var concrete = (Mediator)mediator;
 
@@ -362,12 +415,13 @@ public class BasicHandlerTests
 
         object message = new { Id = id };
 
-        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Publish(message));
+        await Assert.ThrowsAsync<InvalidMessageException>(async () => await mediator.Publish(message, ct));
     }
 
     [Fact]
     public async Task Test_Multiple_Notification_Handlers()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
@@ -376,8 +430,8 @@ public class BasicHandlerTests
         var handler2 = sp.GetRequiredService<SomeOtherNotificationHandler>();
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
-        await mediator.Publish(new SomeNotification(id));
-        await mediator.Publish((object)new SomeNotification(id));
+        await mediator.Publish(new SomeNotification(id), ct);
+        await mediator.Publish((object)new SomeNotification(id), ct);
         Assert.Contains(id, SomeNotificationHandler.Ids);
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
         AssertInstanceIdCount(2, handler1.InstanceIds, id);
@@ -387,6 +441,7 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Multiple_Object_Notification_Handlers()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
@@ -395,7 +450,7 @@ public class BasicHandlerTests
         var handler2 = sp.GetRequiredService<SomeOtherNotificationHandler>();
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
-        await mediator.Publish((object)new SomeNotification(id));
+        await mediator.Publish((object)new SomeNotification(id), ct);
         Assert.Contains(id, SomeNotificationHandler.Ids);
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
         AssertInstanceIdCount(1, handler1.InstanceIds, id);
@@ -405,12 +460,13 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Static_Nested_Request_Handler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
 
         var handler = sp.GetRequiredService<IRequestHandler<SomeStaticClass.SomeStaticNestedRequest, SomeResponse>>();
-        var response = await mediator!.Send(new SomeStaticClass.SomeStaticNestedRequest(id));
+        var response = await mediator!.Send(new SomeStaticClass.SomeStaticNestedRequest(id), ct);
         Assert.NotNull(handler);
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
@@ -420,12 +476,13 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Nested_Request_Handler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
 
         var handler = sp.GetRequiredService<IRequestHandler<SomeOtherClass.SomeNestedRequest, SomeResponse>>();
-        var response = await mediator!.Send(new SomeOtherClass.SomeNestedRequest(id));
+        var response = await mediator!.Send(new SomeOtherClass.SomeNestedRequest(id), ct);
         Assert.NotNull(handler);
         Assert.NotNull(response);
         Assert.Equal(id, response.Id);
@@ -435,19 +492,21 @@ public class BasicHandlerTests
     [Fact]
     public async Task Test_Request_Returning_Array()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         var bytes = id.ToByteArray();
 
         var request = new SomeRequestReturningByteArray(id);
-        var receivedBytes = await mediator.Send(request);
+        var receivedBytes = await mediator.Send(request, ct);
         Assert.Equal(bytes, receivedBytes);
     }
 
     [Fact]
     public async Task Test_Remove_NotificationHandler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(sc =>
         {
             var sds = sc.Where(static a =>
@@ -465,8 +524,8 @@ public class BasicHandlerTests
         var handler2 = sp.GetRequiredService<SomeOtherNotificationHandler>();
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
-        await mediator.Publish(new SomeNotification(id));
-        await mediator.Publish((object)new SomeNotification(id));
+        await mediator.Publish(new SomeNotification(id), ct);
+        await mediator.Publish((object)new SomeNotification(id), ct);
         Assert.DoesNotContain(id, SomeNotificationHandler.Ids);
         Assert.Contains(id, SomeOtherNotificationHandler.Ids);
         AssertInstanceIdCount(0, handler1.InstanceIds, id);

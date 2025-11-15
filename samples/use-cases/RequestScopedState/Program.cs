@@ -14,16 +14,15 @@ builder.Services.AddMediator(
 );
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.SwaggerEndpoint("/openapi/v1.json", "v1");
+});
 
 app.UseHttpsRedirection();
 
@@ -43,8 +42,7 @@ app.MapGet(
             return TypedResults.Ok(forecast);
         }
     )
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+    .WithName("GetWeatherForecast");
 
 app.Run();
 

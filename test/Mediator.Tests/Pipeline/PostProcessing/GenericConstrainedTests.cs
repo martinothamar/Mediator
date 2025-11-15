@@ -11,6 +11,7 @@ public class GenericConstrainedTests
     [Fact]
     public async Task Test_PostProcessor()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<PostProcessingState>();
@@ -24,17 +25,17 @@ public class GenericConstrainedTests
         var state = sp.GetRequiredService<PostProcessingState>();
 
         Assert.NotNull(state);
-        var response = await mediator.Send(new SomeRequest(id));
+        var response = await mediator.Send(new SomeRequest(id), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(id, state!.Id);
         Assert.Equal(2, state.Calls);
 
-        response = await mediator.Send(new SomeQuery(queryId));
+        response = await mediator.Send(new SomeQuery(queryId), ct);
         Assert.Equal(queryId, response.Id);
         Assert.Equal(id, state!.Id);
         Assert.Equal(2, state.Calls);
 
-        response = await mediator.Send(new SomeRequest(id));
+        response = await mediator.Send(new SomeRequest(id), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(id, state!.Id);
         Assert.Equal(4, state.Calls);

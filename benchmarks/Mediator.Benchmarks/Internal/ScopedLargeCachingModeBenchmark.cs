@@ -16,6 +16,7 @@ public class ScopedLargeCachingModeBenchmark
             ServiceLifetime[] lifetimes = [ServiceLifetime.Scoped];
             bool[] largeProjectOptions = [true];
             string[] cachingModes = ["Eager", "Lazy"];
+            // TODO: currently broken because BenchmarkDotNet doens't have .NET 10 yet
             bool[] aot = [false, true];
 
             var jobs =
@@ -25,29 +26,27 @@ public class ScopedLargeCachingModeBenchmark
                 from aotMode in aot
                 select Job
                     .Default.WithRuntime(aotMode ? NativeAotRuntime.Net80 : CoreRuntime.Core80)
-                    .WithArguments(
-                        [
-                            new MsBuildArgument(
-                                $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
-                                    + $"%3BMediator_CachingMode_{cachingMode}"
-                                    + (largeProject ? "%3BMediator_Large_Project" : "")
-                            ),
-                        ]
-                    )
+                    .WithArguments([
+                        new MsBuildArgument(
+                            $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"
+                                + $"%3BMediator_CachingMode_{cachingMode}"
+                                + (largeProject ? "%3BMediator_Large_Project" : "")
+                        ),
+                    ])
                     .WithEnvironmentVariable("ServiceLifetime", lifetime.ToString())
                     .WithEnvironmentVariable("IsLargeProject", $"{largeProject}")
                     .WithEnvironmentVariable("CachingMode", cachingMode)
                     .WithCustomBuildConfiguration($"{lifetime}/{cachingMode}/{largeProject}/{aotMode}")
-                    .WithId($"{lifetime}/{cachingMode}/{largeProject}/{aotMode}");
+                    .WithId($"{lifetime}_{cachingMode}_{largeProject}_{aotMode}");
 
             Config = ManualConfig
                 .CreateEmpty()
                 .AddJob(jobs.ToArray())
-                .AddColumn(new CustomColumn("CachingMode", (_, c) => c.Job.Id.Split('/')[1]))
+                .AddColumn(new CustomColumn("CachingMode", (_, c) => c.Job.Id.Split('_')[1]))
                 .AddColumn(
-                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('/')[2] == "True" ? "Large" : "Small")
+                    new CustomColumn("Project type", (_, c) => c.Job.Id.Split('_')[2] == "True" ? "Large" : "Small")
                 )
-                .AddColumn(new CustomColumn("Compiler", (_, c) => c.Job.Id.Split('/')[3] == "True" ? "AOT" : "JIT"))
+                .AddColumn(new CustomColumn("Compiler", (_, c) => c.Job.Id.Split('_')[3] == "True" ? "AOT" : "JIT"))
                 .AddLogicalGroupRules(BenchmarkLogicalGroupRule.ByJob)
                 .WithOption(ConfigOptions.KeepBenchmarkFiles, false)
                 // .WithOption(ConfigOptions.DisableParallelBuild, true)

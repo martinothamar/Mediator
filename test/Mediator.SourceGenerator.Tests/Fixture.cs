@@ -20,6 +20,7 @@ public static class Fixture
         typeof(ServiceLifetime).Assembly,
         typeof(ServiceProvider).Assembly,
         typeof(MulticastDelegate).Assembly,
+        typeof(IServiceProvider).Assembly,
     };
 
     public static Assembly[] AssemblyReferencesForCodegen =>
@@ -32,15 +33,14 @@ public static class Fixture
 
     public static DirectoryInfo GetSolutionDirectoryInfo()
     {
-        var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        Assert.NotNull(currentDir);
-        var directory = new DirectoryInfo(currentDir);
-        for (int i = 0; i < 10 && directory is not null && !directory.GetFiles("Mediator.sln").Any(); i++)
-            directory = directory.Parent;
-        if (directory is null)
-            throw new InvalidOperationException("Could not find solution directory");
+        var slnDir = SolutionDir();
+        var directory = new DirectoryInfo(slnDir);
+        Assert.True(directory.Exists);
         return directory;
     }
+
+    private static string SolutionDir([CallerFilePath] string thisFilePath = "") =>
+        Path.GetFullPath(Path.Join(thisFilePath, "../../../"));
 
     public static CSharpCompilation CreateLibrary(params string[] source) =>
         CreateLibrary(source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray());

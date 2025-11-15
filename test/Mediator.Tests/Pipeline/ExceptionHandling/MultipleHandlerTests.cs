@@ -11,6 +11,7 @@ public class MultipleHandlerTests
     [Fact]
     public async Task Test_ExceptionHandler()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (sp, mediator) = Fixture.GetMediator(services =>
         {
             services.AddSingleton<State>();
@@ -24,23 +25,27 @@ public class MultipleHandlerTests
         Assert.NotNull(state);
         state!.Reset();
 
-        var response = await mediator.Send(new ErroringRequest(id, 1));
+        var response = await mediator.Send(new ErroringRequest(id, 1), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(typeof(NotImplementedException), state.Handler1Exception?.GetType());
         Assert.Null(state.Handler2Exception);
         state.Reset();
 
-        response = await mediator.Send(new ErroringRequest(id, 2));
+        response = await mediator.Send(new ErroringRequest(id, 2), ct);
         Assert.Equal(id, response.Id);
         Assert.Equal(typeof(NotImplementedException), state.Handler2Exception?.GetType());
         Assert.Null(state.Handler1Exception);
         state.Reset();
 
-        await Assert.ThrowsAsync<NotImplementedException>(async () => await mediator.Send(new ErroringRequest(id, -1)));
+        await Assert.ThrowsAsync<NotImplementedException>(async () =>
+            await mediator.Send(new ErroringRequest(id, -1), ct)
+        );
         Assert.True(state.Handler1Timestamp > state.Handler2Timestamp);
         state.Reset();
 
-        await Assert.ThrowsAsync<NotImplementedException>(async () => await mediator.Send(new ErroringRequest(id, -1)));
+        await Assert.ThrowsAsync<NotImplementedException>(async () =>
+            await mediator.Send(new ErroringRequest(id, -1), ct)
+        );
         Assert.True(state.Handler1Timestamp > state.Handler2Timestamp);
         state.Reset();
     }

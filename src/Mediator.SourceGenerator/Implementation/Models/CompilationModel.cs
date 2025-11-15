@@ -114,9 +114,9 @@ internal sealed record CompilationModel
 
             var isStreaming =
                 r.MessageKind
-                    is RequestMessageKind.StreamRequest
-                        or RequestMessageKind.StreamQuery
-                        or RequestMessageKind.StreamCommand;
+                is RequestMessageKind.StreamRequest
+                    or RequestMessageKind.StreamQuery
+                    or RequestMessageKind.StreamCommand;
             if (isStreaming && r.ResponseIsValueType)
                 HasAnyValueTypeStreamResponse = true;
         }

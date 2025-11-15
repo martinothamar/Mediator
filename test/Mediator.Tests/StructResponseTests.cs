@@ -54,86 +54,93 @@ public sealed class StructResponseTests
     [Fact]
     public async Task Test_Request()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         var message = new Request(id);
 
-        var response = await mediator.Send(message);
+        var response = await mediator.Send(message, ct);
         Assert.Equal(id, response.Id);
     }
 
     [Fact]
     public async Task Test_Command()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         var message = new Command(id);
 
-        var response = await mediator.Send(message);
+        var response = await mediator.Send(message, ct);
         Assert.Equal(id, response.Id);
     }
 
     [Fact]
     public async Task Test_Query()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         var message = new Query(id);
 
-        var response = await mediator.Send(message);
+        var response = await mediator.Send(message, ct);
         Assert.Equal(id, response.Id);
     }
 
     [Fact]
     public async Task Test_Request_As_Object()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         object message = new Request(id);
 
-        var response = await mediator.Send(message);
+        var response = await mediator.Send(message, ct);
         Assert.Equal(id, ((Response)response!).Id);
     }
 
     [Fact]
     public async Task Test_Command_Object()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         object message = new Command(id);
 
-        var response = await mediator.Send(message);
+        var response = await mediator.Send(message, ct);
         Assert.Equal(id, ((Response)response!).Id);
     }
 
     [Fact]
     public async Task Test_Query_Object()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         object message = new Query(id);
 
-        var response = await mediator.Send(message);
+        var response = await mediator.Send(message, ct);
         Assert.Equal(id, ((Response)response!).Id);
     }
 
     [Fact]
     public async Task Test_Stream()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         var message = new Stream(id);
 
-        var response = mediator.CreateStream(message);
+        var response = mediator.CreateStream(message, ct);
         int count = 0;
-        await foreach (var value in response)
+        await foreach (var value in response.WithCancellation(ct))
         {
             Assert.Equal(id, ((Response)value!).Id);
             count++;
@@ -145,14 +152,15 @@ public sealed class StructResponseTests
     [Fact]
     public async Task Test_Stream_Object()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         object message = new Stream(id);
 
-        var response = mediator.CreateStream(message);
+        var response = mediator.CreateStream(message, ct);
         int count = 0;
-        await foreach (var value in response)
+        await foreach (var value in response.WithCancellation(ct))
         {
             Assert.Equal(id, ((Response)value!).Id);
             count++;
@@ -164,13 +172,14 @@ public sealed class StructResponseTests
     [Fact]
     public async Task Test_Stream_Object_WithCancellation()
     {
+        var ct = TestContext.Current.CancellationToken;
         var (_, mediator) = Fixture.GetMediator();
 
         var id = Guid.NewGuid();
         object message = new Stream(id);
         using var cts = new CancellationTokenSource();
         cts.Cancel();
-        var response = mediator.CreateStream(message);
+        var response = mediator.CreateStream(message, ct);
         int count = 0;
         await foreach (var value in response.WithCancellation(cts.Token))
         {
