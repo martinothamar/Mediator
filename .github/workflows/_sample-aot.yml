@@ -13,6 +13,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   sample-aot:
     name: Sample - AOT ${{ inputs.dotnet-framework }}

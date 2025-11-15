@@ -26,6 +26,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     name: Tests ${{ inputs.dotnet-framework }}/${{ inputs.lifetime }}/${{ inputs.size }}/${{ inputs.publisher }}/${{ inputs.cachingMode }}

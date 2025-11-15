@@ -13,6 +13,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   test-memory:
     name: Memory Allocation Tests ${{ inputs.dotnet-framework }}
