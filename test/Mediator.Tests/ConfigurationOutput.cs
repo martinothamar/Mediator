@@ -28,6 +28,7 @@ public class ConfigurationOutput
             $" NotificationPublisherType: {publisher.GetType().FullName} ({Mediator.NotificationPublisherName})"
         );
         output.WriteLine($" Message count: {Mediator.TotalMessages}");
+        output.WriteLine($" CrossedManyMessagesThreshold: {Mediator.CrossedManyMessagesThreshold}");
         output.WriteLine("------------------------------------------------------------------------------");
         output.WriteLine("");
     }

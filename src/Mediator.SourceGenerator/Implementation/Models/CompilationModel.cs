@@ -2,10 +2,11 @@
 
 internal sealed record CompilationModel
 {
-    private const int ManyMessagesTreshold = 16;
+    private readonly int _manyMessagesTreshold;
 
-    public CompilationModel(string mediatorNamespace, string generatorVersion)
+    public CompilationModel(string mediatorNamespace, string generatorVersion, int manyMessagesTreshold = 16)
     {
+        _manyMessagesTreshold = manyMessagesTreshold;
         MediatorNamespace = mediatorNamespace;
         GeneratorVersion = generatorVersion;
         HasErrors = true;
@@ -54,9 +55,11 @@ internal sealed record CompilationModel
         bool configuredViaAttribute,
         bool generateTypesAsInternal,
         string? cachingMode,
-        string? cachingModeShort
+        string? cachingModeShort,
+        int manyMessagesTreshold = 16
     )
     {
+        _manyMessagesTreshold = manyMessagesTreshold;
         MediatorNamespace = mediatorNamespace;
         GeneratorVersion = generatorVersion;
         HasErrors = hasErrors;
@@ -138,13 +141,13 @@ internal sealed record CompilationModel
         HasStreamCommands = iStreamCommandMessages.Count > 0;
         HasNotifications = notificationMessages.Count > 0;
 
-        HasManyRequests = iRequestMessages.Count > ManyMessagesTreshold;
-        HasManyCommands = iCommandMessages.Count > ManyMessagesTreshold;
-        HasManyQueries = iQueryMessages.Count > ManyMessagesTreshold;
-        HasManyStreamRequests = iStreamRequestMessages.Count > ManyMessagesTreshold;
-        HasManyStreamQueries = iStreamQueryMessages.Count > ManyMessagesTreshold;
-        HasManyStreamCommands = iStreamCommandMessages.Count > ManyMessagesTreshold;
-        HasManyNotifications = notificationMessages.Count > ManyMessagesTreshold;
+        HasManyRequests = iRequestMessages.Count > _manyMessagesTreshold;
+        HasManyCommands = iCommandMessages.Count > _manyMessagesTreshold;
+        HasManyQueries = iQueryMessages.Count > _manyMessagesTreshold;
+        HasManyStreamRequests = iStreamRequestMessages.Count > _manyMessagesTreshold;
+        HasManyStreamQueries = iStreamQueryMessages.Count > _manyMessagesTreshold;
+        HasManyStreamCommands = iStreamCommandMessages.Count > _manyMessagesTreshold;
+        HasManyNotifications = notificationMessages.Count > _manyMessagesTreshold;
 
         HasAnyRequest = HasRequests || HasCommands || HasQueries;
         HasAnyStreamRequest = HasStreamRequests || HasStreamQueries || HasStreamCommands;
@@ -209,4 +212,13 @@ internal sealed record CompilationModel
     public bool HasAnyRequest { get; }
     public bool HasAnyStreamRequest { get; }
     public bool HasAnyValueTypeStreamResponse { get; }
+
+    public bool CrossedManyMessagesThreshold =>
+        HasManyRequests
+        || HasManyCommands
+        || HasManyQueries
+        || HasManyStreamRequests
+        || HasManyStreamQueries
+        || HasManyStreamCommands
+        || HasManyNotifications;
 }

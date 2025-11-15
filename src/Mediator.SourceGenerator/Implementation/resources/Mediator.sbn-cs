@@ -711,6 +711,14 @@ namespace {{ MediatorNamespace }}
         /// The total number of Mediator messages that were discovered.
         /// </summary>
         public const int TotalMessages = {{ TotalMessages }};
+        {{~ if IsTestRun ~}}
+
+        /// <summary>
+        /// Indicates whether the message count has crossed the 'many messages' threshold,
+        /// which triggers optimized code generation paths for handler resolution.
+        /// </summary>
+        public const bool CrossedManyMessagesThreshold = {{ if CrossedManyMessagesThreshold; "true"; else; "false"; end; }};
+        {{~ end ~}}
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
