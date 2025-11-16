@@ -4,15 +4,13 @@ on:
   issue_comment:
     types: [created]
 
-permissions:
-  issues: write
-  pull-requests: read
-
 jobs:
   check-permissions:
     name: Check permissions and trigger
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/test-full')
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     outputs:
       authorized: ${{ steps.check.outputs.authorized }}
       pr-number: ${{ github.event.issue.number }}
@@ -45,7 +43,7 @@ jobs:
         with:
           script: |
             const username = context.payload.comment.user.login;
-            const association = context.payload.comment.user.author_association;
+            const association = context.payload.comment.author_association;
             const prOpen = '${{ steps.pr-info.outputs.open }}' === 'true';
 
             const isAuthorized = ['OWNER', 'COLLABORATOR'].includes(association);
@@ -103,6 +101,8 @@ jobs:
     needs: [check-permissions, run-tests]
     if: always() && needs.check-permissions.outputs.authorized == 'true' && needs.check-permissions.outputs.pr-open == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Update comment with results
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0

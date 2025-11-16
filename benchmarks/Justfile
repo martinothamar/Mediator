@@ -88,6 +88,21 @@ coldstart-build-transient:
     just coldstart-build-transient-eager
     just coldstart-build-transient-lazy
 
+coldstart-build-singleton-lazy-speed:
+    #!/bin/sh
+    set -eu
+    echo "Building Singleton/Lazy variants for speed comparison..."
+
+    # Build default (size-optimized) variant
+    just _coldstart-build Singleton Lazy large aot
+
+    # Build speed-optimized variant
+    dotnet publish Mediator.Benchmarks.ColdStart -c Release \
+      -p:EnableAotOptimized=true \
+      -p:ExtraDefineConstants="Mediator_Lifetime_Singleton%3BMediator_CachingMode_Lazy%3BMediator_Large_Project" \
+      -r linux-x64 \
+      -o "Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot-speed"
+
 coldstart-build-baseline:
     #!/bin/sh
     set -eu
@@ -266,6 +281,48 @@ coldstart-transient-lazy:
 coldstart-transient:
     just coldstart-transient-eager
     just coldstart-transient-lazy
+
+coldstart-singleton-lazy-speed:
+    #!/bin/sh
+    set -eu
+
+    if ! command -v hyperfine >/dev/null 2>&1; then
+        echo "Error: hyperfine is not installed."
+        echo "Please install it from: https://github.com/sharkdp/hyperfine"
+        exit 1
+    fi
+
+    missing=""
+
+    if [ ! -f "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" ]; then
+        missing="$missing  - Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart\n"
+    fi
+    if [ ! -f "bin/coldstart_baseline_c" ]; then
+        missing="$missing  - bin/coldstart_baseline_c\n"
+    fi
+    if [ ! -f "Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot/Mediator.Benchmarks.ColdStart" ]; then
+        missing="$missing  - Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot/Mediator.Benchmarks.ColdStart\n"
+    fi
+    if [ ! -f "Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot-speed/Mediator.Benchmarks.ColdStart" ]; then
+        missing="$missing  - Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot-speed/Mediator.Benchmarks.ColdStart\n"
+    fi
+
+    if [ -n "$missing" ]; then
+        echo "Error: The following binaries are missing:"
+        printf "%b" "$missing"
+        echo ""
+        echo "Please run 'just coldstart-build-singleton-lazy-speed' first."
+        exit 1
+    fi
+
+    mkdir -p artifacts
+
+    hyperfine --warmup 50 --min-runs 500 --time-unit millisecond --sort command --shell=none \
+      --export-markdown "artifacts/coldstart-singleton-lazy-speed-comparison.md" \
+      --command-name "Baseline C" "bin/coldstart_baseline_c" \
+      --command-name "Baseline Native AOT" "Mediator.Benchmarks.ColdStart/bin/baseline-small-aot/Mediator.Benchmarks.ColdStart" \
+      --command-name "Singleton/Lazy/Large/AOT" "Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot/Mediator.Benchmarks.ColdStart" \
+      --command-name "Singleton/Lazy/Large/AOT-Speed" "Mediator.Benchmarks.ColdStart/bin/singleton-lazy-large-aot-speed/Mediator.Benchmarks.ColdStart"
 
 coldstart-baseline:
     #!/bin/sh

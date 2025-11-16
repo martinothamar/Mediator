@@ -577,3 +577,22 @@ These benchmarks are run using `hyperfine`.
 | `Transient/Lazy/Large/JIT` | 78.5 ± 4.9 | 64.3 | 96.3 | 821.05 ± 179.87 |
 | `Transient/Lazy/Small/AOT` | 1.6 ± 0.1 | 1.4 | 2.3 | 16.49 ± 3.53 |
 | `Transient/Lazy/Large/AOT` | 3.4 ± 0.2 | 3.0 | 4.2 | 35.17 ± 7.56 |
+
+#### Optimized Native AOT
+
+This run compares the default Native AOT config with some "optimized" settings (`Singleton/Lazy/Large/AOT-Speed`), see the project file.
+
+```
+Relative speed comparison
+        1.00          Baseline C
+       15.22 ±  5.85  Baseline Native AOT
+       36.49 ± 13.78  Singleton/Lazy/Large/AOT
+       29.93 ± 11.40  Singleton/Lazy/Large/AOT-Speed
+```
+
+| Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
+|:---|---:|---:|---:|---:|
+| `Baseline C` | 0.1 ± 0.0 | 0.1 | 1.8 | 1.00 |
+| `Baseline Native AOT` | 1.5 ± 0.3 | 1.2 | 3.1 | 15.22 ± 5.85 |
+| `Singleton/Lazy/Large/AOT` | 3.6 ± 0.6 | 2.8 | 5.7 | 36.49 ± 13.78 |
+| `Singleton/Lazy/Large/AOT-Speed` | 2.9 ± 0.5 | 2.3 | 4.7 | 29.93 ± 11.40 |
