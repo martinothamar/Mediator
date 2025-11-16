@@ -830,6 +830,11 @@ namespace Mediator
         public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
 
         /// <summary>
+        /// The caching mode configuration for Mediator handler resolution.
+        /// </summary>
+        public const global::Mediator.CachingMode CachingMode = global::Mediator.CachingMode.Lazy;
+
+        /// <summary>
         /// The name of the notification publisher service that was configured.
         /// </summary>
         public const string NotificationPublisherName = "ForeachAwaitPublisher";
