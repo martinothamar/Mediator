@@ -23,6 +23,14 @@ internal sealed record CompilationModel
         InternalsNamespace = $"{MediatorNamespace}.Internals";
         TotalMessages = 0;
         NotificationPublisherType = new("global::Mediator.ForeachAwaitPublisher", "ForeachAwaitPublisher");
+        EnableMetrics = false;
+        EnableMetricsOnTarget = false;
+        MeterName = "Mediator";
+        HistogramBuckets = null;
+        HasOpenTelemetrySdk = false;
+        TargetFrameworkIsNet8OrGreater = false;
+        TargetFrameworkIsNet9OrGreater = false;
+        NotificationPublisherResolvedTypeFullName = NotificationPublisherType.FullName;
 
         RequestMessageHandlerWrappers = ImmutableEquatableArray<RequestMessageHandlerWrapperModel>.Empty;
         RequestMessages = ImmutableEquatableArray<RequestMessageModel>.Empty;
@@ -56,6 +64,12 @@ internal sealed record CompilationModel
         bool generateTypesAsInternal,
         string? cachingMode,
         string? cachingModeShort,
+        bool enableMetrics,
+        string meterName,
+        string? histogramBuckets,
+        bool hasOpenTelemetrySdk,
+        bool targetFrameworkIsNet8OrGreater,
+        bool targetFrameworkIsNet9OrGreater,
         int manyMessagesTreshold = 16
     )
     {
@@ -82,6 +96,16 @@ internal sealed record CompilationModel
         TotalMessages = requestMessages.Count + notificationMessages.Count;
         NotificationPublisherType = notificationPublisherType;
         PipelineBehaviors = pipelineBehaviors;
+        EnableMetrics = enableMetrics;
+        EnableMetricsOnTarget = enableMetrics && targetFrameworkIsNet8OrGreater;
+        MeterName = meterName;
+        HistogramBuckets = histogramBuckets;
+        HasOpenTelemetrySdk = hasOpenTelemetrySdk;
+        TargetFrameworkIsNet8OrGreater = targetFrameworkIsNet8OrGreater;
+        TargetFrameworkIsNet9OrGreater = targetFrameworkIsNet9OrGreater;
+        NotificationPublisherResolvedTypeFullName = EnableMetricsOnTarget
+            ? $"global::{InternalsNamespace}.MediatorTelemetryNotificationPublisher"
+            : NotificationPublisherType.FullName;
 
         RequestMessageHandlerWrappers = requestMessageHandlerWrappers;
         NotificationMessages = notificationMessages;
@@ -212,6 +236,15 @@ internal sealed record CompilationModel
     public bool HasAnyRequest { get; }
     public bool HasAnyStreamRequest { get; }
     public bool HasAnyValueTypeStreamResponse { get; }
+
+    public bool EnableMetrics { get; }
+    public bool EnableMetricsOnTarget { get; }
+    public string MeterName { get; }
+    public string? HistogramBuckets { get; }
+    public bool HasOpenTelemetrySdk { get; }
+    public bool TargetFrameworkIsNet8OrGreater { get; }
+    public bool TargetFrameworkIsNet9OrGreater { get; }
+    public string NotificationPublisherResolvedTypeFullName { get; }
 
     public bool CrossedManyMessagesThreshold =>
         HasManyRequests

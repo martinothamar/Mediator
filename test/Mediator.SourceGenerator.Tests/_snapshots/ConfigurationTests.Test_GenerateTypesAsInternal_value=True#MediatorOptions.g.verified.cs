@@ -27,6 +27,30 @@ namespace Mediator
     }
 
     /// <summary>
+    /// Provides telemetry options for Mediator.
+    /// </summary>
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    internal sealed class MediatorTelemetryOptions
+    {
+        /// <summary>
+        /// Enable OpenTelemetry metrics for message processing.
+        /// Requires .NET 8.0 or greater.
+        /// </summary>
+        public bool EnableMetrics { get; set; } = false;
+
+        /// <summary>
+        /// The meter name for OpenTelemetry metrics.
+        /// </summary>
+        public string MeterName { get; set; } = "Mediator";
+
+        /// <summary>
+        /// Custom histogram bucket boundaries for the messaging.process.duration metric.
+        /// If null, uses default boundaries.
+        /// </summary>
+        public double[] HistogramBuckets { get; set; } = null;
+    }
+
+    /// <summary>
     /// Provide options for the Mediator source generator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
@@ -81,5 +105,10 @@ namespace Mediator
         /// When set to <see cref="global::Mediator.CachingMode.Lazy" />, initialization is done on demand as messages are processed.
         /// </summary>
         public global::Mediator.CachingMode CachingMode { get; set; } = global::Mediator.CachingMode.Eager;
+
+        /// <summary>
+        /// Telemetry options for Mediator.
+        /// </summary>
+        public global::Mediator.MediatorTelemetryOptions Telemetry { get; set; } = new();
     }
 }

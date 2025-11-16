@@ -37,5 +37,16 @@ namespace Mediator
         /// When set to <see cref="global::Mediator.CachingMode.Lazy" />, initialization is done on demand as messages are processed.
         /// </summary>
         public global::Mediator.CachingMode CachingMode { get; set; } = global::Mediator.CachingMode.Eager;
+
+        /// <summary>
+        /// Enable OpenTelemetry metrics for message processing.
+        /// Requires .NET 8.0 or greater.
+        /// </summary>
+        public bool TelemetryEnableMetrics { get; set; } = false;
+
+        /// <summary>
+        /// The meter name for OpenTelemetry metrics.
+        /// </summary>
+        public string TelemetryMeterName { get; set; } = "Mediator";
     }
 }

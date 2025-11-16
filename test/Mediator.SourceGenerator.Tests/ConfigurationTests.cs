@@ -808,4 +808,250 @@ public sealed class ConfigurationTests
 
         await inputCompilation.AssertAndVerify();
     }
+
+    [Theory]
+    [CombinatorialData]
+    public async Task Test_Telemetry_Attribute_Matrix(bool em, bool am)
+    {
+        var enableMetricsLiteral = em.ToString().ToLowerInvariant();
+        var expectedMeterName = am ? "TelemetryAttrMeterA" : "TelemetryAttrMeterB";
+        var meterNameAssignment = $"TelemetryMeterName = \"{expectedMeterName}\"";
+
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            [assembly: MediatorOptions(TelemetryEnableMetrics = {{enableMetricsLiteral}}, {{meterNameAssignment}})]
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator();
+                }
+            }
+            """
+        );
+
+        await inputCompilation
+            .AssertAndVerify(Assertions.CompilesWithoutDiagnostics)
+            .UseParameters(em ? "1" : "0", am ? "A" : "B");
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public async Task Test_Telemetry_Metrics_Code_Config_Parses_Into_Model(bool oi)
+    {
+        var telemetryConfig = oi
+            ? """
+                          options.Telemetry = new()
+                          {
+                              EnableMetrics = true,
+                              MeterName = "CodeMeter"
+                          };
+                """
+            : """
+                          options.Telemetry.EnableMetrics = true;
+                          options.Telemetry.MeterName = "CodeMeter";
+                """;
+
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+            {{telemetryConfig}}
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.True(model.EnableMetrics);
+                Assert.Equal("CodeMeter", model.MeterName);
+                Assert.False(model.ConfiguredViaAttribute);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Metrics_Attribute_Config_Parses_Into_Model()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            [assembly: MediatorOptions(TelemetryEnableMetrics = true, TelemetryMeterName = "AttributeMeter")]
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator();
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.True(model.EnableMetrics);
+                Assert.Equal("AttributeMeter", model.MeterName);
+                Assert.True(model.ConfiguredViaAttribute);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Metrics_Code_Config_Rejects_NonLiteral_EnableMetrics_Assignment()
+    {
+        await AssertMetricsCodeConfigRejectsNonLiteralAssignment(
+            optionName: "EnableMetrics",
+            valueExpression: "GetMetricsEnabled()",
+            helperMethod: "private static bool GetMetricsEnabled() => true;",
+            expectedMessage: "Expected boolean literal for 'EnableMetrics'"
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Metrics_Code_Config_Rejects_NonLiteral_MeterName_Assignment()
+    {
+        await AssertMetricsCodeConfigRejectsNonLiteralAssignment(
+            optionName: "MeterName",
+            valueExpression: "GetMetricsMeterName()",
+            helperMethod: "private static string GetMetricsMeterName() => \"CodeMeter\";",
+            expectedMessage: "Expected string literal for 'MeterName'"
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Metrics_Code_Config_Rejects_NonLiteral_HistogramBuckets_Assignment()
+    {
+        await AssertMetricsCodeConfigRejectsNonLiteralAssignment(
+            optionName: "HistogramBuckets",
+            valueExpression: "GetHistogramBuckets()",
+            helperMethod: "private static double[] GetHistogramBuckets() => new[] { 0.1d, 0.5d, 1.0d };",
+            expectedMessage: "Expected array creation or null for 'HistogramBuckets'"
+        );
+    }
+
+    private async Task AssertMetricsCodeConfigRejectsNonLiteralAssignment(
+        string optionName,
+        string valueExpression,
+        string helperMethod,
+        string expectedMessage
+    )
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry.{{optionName}} = {{valueExpression}};
+                    });
+                }
+
+                {{helperMethod}}
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            (Action<GeneratorResult>)(
+                result =>
+                {
+                    Assertions.AssertCommon(result);
+
+                    var diagnostics = result.Diagnostics.Where(d =>
+                        d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id
+                    );
+                    Assert.Contains(diagnostics, d => d.GetMessage().Contains(expectedMessage));
+                }
+            )
+        );
+    }
 }

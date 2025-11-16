@@ -12,6 +12,13 @@ namespace Mediator.SourceGenerator.Tests;
 
 public static class Fixture
 {
+    private static readonly CSharpParseOptions _defaultParseOptionsWithTargetFrameworkSymbols =
+        CSharpParseOptions.Default.WithPreprocessorSymbols(
+            "NET8_0_OR_GREATER",
+            "NET9_0_OR_GREATER",
+            "NET10_0_OR_GREATER"
+        );
+
     public static readonly Assembly[] ImportantAssemblies = new[]
     {
         typeof(object).Assembly,
@@ -21,6 +28,7 @@ public static class Fixture
         typeof(ServiceProvider).Assembly,
         typeof(MulticastDelegate).Assembly,
         typeof(IServiceProvider).Assembly,
+        typeof(System.Diagnostics.Metrics.Meter).Assembly,
     };
 
     public static Assembly[] AssemblyReferencesForCodegen =>
@@ -43,7 +51,9 @@ public static class Fixture
         Path.GetFullPath(Path.Join(thisFilePath, "../../../"));
 
     public static CSharpCompilation CreateLibrary(params string[] source) =>
-        CreateLibrary(source.Select(s => CSharpSyntaxTree.ParseText(s)).ToArray());
+        CreateLibrary(
+            source.Select(s => CSharpSyntaxTree.ParseText(s, _defaultParseOptionsWithTargetFrameworkSymbols)).ToArray()
+        );
 
     public static CSharpCompilation CreateLibrary(params SyntaxTree[] source)
     {
