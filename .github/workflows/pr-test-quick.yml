@@ -8,7 +8,14 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test-source-generator:
+    uses: ./.github/workflows/_test-source-generator.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      dotnet-sdk: '10.0.x'
+
+  tests:
+    needs: test-source-generator
     strategy:
       max-parallel: 16
       matrix:
@@ -83,7 +90,7 @@ jobs:
   all-tests-pass:
     name: All tests pass
     if: always()
-    needs: [build, test-memory, samples-showcase, samples-aot, samples-netfx, formatting]
+    needs: [test-source-generator, tests, test-memory, samples-showcase, samples-aot, samples-netfx, formatting]
     runs-on: ubuntu-latest
     steps:
       - name: Check for failures
