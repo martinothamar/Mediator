@@ -11,7 +11,14 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test-source-generator:
+    uses: ./.github/workflows/_test-source-generator.yml
+    with:
+      checkout-ref: ${{ inputs.checkout-ref }}
+      dotnet-sdk: '10.0.x'
+
+  tests:
+    needs: test-source-generator
     strategy:
       max-parallel: 16
       matrix:
@@ -41,7 +48,7 @@ jobs:
       dotnet-framework: ${{ matrix.dotnet.framework }}
 
   test-memory:
-    needs: build
+    needs: tests
     strategy:
       max-parallel: 16
       matrix:
