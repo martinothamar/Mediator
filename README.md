@@ -5,6 +5,9 @@
 [![Abstractions NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.Abstractions?label=Mediator.Abstractions)](https://www.nuget.org/packages/Mediator.Abstractions)
 [![SourceGenerator NuGet prerelease](https://img.shields.io/nuget/vpre/Mediator.SourceGenerator?label=Mediator.SourceGenerator)](https://www.nuget.org/packages/Mediator.SourceGenerator)<br/>
 
+> [!NOTE]
+> **Want to contribute?** See the [Contributing Guide](CONTRIBUTING.md) for information on building, testing, and submitting changes.
+
 # Mediator
 
 This is a high performance .NET implementation of the Mediator pattern using [source generators](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/).
