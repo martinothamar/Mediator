@@ -45,59 +45,48 @@ jobs:
         with:
           script: |
             const username = context.payload.comment.user.login;
+            const association = context.payload.comment.user.author_association;
             const prOpen = '${{ steps.pr-info.outputs.open }}' === 'true';
 
-            try {
-              const permission = await github.rest.repos.getCollaboratorPermissionLevel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                username: username
-              });
+            const isAuthorized = ['OWNER', 'COLLABORATOR'].includes(association);
 
-              const userPermission = permission.data.permission;
-              const hasWriteAccess = ['admin', 'write', 'maintain'].includes(userPermission);
+            core.setOutput('authorized', isAuthorized);
 
-              core.setOutput('authorized', hasWriteAccess);
+            if (!isAuthorized) {
+              core.warning(`User ${username} has ${association} association - not authorized`);
 
-              if (!hasWriteAccess) {
-                core.warning(`User ${username} has ${userPermission} permission - not authorized`);
-
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  body: `@${username} You don't have permission to trigger tests. Only users with write access can use the \`/test-full\` command.`
-                });
-                return;
-              }
-
-              if (!prOpen) {
-                core.warning('PR is closed - tests will not run');
-
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  body: `@${username} Cannot run tests on a closed PR. Please reopen the PR if you need to run tests.`
-                });
-                return;
-              }
-
-              core.info(`User ${username} has ${userPermission} permission - authorized`);
-
-              // Post acknowledgment comment
-              const comment = await github.rest.issues.createComment({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: `@${username} Starting test suite... [View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+                body: `@${username} You don't have permission to trigger the full test suite`
               });
-
-              core.setOutput('comment-id', comment.data.id);
-            } catch (error) {
-              core.setFailed(`Failed to check permissions: ${error.message}`);
-              core.setOutput('authorized', false);
+              return;
             }
+
+            if (!prOpen) {
+              core.warning('PR is closed - tests will not run');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `@${username} Cannot run tests on a closed PR. Please reopen the PR if you need to run tests.`
+              });
+              return;
+            }
+
+            core.info(`User ${username} has ${association} association - authorized`);
+
+            // Post acknowledgment comment
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `@${username} Starting test suite... [View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+            });
+
+            core.setOutput('comment-id', comment.data.id);
 
   run-tests:
     name: Run test suite
