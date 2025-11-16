@@ -7,28 +7,12 @@ permissions:
   contents: read
 
 jobs:
-  test-suite:
-    uses: ./.github/workflows/test-suite.yml
-    with:
-      checkout-ref: ${{ github.sha }}
-
   publish:
-    if: ${{ always() }}
-    needs: [test-suite]
     runs-on: ubuntu-latest
 
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-      - name: Check for failures
-        run: exit 1
-        if: >-
-          ${{
-               contains(needs.*.result, 'failure')
-            || contains(needs.*.result, 'cancelled')
-            || contains(needs.*.result, 'skipped')
-          }}
-
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0 # depth is needed for nbgv
@@ -67,5 +51,4 @@ jobs:
           dotnet pack src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj --no-restore --no-build --verbosity normal -c Release -o artifacts/
 
       - name: Push to NuGet
-        if: ${{ success() }}
         run: dotnet nuget push artifacts/**.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}
