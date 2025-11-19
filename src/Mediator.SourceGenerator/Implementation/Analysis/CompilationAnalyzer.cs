@@ -26,6 +26,7 @@ internal sealed class CompilationAnalyzer
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
     private readonly List<PipelineBehaviorType> _pipelineBehaviors;
     private Queue<INamespaceOrTypeSymbol>? _configuredAssemblies;
+    private HashSet<INamedTypeSymbol>? _includeTypesForGeneration;
 
     public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
 
@@ -760,6 +761,34 @@ internal sealed class CompilationAnalyzer
                         }
                         else
                         {
+                            // Filter based on IncludeTypesForGeneration if configured
+                            // Only filter if the collection is not null AND has items
+                            // Empty collection or null means no filtering (include all)
+                            if (_includeTypesForGeneration is not null && _includeTypesForGeneration.Count > 0)
+                            {
+                                var implementsMarkerInterface = false;
+                                foreach (var markerInterface in _includeTypesForGeneration)
+                                {
+                                    // Check if typeSymbol implements the marker interface
+                                    if (
+                                        typeSymbol.AllInterfaces.Any(i =>
+                                            _symbolComparer.Equals(i.OriginalDefinition, markerInterface)
+                                        )
+                                    )
+                                    {
+                                        implementsMarkerInterface = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!implementsMarkerInterface)
+                                {
+                                    // Remove the message if it doesn't implement any marker interface
+                                    _requestMessages.Remove(message);
+                                    return true; // Continue processing, just skip this message
+                                }
+                            }
+
                             if (mapping.TryGetValue(typeSymbol, out var requestMessageHandlerObj))
                             {
                                 mapping[typeSymbol] = null;
@@ -1426,6 +1455,40 @@ internal sealed class CompilationAnalyzer
                 }
 
                 _configuredAssemblies.Enqueue(assemblySymbol.GlobalNamespace);
+            }
+        }
+        else if (opt == "IncludeTypesForGeneration")
+        {
+            if (_includeTypesForGeneration is not null)
+            {
+                ReportDiagnostic(
+                    assignment.Left.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "IncludeTypesForGeneration can only be configured once"
+                        )
+                );
+                return false;
+            }
+
+            _includeTypesForGeneration = new(_symbolComparer);
+            var typeOfExpressions = assignment.Right.DescendantNodes().OfType<TypeOfExpressionSyntax>().ToArray();
+
+            foreach (var typeOfExpression in typeOfExpressions)
+            {
+                var typeInfo = semanticModel.GetTypeInfo(typeOfExpression.Type, cancellationToken);
+                if (typeInfo.Type is not INamedTypeSymbol typeSymbol)
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, $"Could not resolve type: {typeOfExpression.Type}")
+                    );
+                    continue;
+                }
+
+                _includeTypesForGeneration.Add(typeSymbol.OriginalDefinition);
             }
         }
         else if (opt == "PipelineBehaviors" || opt == "StreamPipelineBehaviors")
