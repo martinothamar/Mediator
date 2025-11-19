@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "MassTransitIntegration": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:55405;http://localhost:55406"
+    }
+  }
+}
