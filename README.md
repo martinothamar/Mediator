@@ -416,7 +416,7 @@ With Central Package Management (CPM):
 <PackageReference Include="Mediator.Abstractions" />
 ```
 
-or, if you prefer to handle the `PrivateAssets` and `IncludeAssets` centrally too, instead of each project file, you can add this to `Directory.Build.props`:
+or, if you prefer to handle the `PrivateAssets` and `IncludeAssets` centrally too, instead of repeating them in each project file, you can add this to `Directory.Build.props`:
 
 ```xml
 <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
