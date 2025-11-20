@@ -17,6 +17,7 @@ Packages target .NET Standard 2.0 and .NET 8.
 The mediator pattern is great for implementing cross cutting concerns (logging, metrics, etc) and avoiding "fat" constructors due to lots of injected services.
 
 Goals for this library
+
 * High performance
   * Efficient and fast by default, slower configurations are opt-in (in the spirit of [non-pessimization](https://stackoverflow.com/questions/32618848/what-is-pessimization))
   * See [benchmarks](#2-benchmarks) for comparisons
@@ -31,6 +32,7 @@ Goals for this library
   * Follows [semantic versioning](#7-versioning) strictly
 
 In particular, a source generator in this library is used to
+
 * Generate code for DI registration
 * Generate code for the `IMediator` implementation
   * Request/Command/Query `Send` methods are monomorphized
@@ -40,11 +42,15 @@ In particular, a source generator in this library is used to
 
 NuGet packages:
 
+dotnet CLI:
+
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 3.0.*
-dotnet add package Mediator.Abstractions --version 3.0.*
+dotnet add package Mediator.SourceGenerator --version 3.0.* --project <YourProject>.csproj
+dotnet add package Mediator.Abstractions --version 3.0.* --project <YourProject>.csproj
 ```
-or
+
+Without Central Package Management (CPM):
+
 ```xml
 <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*">
   <PrivateAssets>all</PrivateAssets>
@@ -52,6 +58,8 @@ or
 </PackageReference>
 <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
+
+If you use Central Package Management (CPM), find detailed information in [Getting started > Add Packages](#41-add-packages) for best setup.
 
 See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash), covering both similarities and differences between Mediator and MediatR
 
@@ -96,6 +104,7 @@ Note that this library yields the best performance when using the `Singleton` se
 * `<ColdStart | Notification | Request | StreamRequest>_MediatR`: the [MediatR](https://github.com/jbogard/MediatR) library
 
 Benchmark category descriptions
+
 * `ColdStart` - time to resolve `IMediator` from `IServiceProvider` and send a single request
 * `Notification` - publish a single notification
 * `Request` - publish a single request
@@ -108,6 +117,7 @@ See the [benchmarks/ folder](/benchmarks/README.md) for more detailed informatio
 ## 3. Usage and abstractions
 
 There are two NuGet packages needed to use this library
+
 * Mediator.SourceGenerator
   * To generate the `IMediator` implementation and dependency injection setup.
 * Mediator.Abstractions
@@ -318,6 +328,7 @@ services.AddSingleton(typeof(IStreamPipelineBehavior<,>), typeof(StreamLoggingPo
 ### 3.4. Configuration
 
 There are two ways to configure Mediator. Configuration values are needed during compile-time since this is a source generator:
+
 * Assembly level attribute for configuration: `MediatorOptionsAttribute`
 * Options configuration delegate in `AddMediator` function.
 
@@ -375,7 +386,9 @@ See the full runnable sample code in the [Showcase sample](/samples/Showcase/).
 dotnet add package Mediator.SourceGenerator --version 3.0.*
 dotnet add package Mediator.Abstractions --version 3.0.*
 ```
+
 or
+
 ```xml
 <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*">
   <PrivateAssets>all</PrivateAssets>
@@ -383,6 +396,56 @@ or
 </PackageReference>
 <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
+
+With Central Package Management (CPM):
+
+`Directory.Packages.props`:
+
+```xml
+<!-- Use a specific version with CPM; see note below about floating versions -->
+<PackageVersion Include="Mediator.SourceGenerator" Version="3.0.1" />
+<PackageVersion Include="Mediator.Abstractions" Version="3.0.1" />
+```
+
+`<YourProject>.csproj`:
+
+```xml
+<PackageReference Include="Mediator.SourceGenerator">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+<PackageReference Include="Mediator.Abstractions" />
+```
+
+or, if you prefer to handle the `PrivateAssets` and `IncludeAssets` centrally too, instead of repeating them in each project file, you can add this to `Directory.Build.props`:
+
+```xml
+<PropertyGroup>
+  <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+</PropertyGroup>
+<ItemGroup>
+  <PackageReference Update="Mediator.SourceGenerator"
+                      PrivateAssets="all"
+                      IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+</ItemGroup>
+```
+
+so your `<YourProject>.csproj` can be simplified to:
+
+```xml
+<PackageReference Include="Mediator.SourceGenerator" />
+<PackageReference Include="Mediator.Abstractions" />
+```
+
+> [!NOTE]
+> It is possible to use floating versions alongside Central Package Management like in the non-CPM options shown above, but *this is not recommended*. Find more information about this at [NU1011](https://aka.ms/nu1011#solution).
+> If you still want to use floating versions, you need to add the following to your `Directory.Packages.props` file:
+>
+> ```xml
+> <PropertyGroup>
+>   <CentralPackageManagementFloatingVersionsEnabled>true</CentralPackageManagementFloatingVersionsEnabled>
+> </PropertyGroup>
+> ```
 
 ### 4.2. Add Mediator to DI container
 
@@ -595,7 +658,6 @@ public sealed class FireAndForgetNotificationPublisher : INotificationPublisher
 }
 ```
 
-
 ### 4.10. Use streaming messages
 
 Since version 1.* of this library there is support for streaming using `IAsyncEnumerable`.
@@ -642,7 +704,6 @@ Since this is a source generator, diagnostics are also included. Examples below
 
 ![Multiple request handlers found](/img/multiple_request_handlers.png "Multiple request handlers found")
 
-
 ## 6. Differences from [MediatR](https://github.com/LuckyPennySoftware/MediatR)
 
 This is a work in progress list on the differences between this library and MediatR.
@@ -673,4 +734,3 @@ There are various options for Mediator implementations in the .NET ecosystem. He
 * [Foundatio.Mediator](https://github.com/FoundatioFx/Foundatio.Mediator) - different, conventions based API. Also sourcegenerator-based (in-memory only)
 * [Wolverine](https://wolverinefx.net/) (part of the critterstack) - also conventions based, is a larger framework that also offers async/distributed messaging
 * [MassTransit](https://masstransit.io/) - also offers a mediator implementation, and also offers async/distributed messaging
-
