@@ -433,7 +433,7 @@ so your `<YourProject>.csproj` can be simplified to:
 ```
 
 > [!NOTE]
-> It is possible to use floating versions alongside with using Central Package Management like in the non-CPM options shown above, but *this is not recommended*. Find more information about this at [NU1011](https://aka.ms/nu1011#solution).
+> It is possible to use floating versions alongside Central Package Management like in the non-CPM options shown above, but *this is not recommended*. Find more information about this at [NU1011](https://aka.ms/nu1011#solution).
 > If you still want to use floating versions, you need to add the following to your `Directory.Packages.props` file:
 >
 > ```xml
