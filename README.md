@@ -40,11 +40,15 @@ In particular, a source generator in this library is used to
 
 NuGet packages:
 
+dotnet CLI:
+
 ```pwsh
-dotnet add package Mediator.SourceGenerator --version 3.0.*
-dotnet add package Mediator.Abstractions --version 3.0.*
+dotnet add package Mediator.SourceGenerator --version 3.0.* --project <YourProject>.csproj
+dotnet add package Mediator.Abstractions --version 3.0.* --project <YourProject>.csproj
 ```
-or
+
+Without Central Package Management (CPM):
+
 ```xml
 <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*">
   <PrivateAssets>all</PrivateAssets>
@@ -52,6 +56,8 @@ or
 </PackageReference>
 <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
+
+- If you use Central Package Management (CPM), find detailed information in [Getting started > Add Packages](#41-add-packages) for best setup.
 
 See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash), covering both similarities and differences between Mediator and MediatR
 
@@ -375,7 +381,9 @@ See the full runnable sample code in the [Showcase sample](/samples/Showcase/).
 dotnet add package Mediator.SourceGenerator --version 3.0.*
 dotnet add package Mediator.Abstractions --version 3.0.*
 ```
+
 or
+
 ```xml
 <PackageReference Include="Mediator.SourceGenerator" Version="3.0.*">
   <PrivateAssets>all</PrivateAssets>
@@ -383,6 +391,49 @@ or
 </PackageReference>
 <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
+
+With Central Package Management (CPM):
+
+`Directory.Packages.props`:
+
+```xml
+<PackageVersion Include="Mediator.SourceGenerator" Version="3.0.1" />
+<PackageVersion Include="Mediator.Abstractions" Version="3.0.1" />
+```
+
+`<YourProject>.csproj`:
+
+```xml
+<PackageReference Include="Mediator.SourceGenerator">
+  <PrivateAssets>all</PrivateAssets>
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+</PackageReference>
+<PackageReference Include="Mediator.Abstractions" />
+```
+
+or, if you prefer to handle the `PrivateAssets` and `IncludeAssets` centrally too, instead of each project file, you can add this to `Directory.Build.props`:
+
+```xml
+<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+<PackageReference Update="Mediator.SourceGenerator"
+                    PrivateAssets="all"
+                    IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+```
+
+so your `<YourProject>.csproj` can be simplified to:
+
+```xml
+<PackageReference Include="Mediator.SourceGenerator" />
+<PackageReference Include="Mediator.Abstractions" />
+```
+
+> [!NOTE]
+> It is possible to use floating versions alongside with using Central Package Management like in the non-CPM options shown above, but *this is not recommended*. Find more information about this at [NU1011](https://aka.ms/nu1011#solution).
+> If you still want to use floating versions, you need to add the following to your `Directory.Packages.props` file:
+>
+> ```xml
+> <CentralPackageManagementFloatingVersionsEnabled>true</CentralPackageManagementFloatingVersionsEnabled>
+> ```
 
 ### 4.2. Add Mediator to DI container
 
