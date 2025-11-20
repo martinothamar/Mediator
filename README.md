@@ -437,7 +437,9 @@ so your `<YourProject>.csproj` can be simplified to:
 > If you still want to use floating versions, you need to add the following to your `Directory.Packages.props` file:
 >
 > ```xml
-> <CentralPackageManagementFloatingVersionsEnabled>true</CentralPackageManagementFloatingVersionsEnabled>
+> <PropertyGroup>
+>   <CentralPackageManagementFloatingVersionsEnabled>true</CentralPackageManagementFloatingVersionsEnabled>
+> </PropertyGroup>
 > ```
 
 ### 4.2. Add Mediator to DI container
