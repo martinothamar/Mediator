@@ -59,7 +59,7 @@ Without Central Package Management (CPM):
 <PackageReference Include="Mediator.Abstractions" Version="3.0.*" />
 ```
 
-* If you use Central Package Management (CPM), find detailed information in [Getting started > Add Packages](#41-add-packages) for best setup.
+If you use Central Package Management (CPM), find detailed information in [Getting started > Add Packages](#41-add-packages) for best setup.
 
 See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash), covering both similarities and differences between Mediator and MediatR
 
