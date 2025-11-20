@@ -402,6 +402,7 @@ With Central Package Management (CPM):
 `Directory.Packages.props`:
 
 ```xml
+<!-- Use a specific version with CPM; see note below about floating versions -->
 <PackageVersion Include="Mediator.SourceGenerator" Version="3.0.1" />
 <PackageVersion Include="Mediator.Abstractions" Version="3.0.1" />
 ```
