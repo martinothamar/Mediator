@@ -420,10 +420,14 @@ With Central Package Management (CPM):
 or, if you prefer to handle the `PrivateAssets` and `IncludeAssets` centrally too, instead of repeating them in each project file, you can add this to `Directory.Build.props`:
 
 ```xml
-<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-<PackageReference Update="Mediator.SourceGenerator"
-                    PrivateAssets="all"
-                    IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+<PropertyGroup>
+  <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+</PropertyGroup>
+<ItemGroup>
+  <PackageReference Update="Mediator.SourceGenerator"
+                      PrivateAssets="all"
+                      IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+</ItemGroup>
 ```
 
 so your `<YourProject>.csproj` can be simplified to:
