@@ -15,8 +15,7 @@ public class ValueTaskWrapper<T> : IValueTaskSource<T>
     {
         _original = original;
         _result = result;
-        _core = new ManualResetValueTaskSourceCore<T>();
-        _core.RunContinuationsAsynchronously = true;
+        _core = new ManualResetValueTaskSourceCore<T> { RunContinuationsAsynchronously = true };
 
         MonitorOriginal();
     }
@@ -49,4 +48,18 @@ public class ValueTaskWrapper<T> : IValueTaskSource<T>
         short token,
         ValueTaskSourceOnCompletedFlags flags
     ) => _core.OnCompleted(continuation, state, token, flags);
+}
+
+public static class ValueTaskTWrapper
+{
+    public static ValueTask AsValueTask<T>(ValueTask<T> valueTask)
+    {
+        if (valueTask.IsCompletedSuccessfully)
+        {
+            valueTask.GetAwaiter().GetResult();
+            return default;
+        }
+
+        return new ValueTask(valueTask.AsTask());
+    }
 }
