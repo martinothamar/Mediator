@@ -173,8 +173,8 @@ public sealed class MessageValidatorBehaviour<TMessage, TResponse> : IPipelineBe
 {
     public ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         if (!message.IsValid(out var validationError))
@@ -218,8 +218,8 @@ public sealed class ErrorLoggingBehaviour<TMessage, TResponse> : IPipelineBehavi
 
     public async ValueTask<TResponse> Handle(
         TMessage message,
-        CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
+        MessageHandlerDelegate<TMessage, TResponse> next,
+        CancellationToken cancellationToken
     )
     {
         try
