@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System;
+using System.IO;
 using DiffEngine;
 using Microsoft.Build.Locator;
 using VerifyTests;
@@ -23,6 +24,9 @@ public static class ModuleInitializer
 
         VerifySourceGenerators.Initialize();
         VerifyDiffPlex.Initialize(VerifyTests.DiffPlex.OutputType.Compact);
+        var isCi = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CI"));
+        if (BuildServerDetector.Detected && BuildServerDetector.IsWsl && !isCi)
+            BuildServerDetector.Detected = false; // WSL is not a build server
         VerifierSettings.AutoVerify(includeBuildServer: false);
     }
 }
