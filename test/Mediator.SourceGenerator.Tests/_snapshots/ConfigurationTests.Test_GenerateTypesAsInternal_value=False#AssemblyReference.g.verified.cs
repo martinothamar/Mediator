@@ -10,6 +10,7 @@ namespace Mediator
     /// This is used to specify the types or assemblies to scan for Mediator handlers.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     public sealed class AssemblyReference
     {
         /// <summary>
