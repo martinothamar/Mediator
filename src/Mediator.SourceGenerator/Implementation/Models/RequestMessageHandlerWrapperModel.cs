@@ -42,7 +42,7 @@ internal sealed record RequestMessageHandlerWrapperModel
     public string InterfaceHandlerTypeName =>
         HasResponse
             ? $"global::Mediator.I{MessageType}Handler<TRequest, TResponse>"
-            : $"{FullNamespace}.Unit{MessageType}HandlerWrapper<TRequest>";
+            : $"global::Mediator.I{MessageType}Handler<TRequest>";
     public string ReturnTypeName =>
         IsStreaming ? "global::System.Collections.Generic.IAsyncEnumerable<TResponse>"
         : HasResponse ? "global::System.Threading.Tasks.ValueTask<TResponse>"

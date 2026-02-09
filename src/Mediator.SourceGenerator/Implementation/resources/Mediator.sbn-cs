@@ -241,12 +241,13 @@ namespace {{ InternalsNamespace }}
             global::System.IServiceProvider sp
         )
         {
-            var concreteHandler = sp.GetRequiredService<{{wrapperType.InterfaceHandlerTypeName}}>();
-            {{~ if !wrapperType.HasResponse ~}}
-            concreteHandler.Init(containerMetadata, sp);
-            {{~ end ~}}
+            var concreteHandler = sp.GetRequiredService<{{wrapperType.InterfaceHandlerTypeName}}>();         
             var pipelineBehaviours = sp.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
+            {{~ if !wrapperType.HasResponse ~}}
+            var handler = ({{ wrapperType.MessageHandlerDelegateName }})Adapt<TRequest>(concreteHandler.Handle);
+            {{~ else }}
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
+            {{~ end ~}}
 
             {{ wrapperType.PipelineHandlerTypeName }}[] pipelineBehavioursArray;
             if (containerMetadata.ServicesUnderlyingTypeIsArray)
@@ -291,11 +292,13 @@ namespace {{ InternalsNamespace }}
             var handler = _rootHandler;
             {{~ else ~}}
             var concreteHandler = mediator.Services.GetRequiredService<{{wrapperType.InterfaceHandlerTypeName}}>();
-            {{~ if !wrapperType.HasResponse ~}}
-            concreteHandler.Init(mediator);
-            {{~ end ~}}
             var pipelineBehaviours = mediator.Services.GetServices<{{ wrapperType.PipelineHandlerTypeName }}>();
+            {{~ if !wrapperType.HasResponse ~}}
+            var handler = ({{ wrapperType.MessageHandlerDelegateName }})Adapt<TRequest>(concreteHandler.Handle);
+            {{~ else ~}}
             var handler = ({{ wrapperType.MessageHandlerDelegateName }})concreteHandler.Handle;
+            {{~ end ~}}
+          
 
             {{ wrapperType.PipelineHandlerTypeName }}[] pipelineBehavioursArray;
             if (mediator.ServicesUnderlyingTypeIsArray)
@@ -369,6 +372,27 @@ namespace {{ InternalsNamespace }}
             {{~ end ~}}
         }
         {{~ end ~}}
+
+        internal static global::Mediator.MessageHandlerDelegate<TMessage, global::Mediator.Unit>    Adapt<TMessage>(global::Mediator.MessageHandlerDelegate<TMessage> handler)    where TMessage : notnull, global::Mediator.IMessage
+        {
+            return (message, cancellationToken) =>
+            {
+                var vt = handler(message, cancellationToken);
+
+                if (vt.IsCompletedSuccessfully)
+                {
+                    return global::Mediator.Unit.ValueTask;
+                }
+
+                return AwaitAsync(vt);
+
+                static async global::System.Threading.Tasks.ValueTask<global::Mediator.Unit> AwaitAsync(global::System.Threading.Tasks.ValueTask vt)
+                {
+                    await vt.ConfigureAwait(false);
+                    return global::Mediator.Unit.Value!;
+                }
+            };
+        }
     }
     {{~ end ~}}
 
