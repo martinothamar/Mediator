@@ -17,6 +17,12 @@ jobs:
       checkout-ref: ${{ inputs.checkout-ref }}
       dotnet-sdk: '10.0.x'
 
+  benchmark-smoke:
+    uses: ./.github/workflows/_benchmark-smoke.yml
+    with:
+      checkout-ref: ${{ inputs.checkout-ref }}
+      dotnet-sdk: '10.0.x'
+
   tests:
     needs: test-source-generator
     strategy:
