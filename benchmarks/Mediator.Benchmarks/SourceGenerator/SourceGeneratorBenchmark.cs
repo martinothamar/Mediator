@@ -8,10 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.Benchmarks.SourceGenerator;
 
-// Currently broken, wait for release of:
-// https://github.com/Buildalyzer/Buildalyzer/pull/319
-// Or implement building ourself
-
 [MemoryDiagnoser(true)]
 [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
 public class SourceGeneratorBenchmark

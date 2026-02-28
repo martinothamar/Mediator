@@ -16,7 +16,6 @@ public class ScopedLargeCachingModeBenchmark
             ServiceLifetime[] lifetimes = [ServiceLifetime.Scoped];
             bool[] largeProjectOptions = [true];
             string[] cachingModes = ["Eager", "Lazy"];
-            // TODO: currently broken because BenchmarkDotNet doens't have .NET 10 yet
             bool[] aot = [false, true];
 
             var jobs =
@@ -25,7 +24,7 @@ public class ScopedLargeCachingModeBenchmark
                 from cachingMode in cachingModes
                 from aotMode in aot
                 select Job
-                    .Default.WithRuntime(aotMode ? NativeAotRuntime.Net80 : CoreRuntime.Core80)
+                    .Default.WithRuntime(aotMode ? NativeAotRuntime.Net10_0 : CoreRuntime.Core10_0)
                     .WithArguments([
                         new MsBuildArgument(
                             $"/p:ExtraDefineConstants=Mediator_Lifetime_{lifetime}"

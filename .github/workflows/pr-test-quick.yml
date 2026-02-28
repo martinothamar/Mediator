@@ -47,6 +47,12 @@ jobs:
       dotnet-sdk: ${{ matrix.dotnet.sdk }}
       dotnet-framework: ${{ matrix.dotnet.framework }}
 
+  benchmark-smoke:
+    uses: ./.github/workflows/_benchmark-smoke.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      dotnet-sdk: '10.0.x'
+
   samples-showcase:
     uses: ./.github/workflows/_sample-showcase.yml
     with:
@@ -90,7 +96,7 @@ jobs:
   all-tests-pass:
     name: All tests pass
     if: always()
-    needs: [test-source-generator, tests, test-memory, samples-showcase, samples-aot, samples-netfx, formatting]
+    needs: [test-source-generator, tests, test-memory, benchmark-smoke, samples-showcase, samples-aot, samples-netfx, formatting]
     runs-on: ubuntu-latest
     steps:
       - name: Check for failures
