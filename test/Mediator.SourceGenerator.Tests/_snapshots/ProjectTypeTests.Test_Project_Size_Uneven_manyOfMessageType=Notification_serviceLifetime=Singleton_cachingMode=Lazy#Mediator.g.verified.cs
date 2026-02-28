@@ -84,71 +84,71 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register handlers and wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification0), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification14), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification14>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification13), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification13>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification12), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification12>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification11), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification11>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification10), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification10>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification9), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification9>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification15), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification15>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification8), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification8>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification6), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification6>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification5), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification5>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification4), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification4>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification3), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification3>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification2), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification2>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification1), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification1>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification7), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification7>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification16), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification16>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 

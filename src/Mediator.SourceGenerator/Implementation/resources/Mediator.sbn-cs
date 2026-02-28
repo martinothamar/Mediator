@@ -86,7 +86,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ if CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
             services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
-                var publisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                var publisher = sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>().NotificationPublisher;
                 return new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}().Init(publisher, sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(), sp);
             }, {{ SingletonServiceLifetime }}));
             {{~ else ~}}
@@ -129,6 +129,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
+            {{~ if EnableMetricsOnTarget && HasOpenTelemetrySdk ~}}
+
+            global::OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions.ConfigureOpenTelemetryMeterProvider(
+                services,
+                builder => builder.AddMeter("{{ MeterName }}")
+            );
+            {{~ end ~}}
 
             return services;
 
@@ -175,6 +182,186 @@ namespace {{ InternalsNamespace }}
             global::System.Threading.CancellationToken cancellationToken
         );
     }
+    {{~ if EnableMetricsOnTarget ~}}
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    internal static class MediatorTelemetry
+    {
+        public static readonly global::System.Diagnostics.Metrics.Meter Meter =
+            new("{{ MeterName }}", "{{ GeneratorVersion }}");
+
+        public static readonly global::System.Diagnostics.Metrics.Histogram<double> ProcessDuration =
+            {{~ if TargetFrameworkIsNet9OrGreater ~}}
+            Meter.CreateHistogram<double>(
+                "messaging.process.duration",
+                unit: "s",
+                description: "Duration of message processing operation",
+                advice: new() { HistogramBucketBoundaries = new double[] { {{ if HistogramBuckets; HistogramBuckets; else; "0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10"; end; }} } }
+            );
+            {{~ else ~}}
+            Meter.CreateHistogram<double>(
+                "messaging.process.duration",
+                unit: "s",
+                description: "Duration of message processing operation"
+            );
+            {{~ end ~}}
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    internal sealed class MediatorTelemetryBehavior<TMessage, TResponse>
+        : global::Mediator.IPipelineBehavior<TMessage, TResponse>
+        where TMessage : global::Mediator.IMessage
+    {
+        public async global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            TMessage message,
+            global::Mediator.MessageHandlerDelegate<TMessage, TResponse> next,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            var tags = new global::System.Diagnostics.TagList
+            {
+                { "messaging.system", "mediator" },
+                { "messaging.operation.name", "process" },
+                { "messaging.destination.name", typeof(TMessage).Name }
+            };
+
+            try
+            {
+                var response = await next(message, cancellationToken);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                return response;
+            }
+            catch (global::System.Exception ex)
+            {
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                throw;
+            }
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    internal sealed class MediatorStreamTelemetryBehavior<TMessage, TResponse>
+        : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
+        where TMessage : global::Mediator.IStreamMessage
+    {
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            TMessage message,
+            global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            return HandleWithMetrics(message, next, cancellationToken);
+        }
+
+        private static async global::System.Collections.Generic.IAsyncEnumerable<TResponse> HandleWithMetrics(
+            TMessage message,
+            global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken)
+        {
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            var tags = new global::System.Diagnostics.TagList
+            {
+                { "messaging.system", "mediator" },
+                { "messaging.operation.name", "process" },
+                { "messaging.destination.name", typeof(TMessage).Name }
+            };
+
+            global::System.Collections.Generic.IAsyncEnumerable<TResponse> responses;
+            try
+            {
+                responses = next(message, cancellationToken);
+            }
+            catch (global::System.Exception ex)
+            {
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                throw;
+            }
+            await using var enumerator = responses.GetAsyncEnumerator(cancellationToken);
+            try
+            {
+                while (true)
+                {
+                    TResponse response;
+                    try
+                    {
+                        if (!await enumerator.MoveNextAsync())
+                            break;
+                        response = enumerator.Current;
+                    }
+                    catch (global::System.Exception ex)
+                    {
+                        tags.Add("error.type", ex.GetType().FullName);
+                        throw;
+                    }
+
+                    yield return response;
+                }
+            }
+            finally
+            {
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+            }
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    internal sealed class MediatorTelemetryNotificationPublisher
+        : global::Mediator.INotificationPublisher
+    {
+        private readonly {{ NotificationPublisherType.FullName }} _inner;
+
+        public MediatorTelemetryNotificationPublisher({{ NotificationPublisherType.FullName }} inner)
+        {
+            _inner = inner;
+        }
+
+        public async global::System.Threading.Tasks.ValueTask Publish<TNotification>(
+            global::Mediator.NotificationHandlers<TNotification> handlers,
+            TNotification notification,
+            global::System.Threading.CancellationToken cancellationToken)
+            where TNotification : global::Mediator.INotification
+        {
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            var tags = new global::System.Diagnostics.TagList
+            {
+                { "messaging.system", "mediator" },
+                { "messaging.operation.name", "process" },
+                { "messaging.destination.name", typeof(TNotification).Name }
+            };
+
+            try
+            {
+                await _inner.Publish(handlers, notification, cancellationToken);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+            }
+            catch (global::System.Exception ex)
+            {
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                throw;
+            }
+        }
+    }
+    {{~ end ~}}
 
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
@@ -232,6 +419,17 @@ namespace {{ InternalsNamespace }}
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
+            {{~ if EnableMetricsOnTarget ~}}
+            {
+                var handlerCopy = handler;
+                {{~ if wrapperType.IsStreaming ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                {{~ else ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorTelemetryBehavior<TRequest, TResponse>();
+                {{~ end ~}}
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
+            }
+            {{~ end ~}}
 
             _rootHandler = handler;
             return this;
@@ -282,6 +480,17 @@ namespace {{ InternalsNamespace }}
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
             }
+            {{~ if EnableMetricsOnTarget ~}}
+            {
+                var handlerCopy = handler;
+                {{~ if wrapperType.IsStreaming ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                {{~ else ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorTelemetryBehavior<TRequest, TResponse>();
+                {{~ end ~}}
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
+            }
+            {{~ end ~}}
             {{~ end ~}}
             return handler(request, cancellationToken);
         }
@@ -332,12 +541,12 @@ namespace {{ InternalsNamespace }}
         where TNotification : global::Mediator.INotification
     {
         {{~ if ServiceLifetimeIsSingleton ~}}
-        private {{ NotificationPublisherType.FullName }} _publisher = null!;
+        private {{ NotificationPublisherResolvedTypeFullName }} _publisher = null!;
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         {{~ if CachingModeIsLazy ~}}
         public NotificationHandlerWrapper<TNotification> Init(
-            {{ NotificationPublisherType.FullName }} publisher,
+            {{ NotificationPublisherResolvedTypeFullName }} publisher,
             global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
@@ -498,9 +707,11 @@ namespace {{ InternalsNamespace }}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
+        {{~ end ~}}
         {{~ if ServiceLifetimeIsSingleton ~}}
+        {{~ if !CachingModeIsLazy ~}}
 
-        public readonly {{ NotificationPublisherType.FullName }} NotificationPublisher;
+        public readonly {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher;
         {{~ end ~}}
         {{~ end ~}}
 
@@ -514,11 +725,18 @@ namespace {{ InternalsNamespace }}
             {{~ else ~}}
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
             {{~ end ~}}
-            {{~ if !CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
+            {{~ if !CachingModeIsLazy ~}}
 
+            {{~ if EnableMetricsOnTarget ~}}
+            var notificationPublisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+            NotificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+            {{~ else ~}}
             NotificationPublisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ end ~}}
+            {{~ if !CachingModeIsLazy ~}}
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IRequestMessages }});
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size ICommandMessages }});
@@ -621,22 +839,29 @@ namespace {{ MediatorNamespace }}
         {{~ if ServiceLifetimeIsSingleton ~}}
         {{~ if CachingModeIsLazy ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata;
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
+                    {{~ if EnableMetricsOnTarget ~}}
+                {
+                    var notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    _notificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
+                    {{~ else ~}}
                     _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    {{~ end ~}}
                 return _notificationPublisher!;
             }
         }
         internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;
         {{~ else ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
@@ -660,26 +885,40 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ else ~}}
         {{~ if CachingModeIsLazy ~}}
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
+                    {{~ if EnableMetricsOnTarget ~}}
+                {
+                    var notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    _notificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
+                    {{~ else ~}}
                     _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    {{~ end ~}}
                 return _notificationPublisher!;
             }
         }
         {{~ else ~}}
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
+                    {{~ if EnableMetricsOnTarget ~}}
+                {
+                    var notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    _notificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
+                    {{~ else ~}}
                     _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    {{~ end ~}}
                 return _notificationPublisher!;
             }
         }

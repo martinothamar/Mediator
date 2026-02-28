@@ -41,7 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (options != null)
                 options(opts);
 
-            var configuredViaAttribute = true;
+            var configuredViaAttribute = false;
             if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton && !configuredViaAttribute)
             {
                 var errMsg = "Invalid configuration detected for Mediator. ";
@@ -68,6 +68,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            global::OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions.ConfigureOpenTelemetryMeterProvider(
+                services,
+                builder => builder.AddMeter("TestMeter")
+            );
 
             return services;
 
@@ -106,7 +111,7 @@ namespace Mediator.Internals
     internal static class MediatorTelemetry
     {
         public static readonly global::System.Diagnostics.Metrics.Meter Meter =
-            new("TelemetryAttrMeterB", "3.1.0.0");
+            new("TestMeter", "3.1.0.0");
 
         public static readonly global::System.Diagnostics.Metrics.Histogram<double> ProcessDuration =
             Meter.CreateHistogram<double>(

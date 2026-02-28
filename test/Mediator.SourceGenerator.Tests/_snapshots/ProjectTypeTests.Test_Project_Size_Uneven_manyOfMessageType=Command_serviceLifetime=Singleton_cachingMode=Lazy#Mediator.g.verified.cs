@@ -148,7 +148,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Register handlers and wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.TestNotification0), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
+                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.TestNotification0>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 

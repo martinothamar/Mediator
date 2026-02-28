@@ -103,7 +103,7 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
-    internal static class OpenTelemetryMetrics
+    internal static class MediatorTelemetry
     {
         public static readonly global::System.Diagnostics.Metrics.Meter Meter =
             new("TelemetryAttrMeterA", "3.1.0.0");
@@ -118,7 +118,7 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
-    internal sealed class OpenTelemetryMetricsBehavior<TMessage, TResponse>
+    internal sealed class MediatorTelemetryBehavior<TMessage, TResponse>
         : global::Mediator.IPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IMessage
     {
@@ -138,7 +138,7 @@ namespace Mediator.Internals
             try
             {
                 var response = await next(message, cancellationToken);
-                OpenTelemetryMetrics.ProcessDuration.Record(
+                MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
@@ -147,7 +147,7 @@ namespace Mediator.Internals
             catch (global::System.Exception ex)
             {
                 tags.Add("error.type", ex.GetType().FullName);
-                OpenTelemetryMetrics.ProcessDuration.Record(
+                MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
@@ -157,7 +157,7 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
-    internal sealed class OpenTelemetryStreamMetricsBehavior<TMessage, TResponse>
+    internal sealed class MediatorStreamTelemetryBehavior<TMessage, TResponse>
         : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IStreamMessage
     {
@@ -190,7 +190,7 @@ namespace Mediator.Internals
             catch (global::System.Exception ex)
             {
                 tags.Add("error.type", ex.GetType().FullName);
-                OpenTelemetryMetrics.ProcessDuration.Record(
+                MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
@@ -219,7 +219,7 @@ namespace Mediator.Internals
             }
             finally
             {
-                OpenTelemetryMetrics.ProcessDuration.Record(
+                MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
@@ -228,12 +228,12 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
-    internal sealed class OpenTelemetryMetricsNotificationPublisher
+    internal sealed class MediatorTelemetryNotificationPublisher
         : global::Mediator.INotificationPublisher
     {
         private readonly global::Mediator.ForeachAwaitPublisher _inner;
 
-        public OpenTelemetryMetricsNotificationPublisher(global::Mediator.ForeachAwaitPublisher inner)
+        public MediatorTelemetryNotificationPublisher(global::Mediator.ForeachAwaitPublisher inner)
         {
             _inner = inner;
         }
@@ -255,7 +255,7 @@ namespace Mediator.Internals
             try
             {
                 await _inner.Publish(handlers, notification, cancellationToken);
-                OpenTelemetryMetrics.ProcessDuration.Record(
+                MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
@@ -263,7 +263,7 @@ namespace Mediator.Internals
             catch (global::System.Exception ex)
             {
                 tags.Add("error.type", ex.GetType().FullName);
-                OpenTelemetryMetrics.ProcessDuration.Record(
+                MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
@@ -325,8 +325,8 @@ namespace Mediator.Internals
             }
             {
                 var handlerCopy = handler;
-                var metricsBehavior = new global::Mediator.Internals.OpenTelemetryMetricsBehavior<TRequest, TResponse>();
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => metricsBehavior.Handle(message, handlerCopy, cancellationToken);
+                var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -411,8 +411,8 @@ namespace Mediator.Internals
             }
             {
                 var handlerCopy = handler;
-                var metricsBehavior = new global::Mediator.Internals.OpenTelemetryStreamMetricsBehavior<TRequest, TResponse>();
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => metricsBehavior.Handle(message, handlerCopy, cancellationToken);
+                var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -498,8 +498,8 @@ namespace Mediator.Internals
             }
             {
                 var handlerCopy = handler;
-                var metricsBehavior = new global::Mediator.Internals.OpenTelemetryMetricsBehavior<TRequest, TResponse>();
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => metricsBehavior.Handle(message, handlerCopy, cancellationToken);
+                var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -584,8 +584,8 @@ namespace Mediator.Internals
             }
             {
                 var handlerCopy = handler;
-                var metricsBehavior = new global::Mediator.Internals.OpenTelemetryStreamMetricsBehavior<TRequest, TResponse>();
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => metricsBehavior.Handle(message, handlerCopy, cancellationToken);
+                var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -671,8 +671,8 @@ namespace Mediator.Internals
             }
             {
                 var handlerCopy = handler;
-                var metricsBehavior = new global::Mediator.Internals.OpenTelemetryMetricsBehavior<TRequest, TResponse>();
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => metricsBehavior.Handle(message, handlerCopy, cancellationToken);
+                var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -757,8 +757,8 @@ namespace Mediator.Internals
             }
             {
                 var handlerCopy = handler;
-                var metricsBehavior = new global::Mediator.Internals.OpenTelemetryStreamMetricsBehavior<TRequest, TResponse>();
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => metricsBehavior.Handle(message, handlerCopy, cancellationToken);
+                var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
 
             _rootHandler = handler;
@@ -799,7 +799,7 @@ namespace Mediator.Internals
     internal sealed class NotificationHandlerWrapper<TNotification> : INotificationHandlerBase
         where TNotification : global::Mediator.INotification
     {
-        private global::Mediator.Internals.OpenTelemetryMetricsNotificationPublisher _publisher = null!;
+        private global::Mediator.Internals.MediatorTelemetryNotificationPublisher _publisher = null!;
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         public NotificationHandlerWrapper<TNotification> Init(
@@ -880,14 +880,14 @@ namespace Mediator.Internals
 
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response> Wrapper_For_TestCode_Request;
 
-        public readonly global::Mediator.Internals.OpenTelemetryMetricsNotificationPublisher NotificationPublisher;
+        public readonly global::Mediator.Internals.MediatorTelemetryNotificationPublisher NotificationPublisher;
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
 
             var notificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
-            NotificationPublisher = new global::Mediator.Internals.OpenTelemetryMetricsNotificationPublisher(notificationPublisher);
+            NotificationPublisher = new global::Mediator.Internals.MediatorTelemetryNotificationPublisher(notificationPublisher);
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
@@ -927,8 +927,8 @@ namespace Mediator
     {
         internal readonly global::System.IServiceProvider Services;
         private FastLazyValue<global::Mediator.Internals.ContainerMetadata, global::Mediator.Mediator> _containerMetadata;
-        private global::Mediator.Internals.OpenTelemetryMetricsNotificationPublisher? _notificationPublisher;
-        internal global::Mediator.Internals.OpenTelemetryMetricsNotificationPublisher NotificationPublisher
+        private global::Mediator.Internals.MediatorTelemetryNotificationPublisher? _notificationPublisher;
+        internal global::Mediator.Internals.MediatorTelemetryNotificationPublisher NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
