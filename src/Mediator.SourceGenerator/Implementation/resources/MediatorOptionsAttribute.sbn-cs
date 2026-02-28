@@ -48,5 +48,15 @@ namespace Mediator
         /// The meter name for OpenTelemetry metrics.
         /// </summary>
         public string TelemetryMeterName { get; set; } = "Mediator";
+
+        /// <summary>
+        /// Enable OpenTelemetry tracing for message processing.
+        /// </summary>
+        public bool TelemetryEnableTracing { get; set; } = false;
+
+        /// <summary>
+        /// The activity source name for OpenTelemetry tracing.
+        /// </summary>
+        public string TelemetryActivitySourceName { get; set; } = "Mediator";
     }
 }

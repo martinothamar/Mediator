@@ -129,7 +129,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
-            {{~ if EnableMetricsOnTarget && HasOpenTelemetrySdk ~}}
+            {{~ if EnableMetricsOnTarget && HasOpenTelemetryMetricSdk ~}}
 
             global::OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions.ConfigureOpenTelemetryMeterProvider(
                 services,

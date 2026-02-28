@@ -26,8 +26,12 @@ internal sealed record CompilationModel
         EnableMetrics = false;
         EnableMetricsOnTarget = false;
         MeterName = "Mediator";
+        EnableTracing = false;
+        EnableTracingOnTarget = false;
+        ActivitySourceName = "Mediator";
         HistogramBuckets = null;
-        HasOpenTelemetrySdk = false;
+        HasOpenTelemetryMetricSdk = false;
+        HasOpenTelemetryTracingSdk = false;
         TargetFrameworkIsNet8OrGreater = false;
         TargetFrameworkIsNet9OrGreater = false;
         NotificationPublisherResolvedTypeFullName = NotificationPublisherType.FullName;
@@ -66,8 +70,11 @@ internal sealed record CompilationModel
         string? cachingModeShort,
         bool enableMetrics,
         string meterName,
+        bool enableTracing,
+        string activitySourceName,
         string? histogramBuckets,
-        bool hasOpenTelemetrySdk,
+        bool hasOpenTelemetryMetricSdk,
+        bool hasOpenTelemetryTracingSdk,
         bool targetFrameworkIsNet8OrGreater,
         bool targetFrameworkIsNet9OrGreater,
         int manyMessagesTreshold = 16
@@ -99,8 +106,12 @@ internal sealed record CompilationModel
         EnableMetrics = enableMetrics;
         EnableMetricsOnTarget = enableMetrics && targetFrameworkIsNet8OrGreater;
         MeterName = meterName;
+        EnableTracing = enableTracing;
+        EnableTracingOnTarget = enableTracing;
+        ActivitySourceName = activitySourceName;
         HistogramBuckets = histogramBuckets;
-        HasOpenTelemetrySdk = hasOpenTelemetrySdk;
+        HasOpenTelemetryMetricSdk = hasOpenTelemetryMetricSdk;
+        HasOpenTelemetryTracingSdk = hasOpenTelemetryTracingSdk;
         TargetFrameworkIsNet8OrGreater = targetFrameworkIsNet8OrGreater;
         TargetFrameworkIsNet9OrGreater = targetFrameworkIsNet9OrGreater;
         NotificationPublisherResolvedTypeFullName = EnableMetricsOnTarget
@@ -240,8 +251,12 @@ internal sealed record CompilationModel
     public bool EnableMetrics { get; }
     public bool EnableMetricsOnTarget { get; }
     public string MeterName { get; }
+    public bool EnableTracing { get; }
+    public bool EnableTracingOnTarget { get; }
+    public string ActivitySourceName { get; }
     public string? HistogramBuckets { get; }
-    public bool HasOpenTelemetrySdk { get; }
+    public bool HasOpenTelemetryMetricSdk { get; }
+    public bool HasOpenTelemetryTracingSdk { get; }
     public bool TargetFrameworkIsNet8OrGreater { get; }
     public bool TargetFrameworkIsNet9OrGreater { get; }
     public string NotificationPublisherResolvedTypeFullName { get; }

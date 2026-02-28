@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -1086,6 +1088,196 @@ public sealed class ConfigurationTests
     }
 
     private async Task AssertMetricsCodeConfigRejectsNonLiteralAssignment(
+        string optionName,
+        string valueExpression,
+        string helperMethod,
+        string expectedMessage
+    )
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry.{{optionName}} = {{valueExpression}};
+                    });
+                }
+
+                {{helperMethod}}
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            (Action<GeneratorResult>)(
+                result =>
+                {
+                    Assertions.AssertCommon(result);
+
+                    var diagnostics = result.Diagnostics.Where(d =>
+                        d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id
+                    );
+                    Assert.Contains(diagnostics, d => d.GetMessage().Contains(expectedMessage));
+                }
+            )
+        );
+    }
+
+    [Theory]
+    [CombinatorialData]
+    public async Task Test_Telemetry_Tracing_Code_Config_Parses_Into_Model(bool oi)
+    {
+        var telemetryConfig = oi
+            ? """
+                          options.Telemetry = new()
+                          {
+                              EnableTracing = true,
+                              ActivitySourceName = "CodeTracingSource"
+                          };
+                """
+            : """
+                          options.Telemetry.EnableTracing = true;
+                          options.Telemetry.ActivitySourceName = "CodeTracingSource";
+                """;
+
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+            {{telemetryConfig}}
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.True(model.EnableTracing);
+                Assert.Equal("CodeTracingSource", model.ActivitySourceName);
+                Assert.False(model.ConfiguredViaAttribute);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Tracing_Attribute_Config_Parses_Into_Model()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            [assembly: MediatorOptions(TelemetryEnableTracing = true, TelemetryActivitySourceName = "AttributeTracingSource")]
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator();
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.True(model.EnableTracing);
+                Assert.Equal("AttributeTracingSource", model.ActivitySourceName);
+                Assert.True(model.ConfiguredViaAttribute);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Tracing_Code_Config_Rejects_NonLiteral_EnableTracing_Assignment()
+    {
+        await AssertTracingCodeConfigRejectsNonLiteralAssignment(
+            optionName: "EnableTracing",
+            valueExpression: "GetTracingEnabled()",
+            helperMethod: "private static bool GetTracingEnabled() => true;",
+            expectedMessage: "Expected boolean literal for 'EnableTracing'"
+        );
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Tracing_Code_Config_Rejects_NonLiteral_ActivitySourceName_Assignment()
+    {
+        await AssertTracingCodeConfigRejectsNonLiteralAssignment(
+            optionName: "ActivitySourceName",
+            valueExpression: "GetTracingSourceName()",
+            helperMethod: "private static string GetTracingSourceName() => \"CodeTracingSource\";",
+            expectedMessage: "Expected string literal for 'ActivitySourceName'"
+        );
+    }
+
+    private async Task AssertTracingCodeConfigRejectsNonLiteralAssignment(
         string optionName,
         string valueExpression,
         string helperMethod,

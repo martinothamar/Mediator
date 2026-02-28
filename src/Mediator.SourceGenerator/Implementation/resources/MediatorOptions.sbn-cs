@@ -43,6 +43,16 @@ namespace Mediator
         public string MeterName { get; set; } = "Mediator";
 
         /// <summary>
+        /// Enable OpenTelemetry tracing for message processing.
+        /// </summary>
+        public bool EnableTracing { get; set; } = false;
+
+        /// <summary>
+        /// The activity source name for OpenTelemetry tracing.
+        /// </summary>
+        public string ActivitySourceName { get; set; } = "Mediator";
+
+        /// <summary>
         /// Custom histogram bucket boundaries for the messaging.process.duration metric.
         /// If null, uses default boundaries.
         /// </summary>

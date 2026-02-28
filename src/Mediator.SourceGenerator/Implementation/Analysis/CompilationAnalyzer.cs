@@ -58,8 +58,11 @@ internal sealed class CompilationAnalyzer
 
     private bool _enableMetrics = false;
     private string _meterName = "Mediator";
+    private bool _enableTracing = false;
+    private string _activitySourceName = "Mediator";
     private double[]? _histogramBuckets = null;
-    private bool _hasOpenTelemetrySdk = false;
+    private bool _hasOpenTelemetryMetricSdk = false;
+    private bool _hasOpenTelemetryTracingSdk = false;
 
     private bool _hasErrors;
     private bool _isInitialized;
@@ -170,7 +173,7 @@ internal sealed class CompilationAnalyzer
 
             TryParseConfiguration();
 
-            DetectOpenTelemetrySdk();
+            DetectOpenTelemetryDependencies();
 
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapperModel[]
             {
@@ -310,33 +313,45 @@ internal sealed class CompilationAnalyzer
         }
     }
 
-    private void DetectOpenTelemetrySdk()
+    private void DetectOpenTelemetryDependencies()
     {
-        if (!_enableMetrics)
-            return;
+        if (_enableMetrics)
+        {
+            _hasOpenTelemetryMetricSdk = HasOpenTelemetryProviderBuilderExtension(
+                "OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions",
+                "ConfigureOpenTelemetryMeterProvider"
+            );
+        }
 
-        const string openTelemetryMeterProviderExtensionsTypeName =
-            "OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions";
-        const string openTelemetryMeterProviderExtensionsAssemblyName = "OpenTelemetry.Api.ProviderBuilderExtensions";
+        if (_enableTracing)
+        {
+            _hasOpenTelemetryTracingSdk = HasOpenTelemetryProviderBuilderExtension(
+                "OpenTelemetry.Trace.OpenTelemetryDependencyInjectionTracingServiceCollectionExtensions",
+                "ConfigureOpenTelemetryTracerProvider"
+            );
+        }
+    }
 
-        var meterProviderExtensionsType = _context.Compilation.GetTypeByMetadataName(
-            openTelemetryMeterProviderExtensionsTypeName
-        );
-        if (meterProviderExtensionsType is null)
-            return;
+    private bool HasOpenTelemetryProviderBuilderExtension(string typeName, string methodName)
+    {
+        const string openTelemetryProviderExtensionsAssemblyName = "OpenTelemetry.Api.ProviderBuilderExtensions";
+
+        var extensionsType = _context.Compilation.GetTypeByMetadataName(typeName);
+        if (extensionsType is null)
+            return false;
 
         if (
             !string.Equals(
-                meterProviderExtensionsType.ContainingAssembly.Name,
-                openTelemetryMeterProviderExtensionsAssemblyName,
+                extensionsType.ContainingAssembly.Name,
+                openTelemetryProviderExtensionsAssemblyName,
                 StringComparison.Ordinal
             )
         )
         {
-            return;
+            return false;
         }
 
-        foreach (var member in meterProviderExtensionsType.GetMembers("ConfigureOpenTelemetryMeterProvider"))
+        foreach (var member in extensionsType.GetMembers(methodName))
         {
             if (member is not IMethodSymbol method)
                 continue;
@@ -344,9 +359,10 @@ internal sealed class CompilationAnalyzer
             if (!method.IsExtensionMethod || method.Parameters.Length != 2)
                 continue;
 
-            _hasOpenTelemetrySdk = true;
-            return;
+            return true;
         }
+
+        return false;
     }
 
     private void TryLoadBaseMessageSymbols(
@@ -493,8 +509,11 @@ internal sealed class CompilationAnalyzer
                 CachingModeShort,
                 _enableMetrics,
                 _meterName,
+                _enableTracing,
+                _activitySourceName,
                 histogramBucketsString,
-                _hasOpenTelemetrySdk,
+                _hasOpenTelemetryMetricSdk,
+                _hasOpenTelemetryTracingSdk,
                 TargetFrameworkIsNet8OrGreater,
                 TargetFrameworkIsNet9OrGreater,
                 MessageCountThreshold
@@ -1253,6 +1272,60 @@ internal sealed class CompilationAnalyzer
                     return;
                 }
             }
+            else if (attrFieldName == "TelemetryEnableTracing")
+            {
+                var configuredEnableTracing = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken);
+                if (!configuredEnableTracing.HasValue || configuredEnableTracing.Value is not bool enableTracing)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected boolean literal for 'TelemetryEnableTracing'"
+                            )
+                    );
+                    return;
+                }
+
+                _enableTracing = enableTracing;
+            }
+            else if (attrFieldName == "TelemetryActivitySourceName")
+            {
+                var configuredActivitySourceName = semanticModel.GetConstantValue(
+                    attrArg.Expression,
+                    cancellationToken
+                );
+                if (!configuredActivitySourceName.HasValue)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected string literal for 'TelemetryActivitySourceName'"
+                            )
+                    );
+                    return;
+                }
+
+                if (configuredActivitySourceName.Value is string activitySourceName)
+                {
+                    _activitySourceName = activitySourceName;
+                }
+                else if (configuredActivitySourceName.Value is not null)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected string literal for 'TelemetryActivitySourceName'"
+                            )
+                    );
+                    return;
+                }
+            }
         }
 
         ConfiguredViaAttribute = true;
@@ -1324,6 +1397,49 @@ internal sealed class CompilationAnalyzer
                     assignment.Right.GetLocation(),
                     (in CompilationAnalyzerContext c, Location l) =>
                         c.ReportInvalidCodeBasedConfiguration(l, "Expected string literal for 'MeterName'")
+                );
+                return false;
+            }
+        }
+        else if (telemetryOpt == "EnableTracing")
+        {
+            if (assignment.Right is not LiteralExpressionSyntax literal)
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected boolean literal for 'EnableTracing'")
+                );
+                return false;
+            }
+
+            if (literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                _enableTracing = true;
+            else if (literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                _enableTracing = false;
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected boolean literal for 'EnableTracing'")
+                );
+                return false;
+            }
+        }
+        else if (telemetryOpt == "ActivitySourceName")
+        {
+            if (assignment.Right is LiteralExpressionSyntax literal)
+            {
+                if (!literal.IsKind(SyntaxKind.NullLiteralExpression))
+                    _activitySourceName = literal.Token.ValueText;
+            }
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected string literal for 'ActivitySourceName'")
                 );
                 return false;
             }
