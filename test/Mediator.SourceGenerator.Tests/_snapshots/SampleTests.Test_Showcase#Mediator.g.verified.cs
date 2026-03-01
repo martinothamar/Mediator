@@ -306,7 +306,7 @@ namespace Mediator.Internals
                 activity?.Dispose();
                 throw;
             }
-            await using var asyncEnumerator = enumerator;
+            var asyncEnumerator = enumerator;
             try
             {
                 while (true)
@@ -335,6 +335,22 @@ namespace Mediator.Internals
             }
             finally
             {
+                global::System.Exception? disposeException = null;
+                try
+                {
+                    await asyncEnumerator.DisposeAsync();
+                }
+                catch (global::System.Exception ex)
+                {
+                    disposeException = ex;
+                    if (activity is not null)
+                    {
+                        activity.AddException(ex);
+                        activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                        activity.SetTag("error.type", ex.GetType().FullName);
+                    }
+                    errorType = ex.GetType().FullName;
+                }
                 if (errorType is null)
                 {
                     MediatorTelemetry.ProcessDuration.Record(
@@ -352,6 +368,8 @@ namespace Mediator.Internals
                     );
                 }
                 activity?.Dispose();
+                if (disposeException is not null)
+                    global::System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(disposeException).Throw();
             }
         }
     }

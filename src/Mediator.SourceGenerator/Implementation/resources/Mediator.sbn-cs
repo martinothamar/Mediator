@@ -398,7 +398,7 @@ namespace {{ InternalsNamespace }}
                 {{~ end ~}}
                 throw;
             }
-            await using var asyncEnumerator = enumerator;
+            var asyncEnumerator = enumerator;
             try
             {
                 while (true)
@@ -433,6 +433,28 @@ namespace {{ InternalsNamespace }}
             }
             finally
             {
+                global::System.Exception? disposeException = null;
+                try
+                {
+                    await asyncEnumerator.DisposeAsync();
+                }
+                catch (global::System.Exception ex)
+                {
+                    disposeException = ex;
+                    {{~ if EnableTracingOnTarget ~}}
+                    if (activity is not null)
+                    {
+                        {{~ if TargetFrameworkIsNet9OrGreater ~}}
+                        activity.AddException(ex);
+                        {{~ end ~}}
+                        activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                        activity.SetTag("error.type", ex.GetType().FullName);
+                    }
+                    {{~ end ~}}
+                    {{~ if EnableMetricsOnTarget ~}}
+                    errorType = ex.GetType().FullName;
+                    {{~ end ~}}
+                }
                 {{~ if EnableMetricsOnTarget ~}}
                 if (errorType is null)
                 {
@@ -454,6 +476,8 @@ namespace {{ InternalsNamespace }}
                 {{~ if EnableTracingOnTarget ~}}
                 activity?.Dispose();
                 {{~ end ~}}
+                if (disposeException is not null)
+                    global::System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(disposeException).Throw();
             }
         }
     }
