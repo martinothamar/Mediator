@@ -358,7 +358,7 @@ services.AddMediator((MediatorOptions options) =>
 * `Telemetry` - configures telemetry emitted by the generated mediator implementation
   * `EnableMetrics` - enables metrics using `System.Diagnostics.Metrics` (requires .NET 8+)
   * `MeterName` - meter name used when metrics are enabled
-  * `EnableTracing` - enables tracing using `System.Diagnostics.ActivitySource`
+  * `EnableTracing` - enables tracing using `System.Diagnostics.ActivitySource` (requires `System.Diagnostics.DiagnosticSource` APIs to be available on the target compilation)
   * `ActivitySourceName` - activity source name used when tracing is enabled
   * `HistogramBuckets` - optional custom bucket boundaries for `messaging.process.duration` (only configurable through `MediatorOptions`, not assembly attribute)
 

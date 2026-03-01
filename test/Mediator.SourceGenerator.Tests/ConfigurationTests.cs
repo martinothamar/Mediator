@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mediator.SourceGenerator.Tests;
@@ -1334,5 +1336,365 @@ public sealed class ConfigurationTests
         );
 
         await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
+    public void Test_Telemetry_Tracing_Disabled_When_ActivitySource_Symbol_Is_Unavailable()
+    {
+        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry.EnableTracing = true;
+                        options.Telemetry.ActivitySourceName = "TestActivitySource";
+                    });
+                }
+            }
+            """
+        );
+
+        var result = RunGenerator(inputCompilation);
+        Assertions.AssertCommon(result);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(
+            result
+                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
+        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id);
+        Assert.All(
+            result.Diagnostics.Where(d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id),
+            d => Assert.True(d.Location.IsInSource)
+        );
+
+        var model = result.Generator.CompilationModel;
+        Assert.NotNull(model);
+        Assert.True(model.EnableTracing);
+        Assert.False(model.EnableTracingOnTarget);
+        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
+    }
+
+    [Fact]
+    public void Test_Telemetry_Tracing_Attribute_Config_Disabled_When_ActivitySource_Symbol_Is_Unavailable()
+    {
+        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            [assembly: MediatorOptions(TelemetryEnableTracing = true, TelemetryActivitySourceName = "AttrTracingSource")]
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator();
+                }
+            }
+            """
+        );
+
+        var result = RunGenerator(inputCompilation);
+        Assertions.AssertCommon(result);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(
+            result
+                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
+        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id);
+        Assert.All(
+            result.Diagnostics.Where(d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id),
+            d => Assert.True(d.Location.IsInSource)
+        );
+
+        var model = result.Generator.CompilationModel;
+        Assert.NotNull(model);
+        Assert.True(model.EnableTracing);
+        Assert.True(model.ConfiguredViaAttribute);
+        Assert.False(model.EnableTracingOnTarget);
+        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
+    }
+
+    [Fact]
+    public void Test_Telemetry_Metrics_Disabled_When_Meter_Symbol_Is_Unavailable()
+    {
+        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry.EnableMetrics = true;
+                        options.Telemetry.MeterName = "TestMeter";
+                    });
+                }
+            }
+            """
+        );
+
+        var result = RunGenerator(inputCompilation);
+        Assertions.AssertCommon(result);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(
+            result
+                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
+        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id);
+        Assert.All(
+            result.Diagnostics.Where(d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id),
+            d => Assert.True(d.Location.IsInSource)
+        );
+
+        var model = result.Generator.CompilationModel;
+        Assert.NotNull(model);
+        Assert.True(model.EnableMetrics);
+        Assert.False(model.EnableMetricsOnTarget);
+        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
+    }
+
+    [Fact]
+    public void Test_Telemetry_Metrics_Attribute_Config_Disabled_When_Meter_Symbol_Is_Unavailable()
+    {
+        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            [assembly: MediatorOptions(TelemetryEnableMetrics = true, TelemetryMeterName = "AttrMeter")]
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator();
+                }
+            }
+            """
+        );
+
+        var result = RunGenerator(inputCompilation);
+        Assertions.AssertCommon(result);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(
+            result
+                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
+        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id);
+        Assert.All(
+            result.Diagnostics.Where(d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id),
+            d => Assert.True(d.Location.IsInSource)
+        );
+
+        var model = result.Generator.CompilationModel;
+        Assert.NotNull(model);
+        Assert.True(model.EnableMetrics);
+        Assert.True(model.ConfiguredViaAttribute);
+        Assert.False(model.EnableMetricsOnTarget);
+        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
+    }
+
+    [Fact]
+    public void Test_Telemetry_Tracing_Only_On_Target_When_TargetFramework_Symbols_Are_Missing()
+    {
+        var inputCompilation = CreateLibraryWithoutTargetFrameworkPreprocessorSymbols(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry.EnableMetrics = true;
+                        options.Telemetry.MeterName = "TestMeter";
+                        options.Telemetry.EnableTracing = true;
+                        options.Telemetry.ActivitySourceName = "TestActivitySource";
+                    });
+                }
+            }
+            """
+        );
+
+        var result = RunGenerator(inputCompilation);
+        Assertions.AssertCommon(result);
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(
+            result
+                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+        );
+        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id);
+        Assert.All(
+            result.Diagnostics.Where(d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id),
+            d => Assert.True(d.Location.IsInSource)
+        );
+        Assert.DoesNotContain(result.Diagnostics, d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id);
+
+        var model = result.Generator.CompilationModel;
+        Assert.NotNull(model);
+        Assert.False(model.TargetFrameworkIsNet8OrGreater);
+        Assert.True(model.EnableMetrics);
+        Assert.True(model.EnableTracing);
+        Assert.False(model.EnableMetricsOnTarget);
+        Assert.True(model.EnableTracingOnTarget);
+        Assert.Equal(
+            $"global::{model.InternalsNamespace}.MediatorTelemetryNotificationPublisher",
+            model.NotificationPublisherResolvedTypeFullName
+        );
+    }
+
+    private static CSharpCompilation CreateLibraryWithoutDiagnosticSourceReference(string source)
+    {
+        var syntaxTree = CSharpSyntaxTree.ParseText(
+            source,
+            CSharpParseOptions.Default.WithPreprocessorSymbols(
+                "NET8_0_OR_GREATER",
+                "NET9_0_OR_GREATER",
+                "NET10_0_OR_GREATER"
+            ),
+            cancellationToken: TestContext.Current.CancellationToken
+        );
+
+        var diagnosticSourceAssemblyLocation = typeof(System.Diagnostics.ActivitySource).Assembly.Location;
+        var references = Fixture
+            .AssemblyReferencesForCodegen.Where(a =>
+                !a.IsDynamic && !string.Equals(a.Location, diagnosticSourceAssemblyLocation, StringComparison.Ordinal)
+            )
+            .Select(a => MetadataReference.CreateFromFile(a.Location));
+
+        return CSharpCompilation.Create(
+            "Library",
+            new[] { syntaxTree },
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+    }
+
+    private static CSharpCompilation CreateLibraryWithoutTargetFrameworkPreprocessorSymbols(string source)
+    {
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, cancellationToken: TestContext.Current.CancellationToken);
+
+        var references = Fixture
+            .AssemblyReferencesForCodegen.Where(a => !a.IsDynamic)
+            .Select(a => MetadataReference.CreateFromFile(a.Location));
+
+        return CSharpCompilation.Create(
+            "Library",
+            new[] { syntaxTree },
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+    }
+
+    private static GeneratorResult RunGenerator(CSharpCompilation inputCompilation)
+    {
+        var generator = new IncrementalMediatorGenerator();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        driver = driver.RunGeneratorsAndUpdateCompilation(
+            inputCompilation,
+            out var outputCompilation,
+            out var diagnostics,
+            cancellationToken: TestContext.Current.CancellationToken
+        );
+        var runResult = driver.GetRunResult();
+
+        return new(generator, diagnostics, runResult, outputCompilation);
     }
 }

@@ -58,8 +58,10 @@ internal sealed class CompilationAnalyzer
 
     private bool _enableMetrics = false;
     private string _meterName = "Mediator";
+    private Location? _enableMetricsLocation = null;
     private bool _enableTracing = false;
     private string _activitySourceName = "Mediator";
+    private Location? _enableTracingLocation = null;
     private double[]? _histogramBuckets = null;
 
     private bool _hasErrors;
@@ -113,6 +115,10 @@ internal sealed class CompilationAnalyzer
 
     private bool TargetFrameworkIsNet8OrGreater => _preprocessorSymbolNames.Contains("NET8_0_OR_GREATER");
     private bool TargetFrameworkIsNet9OrGreater => _preprocessorSymbolNames.Contains("NET9_0_OR_GREATER");
+    private bool TargetHasMeter =>
+        _context.Compilation.GetTypeByMetadataName("System.Diagnostics.Metrics.Meter") is not null;
+    private bool TargetHasActivitySource =>
+        _context.Compilation.GetTypeByMetadataName("System.Diagnostics.ActivitySource") is not null;
 
     public bool GenerateTypesAsInternal { get; private set; }
 
@@ -421,6 +427,16 @@ internal sealed class CompilationAnalyzer
                 );
             }
 
+            if (_enableMetrics && (!TargetFrameworkIsNet8OrGreater || !TargetHasMeter))
+            {
+                _context.ReportMetricsUnavailableOnTarget(_enableMetricsLocation);
+            }
+
+            if (_enableTracing && !TargetHasActivitySource)
+            {
+                _context.ReportTracingUnavailableOnTarget(_enableTracingLocation);
+            }
+
             var model = new CompilationModel(
                 ToModelsSortedByInheritanceDepth(
                     _requestMessages,
@@ -458,6 +474,8 @@ internal sealed class CompilationAnalyzer
                 histogramBucketsString,
                 TargetFrameworkIsNet8OrGreater,
                 TargetFrameworkIsNet9OrGreater,
+                TargetHasMeter,
+                TargetHasActivitySource,
                 MessageCountThreshold
             );
 
@@ -1186,6 +1204,7 @@ internal sealed class CompilationAnalyzer
                 }
 
                 _enableMetrics = enableMetrics;
+                _enableMetricsLocation = enableMetrics ? attrArg.GetLocation() : null;
             }
             else if (attrFieldName == "TelemetryMeterName")
             {
@@ -1231,6 +1250,7 @@ internal sealed class CompilationAnalyzer
                 }
 
                 _enableTracing = enableTracing;
+                _enableTracingLocation = enableTracing ? attrArg.GetLocation() : null;
             }
             else if (attrFieldName == "TelemetryActivitySourceName")
             {
@@ -1313,9 +1333,15 @@ internal sealed class CompilationAnalyzer
             }
 
             if (literal.IsKind(SyntaxKind.TrueLiteralExpression))
+            {
                 _enableMetrics = true;
+                _enableMetricsLocation = assignment.Left.GetLocation();
+            }
             else if (literal.IsKind(SyntaxKind.FalseLiteralExpression))
+            {
                 _enableMetrics = false;
+                _enableMetricsLocation = null;
+            }
             else
             {
                 ReportDiagnostic(
@@ -1356,9 +1382,15 @@ internal sealed class CompilationAnalyzer
             }
 
             if (literal.IsKind(SyntaxKind.TrueLiteralExpression))
+            {
                 _enableTracing = true;
+                _enableTracingLocation = assignment.Left.GetLocation();
+            }
             else if (literal.IsKind(SyntaxKind.FalseLiteralExpression))
+            {
                 _enableTracing = false;
+                _enableTracingLocation = null;
+            }
             else
             {
                 ReportDiagnostic(

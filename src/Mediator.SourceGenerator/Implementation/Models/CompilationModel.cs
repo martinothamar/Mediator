@@ -73,6 +73,8 @@ internal sealed record CompilationModel
         string? histogramBuckets,
         bool targetFrameworkIsNet8OrGreater,
         bool targetFrameworkIsNet9OrGreater,
+        bool targetHasMeter,
+        bool targetHasActivitySource,
         int manyMessagesTreshold = 16
     )
     {
@@ -100,10 +102,10 @@ internal sealed record CompilationModel
         NotificationPublisherType = notificationPublisherType;
         PipelineBehaviors = pipelineBehaviors;
         EnableMetrics = enableMetrics;
-        EnableMetricsOnTarget = enableMetrics && targetFrameworkIsNet8OrGreater;
+        EnableMetricsOnTarget = enableMetrics && targetFrameworkIsNet8OrGreater && targetHasMeter;
         MeterName = meterName;
         EnableTracing = enableTracing;
-        EnableTracingOnTarget = enableTracing;
+        EnableTracingOnTarget = enableTracing && targetHasActivitySource;
         ActivitySourceName = activitySourceName;
         HistogramBuckets = histogramBuckets;
         TargetFrameworkIsNet8OrGreater = targetFrameworkIsNet8OrGreater;
