@@ -122,16 +122,33 @@ namespace Mediator.Internals
         : global::Mediator.IPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IMessage
     {
+        private const string OperationName = "send";
         private static readonly string DestinationName = typeof(TMessage).Name;
-        private static readonly string SpanName = "process " + DestinationName;
+        private static readonly string SpanName = OperationName + " " + DestinationName;
+        private static readonly string MessageKind = GetMessageKind();
         private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
             new global::System.Collections.Generic.KeyValuePair<string, object?>[]
             {
                 new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
-                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", OperationName),
                 new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.mediator.message.kind", MessageKind),
                 new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
             };
+
+        private static string GetMessageKind()
+        {
+            if (typeof(global::Mediator.IBaseCommand).IsAssignableFrom(typeof(TMessage)))
+                return "command";
+
+            if (typeof(global::Mediator.IBaseQuery).IsAssignableFrom(typeof(TMessage)))
+                return "query";
+
+            if (typeof(global::Mediator.IBaseRequest).IsAssignableFrom(typeof(TMessage)))
+                return "request";
+
+            return "message";
+        }
 
         public async global::System.Threading.Tasks.ValueTask<TResponse> Handle(
             TMessage message,
@@ -167,16 +184,33 @@ namespace Mediator.Internals
         : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IStreamMessage
     {
+        private const string OperationName = "createstream";
         private static readonly string DestinationName = typeof(TMessage).Name;
-        private static readonly string SpanName = "process " + DestinationName;
+        private static readonly string SpanName = OperationName + " " + DestinationName;
+        private static readonly string MessageKind = GetMessageKind();
         private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
             new global::System.Collections.Generic.KeyValuePair<string, object?>[]
             {
                 new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
-                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", OperationName),
                 new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.mediator.message.kind", MessageKind),
                 new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
             };
+
+        private static string GetMessageKind()
+        {
+            if (typeof(global::Mediator.IBaseStreamCommand).IsAssignableFrom(typeof(TMessage)))
+                return "streamcommand";
+
+            if (typeof(global::Mediator.IBaseStreamQuery).IsAssignableFrom(typeof(TMessage)))
+                return "streamquery";
+
+            if (typeof(global::Mediator.IBaseStreamRequest).IsAssignableFrom(typeof(TMessage)))
+                return "streamrequest";
+
+            return "streammessage";
+        }
 
         public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
             TMessage message,
@@ -260,14 +294,16 @@ namespace Mediator.Internals
         private static class NotificationTelemetry<TNotificationType>
             where TNotificationType : global::Mediator.INotification
         {
+            public const string OperationName = "publish";
             public static readonly string DestinationName = typeof(TNotificationType).Name;
-            public static readonly string SpanName = "process " + DestinationName;
+            public static readonly string SpanName = OperationName + " " + DestinationName;
             public static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
                 new global::System.Collections.Generic.KeyValuePair<string, object?>[]
                 {
                     new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
-                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", OperationName),
                     new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.mediator.message.kind", "notification"),
                     new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
                 };
         }

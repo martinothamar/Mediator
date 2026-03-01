@@ -59,8 +59,10 @@ public sealed class TelemetryRuntimeTests
             destinations.Should().Contain(nameof(TelemetryNotification));
             destinations.Should().Contain(nameof(TelemetryStreamRequest));
             meterCapture.Measurements.Should().OnlyContain(x => x.InstrumentName == "messaging.process.duration");
-            meterCapture.Measurements.Should().OnlyContain(x => x.OperationName == "process");
             meterCapture.Measurements.Should().OnlyContain(x => x.OperationType == "process");
+            meterCapture.Measurements.Should().Contain(x => x.OperationName == "send");
+            meterCapture.Measurements.Should().Contain(x => x.OperationName == "publish");
+            meterCapture.Measurements.Should().Contain(x => x.OperationName == "createstream");
         }
         else
         {
@@ -73,12 +75,16 @@ public sealed class TelemetryRuntimeTests
             destinations.Should().Contain(nameof(TelemetryRequest));
             destinations.Should().Contain(nameof(TelemetryNotification));
             destinations.Should().Contain(nameof(TelemetryStreamRequest));
-            activityCapture.Activities.Should().OnlyContain(x => x.OperationName == "process");
             activityCapture.Activities.Should().OnlyContain(x => x.OperationType == "process");
             activityCapture.Activities.Should().OnlyContain(x => x.SpanKind == ActivityKind.Consumer);
-            activityCapture.Activities.Should().Contain(x => x.SpanName == $"process {nameof(TelemetryRequest)}");
-            activityCapture.Activities.Should().Contain(x => x.SpanName == $"process {nameof(TelemetryNotification)}");
-            activityCapture.Activities.Should().Contain(x => x.SpanName == $"process {nameof(TelemetryStreamRequest)}");
+            activityCapture.Activities.Should().Contain(x => x.OperationName == "send");
+            activityCapture.Activities.Should().Contain(x => x.OperationName == "publish");
+            activityCapture.Activities.Should().Contain(x => x.OperationName == "createstream");
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"send {nameof(TelemetryRequest)}");
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"publish {nameof(TelemetryNotification)}");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.SpanName == $"createstream {nameof(TelemetryStreamRequest)}");
         }
         else
         {
@@ -115,7 +121,7 @@ public sealed class TelemetryRuntimeTests
             activityCapture
                 .Activities.Should()
                 .Contain(x =>
-                    x.SpanName == $"process {nameof(TelemetryNotification)}" && x.SpanKind == ActivityKind.Consumer
+                    x.SpanName == $"publish {nameof(TelemetryNotification)}" && x.SpanKind == ActivityKind.Consumer
                 );
         }
         else
