@@ -60,6 +60,7 @@
     <Project Path="test/Mediator.MemAllocationTests/Mediator.MemAllocationTests.csproj" />
     <Project Path="test/Mediator.SmokeTestConsole/Mediator.SmokeTestConsole.csproj" />
     <Project Path="test/Mediator.SourceGenerator.Tests/Mediator.SourceGenerator.Tests.csproj" />
+    <Project Path="test/Mediator.Telemetry.Tests/Mediator.Telemetry.Tests.csproj" />
     <Project Path="test/Mediator.Tests/Mediator.Tests.csproj" />
   </Folder>
   <Folder Name="/_files/">

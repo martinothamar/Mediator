@@ -86,7 +86,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {{~ if CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
             services.Add(new {{ SD }}(typeof({{ message.FullName }}), sp => {
-                var publisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                var publisher = sp.GetRequiredService<global::{{ MediatorNamespace }}.Mediator>().NotificationPublisher;
                 return new {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }}().Init(publisher, sp.GetRequiredService<global::{{ InternalsNamespace }}.ContainerMetadata>(), sp);
             }, {{ SingletonServiceLifetime }}));
             {{~ else ~}}
@@ -175,6 +175,403 @@ namespace {{ InternalsNamespace }}
             global::System.Threading.CancellationToken cancellationToken
         );
     }
+    {{~ if EnableTelemetryOnTarget ~}}
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal static class MediatorTelemetry
+    {
+        {{~ if EnableMetricsOnTarget ~}}
+        public static readonly global::System.Diagnostics.Metrics.Meter Meter =
+            new("{{ MeterName }}", "{{ GeneratorVersion }}");
+
+        public static readonly global::System.Diagnostics.Metrics.Histogram<double> ProcessDuration =
+            {{~ if TargetFrameworkIsNet9OrGreater ~}}
+            Meter.CreateHistogram<double>(
+                "messaging.process.duration",
+                unit: "s",
+                description: "Duration of message processing operation",
+                advice: new() { HistogramBucketBoundaries = new double[] { {{ if HistogramBuckets; HistogramBuckets; else; "0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10"; end; }} } }
+            );
+            {{~ else ~}}
+            Meter.CreateHistogram<double>(
+                "messaging.process.duration",
+                unit: "s",
+                description: "Duration of message processing operation"
+            );
+            {{~ end ~}}
+        {{~ end ~}}
+        {{~ if EnableTracingOnTarget ~}}
+
+        public static readonly global::System.Diagnostics.ActivitySource ActivitySource =
+            new("{{ ActivitySourceName }}", "{{ GeneratorVersion }}");
+        {{~ end ~}}
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class MediatorTelemetryBehavior<TMessage, TResponse>
+        : global::Mediator.IPipelineBehavior<TMessage, TResponse>
+        where TMessage : global::Mediator.IMessage
+    {
+        private const string OperationName = "send";
+        private static readonly string DestinationName = typeof(TMessage).Name;
+        private static readonly string SpanName = OperationName + " " + DestinationName;
+        private static readonly string MessageKind = GetMessageKind();
+        private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+            new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+            {
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", OperationName),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.mediator.message.kind", MessageKind),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+            };
+
+        private static string GetMessageKind()
+        {
+            if (typeof(global::Mediator.IBaseCommand).IsAssignableFrom(typeof(TMessage)))
+                return "command";
+
+            if (typeof(global::Mediator.IBaseQuery).IsAssignableFrom(typeof(TMessage)))
+                return "query";
+
+            if (typeof(global::Mediator.IBaseRequest).IsAssignableFrom(typeof(TMessage)))
+                return "request";
+
+            return "message";
+        }
+
+        public async global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            TMessage message,
+            global::Mediator.MessageHandlerDelegate<TMessage, TResponse> next,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            {{~ if EnableMetricsOnTarget ~}}
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            {{~ end ~}}
+            {{~ if EnableTracingOnTarget ~}}
+            var activity = global::{{ InternalsNamespace }}.MediatorTelemetry.ActivitySource.StartActivity(
+                SpanName,
+                global::System.Diagnostics.ActivityKind.Consumer,
+                default(global::System.Diagnostics.ActivityContext),
+                tags: TelemetryTags
+            );
+            {{~ end ~}}
+
+            try
+            {
+                var response = await next(message, cancellationToken);
+                {{~ if EnableMetricsOnTarget ~}}
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    TelemetryTags
+                );
+                {{~ end ~}}
+                return response;
+            }
+            catch (global::System.Exception ex)
+            {
+                {{~ if EnableTracingOnTarget ~}}
+                if (activity is not null)
+                {
+                    {{~ if TargetFrameworkIsNet9OrGreater ~}}
+                    activity.AddException(ex);
+                    {{~ end ~}}
+                    activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                    activity.SetTag("error.type", ex.GetType().FullName);
+                }
+                {{~ end ~}}
+                {{~ if EnableMetricsOnTarget ~}}
+                var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                {{~ end ~}}
+                throw;
+            }
+            {{~ if EnableTracingOnTarget ~}}
+            finally
+            {
+                activity?.Dispose();
+            }
+            {{~ end ~}}
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class MediatorStreamTelemetryBehavior<TMessage, TResponse>
+        : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
+        where TMessage : global::Mediator.IStreamMessage
+    {
+        private const string OperationName = "createstream";
+        private static readonly string DestinationName = typeof(TMessage).Name;
+        private static readonly string SpanName = OperationName + " " + DestinationName;
+        private static readonly string MessageKind = GetMessageKind();
+        private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+            new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+            {
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", OperationName),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.mediator.message.kind", MessageKind),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+            };
+
+        private static string GetMessageKind()
+        {
+            if (typeof(global::Mediator.IBaseStreamCommand).IsAssignableFrom(typeof(TMessage)))
+                return "streamcommand";
+
+            if (typeof(global::Mediator.IBaseStreamQuery).IsAssignableFrom(typeof(TMessage)))
+                return "streamquery";
+
+            if (typeof(global::Mediator.IBaseStreamRequest).IsAssignableFrom(typeof(TMessage)))
+                return "streamrequest";
+
+            return "streammessage";
+        }
+
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            TMessage message,
+            global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            return HandleWithTelemetry(message, next, cancellationToken);
+        }
+
+        private static async global::System.Collections.Generic.IAsyncEnumerable<TResponse> HandleWithTelemetry(
+            TMessage message,
+            global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken)
+        {
+            {{~ if EnableMetricsOnTarget ~}}
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            string? errorType = null;
+            {{~ end ~}}
+            {{~ if EnableTracingOnTarget ~}}
+            var activity = global::{{ InternalsNamespace }}.MediatorTelemetry.ActivitySource.StartActivity(
+                SpanName,
+                global::System.Diagnostics.ActivityKind.Consumer,
+                default(global::System.Diagnostics.ActivityContext),
+                tags: TelemetryTags
+            );
+            {{~ end ~}}
+
+            global::System.Collections.Generic.IAsyncEnumerator<TResponse> enumerator;
+            try
+            {
+                var responses = next(message, cancellationToken);
+                enumerator = responses.GetAsyncEnumerator(cancellationToken);
+            }
+            catch (global::System.Exception ex)
+            {
+                {{~ if EnableTracingOnTarget ~}}
+                if (activity is not null)
+                {
+                    {{~ if TargetFrameworkIsNet9OrGreater ~}}
+                    activity.AddException(ex);
+                    {{~ end ~}}
+                    activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                    activity.SetTag("error.type", ex.GetType().FullName);
+                }
+                {{~ end ~}}
+                {{~ if EnableMetricsOnTarget ~}}
+                var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                {{~ end ~}}
+                {{~ if EnableTracingOnTarget ~}}
+                activity?.Dispose();
+                {{~ end ~}}
+                throw;
+            }
+            var asyncEnumerator = enumerator;
+            try
+            {
+                while (true)
+                {
+                    TResponse response;
+                    try
+                    {
+                        if (!await asyncEnumerator.MoveNextAsync())
+                            break;
+                        response = asyncEnumerator.Current;
+                    }
+                    catch (global::System.Exception ex)
+                    {
+                        {{~ if EnableTracingOnTarget ~}}
+                        if (activity is not null)
+                        {
+                            {{~ if TargetFrameworkIsNet9OrGreater ~}}
+                            activity.AddException(ex);
+                            {{~ end ~}}
+                            activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                            activity.SetTag("error.type", ex.GetType().FullName);
+                        }
+                        {{~ end ~}}
+                        {{~ if EnableMetricsOnTarget ~}}
+                        errorType = ex.GetType().FullName;
+                        {{~ end ~}}
+                        throw;
+                    }
+
+                    yield return response;
+                }
+            }
+            finally
+            {
+                global::System.Exception? disposeException = null;
+                try
+                {
+                    await asyncEnumerator.DisposeAsync();
+                }
+                catch (global::System.Exception ex)
+                {
+                    disposeException = ex;
+                    {{~ if EnableTracingOnTarget ~}}
+                    if (activity is not null)
+                    {
+                        {{~ if TargetFrameworkIsNet9OrGreater ~}}
+                        activity.AddException(ex);
+                        {{~ end ~}}
+                        activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                        activity.SetTag("error.type", ex.GetType().FullName);
+                    }
+                    {{~ end ~}}
+                    {{~ if EnableMetricsOnTarget ~}}
+                    errorType = ex.GetType().FullName;
+                    {{~ end ~}}
+                }
+                {{~ if EnableMetricsOnTarget ~}}
+                if (errorType is null)
+                {
+                    MediatorTelemetry.ProcessDuration.Record(
+                        global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                        TelemetryTags
+                    );
+                }
+                else
+                {
+                    var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                    tags.Add("error.type", errorType);
+                    MediatorTelemetry.ProcessDuration.Record(
+                        global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                        tags
+                    );
+                }
+                {{~ end ~}}
+                {{~ if EnableTracingOnTarget ~}}
+                activity?.Dispose();
+                {{~ end ~}}
+                if (disposeException is not null)
+                    global::System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(disposeException).Throw();
+            }
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
+    internal sealed class MediatorTelemetryNotificationPublisher
+        : global::Mediator.INotificationPublisher
+    {
+        private readonly {{ NotificationPublisherType.FullName }} _inner;
+        private static class NotificationTelemetry<TNotificationType>
+            where TNotificationType : global::Mediator.INotification
+        {
+            public const string OperationName = "publish";
+            public static readonly string DestinationName = typeof(TNotificationType).Name;
+            public static readonly string SpanName = OperationName + " " + DestinationName;
+            public static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+                new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+                {
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", OperationName),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.mediator.message.kind", "notification"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+                };
+        }
+
+        public MediatorTelemetryNotificationPublisher({{ NotificationPublisherType.FullName }} inner)
+        {
+            _inner = inner;
+        }
+
+        public async global::System.Threading.Tasks.ValueTask Publish<TNotification>(
+            global::Mediator.NotificationHandlers<TNotification> handlers,
+            TNotification notification,
+            global::System.Threading.CancellationToken cancellationToken)
+            where TNotification : global::Mediator.INotification
+        {
+            var telemetryTags = NotificationTelemetry<TNotification>.TelemetryTags;
+            {{~ if EnableMetricsOnTarget ~}}
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            {{~ end ~}}
+            {{~ if EnableTracingOnTarget ~}}
+            var activity = global::{{ InternalsNamespace }}.MediatorTelemetry.ActivitySource.StartActivity(
+                NotificationTelemetry<TNotification>.SpanName,
+                global::System.Diagnostics.ActivityKind.Consumer,
+                default(global::System.Diagnostics.ActivityContext),
+                tags: telemetryTags
+            );
+            {{~ end ~}}
+
+            try
+            {
+                await _inner.Publish(handlers, notification, cancellationToken);
+                {{~ if EnableMetricsOnTarget ~}}
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    telemetryTags
+                );
+                {{~ end ~}}
+            }
+            catch (global::System.Exception ex)
+            {
+                {{~ if EnableTracingOnTarget ~}}
+                if (activity is not null)
+                {
+                    {{~ if TargetFrameworkIsNet9OrGreater ~}}
+                    activity.AddException(ex);
+                    {{~ end ~}}
+                    activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                    activity.SetTag("error.type", ex.GetType().FullName);
+                }
+                {{~ end ~}}
+                {{~ if EnableMetricsOnTarget ~}}
+                var tags = new global::System.Diagnostics.TagList(telemetryTags);
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                {{~ end ~}}
+                throw;
+            }
+            {{~ if EnableTracingOnTarget ~}}
+            finally
+            {
+                activity?.Dispose();
+            }
+            {{~ end ~}}
+        }
+    }
+    {{~ end ~}}
 
     {{~ for wrapperType in RequestMessageHandlerWrappers ~}}
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
@@ -232,6 +629,17 @@ namespace {{ InternalsNamespace }}
                 var pipelineCopy = pipeline;
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
             }
+            {{~ if EnableTelemetryOnTarget ~}}
+            {
+                var handlerCopy = handler;
+                {{~ if wrapperType.IsStreaming ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                {{~ else ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorTelemetryBehavior<TRequest, TResponse>();
+                {{~ end ~}}
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
+            }
+            {{~ end ~}}
 
             _rootHandler = handler;
             return this;
@@ -282,6 +690,17 @@ namespace {{ InternalsNamespace }}
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
             }
+            {{~ if EnableTelemetryOnTarget ~}}
+            {
+                var handlerCopy = handler;
+                {{~ if wrapperType.IsStreaming ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                {{~ else ~}}
+                var telemetryBehavior = new global::{{ InternalsNamespace }}.MediatorTelemetryBehavior<TRequest, TResponse>();
+                {{~ end ~}}
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
+            }
+            {{~ end ~}}
             {{~ end ~}}
             return handler(request, cancellationToken);
         }
@@ -332,12 +751,12 @@ namespace {{ InternalsNamespace }}
         where TNotification : global::Mediator.INotification
     {
         {{~ if ServiceLifetimeIsSingleton ~}}
-        private {{ NotificationPublisherType.FullName }} _publisher = null!;
+        private {{ NotificationPublisherResolvedTypeFullName }} _publisher = null!;
         private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
         {{~ if CachingModeIsLazy ~}}
         public NotificationHandlerWrapper<TNotification> Init(
-            {{ NotificationPublisherType.FullName }} publisher,
+            {{ NotificationPublisherResolvedTypeFullName }} publisher,
             global::{{ InternalsNamespace }}.ContainerMetadata containerMetadata,
             global::System.IServiceProvider sp
         )
@@ -498,9 +917,11 @@ namespace {{ InternalsNamespace }}
         public readonly {{ message.HandlerWrapperTypeNameWithGenericTypeArguments }} {{ message.HandlerWrapperPropertyName }};
         {{~ end ~}}
         {{~ end ~}}
+        {{~ end ~}}
         {{~ if ServiceLifetimeIsSingleton ~}}
+        {{~ if !CachingModeIsLazy ~}}
 
-        public readonly {{ NotificationPublisherType.FullName }} NotificationPublisher;
+        public readonly {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher;
         {{~ end ~}}
         {{~ end ~}}
 
@@ -514,11 +935,18 @@ namespace {{ InternalsNamespace }}
             {{~ else ~}}
             ServicesUnderlyingTypeIsArray = sp.GetServices<global::{{ InternalsNamespace }}.IContainerProbe>() is global::{{ InternalsNamespace }}.IContainerProbe[];
             {{~ end ~}}
-            {{~ if !CachingModeIsLazy ~}}
             {{~ if ServiceLifetimeIsSingleton ~}}
+            {{~ if !CachingModeIsLazy ~}}
 
+            {{~ if EnableTelemetryOnTarget ~}}
+            var notificationPublisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+            NotificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+            {{~ else ~}}
             NotificationPublisher = sp.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
             {{~ end ~}}
+            {{~ end ~}}
+            {{~ end ~}}
+            {{~ if !CachingModeIsLazy ~}}
 
             var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size IRequestMessages }});
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>({{ object.size ICommandMessages }});
@@ -621,22 +1049,29 @@ namespace {{ MediatorNamespace }}
         {{~ if ServiceLifetimeIsSingleton ~}}
         {{~ if CachingModeIsLazy ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} global::{{ InternalsNamespace }}.ContainerMetadata _containerMetadata;
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
+                    {{~ if EnableTelemetryOnTarget ~}}
+                {
+                    var notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    _notificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
+                    {{~ else ~}}
                     _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    {{~ end ~}}
                 return _notificationPublisher!;
             }
         }
         internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;
         {{~ else ~}}
         {{ if IsTestRun }}internal{{ else }}private{{ end }} FastLazyValue<global::{{ InternalsNamespace }}.ContainerMetadata, global::{{ MediatorNamespace }}.Mediator> _containerMetadata;
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
@@ -660,26 +1095,40 @@ namespace {{ MediatorNamespace }}
         {{~ end ~}}
         {{~ else ~}}
         {{~ if CachingModeIsLazy ~}}
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
+                    {{~ if EnableTelemetryOnTarget ~}}
+                {
+                    var notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    _notificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
+                    {{~ else ~}}
                     _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    {{~ end ~}}
                 return _notificationPublisher!;
             }
         }
         {{~ else ~}}
-        private {{ NotificationPublisherType.FullName }}? _notificationPublisher;
-        internal {{ NotificationPublisherType.FullName }} NotificationPublisher
+        private {{ NotificationPublisherResolvedTypeFullName }}? _notificationPublisher;
+        internal {{ NotificationPublisherResolvedTypeFullName }} NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
+                    {{~ if EnableTelemetryOnTarget ~}}
+                {
+                    var notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    _notificationPublisher = new global::{{ InternalsNamespace }}.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
+                    {{~ else ~}}
                     _notificationPublisher = Services.GetRequiredService<{{ NotificationPublisherType.FullName }}>();
+                    {{~ end ~}}
                 return _notificationPublisher!;
             }
         }
@@ -721,6 +1170,20 @@ namespace {{ MediatorNamespace }}
         /// The total number of Mediator messages that were discovered.
         /// </summary>
         public const int TotalMessages = {{ TotalMessages }};
+        {{~ if EnableMetricsOnTarget ~}}
+
+        /// <summary>
+        /// The configured telemetry meter name.
+        /// </summary>
+        public const string MeterName = "{{ MeterName }}";
+        {{~ end ~}}
+        {{~ if EnableTracingOnTarget ~}}
+
+        /// <summary>
+        /// The configured telemetry activity source name.
+        /// </summary>
+        public const string ActivitySourceName = "{{ ActivitySourceName }}";
+        {{~ end ~}}
         {{~ if IsTestRun ~}}
 
         /// <summary>

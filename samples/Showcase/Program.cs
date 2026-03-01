@@ -13,6 +13,8 @@ services.AddMediator(
     {
         options.Assemblies = [typeof(Ping)];
         options.NotificationPublisherType = typeof(FireAndForgetNotificationPublisher);
+        options.Telemetry.EnableMetrics = true;
+        options.Telemetry.EnableTracing = true;
         options.PipelineBehaviors =
         [
             // Ordering of pipeline behavior registrations matter!

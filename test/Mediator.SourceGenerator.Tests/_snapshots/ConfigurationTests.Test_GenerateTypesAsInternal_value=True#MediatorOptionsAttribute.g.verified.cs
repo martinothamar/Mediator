@@ -38,5 +38,26 @@ namespace Mediator
         /// When set to <see cref="global::Mediator.CachingMode.Lazy" />, initialization is done on demand as messages are processed.
         /// </summary>
         public global::Mediator.CachingMode CachingMode { get; set; } = global::Mediator.CachingMode.Eager;
+
+        /// <summary>
+        /// Enable metrics for message processing using <see cref="global::System.Diagnostics.Metrics.Meter" />.
+        /// Requires .NET 8.0 or greater.
+        /// </summary>
+        public bool TelemetryEnableMetrics { get; set; } = false;
+
+        /// <summary>
+        /// The <see cref="global::System.Diagnostics.Metrics.Meter" /> name used for metrics.
+        /// </summary>
+        public string TelemetryMeterName { get; set; } = "Mediator";
+
+        /// <summary>
+        /// Enable tracing for message processing using <see cref="global::System.Diagnostics.ActivitySource" />.
+        /// </summary>
+        public bool TelemetryEnableTracing { get; set; } = false;
+
+        /// <summary>
+        /// The <see cref="global::System.Diagnostics.ActivitySource" /> name used for tracing.
+        /// </summary>
+        public string TelemetryActivitySourceName { get; set; } = "Mediator";
     }
 }

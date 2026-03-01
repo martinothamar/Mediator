@@ -245,6 +245,45 @@ namespace MyCode
     }
 
     [Fact]
+    public async Task Test_Invalid_Telemetry_Variable_In_Config()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    var telemetry = new MediatorTelemetryOptions
+                    {
+                        EnableMetrics = true,
+                        MeterName = "TestMeter"
+                    };
+
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry = telemetry;
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(result =>
+        {
+            Assertions.AssertCommon(result);
+
+            Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.True(result.Diagnostics.Length == 1);
+        });
+    }
+
+    [Fact]
     public async Task Test_Unassigned_Variables_In_Config()
     {
         var source = await Fixture.SourceFromResourceFile("UnassignedVariablesConfig.cs");

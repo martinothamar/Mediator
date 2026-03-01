@@ -42,4 +42,4 @@ jobs:
 
       - name: Run benchmark smoke
         working-directory: ./benchmarks
-        run: dotnet run -f net10.0 -c Release --project Mediator.Benchmarks/ --no-restore -- --filter "*Mediator.Benchmarks.SourceGenerator.SourceGeneratorBenchmark.Cached*" --warmupCount 1 --iterationCount 1 --iterationTime 100
+        run: dotnet run -f net10.0 -c Release --project Mediator.Benchmarks/ --no-restore -- --filter "*Mediator.Benchmarks.SourceGenerator.SourceGeneratorBenchmark.Cached*" --warmupCount 1 --iterationCount 1 --iterationTime 50

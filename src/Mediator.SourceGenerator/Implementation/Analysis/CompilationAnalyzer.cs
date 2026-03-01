@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using Mediator.SourceGenerator.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -25,6 +26,7 @@ internal sealed class CompilationAnalyzer
     private readonly HashSet<NotificationMessage> _notificationMessages;
     private readonly HashSet<NotificationMessageHandler> _notificationMessageHandlers;
     private readonly List<PipelineBehaviorType> _pipelineBehaviors;
+    private readonly HashSet<string> _preprocessorSymbolNames;
     private Queue<INamespaceOrTypeSymbol>? _configuredAssemblies;
 
     public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
@@ -53,6 +55,14 @@ internal sealed class CompilationAnalyzer
     private IFieldSymbol? _cachingModeSymbol => _configuredCachingModeSymbol ?? _eagerCachingModeSymbol;
 
     private bool _configuredLazyCachingModeFromSyntax = false;
+
+    private bool _enableMetrics = false;
+    private string _meterName = "Mediator";
+    private Location? _enableMetricsLocation = null;
+    private bool _enableTracing = false;
+    private string _activitySourceName = "Mediator";
+    private Location? _enableTracingLocation = null;
+    private double[]? _histogramBuckets = null;
 
     private bool _hasErrors;
     private bool _isInitialized;
@@ -103,6 +113,13 @@ internal sealed class CompilationAnalyzer
         (_context.Compilation.AssemblyName?.StartsWith("Mediator.Tests") ?? false)
         || (_context.Compilation.AssemblyName?.StartsWith("Mediator.SmokeTest") ?? false);
 
+    private bool TargetFrameworkIsNet8OrGreater => _preprocessorSymbolNames.Contains("NET8_0_OR_GREATER");
+    private bool TargetFrameworkIsNet9OrGreater => _preprocessorSymbolNames.Contains("NET9_0_OR_GREATER");
+    private bool TargetHasMeter =>
+        _context.Compilation.GetTypeByMetadataName("System.Diagnostics.Metrics.Meter") is not null;
+    private bool TargetHasActivitySource =>
+        _context.Compilation.GetTypeByMetadataName("System.Diagnostics.ActivitySource") is not null;
+
     public bool GenerateTypesAsInternal { get; private set; }
 
     private bool ConfiguredViaAttribute { get; set; }
@@ -113,20 +130,13 @@ internal sealed class CompilationAnalyzer
     {
         get
         {
-            var symbolNames = new HashSet<string>(
-                _context
-                    .Compilation.SyntaxTrees.Select(tree => tree.Options as CSharpParseOptions)
-                    .Where(options => options is not null)
-                    .SelectMany(options => options!.PreprocessorSymbolNames)
-            );
-
             // If we compile using Mediator_Default_Project it means
             // we've parameterized test run between
             // - Mediator_Default_Project
             // - Mediator_Large_Project
             // where the intention is to have tests cover both paths
             // in terms of the differences in generated code
-            if (symbolNames.Contains("Mediator_Default_Project"))
+            if (_preprocessorSymbolNames.Contains("Mediator_Default_Project"))
                 return 100_000;
 
             // Found during benchmarking in .NET 8/3.0.0 version
@@ -142,6 +152,13 @@ internal sealed class CompilationAnalyzer
         _notificationMessages = new();
         _notificationMessageHandlers = new();
         _pipelineBehaviors = new();
+        _preprocessorSymbolNames = new(
+            _context
+                .Compilation.SyntaxTrees.Select(tree => tree.Options as CSharpParseOptions)
+                .Where(options => options is not null)
+                .SelectMany(options => options!.PreprocessorSymbolNames),
+            StringComparer.Ordinal
+        );
         _baseHandlerSymbols = Array.Empty<INamedTypeSymbol>();
         _baseMessageSymbols = Array.Empty<INamedTypeSymbol>();
     }
@@ -401,6 +418,25 @@ internal sealed class CompilationAnalyzer
             if (_notificationPublisherImplementationSymbol is null)
                 throw new Exception("Unexpected state: NotificationPublisherImplementationSymbol is null");
 
+            string? histogramBucketsString = null;
+            if (_histogramBuckets is not null && _histogramBuckets.Length > 0)
+            {
+                histogramBucketsString = string.Join(
+                    ", ",
+                    _histogramBuckets.Select(b => b.ToString(CultureInfo.InvariantCulture))
+                );
+            }
+
+            if (_enableMetrics && (!TargetFrameworkIsNet8OrGreater || !TargetHasMeter))
+            {
+                _context.ReportMetricsUnavailableOnTarget(_enableMetricsLocation);
+            }
+
+            if (_enableTracing && !TargetHasActivitySource)
+            {
+                _context.ReportTracingUnavailableOnTarget(_enableTracingLocation);
+            }
+
             var model = new CompilationModel(
                 ToModelsSortedByInheritanceDepth(
                     _requestMessages,
@@ -431,6 +467,15 @@ internal sealed class CompilationAnalyzer
                 GenerateTypesAsInternal,
                 CachingMode,
                 CachingModeShort,
+                _enableMetrics,
+                _meterName,
+                _enableTracing,
+                _activitySourceName,
+                histogramBucketsString,
+                TargetFrameworkIsNet8OrGreater,
+                TargetFrameworkIsNet9OrGreater,
+                TargetHasMeter,
+                TargetHasActivitySource,
                 MessageCountThreshold
             );
 
@@ -1142,9 +1187,387 @@ internal sealed class CompilationAnalyzer
                     return;
                 }
             }
+            else if (attrFieldName == "TelemetryEnableMetrics")
+            {
+                var configuredEnableMetrics = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken);
+                if (!configuredEnableMetrics.HasValue || configuredEnableMetrics.Value is not bool enableMetrics)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected boolean literal for 'TelemetryEnableMetrics'"
+                            )
+                    );
+                    return;
+                }
+
+                _enableMetrics = enableMetrics;
+                _enableMetricsLocation = enableMetrics ? attrArg.GetLocation() : null;
+            }
+            else if (attrFieldName == "TelemetryMeterName")
+            {
+                var configuredMeterName = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken);
+                if (!configuredMeterName.HasValue)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, "Expected string literal for 'TelemetryMeterName'")
+                    );
+                    return;
+                }
+
+                if (configuredMeterName.Value is string meterName)
+                {
+                    _meterName = meterName;
+                }
+                else if (configuredMeterName.Value is not null)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, "Expected string literal for 'TelemetryMeterName'")
+                    );
+                    return;
+                }
+            }
+            else if (attrFieldName == "TelemetryEnableTracing")
+            {
+                var configuredEnableTracing = semanticModel.GetConstantValue(attrArg.Expression, cancellationToken);
+                if (!configuredEnableTracing.HasValue || configuredEnableTracing.Value is not bool enableTracing)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected boolean literal for 'TelemetryEnableTracing'"
+                            )
+                    );
+                    return;
+                }
+
+                _enableTracing = enableTracing;
+                _enableTracingLocation = enableTracing ? attrArg.GetLocation() : null;
+            }
+            else if (attrFieldName == "TelemetryActivitySourceName")
+            {
+                var configuredActivitySourceName = semanticModel.GetConstantValue(
+                    attrArg.Expression,
+                    cancellationToken
+                );
+                if (!configuredActivitySourceName.HasValue)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected string literal for 'TelemetryActivitySourceName'"
+                            )
+                    );
+                    return;
+                }
+
+                if (configuredActivitySourceName.Value is string activitySourceName)
+                {
+                    _activitySourceName = activitySourceName;
+                }
+                else if (configuredActivitySourceName.Value is not null)
+                {
+                    ReportDiagnostic(
+                        attrArg.Expression.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected string literal for 'TelemetryActivitySourceName'"
+                            )
+                    );
+                    return;
+                }
+            }
         }
 
         ConfiguredViaAttribute = true;
+    }
+
+    private bool ProcessTelemetryAssignment(
+        AssignmentExpressionSyntax assignment,
+        SemanticModel semanticModel,
+        CancellationToken cancellationToken
+    )
+    {
+        string telemetryOpt;
+
+        // Handle both "EnableMetrics = true" (object initializer) and "options.Telemetry.EnableMetrics = true"
+        if (assignment.Left is IdentifierNameSyntax identifierName)
+        {
+            telemetryOpt = identifierName.Identifier.Text;
+        }
+        else if (assignment.Left is MemberAccessExpressionSyntax memberAccess)
+        {
+            telemetryOpt = memberAccess.Name.Identifier.Text;
+        }
+        else
+        {
+            ReportDiagnostic(
+                assignment.Left.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) =>
+                    c.ReportInvalidCodeBasedConfiguration(l, "Expected identifier in telemetry configuration")
+            );
+            return false;
+        }
+
+        if (telemetryOpt == "EnableMetrics")
+        {
+            if (assignment.Right is not LiteralExpressionSyntax literal)
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected boolean literal for 'EnableMetrics'")
+                );
+                return false;
+            }
+
+            if (literal.IsKind(SyntaxKind.TrueLiteralExpression))
+            {
+                _enableMetrics = true;
+                _enableMetricsLocation = assignment.Left.GetLocation();
+            }
+            else if (literal.IsKind(SyntaxKind.FalseLiteralExpression))
+            {
+                _enableMetrics = false;
+                _enableMetricsLocation = null;
+            }
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected boolean literal for 'EnableMetrics'")
+                );
+                return false;
+            }
+        }
+        else if (telemetryOpt == "MeterName")
+        {
+            if (assignment.Right is LiteralExpressionSyntax literal)
+            {
+                if (!literal.IsKind(SyntaxKind.NullLiteralExpression))
+                    _meterName = literal.Token.ValueText;
+            }
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected string literal for 'MeterName'")
+                );
+                return false;
+            }
+        }
+        else if (telemetryOpt == "EnableTracing")
+        {
+            if (assignment.Right is not LiteralExpressionSyntax literal)
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected boolean literal for 'EnableTracing'")
+                );
+                return false;
+            }
+
+            if (literal.IsKind(SyntaxKind.TrueLiteralExpression))
+            {
+                _enableTracing = true;
+                _enableTracingLocation = assignment.Left.GetLocation();
+            }
+            else if (literal.IsKind(SyntaxKind.FalseLiteralExpression))
+            {
+                _enableTracing = false;
+                _enableTracingLocation = null;
+            }
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected boolean literal for 'EnableTracing'")
+                );
+                return false;
+            }
+        }
+        else if (telemetryOpt == "ActivitySourceName")
+        {
+            if (assignment.Right is LiteralExpressionSyntax literal)
+            {
+                if (!literal.IsKind(SyntaxKind.NullLiteralExpression))
+                    _activitySourceName = literal.Token.ValueText;
+            }
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, "Expected string literal for 'ActivitySourceName'")
+                );
+                return false;
+            }
+        }
+        else if (telemetryOpt == "HistogramBuckets")
+        {
+            if (
+                assignment.Right is ArrayCreationExpressionSyntax arrayCreation
+                && arrayCreation.Initializer is not null
+            )
+            {
+                var buckets = new List<double>();
+                foreach (var element in arrayCreation.Initializer.Expressions)
+                {
+                    if (
+                        element is LiteralExpressionSyntax bucketLiteral
+                        && bucketLiteral.Token.Value is double or int or float
+                    )
+                    {
+                        buckets.Add(Convert.ToDouble(bucketLiteral.Token.Value));
+                    }
+                    else
+                    {
+                        ReportDiagnostic(
+                            element.GetLocation(),
+                            (in CompilationAnalyzerContext c, Location l) =>
+                                c.ReportInvalidCodeBasedConfiguration(l, "HistogramBuckets must be numeric literals")
+                        );
+                        return false;
+                    }
+                }
+                _histogramBuckets = buckets.ToArray();
+            }
+            else if (
+                assignment.Right is ImplicitArrayCreationExpressionSyntax implicitArrayCreation
+                && implicitArrayCreation.Initializer is not null
+            )
+            {
+                var buckets = new List<double>();
+                foreach (var element in implicitArrayCreation.Initializer.Expressions)
+                {
+                    if (
+                        element is LiteralExpressionSyntax bucketLiteral
+                        && bucketLiteral.Token.Value is double or int or float
+                    )
+                    {
+                        buckets.Add(Convert.ToDouble(bucketLiteral.Token.Value));
+                    }
+                    else
+                    {
+                        ReportDiagnostic(
+                            element.GetLocation(),
+                            (in CompilationAnalyzerContext c, Location l) =>
+                                c.ReportInvalidCodeBasedConfiguration(l, "HistogramBuckets must be numeric literals")
+                        );
+                        return false;
+                    }
+                }
+                _histogramBuckets = buckets.ToArray();
+            }
+            else if (
+                assignment.Right.GetFirstToken().IsKind(SyntaxKind.OpenBracketToken)
+                && assignment.Right.GetLastToken().IsKind(SyntaxKind.CloseBracketToken)
+            )
+            {
+                var buckets = new List<double>();
+                var elementTokens = new List<SyntaxToken>();
+                var tokens = assignment.Right.DescendantTokens(descendIntoTrivia: false);
+
+                using var tokenEnumerator = tokens.GetEnumerator();
+                if (!tokenEnumerator.MoveNext())
+                {
+                    ReportDiagnostic(
+                        assignment.Right.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected array creation or null for 'HistogramBuckets'"
+                            )
+                    );
+                    return false;
+                }
+
+                while (tokenEnumerator.MoveNext())
+                {
+                    var token = tokenEnumerator.Current;
+                    if (token.IsKind(SyntaxKind.CloseBracketToken))
+                        break;
+
+                    if (token.IsKind(SyntaxKind.CommaToken))
+                    {
+                        if (elementTokens.Count > 0 && !TryParseHistogramBucketElement(elementTokens, buckets))
+                            return false;
+                        elementTokens.Clear();
+                        continue;
+                    }
+
+                    elementTokens.Add(token);
+                }
+
+                if (elementTokens.Count > 0 && !TryParseHistogramBucketElement(elementTokens, buckets))
+                    return false;
+
+                _histogramBuckets = buckets.ToArray();
+            }
+            else if (assignment.Right.IsKind(SyntaxKind.NullLiteralExpression))
+            {
+                _histogramBuckets = null;
+            }
+            else
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "Expected array creation or null for 'HistogramBuckets'"
+                        )
+                );
+                return false;
+            }
+        }
+        else
+        {
+            ReportDiagnostic(
+                assignment.Left.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) =>
+                    c.ReportInvalidCodeBasedConfiguration(l, $"Unrecognized telemetry option: {telemetryOpt}")
+            );
+            return false;
+        }
+
+        return true;
+
+        bool TryParseHistogramBucketElement(List<SyntaxToken> tokens, List<double> target)
+        {
+            if (tokens.Count == 0)
+                return true;
+
+            var elementText = string.Concat(tokens.Select(t => t.ToFullString()));
+            var parsed = SyntaxFactory.ParseExpression(elementText);
+            if (parsed is LiteralExpressionSyntax bucketLiteral && bucketLiteral.Token.Value is double or int or float)
+            {
+                target.Add(Convert.ToDouble(bucketLiteral.Token.Value));
+                return true;
+            }
+
+            ReportDiagnostic(
+                assignment.Right.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) =>
+                    c.ReportInvalidCodeBasedConfiguration(l, "HistogramBuckets must be numeric literals")
+            );
+            return false;
+        }
     }
 
     private bool ProcessAddMediatorAssignmentStatement(
@@ -1157,7 +1580,19 @@ internal sealed class CompilationAnalyzer
         Debug.Assert(_streamPipelineBehaviorInterfaceSymbol is not null);
         Debug.Assert(_unitSymbol is not null);
 
-        var opt = ((MemberAccessExpressionSyntax)assignment.Left).Name.Identifier.Text;
+        var memberAccess = (MemberAccessExpressionSyntax)assignment.Left;
+
+        // Check for nested member access like options.Telemetry.EnableMetrics
+        if (memberAccess.Expression is MemberAccessExpressionSyntax nestedMemberAccess)
+        {
+            var parentProp = nestedMemberAccess.Name.Identifier.Text;
+            if (parentProp == "Telemetry")
+            {
+                return ProcessTelemetryAssignment(assignment, semanticModel, cancellationToken);
+            }
+        }
+
+        var opt = memberAccess.Name.Identifier.Text;
         if (opt == "Namespace")
         {
             if (assignment.Right is LiteralExpressionSyntax literal)
@@ -1426,6 +1861,64 @@ internal sealed class CompilationAnalyzer
                 }
 
                 _configuredAssemblies.Enqueue(assemblySymbol.GlobalNamespace);
+            }
+        }
+        else if (opt == "Telemetry")
+        {
+            if (assignment.Right is IdentifierNameSyntax or MemberAccessExpressionSyntax)
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "Telemetry must be configured inline. Variables and member access are not supported."
+                        )
+                );
+                return false;
+            }
+            if (assignment.Right is not ObjectCreationExpressionSyntax and not ImplicitObjectCreationExpressionSyntax)
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(
+                            l,
+                            "Telemetry must be configured with an object creation expression"
+                        )
+                );
+                return false;
+            }
+
+            // Parse nested telemetry configuration
+            var telemetryConfig = assignment.Right;
+
+            // Handle object initializer
+            if (
+                telemetryConfig is ObjectCreationExpressionSyntax objectCreation
+                && objectCreation.Initializer is not null
+            )
+            {
+                foreach (
+                    var telemetryAssignment in objectCreation.Initializer.Expressions.OfType<AssignmentExpressionSyntax>()
+                )
+                {
+                    if (!ProcessTelemetryAssignment(telemetryAssignment, semanticModel, cancellationToken))
+                        return false;
+                }
+            }
+            else if (
+                telemetryConfig is ImplicitObjectCreationExpressionSyntax implicitObjectCreation
+                && implicitObjectCreation.Initializer is not null
+            )
+            {
+                foreach (
+                    var telemetryAssignment in implicitObjectCreation.Initializer.Expressions.OfType<AssignmentExpressionSyntax>()
+                )
+                {
+                    if (!ProcessTelemetryAssignment(telemetryAssignment, semanticModel, cancellationToken))
+                        return false;
+                }
             }
         }
         else if (opt == "PipelineBehaviors" || opt == "StreamPipelineBehaviors")
