@@ -40,6 +40,7 @@ jobs:
       max-parallel: 16
       matrix:
         metrics: [Off, On]
+        tracing: [Off, On]
     uses: ./.github/workflows/_test-telemetry.yml
     with:
       checkout-ref: ${{ github.event.pull_request.head.sha }}
@@ -47,6 +48,7 @@ jobs:
       publisher: ForeachAwait
       cachingMode: Eager
       metrics: ${{ matrix.metrics }}
+      tracing: ${{ matrix.tracing }}
       dotnet-sdk: '10.0.x'
       dotnet-framework: net10.0
 

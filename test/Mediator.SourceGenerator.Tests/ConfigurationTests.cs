@@ -818,21 +818,27 @@ public sealed class ConfigurationTests
         ServiceLifetime sl,
         [CombinatorialValues("Eager", "Lazy")] string cm,
         bool em,
+        bool et,
         bool oi
     )
     {
         var enableMetricsLiteral = em.ToString().ToLowerInvariant();
+        var enableTracingLiteral = et.ToString().ToLowerInvariant();
         var telemetryConfig = oi
             ? $$"""
                           options.Telemetry = new()
                           {
                               EnableMetrics = {{enableMetricsLiteral}},
-                              MeterName = "TestMeter"
+                              MeterName = "TestMeter",
+                              EnableTracing = {{enableTracingLiteral}},
+                              ActivitySourceName = "TestActivitySource"
                           };
                 """
             : $$"""
                           options.Telemetry.EnableMetrics = {{enableMetricsLiteral}};
                           options.Telemetry.MeterName = "TestMeter";
+                          options.Telemetry.EnableTracing = {{enableTracingLiteral}};
+                          options.Telemetry.ActivitySourceName = "TestActivitySource";
                 """;
 
         var inputCompilation = Fixture.CreateLibrary(
@@ -894,6 +900,7 @@ public sealed class ConfigurationTests
                     : "T",
                 cm == "Lazy" ? "L" : "E",
                 em ? "1" : "0",
+                et ? "1" : "0",
                 oi ? "1" : "0"
             );
     }
@@ -1394,6 +1401,76 @@ public sealed class ConfigurationTests
                         {
                             options.Telemetry.EnableMetrics = true;
                             options.Telemetry.MeterName = "TestMeter";
+                        });
+                    }
+                }
+                """
+            )
+            .AddReferences(openTelemetryProviderBuilderExtensions.ToMetadataReference());
+
+        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
+    }
+
+    [Fact]
+    public async Task Test_Telemetry_Detects_TracerProvider_Extensions_Package()
+    {
+        var openTelemetryProviderBuilderExtensions = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using Microsoft.Extensions.DependencyInjection;
+
+                namespace OpenTelemetry.Trace;
+
+                public class TracerProviderBuilder
+                {
+                    public TracerProviderBuilder AddSource(string sourceName) => this;
+                }
+
+                public static class OpenTelemetryDependencyInjectionTracingServiceCollectionExtensions
+                {
+                    public static IServiceCollection ConfigureOpenTelemetryTracerProvider(
+                        this IServiceCollection services,
+                        Action<TracerProviderBuilder> configure)
+                    {
+                        var builder = new TracerProviderBuilder();
+                        configure(builder);
+                        return services;
+                    }
+                }
+                """
+            )
+            .WithAssemblyName("OpenTelemetry.Api.ProviderBuilderExtensions");
+
+        var inputCompilation = Fixture
+            .CreateLibrary(
+                """
+                using System;
+                using System.Threading;
+                using System.Threading.Tasks;
+                using Mediator;
+                using Microsoft.Extensions.DependencyInjection;
+
+                namespace TestCode;
+
+                public readonly record struct Request(Guid Id) : IRequest<Response>;
+                public readonly record struct Response(Guid Id);
+
+                public sealed class RequestHandler : IRequestHandler<Request, Response>
+                {
+                    public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                        new(new Response(request.Id));
+                }
+
+                public class Program
+                {
+                    public static void Main()
+                    {
+                        var services = new ServiceCollection();
+                        services.AddMediator(options =>
+                        {
+                            options.Telemetry.EnableTracing = true;
+                            options.Telemetry.ActivitySourceName = "TestActivitySource";
                         });
                     }
                 }

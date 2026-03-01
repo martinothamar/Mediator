@@ -114,7 +114,7 @@ internal sealed record CompilationModel
         HasOpenTelemetryTracingSdk = hasOpenTelemetryTracingSdk;
         TargetFrameworkIsNet8OrGreater = targetFrameworkIsNet8OrGreater;
         TargetFrameworkIsNet9OrGreater = targetFrameworkIsNet9OrGreater;
-        NotificationPublisherResolvedTypeFullName = EnableMetricsOnTarget
+        NotificationPublisherResolvedTypeFullName = EnableTelemetryOnTarget
             ? $"global::{InternalsNamespace}.MediatorTelemetryNotificationPublisher"
             : NotificationPublisherType.FullName;
 
@@ -253,6 +253,7 @@ internal sealed record CompilationModel
     public string MeterName { get; }
     public bool EnableTracing { get; }
     public bool EnableTracingOnTarget { get; }
+    public bool EnableTelemetryOnTarget => EnableMetricsOnTarget || EnableTracingOnTarget;
     public string ActivitySourceName { get; }
     public string? HistogramBuckets { get; }
     public bool HasOpenTelemetryMetricSdk { get; }

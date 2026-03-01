@@ -39,4 +39,12 @@ using Microsoft.Extensions.DependencyInjection;
     ,
     TelemetryMeterName = "Mediator.Telemetry.Tests"
 #endif
+#if Mediator_Telemetry_EnableTracing
+    ,
+    TelemetryEnableTracing = true
+#endif
+#if Mediator_Telemetry_ActivitySourceName_Tests
+    ,
+    TelemetryActivitySourceName = "Mediator.Telemetry.Tests"
+#endif
 )]

@@ -136,6 +136,9 @@ namespace Mediator.Internals
                 description: "Duration of message processing operation",
                 advice: new() { HistogramBucketBoundaries = new double[] { 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10 } }
             );
+
+        public static readonly global::System.Diagnostics.ActivitySource ActivitySource =
+            new("Mediator", "3.1.0.0");
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
@@ -143,36 +146,58 @@ namespace Mediator.Internals
         : global::Mediator.IPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IMessage
     {
+        private static readonly string DestinationName = typeof(TMessage).Name;
+        private static readonly string SpanName = "process " + DestinationName;
+        private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+            new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+            {
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+            };
+
         public async global::System.Threading.Tasks.ValueTask<TResponse> Handle(
             TMessage message,
             global::Mediator.MessageHandlerDelegate<TMessage, TResponse> next,
             global::System.Threading.CancellationToken cancellationToken)
         {
             var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
-            var tags = new global::System.Diagnostics.TagList
-            {
-                { "messaging.system", "mediator" },
-                { "messaging.operation.name", "process" },
-                { "messaging.destination.name", typeof(TMessage).Name }
-            };
+            var activity = global::Mediator.Internals.MediatorTelemetry.ActivitySource.StartActivity(
+                SpanName,
+                global::System.Diagnostics.ActivityKind.Consumer,
+                default(global::System.Diagnostics.ActivityContext),
+                tags: TelemetryTags
+            );
 
             try
             {
                 var response = await next(message, cancellationToken);
                 MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
-                    tags
+                    TelemetryTags
                 );
                 return response;
             }
             catch (global::System.Exception ex)
             {
+                if (activity is not null)
+                {
+                    activity.AddException(ex);
+                    activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                    activity.SetTag("error.type", ex.GetType().FullName);
+                }
+                var tags = new global::System.Diagnostics.TagList(TelemetryTags);
                 tags.Add("error.type", ex.GetType().FullName);
                 MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
                 throw;
+            }
+            finally
+            {
+                activity?.Dispose();
             }
         }
     }
@@ -182,26 +207,38 @@ namespace Mediator.Internals
         : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IStreamMessage
     {
+        private static readonly string DestinationName = typeof(TMessage).Name;
+        private static readonly string SpanName = "process " + DestinationName;
+        private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+            new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+            {
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+            };
+
         public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
             TMessage message,
             global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
             global::System.Threading.CancellationToken cancellationToken)
         {
-            return HandleWithMetrics(message, next, cancellationToken);
+            return HandleWithTelemetry(message, next, cancellationToken);
         }
 
-        private static async global::System.Collections.Generic.IAsyncEnumerable<TResponse> HandleWithMetrics(
+        private static async global::System.Collections.Generic.IAsyncEnumerable<TResponse> HandleWithTelemetry(
             TMessage message,
             global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken)
         {
             var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
-            var tags = new global::System.Diagnostics.TagList
-            {
-                { "messaging.system", "mediator" },
-                { "messaging.operation.name", "process" },
-                { "messaging.destination.name", typeof(TMessage).Name }
-            };
+            string? errorType = null;
+            var activity = global::Mediator.Internals.MediatorTelemetry.ActivitySource.StartActivity(
+                SpanName,
+                global::System.Diagnostics.ActivityKind.Consumer,
+                default(global::System.Diagnostics.ActivityContext),
+                tags: TelemetryTags
+            );
 
             global::System.Collections.Generic.IAsyncEnumerable<TResponse> responses;
             try
@@ -210,6 +247,13 @@ namespace Mediator.Internals
             }
             catch (global::System.Exception ex)
             {
+                if (activity is not null)
+                {
+                    activity.AddException(ex);
+                    activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                    activity.SetTag("error.type", ex.GetType().FullName);
+                }
+                var tags = new global::System.Diagnostics.TagList(TelemetryTags);
                 tags.Add("error.type", ex.GetType().FullName);
                 MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
@@ -231,7 +275,13 @@ namespace Mediator.Internals
                     }
                     catch (global::System.Exception ex)
                     {
-                        tags.Add("error.type", ex.GetType().FullName);
+                        if (activity is not null)
+                        {
+                            activity.AddException(ex);
+                            activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                            activity.SetTag("error.type", ex.GetType().FullName);
+                        }
+                        errorType = ex.GetType().FullName;
                         throw;
                     }
 
@@ -240,10 +290,23 @@ namespace Mediator.Internals
             }
             finally
             {
-                MediatorTelemetry.ProcessDuration.Record(
-                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
-                    tags
-                );
+                if (errorType is null)
+                {
+                    MediatorTelemetry.ProcessDuration.Record(
+                        global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                        TelemetryTags
+                    );
+                }
+                else
+                {
+                    var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                    tags.Add("error.type", errorType);
+                    MediatorTelemetry.ProcessDuration.Record(
+                        global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                        tags
+                    );
+                }
+                activity?.Dispose();
             }
         }
     }
@@ -253,6 +316,20 @@ namespace Mediator.Internals
         : global::Mediator.INotificationPublisher
     {
         private readonly global::FireAndForgetNotificationPublisher _inner;
+        private static class NotificationTelemetry<TNotificationType>
+            where TNotificationType : global::Mediator.INotification
+        {
+            public static readonly string DestinationName = typeof(TNotificationType).Name;
+            public static readonly string SpanName = "process " + DestinationName;
+            public static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+                new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+                {
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+                };
+        }
 
         public MediatorTelemetryNotificationPublisher(global::FireAndForgetNotificationPublisher inner)
         {
@@ -265,30 +342,42 @@ namespace Mediator.Internals
             global::System.Threading.CancellationToken cancellationToken)
             where TNotification : global::Mediator.INotification
         {
+            var telemetryTags = NotificationTelemetry<TNotification>.TelemetryTags;
             var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
-            var tags = new global::System.Diagnostics.TagList
-            {
-                { "messaging.system", "mediator" },
-                { "messaging.operation.name", "process" },
-                { "messaging.destination.name", typeof(TNotification).Name }
-            };
+            var activity = global::Mediator.Internals.MediatorTelemetry.ActivitySource.StartActivity(
+                NotificationTelemetry<TNotification>.SpanName,
+                global::System.Diagnostics.ActivityKind.Consumer,
+                default(global::System.Diagnostics.ActivityContext),
+                tags: telemetryTags
+            );
 
             try
             {
                 await _inner.Publish(handlers, notification, cancellationToken);
                 MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
-                    tags
+                    telemetryTags
                 );
             }
             catch (global::System.Exception ex)
             {
+                if (activity is not null)
+                {
+                    activity.AddException(ex);
+                    activity.SetStatus(global::System.Diagnostics.ActivityStatusCode.Error);
+                    activity.SetTag("error.type", ex.GetType().FullName);
+                }
+                var tags = new global::System.Diagnostics.TagList(telemetryTags);
                 tags.Add("error.type", ex.GetType().FullName);
                 MediatorTelemetry.ProcessDuration.Record(
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
                 throw;
+            }
+            finally
+            {
+                activity?.Dispose();
             }
         }
     }

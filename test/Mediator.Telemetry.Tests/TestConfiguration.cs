@@ -16,6 +16,18 @@ internal static class TestConfiguration
     public static string MeterName { get; } = "Mediator";
 #endif
 
+#if Mediator_Telemetry_EnableTracing
+    public static bool EnableTracing { get; } = true;
+#else
+    public static bool EnableTracing { get; } = false;
+#endif
+
+#if Mediator_Telemetry_ActivitySourceName_Tests
+    public static string ActivitySourceName { get; } = "Mediator.Telemetry.Tests";
+#else
+    public static string ActivitySourceName { get; } = "Mediator";
+#endif
+
 #if Mediator_Lifetime_Scoped
     public static bool CreateServiceScope { get; } = true;
 #else

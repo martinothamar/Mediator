@@ -18,6 +18,9 @@ on:
       metrics:
         required: true
         type: string
+      tracing:
+        required: true
+        type: string
       dotnet-sdk:
         required: true
         type: string
@@ -30,7 +33,7 @@ permissions:
 
 jobs:
   test-telemetry:
-    name: Telemetry Tests ${{ inputs.dotnet-framework }}/${{ inputs.lifetime }}/${{ inputs.publisher }}/${{ inputs.cachingMode }}/metrics=${{ inputs.metrics }}
+    name: Telemetry Tests ${{ inputs.dotnet-framework }}/${{ inputs.lifetime }}/${{ inputs.publisher }}/${{ inputs.cachingMode }}/metrics=${{ inputs.metrics }}/tracing=${{ inputs.tracing }}
     runs-on: ubuntu-latest
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
@@ -63,6 +66,9 @@ jobs:
           DEFINES="Mediator_Lifetime_${{ inputs.lifetime }}%3BMediator_Publisher_${{ inputs.publisher }}%3BMediator_CachingMode_${{ inputs.cachingMode }}"
           if [ "${{ inputs.metrics }}" = "On" ]; then
             DEFINES="${DEFINES}%3BMediator_Telemetry_EnableMetrics%3BMediator_Telemetry_MeterName_Tests"
+          fi
+          if [ "${{ inputs.tracing }}" = "On" ]; then
+            DEFINES="${DEFINES}%3BMediator_Telemetry_EnableTracing%3BMediator_Telemetry_ActivitySourceName_Tests"
           fi
           dotnet build --no-restore -f ${{ inputs.dotnet-framework }} \
             -p:ExtraDefineConstants=\"${DEFINES}\" \

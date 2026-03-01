@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Threading;
@@ -14,10 +15,11 @@ namespace Mediator.Telemetry.Tests;
 public sealed class TelemetryRuntimeTests
 {
     [Fact]
-    public async Task Test_Telemetry_Emits_Metrics_For_Request_Notification_And_Stream()
+    public async Task Test_Telemetry_Emits_Signals_For_Request_Notification_And_Stream()
     {
         TelemetryNotificationHandler.Reset();
-        using var capture = new MeterCapture(TestConfiguration.MeterName);
+        using var meterCapture = new MeterCapture(TestConfiguration.MeterName);
+        using var activityCapture = new ActivityCapture(TestConfiguration.ActivitySourceName);
         using var ctx = CreateServiceProvider();
         var mediator = ctx.Services.GetRequiredService<IMediator>();
         var ct = TestContext.Current.CancellationToken;
@@ -37,16 +39,35 @@ public sealed class TelemetryRuntimeTests
 
         if (TestConfiguration.EnableMetrics)
         {
-            var destinations = capture.Measurements.Select(x => x.DestinationName).ToArray();
+            var destinations = meterCapture.Measurements.Select(x => x.DestinationName).ToArray();
             destinations.Should().Contain(nameof(TelemetryRequest));
             destinations.Should().Contain(nameof(TelemetryNotification));
             destinations.Should().Contain(nameof(TelemetryStreamRequest));
-            capture.Measurements.Should().OnlyContain(x => x.InstrumentName == "messaging.process.duration");
-            capture.Measurements.Should().OnlyContain(x => x.OperationName == "process");
+            meterCapture.Measurements.Should().OnlyContain(x => x.InstrumentName == "messaging.process.duration");
+            meterCapture.Measurements.Should().OnlyContain(x => x.OperationName == "process");
+            meterCapture.Measurements.Should().OnlyContain(x => x.OperationType == "process");
         }
         else
         {
-            capture.Measurements.Should().BeEmpty();
+            meterCapture.Measurements.Should().BeEmpty();
+        }
+
+        if (TestConfiguration.EnableTracing)
+        {
+            var destinations = activityCapture.Activities.Select(x => x.DestinationName).ToArray();
+            destinations.Should().Contain(nameof(TelemetryRequest));
+            destinations.Should().Contain(nameof(TelemetryNotification));
+            destinations.Should().Contain(nameof(TelemetryStreamRequest));
+            activityCapture.Activities.Should().OnlyContain(x => x.OperationName == "process");
+            activityCapture.Activities.Should().OnlyContain(x => x.OperationType == "process");
+            activityCapture.Activities.Should().OnlyContain(x => x.SpanKind == ActivityKind.Consumer);
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"process {nameof(TelemetryRequest)}");
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"process {nameof(TelemetryNotification)}");
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"process {nameof(TelemetryStreamRequest)}");
+        }
+        else
+        {
+            activityCapture.Activities.Should().BeEmpty();
         }
     }
 
@@ -54,7 +75,8 @@ public sealed class TelemetryRuntimeTests
     public async Task Test_Telemetry_NotificationPublisher_Resolution_Follows_Configuration()
     {
         TelemetryNotificationHandler.Reset();
-        using var capture = new MeterCapture(TestConfiguration.MeterName);
+        using var meterCapture = new MeterCapture(TestConfiguration.MeterName);
+        using var activityCapture = new ActivityCapture(TestConfiguration.ActivitySourceName);
         using var ctx = CreateServiceProvider();
         var mediator = ctx.Services.GetRequiredService<IMediator>();
         var ct = TestContext.Current.CancellationToken;
@@ -68,15 +90,28 @@ public sealed class TelemetryRuntimeTests
         publisher.Should().BeOfType(TestConfiguration.NotificationPublisherType);
 
         if (TestConfiguration.EnableMetrics)
-            capture.Measurements.Should().Contain(x => x.DestinationName == nameof(TelemetryNotification));
+            meterCapture.Measurements.Should().Contain(x => x.DestinationName == nameof(TelemetryNotification));
         else
-            capture.Measurements.Should().BeEmpty();
+            meterCapture.Measurements.Should().BeEmpty();
+
+        if (TestConfiguration.EnableTracing)
+        {
+            activityCapture.Activities.Should().Contain(x => x.DestinationName == nameof(TelemetryNotification));
+            activityCapture
+                .Activities.Should()
+                .Contain(x =>
+                    x.SpanName == $"process {nameof(TelemetryNotification)}" && x.SpanKind == ActivityKind.Consumer
+                );
+        }
+        else
+            activityCapture.Activities.Should().BeEmpty();
     }
 
     [Fact]
     public async Task Test_Telemetry_Emits_ErrorType_For_Failing_Request_Notification_And_Stream()
     {
-        using var capture = new MeterCapture(TestConfiguration.MeterName);
+        using var meterCapture = new MeterCapture(TestConfiguration.MeterName);
+        using var activityCapture = new ActivityCapture(TestConfiguration.ActivitySourceName);
         using var ctx = CreateServiceProvider();
         var mediator = ctx.Services.GetRequiredService<IMediator>();
         var ct = TestContext.Current.CancellationToken;
@@ -103,19 +138,37 @@ public sealed class TelemetryRuntimeTests
         if (TestConfiguration.EnableMetrics)
         {
             var errorType = typeof(InvalidOperationException).FullName;
-            capture
+            meterCapture
                 .Measurements.Should()
                 .Contain(x => x.DestinationName == nameof(FailingTelemetryRequest) && x.ErrorType == errorType);
-            capture
+            meterCapture
                 .Measurements.Should()
                 .Contain(x => x.DestinationName == nameof(FailingTelemetryNotification) && x.ErrorType == errorType);
-            capture
+            meterCapture
                 .Measurements.Should()
                 .Contain(x => x.DestinationName == nameof(FailingTelemetryStreamRequest) && x.ErrorType == errorType);
         }
         else
         {
-            capture.Measurements.Should().BeEmpty();
+            meterCapture.Measurements.Should().BeEmpty();
+        }
+
+        if (TestConfiguration.EnableTracing)
+        {
+            var errorType = typeof(InvalidOperationException).FullName;
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(FailingTelemetryRequest) && x.ErrorType == errorType);
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(FailingTelemetryNotification) && x.ErrorType == errorType);
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(FailingTelemetryStreamRequest) && x.ErrorType == errorType);
+        }
+        else
+        {
+            activityCapture.Activities.Should().BeEmpty();
         }
     }
 
@@ -213,8 +266,54 @@ public sealed class TelemetryRuntimeTests
         double Value,
         string? DestinationName,
         string? OperationName,
+        string? OperationType,
         string? ErrorType
     );
+
+    private readonly record struct ActivityData(
+        string? DestinationName,
+        string? OperationName,
+        string? OperationType,
+        string? ErrorType,
+        string SpanName,
+        ActivityKind SpanKind
+    );
+
+    private sealed class ActivityCapture : IDisposable
+    {
+        private readonly ConcurrentQueue<ActivityData> _activities = new();
+        private readonly ActivityListener _listener;
+
+        public IReadOnlyCollection<ActivityData> Activities => _activities;
+
+        public ActivityCapture(string activitySourceName)
+        {
+            _listener = new ActivityListener
+            {
+                ShouldListenTo = activitySource => activitySource.Name == activitySourceName,
+                Sample = static (ref ActivityCreationOptions<ActivityContext> options) =>
+                    ActivitySamplingResult.AllDataAndRecorded,
+                SampleUsingParentId = static (ref ActivityCreationOptions<string> options) =>
+                    ActivitySamplingResult.AllDataAndRecorded,
+                ActivityStopped = activity =>
+                {
+                    _activities.Enqueue(
+                        new(
+                            activity.GetTagItem("messaging.destination.name")?.ToString(),
+                            activity.GetTagItem("messaging.operation.name")?.ToString(),
+                            activity.GetTagItem("messaging.operation.type")?.ToString(),
+                            activity.GetTagItem("error.type")?.ToString(),
+                            activity.OperationName,
+                            activity.Kind
+                        )
+                    );
+                },
+            };
+            ActivitySource.AddActivityListener(_listener);
+        }
+
+        public void Dispose() => _listener.Dispose();
+    }
 
     private sealed class MeterCapture : IDisposable
     {
@@ -236,6 +335,7 @@ public sealed class TelemetryRuntimeTests
                 {
                     string? destinationName = null;
                     string? operationName = null;
+                    string? operationType = null;
                     string? errorType = null;
 
                     foreach (var tag in tags)
@@ -244,11 +344,15 @@ public sealed class TelemetryRuntimeTests
                             destinationName = tag.Value?.ToString();
                         else if (tag.Key == "messaging.operation.name")
                             operationName = tag.Value?.ToString();
+                        else if (tag.Key == "messaging.operation.type")
+                            operationType = tag.Value?.ToString();
                         else if (tag.Key == "error.type")
                             errorType = tag.Value?.ToString();
                     }
 
-                    _measurements.Enqueue(new(instrument.Name, measurement, destinationName, operationName, errorType));
+                    _measurements.Enqueue(
+                        new(instrument.Name, measurement, destinationName, operationName, operationType, errorType)
+                    );
                 }
             );
             _listener.Start();
