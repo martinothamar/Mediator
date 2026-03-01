@@ -30,8 +30,6 @@ internal sealed record CompilationModel
         EnableTracingOnTarget = false;
         ActivitySourceName = "Mediator";
         HistogramBuckets = null;
-        HasOpenTelemetryMetricSdk = false;
-        HasOpenTelemetryTracingSdk = false;
         TargetFrameworkIsNet8OrGreater = false;
         TargetFrameworkIsNet9OrGreater = false;
         NotificationPublisherResolvedTypeFullName = NotificationPublisherType.FullName;
@@ -73,8 +71,6 @@ internal sealed record CompilationModel
         bool enableTracing,
         string activitySourceName,
         string? histogramBuckets,
-        bool hasOpenTelemetryMetricSdk,
-        bool hasOpenTelemetryTracingSdk,
         bool targetFrameworkIsNet8OrGreater,
         bool targetFrameworkIsNet9OrGreater,
         int manyMessagesTreshold = 16
@@ -110,8 +106,6 @@ internal sealed record CompilationModel
         EnableTracingOnTarget = enableTracing;
         ActivitySourceName = activitySourceName;
         HistogramBuckets = histogramBuckets;
-        HasOpenTelemetryMetricSdk = hasOpenTelemetryMetricSdk;
-        HasOpenTelemetryTracingSdk = hasOpenTelemetryTracingSdk;
         TargetFrameworkIsNet8OrGreater = targetFrameworkIsNet8OrGreater;
         TargetFrameworkIsNet9OrGreater = targetFrameworkIsNet9OrGreater;
         NotificationPublisherResolvedTypeFullName = EnableTelemetryOnTarget
@@ -256,8 +250,6 @@ internal sealed record CompilationModel
     public bool EnableTelemetryOnTarget => EnableMetricsOnTarget || EnableTracingOnTarget;
     public string ActivitySourceName { get; }
     public string? HistogramBuckets { get; }
-    public bool HasOpenTelemetryMetricSdk { get; }
-    public bool HasOpenTelemetryTracingSdk { get; }
     public bool TargetFrameworkIsNet8OrGreater { get; }
     public bool TargetFrameworkIsNet9OrGreater { get; }
     public string NotificationPublisherResolvedTypeFullName { get; }

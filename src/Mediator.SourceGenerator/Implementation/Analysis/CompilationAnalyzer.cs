@@ -61,8 +61,6 @@ internal sealed class CompilationAnalyzer
     private bool _enableTracing = false;
     private string _activitySourceName = "Mediator";
     private double[]? _histogramBuckets = null;
-    private bool _hasOpenTelemetryMetricSdk = false;
-    private bool _hasOpenTelemetryTracingSdk = false;
 
     private bool _hasErrors;
     private bool _isInitialized;
@@ -172,8 +170,6 @@ internal sealed class CompilationAnalyzer
             TryLoadCachingModeSymbols(out _cachingModeEnumSymbol, out _eagerCachingModeSymbol);
 
             TryParseConfiguration();
-
-            DetectOpenTelemetryDependencies();
 
             RequestMessageHandlerWrappers = new RequestMessageHandlerWrapperModel[]
             {
@@ -311,58 +307,6 @@ internal sealed class CompilationAnalyzer
             cachingModeEnumSymbol = readCachingModeEnumSymbol;
             eagerCachingModeSymbol = (IFieldSymbol)cachingModeEnumSymbol.GetMembers().Single(m => m.Name == "Eager");
         }
-    }
-
-    private void DetectOpenTelemetryDependencies()
-    {
-        if (_enableMetrics)
-        {
-            _hasOpenTelemetryMetricSdk = HasOpenTelemetryProviderBuilderExtension(
-                "OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions",
-                "ConfigureOpenTelemetryMeterProvider"
-            );
-        }
-
-        if (_enableTracing)
-        {
-            _hasOpenTelemetryTracingSdk = HasOpenTelemetryProviderBuilderExtension(
-                "OpenTelemetry.Trace.OpenTelemetryDependencyInjectionTracingServiceCollectionExtensions",
-                "ConfigureOpenTelemetryTracerProvider"
-            );
-        }
-    }
-
-    private bool HasOpenTelemetryProviderBuilderExtension(string typeName, string methodName)
-    {
-        const string openTelemetryProviderExtensionsAssemblyName = "OpenTelemetry.Api.ProviderBuilderExtensions";
-
-        var extensionsType = _context.Compilation.GetTypeByMetadataName(typeName);
-        if (extensionsType is null)
-            return false;
-
-        if (
-            !string.Equals(
-                extensionsType.ContainingAssembly.Name,
-                openTelemetryProviderExtensionsAssemblyName,
-                StringComparison.Ordinal
-            )
-        )
-        {
-            return false;
-        }
-
-        foreach (var member in extensionsType.GetMembers(methodName))
-        {
-            if (member is not IMethodSymbol method)
-                continue;
-
-            if (!method.IsExtensionMethod || method.Parameters.Length != 2)
-                continue;
-
-            return true;
-        }
-
-        return false;
     }
 
     private void TryLoadBaseMessageSymbols(
@@ -512,8 +456,6 @@ internal sealed class CompilationAnalyzer
                 _enableTracing,
                 _activitySourceName,
                 histogramBucketsString,
-                _hasOpenTelemetryMetricSdk,
-                _hasOpenTelemetryTracingSdk,
                 TargetFrameworkIsNet8OrGreater,
                 TargetFrameworkIsNet9OrGreater,
                 MessageCountThreshold

@@ -129,20 +129,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe0), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.IContainerProbe), typeof(global::{{ InternalsNamespace }}.ContainerProbe1), {{ ServiceLifetime }}));
             services.Add(new {{ SD }}(typeof(global::{{ InternalsNamespace }}.ContainerMetadata), typeof(global::{{ InternalsNamespace }}.ContainerMetadata), {{ SingletonServiceLifetime }}));
-            {{~ if EnableMetricsOnTarget && HasOpenTelemetryMetricSdk ~}}
-
-            global::OpenTelemetry.Metrics.OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions.ConfigureOpenTelemetryMeterProvider(
-                services,
-                builder => builder.AddMeter("{{ MeterName }}")
-            );
-            {{~ end ~}}
-            {{~ if EnableTracingOnTarget && HasOpenTelemetryTracingSdk ~}}
-
-            global::OpenTelemetry.Trace.OpenTelemetryDependencyInjectionTracingServiceCollectionExtensions.ConfigureOpenTelemetryTracerProvider(
-                services,
-                builder => builder.AddSource("{{ ActivitySourceName }}")
-            );
-            {{~ end ~}}
 
             return services;
 
@@ -1108,6 +1094,20 @@ namespace {{ MediatorNamespace }}
         /// The total number of Mediator messages that were discovered.
         /// </summary>
         public const int TotalMessages = {{ TotalMessages }};
+        {{~ if EnableMetricsOnTarget ~}}
+
+        /// <summary>
+        /// The configured telemetry meter name.
+        /// </summary>
+        public const string MeterName = "{{ MeterName }}";
+        {{~ end ~}}
+        {{~ if EnableTracingOnTarget ~}}
+
+        /// <summary>
+        /// The configured telemetry activity source name.
+        /// </summary>
+        public const string ActivitySourceName = "{{ ActivitySourceName }}";
+        {{~ end ~}}
         {{~ if IsTestRun ~}}
 
         /// <summary>
