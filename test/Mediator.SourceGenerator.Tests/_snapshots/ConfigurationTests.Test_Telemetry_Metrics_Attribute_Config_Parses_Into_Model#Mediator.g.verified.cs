@@ -1006,6 +1006,11 @@ namespace Mediator
         public const int TotalMessages = 1;
 
         /// <summary>
+        /// The configured telemetry meter name.
+        /// </summary>
+        public const string MeterName = "AttributeMeter";
+
+        /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)

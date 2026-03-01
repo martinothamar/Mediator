@@ -42,47 +42,40 @@ namespace Microsoft.Extensions.DependencyInjection
                 options(opts);
 
             var configuredViaAttribute = false;
-            if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton && !configuredViaAttribute)
+            if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped && !configuredViaAttribute)
             {
                 var errMsg = "Invalid configuration detected for Mediator. ";
-                errMsg += "Generated code for 'Singleton' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
+                errMsg += "Generated code for 'Scoped' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
                 errMsg += "This means that the source generator hasn't seen the 'AddMediator' method call during compilation. ";
                 errMsg += "Make sure that the 'AddMediator' method is called from the project that references the Mediator.SourceGenerator package.";
                 throw new global::System.Exception(errMsg);
             }
 
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
             // Register handlers for request messages
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Request), sp => {
-                return new global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
-            }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.StreamRequest), sp => {
-                return new global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
-            }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers and wrappers for notification messages
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotification), sp => {
-                var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
-                return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
-            }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>), typeof(global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register notification handlers
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotificationHandler), typeof(global::TestCode.PingNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.PingNotification>), GetRequiredService<global::TestCode.PingNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotificationHandler), typeof(global::TestCode.PingNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.PingNotification>), GetRequiredService<global::TestCode.PingNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
             // Register the notification publisher that was configured
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.TaskWhenAllPublisher), typeof(global::Mediator.TaskWhenAllPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.TaskWhenAllPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.TaskWhenAllPublisher), typeof(global::Mediator.TaskWhenAllPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.TaskWhenAllPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
             // Register internal components
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -99,6 +92,7 @@ namespace Mediator.Internals
     internal interface IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -107,6 +101,7 @@ namespace Mediator.Internals
     internal interface INotificationHandlerBase
     {
         global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
             object notification,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -115,6 +110,7 @@ namespace Mediator.Internals
     internal interface IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -383,6 +379,7 @@ namespace Mediator.Internals
     internal interface IRequestHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -394,19 +391,19 @@ namespace Mediator.Internals
     internal sealed class RequestHandlerWrapper<TRequest, TResponse> : IRequestHandlerBase<TResponse>
         where TRequest : global::Mediator.IRequest<TResponse>
     {
-        private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public RequestHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = sp.GetRequiredService<global::Mediator.IRequestHandler<TRequest, TResponse>>();
-            var pipelineBehaviours = sp.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.IRequestHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            if (mediator.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
@@ -414,61 +411,57 @@ namespace Mediator.Internals
                 pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, TResponse>[]>(
                     pipelineBehaviours
                 );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             else
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
                 );
-                pipelineBehavioursArray = pipelineBehaviours.ToArray();
-            }
-
-            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-            {
-                var pipeline = pipelineBehavioursArray[i];
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             {
                 var handlerCopy = handler;
                 var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
-
-            _rootHandler = handler;
-            return this;
-        }
-
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handler = _rootHandler;
             return handler(request, cancellationToken);
         }
 
         public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TRequest)request, cancellationToken);
+            return Handle(mediator, (TRequest)request, cancellationToken);
         }
 
         public async global::System.Threading.Tasks.ValueTask<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return await Handle((TRequest)request, cancellationToken);
+            return await Handle(mediator, (TRequest)request, cancellationToken);
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
     internal interface IStreamRequestHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IStreamRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -480,19 +473,19 @@ namespace Mediator.Internals
     internal sealed class StreamRequestHandlerWrapper<TRequest, TResponse> : IStreamRequestHandlerBase<TResponse>
         where TRequest : global::Mediator.IStreamRequest<TResponse>
     {
-        private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public StreamRequestHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = sp.GetRequiredService<global::Mediator.IStreamRequestHandler<TRequest, TResponse>>();
-            var pipelineBehaviours = sp.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.IStreamRequestHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            if (mediator.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
@@ -500,55 +493,50 @@ namespace Mediator.Internals
                 pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]>(
                     pipelineBehaviours
                 );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             else
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is not global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
                 );
-                pipelineBehavioursArray = pipelineBehaviours.ToArray();
-            }
-
-            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-            {
-                var pipeline = pipelineBehavioursArray[i];
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             {
                 var handlerCopy = handler;
                 var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
-
-            _rootHandler = handler;
-            return this;
-        }
-
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handler = _rootHandler;
             return handler(request, cancellationToken);
         }
 
         public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IStreamRequest<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TRequest)request, cancellationToken);
+            return Handle(mediator, (TRequest)request, cancellationToken);
         }
 
         public async global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken
         )
         {
-            await foreach (var el in Handle((TRequest)request, cancellationToken))
+            await foreach (var el in Handle(mediator, (TRequest)request, cancellationToken))
                 yield return el;
         }
     }
@@ -556,6 +544,7 @@ namespace Mediator.Internals
     internal interface ICommandHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.ICommand<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -567,19 +556,19 @@ namespace Mediator.Internals
     internal sealed class CommandHandlerWrapper<TRequest, TResponse> : ICommandHandlerBase<TResponse>
         where TRequest : global::Mediator.ICommand<TResponse>
     {
-        private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public CommandHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = sp.GetRequiredService<global::Mediator.ICommandHandler<TRequest, TResponse>>();
-            var pipelineBehaviours = sp.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.ICommandHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            if (mediator.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
@@ -587,61 +576,57 @@ namespace Mediator.Internals
                 pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, TResponse>[]>(
                     pipelineBehaviours
                 );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             else
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
                 );
-                pipelineBehavioursArray = pipelineBehaviours.ToArray();
-            }
-
-            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-            {
-                var pipeline = pipelineBehavioursArray[i];
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             {
                 var handlerCopy = handler;
                 var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
-
-            _rootHandler = handler;
-            return this;
-        }
-
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handler = _rootHandler;
             return handler(request, cancellationToken);
         }
 
         public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.ICommand<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TRequest)request, cancellationToken);
+            return Handle(mediator, (TRequest)request, cancellationToken);
         }
 
         public async global::System.Threading.Tasks.ValueTask<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return await Handle((TRequest)request, cancellationToken);
+            return await Handle(mediator, (TRequest)request, cancellationToken);
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
     internal interface IStreamCommandHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IStreamCommand<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -653,19 +638,19 @@ namespace Mediator.Internals
     internal sealed class StreamCommandHandlerWrapper<TRequest, TResponse> : IStreamCommandHandlerBase<TResponse>
         where TRequest : global::Mediator.IStreamCommand<TResponse>
     {
-        private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public StreamCommandHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = sp.GetRequiredService<global::Mediator.IStreamCommandHandler<TRequest, TResponse>>();
-            var pipelineBehaviours = sp.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.IStreamCommandHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            if (mediator.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
@@ -673,55 +658,50 @@ namespace Mediator.Internals
                 pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]>(
                     pipelineBehaviours
                 );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             else
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is not global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
                 );
-                pipelineBehavioursArray = pipelineBehaviours.ToArray();
-            }
-
-            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-            {
-                var pipeline = pipelineBehavioursArray[i];
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             {
                 var handlerCopy = handler;
                 var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
-
-            _rootHandler = handler;
-            return this;
-        }
-
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handler = _rootHandler;
             return handler(request, cancellationToken);
         }
 
         public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IStreamCommand<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TRequest)request, cancellationToken);
+            return Handle(mediator, (TRequest)request, cancellationToken);
         }
 
         public async global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken
         )
         {
-            await foreach (var el in Handle((TRequest)request, cancellationToken))
+            await foreach (var el in Handle(mediator, (TRequest)request, cancellationToken))
                 yield return el;
         }
     }
@@ -729,6 +709,7 @@ namespace Mediator.Internals
     internal interface IQueryHandlerBase<TResponse> : IMessageHandlerBase
     {
         global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IQuery<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -740,19 +721,19 @@ namespace Mediator.Internals
     internal sealed class QueryHandlerWrapper<TRequest, TResponse> : IQueryHandlerBase<TResponse>
         where TRequest : global::Mediator.IQuery<TResponse>
     {
-        private global::Mediator.MessageHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public QueryHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = sp.GetRequiredService<global::Mediator.IQueryHandler<TRequest, TResponse>>();
-            var pipelineBehaviours = sp.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.IQueryHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.MessageHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            if (mediator.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
@@ -760,61 +741,57 @@ namespace Mediator.Internals
                 pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IPipelineBehavior<TRequest, TResponse>[]>(
                     pipelineBehaviours
                 );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             else
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is not global::Mediator.IPipelineBehavior<TRequest, TResponse>[]
                 );
-                pipelineBehavioursArray = pipelineBehaviours.ToArray();
-            }
-
-            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-            {
-                var pipeline = pipelineBehavioursArray[i];
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             {
                 var handlerCopy = handler;
                 var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
-
-            _rootHandler = handler;
-            return this;
-        }
-
-        public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handler = _rootHandler;
             return handler(request, cancellationToken);
         }
 
         public global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IQuery<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TRequest)request, cancellationToken);
+            return Handle(mediator, (TRequest)request, cancellationToken);
         }
 
         public async global::System.Threading.Tasks.ValueTask<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return await Handle((TRequest)request, cancellationToken);
+            return await Handle(mediator, (TRequest)request, cancellationToken);
         }
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
     internal interface IStreamQueryHandlerBase<TResponse> : IStreamMessageHandlerBase
     {
         global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IStreamQuery<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         );
@@ -826,19 +803,19 @@ namespace Mediator.Internals
     internal sealed class StreamQueryHandlerWrapper<TRequest, TResponse> : IStreamQueryHandlerBase<TResponse>
         where TRequest : global::Mediator.IStreamQuery<TResponse>
     {
-        private global::Mediator.StreamHandlerDelegate<TRequest, TResponse> _rootHandler = null!;
 
-        public StreamQueryHandlerWrapper<TRequest, TResponse> Init(
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
+            TRequest request,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            var concreteHandler = sp.GetRequiredService<global::Mediator.IStreamQueryHandler<TRequest, TResponse>>();
-            var pipelineBehaviours = sp.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
+            var concreteHandler = mediator.Services.GetRequiredService<global::Mediator.IStreamQueryHandler<TRequest, TResponse>>();
+            var pipelineBehaviours = mediator.Services.GetServices<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>>();
             var handler = (global::Mediator.StreamHandlerDelegate<TRequest, TResponse>)concreteHandler.Handle;
 
             global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[] pipelineBehavioursArray;
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            if (mediator.ServicesUnderlyingTypeIsArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
@@ -846,55 +823,50 @@ namespace Mediator.Internals
                 pipelineBehavioursArray = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]>(
                     pipelineBehaviours
                 );
+                for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
+                {
+                    var pipeline = pipelineBehavioursArray[i];
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             else
             {
                 global::System.Diagnostics.Debug.Assert(
                     pipelineBehaviours is not global::Mediator.IStreamPipelineBehavior<TRequest, TResponse>[]
                 );
-                pipelineBehavioursArray = pipelineBehaviours.ToArray();
-            }
-
-            for (int i = pipelineBehavioursArray.Length - 1; i >= 0; i--)
-            {
-                var pipeline = pipelineBehavioursArray[i];
-                var handlerCopy = handler;
-                var pipelineCopy = pipeline;
-                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                foreach (var pipeline in pipelineBehaviours.Reverse())
+                {
+                    var handlerCopy = handler;
+                    var pipelineCopy = pipeline;
+                    handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
+                }
             }
             {
                 var handlerCopy = handler;
                 var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
                 handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
-
-            _rootHandler = handler;
-            return this;
-        }
-
-        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
-            TRequest request,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handler = _rootHandler;
             return handler(request, cancellationToken);
         }
 
         public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            global::Mediator.Mediator mediator,
             global::Mediator.IStreamQuery<TResponse> request,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TRequest)request, cancellationToken);
+            return Handle(mediator, (TRequest)request, cancellationToken);
         }
 
         public async global::System.Collections.Generic.IAsyncEnumerable<object?> Handle(
+            global::Mediator.Mediator mediator,
             object request,
             [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken
         )
         {
-            await foreach (var el in Handle((TRequest)request, cancellationToken))
+            await foreach (var el in Handle(mediator, (TRequest)request, cancellationToken))
                 yield return el;
         }
     }
@@ -906,26 +878,25 @@ namespace Mediator.Internals
     internal sealed class NotificationHandlerWrapper<TNotification> : INotificationHandlerBase
         where TNotification : global::Mediator.INotification
     {
-        private global::Mediator.Internals.MediatorTelemetryNotificationPublisher _publisher = null!;
-        private global::Mediator.INotificationHandler<TNotification>[] _handlers = null!;
 
-        public NotificationHandlerWrapper<TNotification> Init(
-            global::Mediator.Internals.MediatorTelemetryNotificationPublisher publisher,
-            global::Mediator.Internals.ContainerMetadata containerMetadata,
-            global::System.IServiceProvider sp
+        public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
+            TNotification notification,
+            global::System.Threading.CancellationToken cancellationToken
         )
         {
-            _publisher = publisher;
-            var handlers = sp.GetServices<global::Mediator.INotificationHandler<TNotification>>();
-            if (containerMetadata.ServicesUnderlyingTypeIsArray)
+            var handlers = mediator.Services.GetServices<global::Mediator.INotificationHandler<TNotification>>();
+            var isArray = mediator.ServicesUnderlyingTypeIsArray;
+            if (isArray)
             {
                 global::System.Diagnostics.Debug.Assert(
                     handlers is global::Mediator.INotificationHandler<TNotification>[],
                     $"Unexpected type: {handlers.GetType()}"
                 );
-                _handlers = global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<TNotification>[]>(
-                    handlers
-                );
+                if (global::System.Runtime.CompilerServices.Unsafe.As<global::Mediator.INotificationHandler<TNotification>[]>(handlers).Length == 0)
+                {
+                    return default;
+                }
             }
             else
             {
@@ -933,34 +904,21 @@ namespace Mediator.Internals
                     handlers is not global::Mediator.INotificationHandler<TNotification>[],
                     $"Unexpected type: {handlers.GetType()}"
                 );
-                _handlers = handlers.ToArray();
             }
-            return this;
-        }
-
-        public global::System.Threading.Tasks.ValueTask Handle(
-            TNotification notification,
-            global::System.Threading.CancellationToken cancellationToken
-        )
-        {
-            var handlers = _handlers;
-            if (handlers.Length == 0)
-            {
-                return default;
-            }
-            return _publisher.Publish(
-                new global::Mediator.NotificationHandlers<TNotification>(handlers, isArray: true),
+            return mediator.NotificationPublisher.Publish(
+                new global::Mediator.NotificationHandlers<TNotification>(handlers, isArray),
                 notification,
                 cancellationToken
             );
         }
 
         public global::System.Threading.Tasks.ValueTask Handle(
+            global::Mediator.Mediator mediator,
             object notification,
             global::System.Threading.CancellationToken cancellationToken
         )
         {
-            return Handle((TNotification)notification, cancellationToken);
+            return Handle(mediator, (TNotification)notification, cancellationToken);
         }
     }
 
@@ -976,9 +934,54 @@ namespace Mediator.Internals
     {
         public readonly bool ServicesUnderlyingTypeIsArray;
 
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> RequestHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> CommandHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> QueryHandlerWrappers;
+
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamRequestHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamCommandHandlerWrappers;
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> StreamQueryHandlerWrappers;
+
+        public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
+
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response> Wrapper_For_TestCode_Request;
+
+        public readonly global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response> Wrapper_For_TestCode_StreamRequest;
+
+        public readonly global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification> Wrapper_For_TestCode_PingNotification;
+
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
+            using (var scope = sp.CreateScope())
+            {
+                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
+            }
+
+            var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
+            var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            requestHandlerTypes.Add(typeof(global::TestCode.Request), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>>());
+            RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
+            CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
+            QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
+
+            var streamRequestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
+            var streamCommandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            var streamQueryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
+            streamRequestHandlerTypes.Add(typeof(global::TestCode.StreamRequest), sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>>());
+            StreamRequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamRequestHandlerTypes);
+            StreamCommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamCommandHandlerTypes);
+            StreamQueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(streamQueryHandlerTypes);
+
+            var notificationHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
+            notificationHandlerTypes.Add(typeof(global::TestCode.PingNotification), sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>>());
+            NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
+
+            Wrapper_For_TestCode_Request = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>>();
+
+            Wrapper_For_TestCode_StreamRequest = sp.GetRequiredService<global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>>();
+
+            Wrapper_For_TestCode_PingNotification = sp.GetRequiredService<global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>>();
         }
     }
 }
@@ -997,7 +1000,6 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private global::Mediator.Internals.ContainerMetadata _containerMetadata;
         private global::Mediator.Internals.MediatorTelemetryNotificationPublisher? _notificationPublisher;
         internal global::Mediator.Internals.MediatorTelemetryNotificationPublisher NotificationPublisher
         {
@@ -1012,17 +1014,32 @@ namespace Mediator
                 return _notificationPublisher!;
             }
         }
+        private global::Mediator.Internals.ContainerMetadata? _containerMetadataStorage;
+        private global::Mediator.Internals.ContainerMetadata _containerMetadata
+        {
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (_containerMetadataStorage == null)
+                {
+                    var containerMetadata = Services.GetRequiredService<global::Mediator.Internals.ContainerMetadata>();
+                    _containerMetadataStorage = containerMetadata;
+                    return containerMetadata;
+                }
+                return _containerMetadataStorage;
+            }
+        }
         internal bool ServicesUnderlyingTypeIsArray => _containerMetadata.ServicesUnderlyingTypeIsArray;
 
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
         /// </summary>
-        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
+        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped;
 
         /// <summary>
         /// The caching mode configuration for Mediator handler resolution.
         /// </summary>
-        public const global::Mediator.CachingMode CachingMode = global::Mediator.CachingMode.Lazy;
+        public const global::Mediator.CachingMode CachingMode = global::Mediator.CachingMode.Eager;
 
         /// <summary>
         /// The name of the notification publisher service that was configured.
@@ -1035,12 +1052,21 @@ namespace Mediator
         public const int TotalMessages = 3;
 
         /// <summary>
+        /// The configured telemetry meter name.
+        /// </summary>
+        public const string MeterName = "TestMeter";
+
+        /// <summary>
+        /// The configured telemetry activity source name.
+        /// </summary>
+        public const string ActivitySourceName = "TestActivitySource";
+
+        /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)
         {
             Services = sp;
-            _containerMetadata = sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>();
         }
 
 
@@ -1056,11 +1082,7 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            var wrapperObj = Services.GetService(typeof(global::TestCode.Request));
-            var wrapper = wrapperObj as global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>;
-            if (wrapper == null)
-                ThrowMissingHandler(request);
-            return wrapper!.Handle(request, cancellationToken);
+            return _containerMetadata.Wrapper_For_TestCode_Request.Handle(this, request, cancellationToken);
         }
 
         /// <summary>
@@ -1074,11 +1096,7 @@ namespace Mediator
             global::System.Threading.CancellationToken cancellationToken = default
         )
         {
-            var wrapperObj = Services.GetService(typeof(global::TestCode.StreamRequest));
-            var wrapper = wrapperObj as global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>;
-            if (wrapper == null)
-                ThrowMissingHandler(request);
-            return wrapper!.Handle(request, cancellationToken);
+            return _containerMetadata.Wrapper_For_TestCode_StreamRequest.Handle(this, request, cancellationToken);
         }
 
         /// <summary>
@@ -1406,11 +1424,7 @@ namespace Mediator
         {
             ThrowIfNull(notification, nameof(notification));
 
-            var wrapperObj = Services.GetService(typeof(global::TestCode.PingNotification));
-            var wrapper = wrapperObj as global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>;
-            if (wrapper == null)
-                ThrowMissingHandler(notification);
-            return wrapper!.Handle(notification, cancellationToken);
+            return _containerMetadata.Wrapper_For_TestCode_PingNotification.Handle(this, notification, cancellationToken);
         }
 
         /// <summary>

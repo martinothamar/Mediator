@@ -814,99 +814,6 @@ public sealed class ConfigurationTests
 
     [Theory]
     [CombinatorialData]
-    public async Task Test_Telemetry_Matrix_AllMessageKinds(
-        ServiceLifetime sl,
-        [CombinatorialValues("Eager", "Lazy")] string cm,
-        bool em,
-        bool et,
-        bool oi
-    )
-    {
-        var enableMetricsLiteral = em.ToString().ToLowerInvariant();
-        var enableTracingLiteral = et.ToString().ToLowerInvariant();
-        var telemetryConfig = oi
-            ? $$"""
-                          options.Telemetry = new()
-                          {
-                              EnableMetrics = {{enableMetricsLiteral}},
-                              MeterName = "TestMeter",
-                              EnableTracing = {{enableTracingLiteral}},
-                              ActivitySourceName = "TestActivitySource"
-                          };
-                """
-            : $$"""
-                          options.Telemetry.EnableMetrics = {{enableMetricsLiteral}};
-                          options.Telemetry.MeterName = "TestMeter";
-                          options.Telemetry.EnableTracing = {{enableTracingLiteral}};
-                          options.Telemetry.ActivitySourceName = "TestActivitySource";
-                """;
-
-        var inputCompilation = Fixture.CreateLibrary(
-            $$"""
-            using System;
-            using System.Collections.Generic;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-
-                    services.AddMediator(options =>
-                    {
-                        options.ServiceLifetime = ServiceLifetime.{{sl}};
-                        options.CachingMode = CachingMode.{{cm}};
-                        options.NotificationPublisherType = typeof(TaskWhenAllPublisher);
-            {{telemetryConfig}}
-                    });
-                }
-            }
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct StreamRequest(Guid Id) : IStreamRequest<Response>;
-            public readonly record struct Response(Guid Id);
-            public sealed record PingNotification(Guid Id) : INotification;
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>, IStreamRequestHandler<StreamRequest, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new ValueTask<Response>(new Response(request.Id));
-
-                public async IAsyncEnumerable<Response> Handle(StreamRequest request, CancellationToken cancellationToken)
-                {
-                    await Task.Yield();
-                    yield return new Response(request.Id);
-                }
-            }
-
-            public sealed class PingNotificationHandler : INotificationHandler<PingNotification>
-            {
-                public ValueTask Handle(PingNotification notification, CancellationToken cancellationToken) => default;
-            }
-            """
-        );
-
-        await inputCompilation
-            .AssertAndVerify(Assertions.CompilesWithoutErrorDiagnostics)
-            .UseParameters(
-                sl == ServiceLifetime.Singleton ? "S"
-                    : sl == ServiceLifetime.Scoped ? "Sc"
-                    : "T",
-                cm == "Lazy" ? "L" : "E",
-                em ? "1" : "0",
-                et ? "1" : "0",
-                oi ? "1" : "0"
-            );
-    }
-
-    [Theory]
-    [CombinatorialData]
     public async Task Test_Telemetry_Attribute_Matrix(bool em, bool am)
     {
         var enableMetricsLiteral = em.ToString().ToLowerInvariant();
@@ -1342,141 +1249,89 @@ public sealed class ConfigurationTests
     }
 
     [Fact]
-    public async Task Test_Telemetry_Detects_MeterProvider_Extensions_Package()
+    public async Task Test_Telemetry_Exposes_MeterName_On_Mediator_When_Metrics_Enabled()
     {
-        var openTelemetryProviderBuilderExtensions = Fixture
-            .CreateLibrary(
-                """
-                using System;
-                using Microsoft.Extensions.DependencyInjection;
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
 
-                namespace OpenTelemetry.Metrics;
+            namespace TestCode;
 
-                public class MeterProviderBuilder
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
                 {
-                    public MeterProviderBuilder AddMeter(string meterName) => this;
-                }
-
-                public static class OpenTelemetryDependencyInjectionMetricsServiceCollectionExtensions
-                {
-                    public static IServiceCollection ConfigureOpenTelemetryMeterProvider(
-                        this IServiceCollection services,
-                        Action<MeterProviderBuilder> configure)
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
                     {
-                        var builder = new MeterProviderBuilder();
-                        configure(builder);
-                        return services;
-                    }
+                        options.Telemetry.EnableMetrics = true;
+                        options.Telemetry.MeterName = "TestMeter";
+                    });
+
+                    var meterName = global::Mediator.Mediator.MeterName;
+                    if (meterName != "TestMeter")
+                        throw new Exception("Unexpected meter name");
                 }
-                """
-            )
-            .WithAssemblyName("OpenTelemetry.Api.ProviderBuilderExtensions");
-
-        var inputCompilation = Fixture
-            .CreateLibrary(
-                """
-                using System;
-                using System.Threading;
-                using System.Threading.Tasks;
-                using Mediator;
-                using Microsoft.Extensions.DependencyInjection;
-
-                namespace TestCode;
-
-                public readonly record struct Request(Guid Id) : IRequest<Response>;
-                public readonly record struct Response(Guid Id);
-
-                public sealed class RequestHandler : IRequestHandler<Request, Response>
-                {
-                    public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                        new(new Response(request.Id));
-                }
-
-                public class Program
-                {
-                    public static void Main()
-                    {
-                        var services = new ServiceCollection();
-                        services.AddMediator(options =>
-                        {
-                            options.Telemetry.EnableMetrics = true;
-                            options.Telemetry.MeterName = "TestMeter";
-                        });
-                    }
-                }
-                """
-            )
-            .AddReferences(openTelemetryProviderBuilderExtensions.ToMetadataReference());
+            }
+            """
+        );
 
         await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }
 
     [Fact]
-    public async Task Test_Telemetry_Detects_TracerProvider_Extensions_Package()
+    public async Task Test_Telemetry_Exposes_ActivitySourceName_On_Mediator_When_Tracing_Enabled()
     {
-        var openTelemetryProviderBuilderExtensions = Fixture
-            .CreateLibrary(
-                """
-                using System;
-                using Microsoft.Extensions.DependencyInjection;
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
 
-                namespace OpenTelemetry.Trace;
+            namespace TestCode;
 
-                public class TracerProviderBuilder
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
                 {
-                    public TracerProviderBuilder AddSource(string sourceName) => this;
-                }
-
-                public static class OpenTelemetryDependencyInjectionTracingServiceCollectionExtensions
-                {
-                    public static IServiceCollection ConfigureOpenTelemetryTracerProvider(
-                        this IServiceCollection services,
-                        Action<TracerProviderBuilder> configure)
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
                     {
-                        var builder = new TracerProviderBuilder();
-                        configure(builder);
-                        return services;
-                    }
+                        options.Telemetry.EnableTracing = true;
+                        options.Telemetry.ActivitySourceName = "TestActivitySource";
+                    });
+
+                    var activitySourceName = global::Mediator.Mediator.ActivitySourceName;
+                    if (activitySourceName != "TestActivitySource")
+                        throw new Exception("Unexpected activity source name");
                 }
-                """
-            )
-            .WithAssemblyName("OpenTelemetry.Api.ProviderBuilderExtensions");
-
-        var inputCompilation = Fixture
-            .CreateLibrary(
-                """
-                using System;
-                using System.Threading;
-                using System.Threading.Tasks;
-                using Mediator;
-                using Microsoft.Extensions.DependencyInjection;
-
-                namespace TestCode;
-
-                public readonly record struct Request(Guid Id) : IRequest<Response>;
-                public readonly record struct Response(Guid Id);
-
-                public sealed class RequestHandler : IRequestHandler<Request, Response>
-                {
-                    public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                        new(new Response(request.Id));
-                }
-
-                public class Program
-                {
-                    public static void Main()
-                    {
-                        var services = new ServiceCollection();
-                        services.AddMediator(options =>
-                        {
-                            options.Telemetry.EnableTracing = true;
-                            options.Telemetry.ActivitySourceName = "TestActivitySource";
-                        });
-                    }
-                }
-                """
-            )
-            .AddReferences(openTelemetryProviderBuilderExtensions.ToMetadataReference());
+            }
+            """
+        );
 
         await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
     }

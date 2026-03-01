@@ -1089,6 +1089,16 @@ namespace Mediator
         public const int TotalMessages = 3;
 
         /// <summary>
+        /// The configured telemetry meter name.
+        /// </summary>
+        public const string MeterName = "Mediator";
+
+        /// <summary>
+        /// The configured telemetry activity source name.
+        /// </summary>
+        public const string ActivitySourceName = "Mediator";
+
+        /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)

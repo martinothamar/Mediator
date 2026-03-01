@@ -15,6 +15,21 @@ namespace Mediator.Telemetry.Tests;
 public sealed class TelemetryRuntimeTests
 {
     [Fact]
+    public void Test_Telemetry_Names_Are_Exposed_On_Mediator()
+    {
+#if !Mediator_Telemetry_EnableMetrics && !Mediator_Telemetry_EnableTracing
+        return;
+#endif
+
+#if Mediator_Telemetry_EnableMetrics
+        global::Mediator.Mediator.MeterName.Should().Be(TestConfiguration.MeterName);
+#endif
+#if Mediator_Telemetry_EnableTracing
+        global::Mediator.Mediator.ActivitySourceName.Should().Be(TestConfiguration.ActivitySourceName);
+#endif
+    }
+
+    [Fact]
     public async Task Test_Telemetry_Emits_Signals_For_Request_Notification_And_Stream()
     {
         TelemetryNotificationHandler.Reset();

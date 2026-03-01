@@ -978,6 +978,11 @@ namespace Mediator
         public const int TotalMessages = 3;
 
         /// <summary>
+        /// The configured telemetry activity source name.
+        /// </summary>
+        public const string ActivitySourceName = "TestActivitySource";
+
+        /// <summary>
         /// Constructor for DI, should not be used by consumer.
         /// </summary>
         public Mediator(global::System.IServiceProvider sp)

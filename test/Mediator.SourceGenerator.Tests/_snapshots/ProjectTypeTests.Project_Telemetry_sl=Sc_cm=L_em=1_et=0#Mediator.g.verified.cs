@@ -42,40 +42,40 @@ namespace Microsoft.Extensions.DependencyInjection
                 options(opts);
 
             var configuredViaAttribute = false;
-            if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient && !configuredViaAttribute)
+            if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped && !configuredViaAttribute)
             {
                 var errMsg = "Invalid configuration detected for Mediator. ";
-                errMsg += "Generated code for 'Transient' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
+                errMsg += "Generated code for 'Scoped' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
                 errMsg += "This means that the source generator hasn't seen the 'AddMediator' method call during compilation. ";
                 errMsg += "Make sure that the 'AddMediator' method is called from the project that references the Mediator.SourceGenerator package.";
                 throw new global::System.Exception(errMsg);
             }
 
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Mediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IMediator), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), typeof(global::Mediator.Mediator), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
             // Register handlers for request messages
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Request), _ => new global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.StreamRequest), _ => new global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register handlers and wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotification), _ => new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register notification handlers
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotificationHandler), typeof(global::TestCode.PingNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.PingNotification>), GetRequiredService<global::TestCode.PingNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotificationHandler), typeof(global::TestCode.PingNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.PingNotification>), GetRequiredService<global::TestCode.PingNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
             // Register the notification publisher that was configured
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.TaskWhenAllPublisher), typeof(global::Mediator.TaskWhenAllPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.TaskWhenAllPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.TaskWhenAllPublisher), typeof(global::Mediator.TaskWhenAllPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationPublisher), sp => sp.GetRequiredService<global::Mediator.TaskWhenAllPublisher>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
 
             // Register internal components
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
@@ -114,6 +114,211 @@ namespace Mediator.Internals
             object request,
             global::System.Threading.CancellationToken cancellationToken
         );
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    internal static class MediatorTelemetry
+    {
+        public static readonly global::System.Diagnostics.Metrics.Meter Meter =
+            new("TestMeter", "3.1.0.0");
+
+        public static readonly global::System.Diagnostics.Metrics.Histogram<double> ProcessDuration =
+            Meter.CreateHistogram<double>(
+                "messaging.process.duration",
+                unit: "s",
+                description: "Duration of message processing operation",
+                advice: new() { HistogramBucketBoundaries = new double[] { 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10 } }
+            );
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    internal sealed class MediatorTelemetryBehavior<TMessage, TResponse>
+        : global::Mediator.IPipelineBehavior<TMessage, TResponse>
+        where TMessage : global::Mediator.IMessage
+    {
+        private static readonly string DestinationName = typeof(TMessage).Name;
+        private static readonly string SpanName = "process " + DestinationName;
+        private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+            new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+            {
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+            };
+
+        public async global::System.Threading.Tasks.ValueTask<TResponse> Handle(
+            TMessage message,
+            global::Mediator.MessageHandlerDelegate<TMessage, TResponse> next,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+
+            try
+            {
+                var response = await next(message, cancellationToken);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    TelemetryTags
+                );
+                return response;
+            }
+            catch (global::System.Exception ex)
+            {
+                var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                throw;
+            }
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    internal sealed class MediatorStreamTelemetryBehavior<TMessage, TResponse>
+        : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
+        where TMessage : global::Mediator.IStreamMessage
+    {
+        private static readonly string DestinationName = typeof(TMessage).Name;
+        private static readonly string SpanName = "process " + DestinationName;
+        private static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+            new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+            {
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+            };
+
+        public global::System.Collections.Generic.IAsyncEnumerable<TResponse> Handle(
+            TMessage message,
+            global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
+            global::System.Threading.CancellationToken cancellationToken)
+        {
+            return HandleWithTelemetry(message, next, cancellationToken);
+        }
+
+        private static async global::System.Collections.Generic.IAsyncEnumerable<TResponse> HandleWithTelemetry(
+            TMessage message,
+            global::Mediator.StreamHandlerDelegate<TMessage, TResponse> next,
+            [global::System.Runtime.CompilerServices.EnumeratorCancellation] global::System.Threading.CancellationToken cancellationToken)
+        {
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+            string? errorType = null;
+
+            global::System.Collections.Generic.IAsyncEnumerable<TResponse> responses;
+            try
+            {
+                responses = next(message, cancellationToken);
+            }
+            catch (global::System.Exception ex)
+            {
+                var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                throw;
+            }
+            await using var enumerator = responses.GetAsyncEnumerator(cancellationToken);
+            try
+            {
+                while (true)
+                {
+                    TResponse response;
+                    try
+                    {
+                        if (!await enumerator.MoveNextAsync())
+                            break;
+                        response = enumerator.Current;
+                    }
+                    catch (global::System.Exception ex)
+                    {
+                        errorType = ex.GetType().FullName;
+                        throw;
+                    }
+
+                    yield return response;
+                }
+            }
+            finally
+            {
+                if (errorType is null)
+                {
+                    MediatorTelemetry.ProcessDuration.Record(
+                        global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                        TelemetryTags
+                    );
+                }
+                else
+                {
+                    var tags = new global::System.Diagnostics.TagList(TelemetryTags);
+                    tags.Add("error.type", errorType);
+                    MediatorTelemetry.ProcessDuration.Record(
+                        global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                        tags
+                    );
+                }
+            }
+        }
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    internal sealed class MediatorTelemetryNotificationPublisher
+        : global::Mediator.INotificationPublisher
+    {
+        private readonly global::Mediator.TaskWhenAllPublisher _inner;
+        private static class NotificationTelemetry<TNotificationType>
+            where TNotificationType : global::Mediator.INotification
+        {
+            public static readonly string DestinationName = typeof(TNotificationType).Name;
+            public static readonly string SpanName = "process " + DestinationName;
+            public static readonly global::System.Collections.Generic.KeyValuePair<string, object?>[] TelemetryTags =
+                new global::System.Collections.Generic.KeyValuePair<string, object?>[]
+                {
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.system", "mediator"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.name", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.operation.type", "process"),
+                    new global::System.Collections.Generic.KeyValuePair<string, object?>("messaging.destination.name", DestinationName),
+                };
+        }
+
+        public MediatorTelemetryNotificationPublisher(global::Mediator.TaskWhenAllPublisher inner)
+        {
+            _inner = inner;
+        }
+
+        public async global::System.Threading.Tasks.ValueTask Publish<TNotification>(
+            global::Mediator.NotificationHandlers<TNotification> handlers,
+            TNotification notification,
+            global::System.Threading.CancellationToken cancellationToken)
+            where TNotification : global::Mediator.INotification
+        {
+            var telemetryTags = NotificationTelemetry<TNotification>.TelemetryTags;
+            var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
+
+            try
+            {
+                await _inner.Publish(handlers, notification, cancellationToken);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    telemetryTags
+                );
+            }
+            catch (global::System.Exception ex)
+            {
+                var tags = new global::System.Diagnostics.TagList(telemetryTags);
+                tags.Add("error.type", ex.GetType().FullName);
+                MediatorTelemetry.ProcessDuration.Record(
+                    global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
+                    tags
+                );
+                throw;
+            }
+        }
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
@@ -171,6 +376,11 @@ namespace Mediator.Internals
                     var pipelineCopy = pipeline;
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
+            }
+            {
+                var handlerCopy = handler;
+                var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
             return handler(request, cancellationToken);
         }
@@ -248,6 +458,11 @@ namespace Mediator.Internals
                     var pipelineCopy = pipeline;
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
+            }
+            {
+                var handlerCopy = handler;
+                var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
             return handler(request, cancellationToken);
         }
@@ -327,6 +542,11 @@ namespace Mediator.Internals
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
             }
+            {
+                var handlerCopy = handler;
+                var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
+            }
             return handler(request, cancellationToken);
         }
 
@@ -403,6 +623,11 @@ namespace Mediator.Internals
                     var pipelineCopy = pipeline;
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
+            }
+            {
+                var handlerCopy = handler;
+                var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
             return handler(request, cancellationToken);
         }
@@ -482,6 +707,11 @@ namespace Mediator.Internals
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
             }
+            {
+                var handlerCopy = handler;
+                var telemetryBehavior = new global::Mediator.Internals.MediatorTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
+            }
             return handler(request, cancellationToken);
         }
 
@@ -558,6 +788,11 @@ namespace Mediator.Internals
                     var pipelineCopy = pipeline;
                     handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => pipelineCopy.Handle(message, handlerCopy, cancellationToken);
                 }
+            }
+            {
+                var handlerCopy = handler;
+                var telemetryBehavior = new global::Mediator.Internals.MediatorStreamTelemetryBehavior<TRequest, TResponse>();
+                handler = (TRequest message, System.Threading.CancellationToken cancellationToken) => telemetryBehavior.Handle(message, handlerCopy, cancellationToken);
             }
             return handler(request, cancellationToken);
         }
@@ -647,7 +882,10 @@ namespace Mediator.Internals
 
         public ContainerMetadata(global::System.IServiceProvider sp)
         {
-            ServicesUnderlyingTypeIsArray = sp.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
+            using (var scope = sp.CreateScope())
+            {
+                ServicesUnderlyingTypeIsArray = scope.ServiceProvider.GetServices<global::Mediator.Internals.IContainerProbe>() is global::Mediator.Internals.IContainerProbe[];
+            }
         }
     }
 }
@@ -666,14 +904,17 @@ namespace Mediator
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
         internal readonly global::System.IServiceProvider Services;
-        private global::Mediator.TaskWhenAllPublisher? _notificationPublisher;
-        internal global::Mediator.TaskWhenAllPublisher NotificationPublisher
+        private global::Mediator.Internals.MediatorTelemetryNotificationPublisher? _notificationPublisher;
+        internal global::Mediator.Internals.MediatorTelemetryNotificationPublisher NotificationPublisher
         {
             [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_notificationPublisher == null)
-                    _notificationPublisher = Services.GetRequiredService<global::Mediator.TaskWhenAllPublisher>();
+                {
+                    var notificationPublisher = Services.GetRequiredService<global::Mediator.TaskWhenAllPublisher>();
+                    _notificationPublisher = new global::Mediator.Internals.MediatorTelemetryNotificationPublisher(notificationPublisher);
+                }
                 return _notificationPublisher!;
             }
         }
@@ -697,7 +938,7 @@ namespace Mediator
         /// <summary>
         /// The lifetime of Mediator-related service registrations in DI container.
         /// </summary>
-        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient;
+        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped;
 
         /// <summary>
         /// The caching mode configuration for Mediator handler resolution.
@@ -713,6 +954,11 @@ namespace Mediator
         /// The total number of Mediator messages that were discovered.
         /// </summary>
         public const int TotalMessages = 3;
+
+        /// <summary>
+        /// The configured telemetry meter name.
+        /// </summary>
+        public const string MeterName = "TestMeter";
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
