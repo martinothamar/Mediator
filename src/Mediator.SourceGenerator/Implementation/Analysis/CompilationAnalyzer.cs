@@ -1474,6 +1474,51 @@ internal sealed class CompilationAnalyzer
                 }
                 _histogramBuckets = buckets.ToArray();
             }
+            else if (
+                assignment.Right.GetFirstToken().IsKind(SyntaxKind.OpenBracketToken)
+                && assignment.Right.GetLastToken().IsKind(SyntaxKind.CloseBracketToken)
+            )
+            {
+                var buckets = new List<double>();
+                var elementTokens = new List<SyntaxToken>();
+                var tokens = assignment.Right.DescendantTokens(descendIntoTrivia: false);
+
+                using var tokenEnumerator = tokens.GetEnumerator();
+                if (!tokenEnumerator.MoveNext())
+                {
+                    ReportDiagnostic(
+                        assignment.Right.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                "Expected array creation or null for 'HistogramBuckets'"
+                            )
+                    );
+                    return false;
+                }
+
+                while (tokenEnumerator.MoveNext())
+                {
+                    var token = tokenEnumerator.Current;
+                    if (token.IsKind(SyntaxKind.CloseBracketToken))
+                        break;
+
+                    if (token.IsKind(SyntaxKind.CommaToken))
+                    {
+                        if (elementTokens.Count > 0 && !TryParseHistogramBucketElement(elementTokens, buckets))
+                            return false;
+                        elementTokens.Clear();
+                        continue;
+                    }
+
+                    elementTokens.Add(token);
+                }
+
+                if (elementTokens.Count > 0 && !TryParseHistogramBucketElement(elementTokens, buckets))
+                    return false;
+
+                _histogramBuckets = buckets.ToArray();
+            }
             else if (assignment.Right.IsKind(SyntaxKind.NullLiteralExpression))
             {
                 _histogramBuckets = null;
@@ -1502,6 +1547,27 @@ internal sealed class CompilationAnalyzer
         }
 
         return true;
+
+        bool TryParseHistogramBucketElement(List<SyntaxToken> tokens, List<double> target)
+        {
+            if (tokens.Count == 0)
+                return true;
+
+            var elementText = string.Concat(tokens.Select(t => t.ToFullString()));
+            var parsed = SyntaxFactory.ParseExpression(elementText);
+            if (parsed is LiteralExpressionSyntax bucketLiteral && bucketLiteral.Token.Value is double or int or float)
+            {
+                target.Add(Convert.ToDouble(bucketLiteral.Token.Value));
+                return true;
+            }
+
+            ReportDiagnostic(
+                assignment.Right.GetLocation(),
+                (in CompilationAnalyzerContext c, Location l) =>
+                    c.ReportInvalidCodeBasedConfiguration(l, "HistogramBuckets must be numeric literals")
+            );
+            return false;
+        }
     }
 
     private bool ProcessAddMediatorAssignmentStatement(

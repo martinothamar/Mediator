@@ -40,29 +40,71 @@ public sealed class TelemetryRuntimeTests
         var ct = TestContext.Current.CancellationToken;
         var id = Guid.NewGuid();
 
-        var response = await mediator.Send(new TelemetryRequest(id), ct);
-        response.Id.Should().Be(id);
+        static async Task<List<TelemetryResponse>> ReadStream(IAsyncEnumerable<TelemetryResponse> stream)
+        {
+            var values = new List<TelemetryResponse>();
+            await foreach (var value in stream)
+                values.Add(value);
+            return values;
+        }
+
+        var requestResponse = await mediator.Send(new TelemetryRequest(id), ct);
+        requestResponse.Id.Should().Be(id);
+
+        var commandResponse = await mediator.Send(new TelemetryCommand(id), ct);
+        commandResponse.Id.Should().Be(id);
+
+        var queryResponse = await mediator.Send(new TelemetryQuery(id), ct);
+        queryResponse.Id.Should().Be(id);
 
         await mediator.Publish(new TelemetryNotification(id), ct);
 
-        var streamValues = new List<TelemetryResponse>();
-        await foreach (var value in mediator.CreateStream(new TelemetryStreamRequest(id), ct))
-            streamValues.Add(value);
+        var streamRequestValues = await ReadStream(mediator.CreateStream(new TelemetryStreamRequest(id), ct));
+        var streamCommandValues = await ReadStream(mediator.CreateStream(new TelemetryStreamCommand(id), ct));
+        var streamQueryValues = await ReadStream(mediator.CreateStream(new TelemetryStreamQuery(id), ct));
 
-        streamValues.Should().HaveCount(3);
+        streamRequestValues.Should().HaveCount(3);
+        streamCommandValues.Should().HaveCount(3);
+        streamQueryValues.Should().HaveCount(3);
         TelemetryNotificationHandler.CallCount.Should().Be(1);
 
         if (TestConfiguration.EnableMetrics)
         {
             var destinations = meterCapture.Measurements.Select(x => x.DestinationName).ToArray();
             destinations.Should().Contain(nameof(TelemetryRequest));
+            destinations.Should().Contain(nameof(TelemetryCommand));
+            destinations.Should().Contain(nameof(TelemetryQuery));
             destinations.Should().Contain(nameof(TelemetryNotification));
             destinations.Should().Contain(nameof(TelemetryStreamRequest));
+            destinations.Should().Contain(nameof(TelemetryStreamCommand));
+            destinations.Should().Contain(nameof(TelemetryStreamQuery));
             meterCapture.Measurements.Should().OnlyContain(x => x.InstrumentName == "messaging.process.duration");
             meterCapture.Measurements.Should().OnlyContain(x => x.OperationType == "process");
+            meterCapture.Measurements.Should().OnlyContain(x => x.MessagingSystem == "mediator");
             meterCapture.Measurements.Should().Contain(x => x.OperationName == "send");
             meterCapture.Measurements.Should().Contain(x => x.OperationName == "publish");
             meterCapture.Measurements.Should().Contain(x => x.OperationName == "createstream");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryRequest) && x.MessageKind == "request");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryCommand) && x.MessageKind == "command");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryQuery) && x.MessageKind == "query");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryNotification) && x.MessageKind == "notification");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryStreamRequest) && x.MessageKind == "streamrequest");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryStreamCommand) && x.MessageKind == "streamcommand");
+            meterCapture
+                .Measurements.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryStreamQuery) && x.MessageKind == "streamquery");
         }
         else
         {
@@ -73,18 +115,52 @@ public sealed class TelemetryRuntimeTests
         {
             var destinations = activityCapture.Activities.Select(x => x.DestinationName).ToArray();
             destinations.Should().Contain(nameof(TelemetryRequest));
+            destinations.Should().Contain(nameof(TelemetryCommand));
+            destinations.Should().Contain(nameof(TelemetryQuery));
             destinations.Should().Contain(nameof(TelemetryNotification));
             destinations.Should().Contain(nameof(TelemetryStreamRequest));
+            destinations.Should().Contain(nameof(TelemetryStreamCommand));
+            destinations.Should().Contain(nameof(TelemetryStreamQuery));
             activityCapture.Activities.Should().OnlyContain(x => x.OperationType == "process");
             activityCapture.Activities.Should().OnlyContain(x => x.SpanKind == ActivityKind.Consumer);
+            activityCapture.Activities.Should().OnlyContain(x => x.MessagingSystem == "mediator");
             activityCapture.Activities.Should().Contain(x => x.OperationName == "send");
             activityCapture.Activities.Should().Contain(x => x.OperationName == "publish");
             activityCapture.Activities.Should().Contain(x => x.OperationName == "createstream");
             activityCapture.Activities.Should().Contain(x => x.SpanName == $"send {nameof(TelemetryRequest)}");
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"send {nameof(TelemetryCommand)}");
+            activityCapture.Activities.Should().Contain(x => x.SpanName == $"send {nameof(TelemetryQuery)}");
             activityCapture.Activities.Should().Contain(x => x.SpanName == $"publish {nameof(TelemetryNotification)}");
             activityCapture
                 .Activities.Should()
                 .Contain(x => x.SpanName == $"createstream {nameof(TelemetryStreamRequest)}");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.SpanName == $"createstream {nameof(TelemetryStreamCommand)}");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.SpanName == $"createstream {nameof(TelemetryStreamQuery)}");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryRequest) && x.MessageKind == "request");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryCommand) && x.MessageKind == "command");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryQuery) && x.MessageKind == "query");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryNotification) && x.MessageKind == "notification");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryStreamRequest) && x.MessageKind == "streamrequest");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryStreamCommand) && x.MessageKind == "streamcommand");
+            activityCapture
+                .Activities.Should()
+                .Contain(x => x.DestinationName == nameof(TelemetryStreamQuery) && x.MessageKind == "streamquery");
         }
         else
         {
@@ -303,7 +379,15 @@ public sealed class TelemetryRuntimeTests
 
     public sealed record TelemetryRequest(Guid Id) : IRequest<TelemetryResponse>;
 
+    public sealed record TelemetryCommand(Guid Id) : ICommand<TelemetryResponse>;
+
+    public sealed record TelemetryQuery(Guid Id) : IQuery<TelemetryResponse>;
+
     public sealed record TelemetryStreamRequest(Guid Id) : IStreamRequest<TelemetryResponse>;
+
+    public sealed record TelemetryStreamCommand(Guid Id) : IStreamCommand<TelemetryResponse>;
+
+    public sealed record TelemetryStreamQuery(Guid Id) : IStreamQuery<TelemetryResponse>;
 
     public sealed record TelemetryNotification(Guid Id) : INotification;
 
@@ -321,22 +405,61 @@ public sealed class TelemetryRuntimeTests
 
     public sealed class TelemetryHandler
         : IRequestHandler<TelemetryRequest, TelemetryResponse>,
-            IStreamRequestHandler<TelemetryStreamRequest, TelemetryResponse>
+            ICommandHandler<TelemetryCommand, TelemetryResponse>,
+            IQueryHandler<TelemetryQuery, TelemetryResponse>,
+            IStreamRequestHandler<TelemetryStreamRequest, TelemetryResponse>,
+            IStreamCommandHandler<TelemetryStreamCommand, TelemetryResponse>,
+            IStreamQueryHandler<TelemetryStreamQuery, TelemetryResponse>
     {
         public ValueTask<TelemetryResponse> Handle(TelemetryRequest request, CancellationToken cancellationToken)
         {
             return new(new TelemetryResponse(request.Id, 0));
         }
 
-        public async IAsyncEnumerable<TelemetryResponse> Handle(
+        public ValueTask<TelemetryResponse> Handle(TelemetryCommand command, CancellationToken cancellationToken)
+        {
+            return new(new TelemetryResponse(command.Id, 0));
+        }
+
+        public ValueTask<TelemetryResponse> Handle(TelemetryQuery query, CancellationToken cancellationToken)
+        {
+            return new(new TelemetryResponse(query.Id, 0));
+        }
+
+        public IAsyncEnumerable<TelemetryResponse> Handle(
             TelemetryStreamRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            return StreamResponses(request.Id, cancellationToken);
+        }
+
+        public IAsyncEnumerable<TelemetryResponse> Handle(
+            TelemetryStreamCommand command,
+            CancellationToken cancellationToken
+        )
+        {
+            return StreamResponses(command.Id, cancellationToken);
+        }
+
+        public IAsyncEnumerable<TelemetryResponse> Handle(
+            TelemetryStreamQuery query,
+            CancellationToken cancellationToken
+        )
+        {
+            return StreamResponses(query.Id, cancellationToken);
+        }
+
+        private static async IAsyncEnumerable<TelemetryResponse> StreamResponses(
+            Guid id,
             [EnumeratorCancellation] CancellationToken cancellationToken
         )
         {
             for (var i = 1; i <= 3; i++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
-                yield return new TelemetryResponse(request.Id, i);
+                yield return new TelemetryResponse(id, i);
             }
         }
     }
@@ -416,16 +539,20 @@ public sealed class TelemetryRuntimeTests
     private readonly record struct MeasurementData(
         string InstrumentName,
         double Value,
+        string? MessagingSystem,
         string? DestinationName,
         string? OperationName,
         string? OperationType,
+        string? MessageKind,
         string? ErrorType
     );
 
     private readonly record struct ActivityData(
+        string? MessagingSystem,
         string? DestinationName,
         string? OperationName,
         string? OperationType,
+        string? MessageKind,
         string? ErrorType,
         string SpanName,
         ActivityKind SpanKind
@@ -451,9 +578,11 @@ public sealed class TelemetryRuntimeTests
                 {
                     _activities.Enqueue(
                         new(
+                            activity.GetTagItem("messaging.system")?.ToString(),
                             activity.GetTagItem("messaging.destination.name")?.ToString(),
                             activity.GetTagItem("messaging.operation.name")?.ToString(),
                             activity.GetTagItem("messaging.operation.type")?.ToString(),
+                            activity.GetTagItem("messaging.mediator.message.kind")?.ToString(),
                             activity.GetTagItem("error.type")?.ToString(),
                             activity.OperationName,
                             activity.Kind
@@ -488,22 +617,37 @@ public sealed class TelemetryRuntimeTests
                     string? destinationName = null;
                     string? operationName = null;
                     string? operationType = null;
+                    string? messagingSystem = null;
+                    string? messageKind = null;
                     string? errorType = null;
 
                     foreach (var tag in tags)
                     {
-                        if (tag.Key == "messaging.destination.name")
+                        if (tag.Key == "messaging.system")
+                            messagingSystem = tag.Value?.ToString();
+                        else if (tag.Key == "messaging.destination.name")
                             destinationName = tag.Value?.ToString();
                         else if (tag.Key == "messaging.operation.name")
                             operationName = tag.Value?.ToString();
                         else if (tag.Key == "messaging.operation.type")
                             operationType = tag.Value?.ToString();
+                        else if (tag.Key == "messaging.mediator.message.kind")
+                            messageKind = tag.Value?.ToString();
                         else if (tag.Key == "error.type")
                             errorType = tag.Value?.ToString();
                     }
 
                     _measurements.Enqueue(
-                        new(instrument.Name, measurement, destinationName, operationName, operationType, errorType)
+                        new(
+                            instrument.Name,
+                            measurement,
+                            messagingSystem,
+                            destinationName,
+                            operationName,
+                            operationType,
+                            messageKind,
+                            errorType
+                        )
                     );
                 }
             );

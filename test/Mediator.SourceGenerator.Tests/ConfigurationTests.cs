@@ -922,6 +922,94 @@ public sealed class ConfigurationTests
         );
     }
 
+    [Theory]
+    [CombinatorialData]
+    public async Task Test_Telemetry_Metrics_Code_Config_Parses_HistogramBuckets_Into_Model(bool oi, bool cl, bool ml)
+    {
+        var buckets = ml
+            ? cl
+                ? """
+                    [
+                        0.1d, // lower
+                        0.5d, /* middle */
+                        1.0d, // upper
+                    ]
+                    """
+                : """
+                    new[]
+                    {
+                        0.1d, // lower
+                        0.5d, /* middle */
+                        1.0d, // upper
+                    }
+                    """
+            : cl
+                ? "[0.1d, 0.5d, 1.0d]"
+                : "new[] { 0.1d, 0.5d, 1.0d }";
+        var telemetryConfig = oi
+            ? $$"""
+                          options.Telemetry = new()
+                          {
+                              EnableMetrics = true,
+                              MeterName = "CodeMeter",
+                              HistogramBuckets = {{buckets}}
+                          };
+                """
+            : $$"""
+                          options.Telemetry.EnableMetrics = true;
+                          options.Telemetry.MeterName = "CodeMeter";
+                          options.Telemetry.HistogramBuckets = {{buckets}};
+                """;
+
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+            {{telemetryConfig}}
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation
+            .AssertAndVerify(
+                Assertions.CompilesWithoutDiagnostics,
+                result =>
+                {
+                    var model = result.Generator.CompilationModel;
+                    Assert.NotNull(model);
+                    Assert.True(model.EnableMetrics);
+                    Assert.Equal("CodeMeter", model.MeterName);
+                    Assert.Equal("0.1, 0.5, 1", model.HistogramBuckets);
+                    Assert.False(model.ConfiguredViaAttribute);
+                }
+            )
+            .UseParameters(oi ? "oi" : "assign", cl ? "cl" : "arr", ml ? "mlc" : "sl");
+    }
+
     [Fact]
     public async Task Test_Telemetry_Metrics_Attribute_Config_Parses_Into_Model()
     {
