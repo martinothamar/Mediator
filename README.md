@@ -70,6 +70,7 @@ See this great video by [@Elfocrash / Nick Chapsas](https://github.com/Elfocrash
       - [3.3.2. Error logging example](#332-error-logging-example)
       - [3.3.3. Stream message processing example](#333-stream-message-processing-example)
     - [3.4. Configuration](#34-configuration)
+    - [3.5. Telemetry](#35-telemetry)
   - [4. Getting started](#4-getting-started)
     - [4.1. Add packages](#41-add-packages)
     - [4.2. Add Mediator to DI container](#42-add-mediator-to-di-container)
@@ -354,6 +355,18 @@ services.AddMediator((MediatorOptions options) =>
 * `CachingMode` - controls when Mediator initialization occurs
   * `Eager` (default) - all handler wrappers and lookups are initialized on first Mediator access, best for long-running applications where startup cost is amortized
   * `Lazy` - handler wrappers are initialized on-demand as messages are processed, best for cold start scenarios (serverless, Native AOT) where minimal initialization is preferred
+* `Telemetry` - configures telemetry emitted by the generated mediator implementation
+  * `EnableMetrics` - enables metrics using `System.Diagnostics.Metrics` (requires .NET 8+)
+  * `MeterName` - meter name used when metrics are enabled
+  * `EnableTracing` - enables tracing using `System.Diagnostics.ActivitySource`
+  * `ActivitySourceName` - activity source name used when tracing is enabled
+  * `HistogramBuckets` - optional custom bucket boundaries for `messaging.process.duration` (only configurable through `MediatorOptions`, not assembly attribute)
+
+For assembly attribute configuration (`MediatorOptionsAttribute`), telemetry is configured with:
+* `TelemetryEnableMetrics`
+* `TelemetryMeterName`
+* `TelemetryEnableTracing`
+* `TelemetryActivitySourceName`
 
 Note that since parsing of these options is done during compilation/source generation, all values must be compile time constants.
 In addition, since some types are not valid attributes parameter types (such as arrays/lists), some configuration is only available through `AddMediator`/`MediatorOptions` and not the assembly attribute.
@@ -361,6 +374,50 @@ In addition, since some types are not valid attributes parameter types (such as 
 Singleton lifetime is highly recommended as it yields the best performance.
 Every application is different, but it is likely that a lot of your message handlers doesn't keep state and have no need for transient or scoped lifetime.
 In a lot of cases those lifetimes only allocate lots of memory for no particular reason.
+
+### 3.5. Telemetry
+
+Mediator can emit telemetry for requests, streams and notifications using BCL APIs (`System.Diagnostics.Metrics` and `System.Diagnostics.ActivitySource`).
+
+```csharp
+services.AddMediator((MediatorOptions options) =>
+{
+    options.Telemetry.EnableMetrics = true;
+    options.Telemetry.EnableTracing = true;
+    options.Telemetry.MeterName = "<optional-custom-name>";
+    options.Telemetry.ActivitySourceName = "<optional-custom-name>";
+});
+```
+
+Telemetry emitted by Mediator follows [OpenTelemetry semantic conventions for messaging](https://opentelemetry.io/docs/specs/semconv/messaging/):
+
+* Metric: `messaging.process.duration` (`Histogram<double>`, unit `s`)
+* Traces: `<messaging.operation.name> <messaging.destination.name>` - one `Activity` per message operation, kind `Consumer`
+* Operation names (`messaging.operation.name`):
+  * `send` for request/query/command messages
+  * `createstream` for stream request/query/command messages
+  * `publish` for notifications
+* Operation type (`messaging.operation.type`): `process`
+* Common attributes:
+  * `messaging.system=mediator`
+  * `messaging.destination.name=<message type name>`
+  * `error.type=<exception full name>` (only when an operation fails)
+* Mediator-specific attribute:
+  * `messaging.mediator.message.kind=command|query|request|streamcommand|streamquery|streamrequest|notification`
+
+To connect this with OpenTelemetry, wire `Meter`/`ActivitySource` in your app:
+
+```csharp
+builder.Services
+    .AddOpenTelemetry()
+    .WithMetrics(metrics => metrics.AddMeter(Mediator.Mediator.MeterName))
+    .WithTracing(tracing => tracing.AddSource(Mediator.Mediator.ActivitySourceName));
+```
+
+Mediator does not automatically call OpenTelemetry SDK configuration extension methods for you.
+If you configured a custom mediator namespace, use that generated concrete mediator type instead of `Mediator.Mediator`.
+
+See [ASP.NET Core sample](/samples/apps/ASPNET_Core) for example OpenTelemetry configuration using Mediator telemetry.
 
 ## 4. Getting started
 
@@ -673,4 +730,3 @@ There are various options for Mediator implementations in the .NET ecosystem. He
 * [Foundatio.Mediator](https://github.com/FoundatioFx/Foundatio.Mediator) - different, conventions based API. Also sourcegenerator-based (in-memory only)
 * [Wolverine](https://wolverinefx.net/) (part of the critterstack) - also conventions based, is a larger framework that also offers async/distributed messaging
 * [MassTransit](https://masstransit.io/) - also offers a mediator implementation, and also offers async/distributed messaging
-
