@@ -33,23 +33,23 @@ namespace Mediator
     public sealed class MediatorTelemetryOptions
     {
         /// <summary>
-        /// Enable OpenTelemetry metrics for message processing.
+        /// Enable metrics for message processing using <see cref="global::System.Diagnostics.Metrics.Meter" />.
         /// Requires .NET 8.0 or greater.
         /// </summary>
         public bool EnableMetrics { get; set; } = false;
 
         /// <summary>
-        /// The meter name for OpenTelemetry metrics.
+        /// The <see cref="global::System.Diagnostics.Metrics.Meter" /> name used for metrics.
         /// </summary>
         public string MeterName { get; set; } = "Mediator";
 
         /// <summary>
-        /// Enable OpenTelemetry tracing for message processing.
+        /// Enable tracing for message processing using <see cref="global::System.Diagnostics.ActivitySource" />.
         /// </summary>
         public bool EnableTracing { get; set; } = false;
 
         /// <summary>
-        /// The activity source name for OpenTelemetry tracing.
+        /// The <see cref="global::System.Diagnostics.ActivitySource" /> name used for tracing.
         /// </summary>
         public string ActivitySourceName { get; set; } = "Mediator";
 
