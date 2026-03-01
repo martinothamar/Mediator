@@ -121,6 +121,9 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal static class MediatorTelemetry
     {
 
@@ -129,6 +132,9 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class MediatorTelemetryBehavior<TMessage, TResponse>
         : global::Mediator.IPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IMessage
@@ -196,6 +202,9 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class MediatorStreamTelemetryBehavior<TMessage, TResponse>
         : global::Mediator.IStreamPipelineBehavior<TMessage, TResponse>
         where TMessage : global::Mediator.IStreamMessage
@@ -299,6 +308,9 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class MediatorTelemetryNotificationPublisher
         : global::Mediator.INotificationPublisher
     {

@@ -30,6 +30,7 @@ namespace Mediator
     /// Provides telemetry options for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     internal sealed class MediatorTelemetryOptions
     {
         /// <summary>

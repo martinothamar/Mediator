@@ -29,6 +29,7 @@ namespace Mediator
     /// Provides telemetry options for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "{{ GeneratorVersion }}")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     {{ TypeAccessibility }} sealed class MediatorTelemetryOptions
     {
         /// <summary>
