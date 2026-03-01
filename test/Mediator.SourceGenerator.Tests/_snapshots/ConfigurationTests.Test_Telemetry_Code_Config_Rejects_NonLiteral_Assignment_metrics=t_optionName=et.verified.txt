@@ -2,12 +2,12 @@
   Diagnostics: [
     {
       Location: /*
-        {
-            options.Telemetry.EnableTracing = GetTracingEnabled();
-                                              ^^^^^^^^^^^^^^^^^^^
-        });
+{
+    options.Telemetry.EnableTracing = GetTracingEnabled();
+                                      ^^^^^^^^^^^^^^^^^^^
+});
 */
- : (24,46)-(24,65),
+ : (25,38)-(25,57),
       Message: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. Expected boolean literal for 'EnableTracing',
       Severity: Error,
       Descriptor: {

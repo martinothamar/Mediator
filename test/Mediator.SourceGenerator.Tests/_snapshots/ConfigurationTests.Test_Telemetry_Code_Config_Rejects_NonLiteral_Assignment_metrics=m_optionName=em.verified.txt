@@ -2,12 +2,12 @@
   Diagnostics: [
     {
       Location: /*
-        {
-            options.Telemetry.EnableMetrics = GetMetricsEnabled();
-                                              ^^^^^^^^^^^^^^^^^^^
-        });
+{
+    options.Telemetry.EnableMetrics = GetMetricsEnabled();
+                                      ^^^^^^^^^^^^^^^^^^^
+});
 */
- : (24,46)-(24,65),
+ : (25,38)-(25,57),
       Message: MediatorGenerator could not parse MediatorOptions-based configuration. Only compile-time constant values can be used in MediatorOptions configuration. Expected boolean literal for 'EnableMetrics',
       Severity: Error,
       Descriptor: {

@@ -822,36 +822,9 @@ public sealed class ConfigurationTests
         var expectedMeterName = am ? "TelemetryAttrMeterA" : "TelemetryAttrMeterB";
         var meterNameAssignment = $"TelemetryMeterName = \"{expectedMeterName}\"";
 
-        var inputCompilation = Fixture.CreateLibrary(
-            $$"""
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            [assembly: MediatorOptions(TelemetryEnableMetrics = {{enableMetricsLiteral}}, {{meterNameAssignment}})]
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator();
-                }
-            }
-            """
+        var inputCompilation = CreateTelemetryLibrary(
+            "services.AddMediator();",
+            $$"""[assembly: MediatorOptions(TelemetryEnableMetrics = {{enableMetricsLiteral}}, {{meterNameAssignment}})]"""
         );
 
         await inputCompilation
@@ -861,65 +834,54 @@ public sealed class ConfigurationTests
 
     [Theory]
     [CombinatorialData]
-    public async Task Test_Telemetry_Metrics_Code_Config_Parses_Into_Model(bool oi)
+    public async Task Test_Telemetry_Code_Config_Parses_Into_Model(bool metrics, bool oi)
     {
+        var enableOpt = metrics ? "EnableMetrics" : "EnableTracing";
+        var nameOpt = metrics ? "MeterName" : "ActivitySourceName";
+        var expectedName = metrics ? "CodeMeter" : "CodeTracingSource";
         var telemetryConfig = oi
-            ? """
+            ? $$"""
                           options.Telemetry = new()
                           {
-                              EnableMetrics = true,
-                              MeterName = "CodeMeter"
+                              {{enableOpt}} = true,
+                              {{nameOpt}} = "{{expectedName}}"
                           };
                 """
-            : """
-                          options.Telemetry.EnableMetrics = true;
-                          options.Telemetry.MeterName = "CodeMeter";
+            : $$"""
+                          options.Telemetry.{{enableOpt}} = true;
+                          options.Telemetry.{{nameOpt}} = "{{expectedName}}";
                 """;
 
-        var inputCompilation = Fixture.CreateLibrary(
+        var inputCompilation = CreateTelemetryLibrary(
             $$"""
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            services.AddMediator(options =>
             {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
             {{telemetryConfig}}
-                    });
-                }
-            }
+            });
             """
         );
 
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                Assert.True(model.EnableMetrics);
-                Assert.Equal("CodeMeter", model.MeterName);
-                Assert.False(model.ConfiguredViaAttribute);
-            }
-        );
+        await inputCompilation
+            .AssertAndVerify(
+                Assertions.CompilesWithoutDiagnostics,
+                result =>
+                {
+                    var model = result.Generator.CompilationModel;
+                    Assert.NotNull(model);
+                    Assert.False(model.ConfiguredViaAttribute);
+                    if (metrics)
+                    {
+                        Assert.True(model.EnableMetrics);
+                        Assert.Equal(expectedName, model.MeterName);
+                    }
+                    else
+                    {
+                        Assert.True(model.EnableTracing);
+                        Assert.Equal(expectedName, model.ActivitySourceName);
+                    }
+                }
+            )
+            .UseParameters(metrics ? "m" : "t", oi ? "oi" : "a");
     }
 
     [Theory]
@@ -961,36 +923,12 @@ public sealed class ConfigurationTests
                           options.Telemetry.HistogramBuckets = {{buckets}};
                 """;
 
-        var inputCompilation = Fixture.CreateLibrary(
+        var inputCompilation = CreateTelemetryLibrary(
             $$"""
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            services.AddMediator(options =>
             {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
             {{telemetryConfig}}
-                    });
-                }
-            }
+            });
             """
         );
 
@@ -1010,653 +948,200 @@ public sealed class ConfigurationTests
             .UseParameters(oi ? "oi" : "assign", cl ? "cl" : "arr", ml ? "mlc" : "sl");
     }
 
-    [Fact]
-    public async Task Test_Telemetry_Metrics_Attribute_Config_Parses_Into_Model()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Test_Telemetry_Attribute_Config_Parses_Into_Model(bool metrics)
     {
-        var inputCompilation = Fixture.CreateLibrary(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            [assembly: MediatorOptions(TelemetryEnableMetrics = true, TelemetryMeterName = "AttributeMeter")]
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator();
-                }
-            }
-            """
+        var enableOpt = metrics ? "TelemetryEnableMetrics" : "TelemetryEnableTracing";
+        var nameOpt = metrics ? "TelemetryMeterName" : "TelemetryActivitySourceName";
+        var expectedName = metrics ? "AttributeMeter" : "AttributeTracingSource";
+        var inputCompilation = CreateTelemetryLibrary(
+            "services.AddMediator();",
+            $$"""[assembly: MediatorOptions({{enableOpt}} = true, {{nameOpt}} = "{{expectedName}}")]"""
         );
 
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                Assert.True(model.EnableMetrics);
-                Assert.Equal("AttributeMeter", model.MeterName);
-                Assert.True(model.ConfiguredViaAttribute);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Metrics_Code_Config_Rejects_NonLiteral_EnableMetrics_Assignment()
-    {
-        await AssertMetricsCodeConfigRejectsNonLiteralAssignment(
-            optionName: "EnableMetrics",
-            valueExpression: "GetMetricsEnabled()",
-            helperMethod: "private static bool GetMetricsEnabled() => true;",
-            expectedMessage: "Expected boolean literal for 'EnableMetrics'"
-        );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Metrics_Code_Config_Rejects_NonLiteral_MeterName_Assignment()
-    {
-        await AssertMetricsCodeConfigRejectsNonLiteralAssignment(
-            optionName: "MeterName",
-            valueExpression: "GetMetricsMeterName()",
-            helperMethod: "private static string GetMetricsMeterName() => \"CodeMeter\";",
-            expectedMessage: "Expected string literal for 'MeterName'"
-        );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Metrics_Code_Config_Rejects_NonLiteral_HistogramBuckets_Assignment()
-    {
-        await AssertMetricsCodeConfigRejectsNonLiteralAssignment(
-            optionName: "HistogramBuckets",
-            valueExpression: "GetHistogramBuckets()",
-            helperMethod: "private static double[] GetHistogramBuckets() => new[] { 0.1d, 0.5d, 1.0d };",
-            expectedMessage: "Expected array creation or null for 'HistogramBuckets'"
-        );
-    }
-
-    private async Task AssertMetricsCodeConfigRejectsNonLiteralAssignment(
-        string optionName,
-        string valueExpression,
-        string helperMethod,
-        string expectedMessage
-    )
-    {
-        var inputCompilation = Fixture.CreateLibrary(
-            $$"""
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.{{optionName}} = {{valueExpression}};
-                    });
-                }
-
-                {{helperMethod}}
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(
-            (Action<GeneratorResult>)(
+        await inputCompilation
+            .AssertAndVerify(
+                Assertions.CompilesWithoutDiagnostics,
                 result =>
                 {
-                    Assertions.AssertCommon(result);
-
-                    var diagnostics = result.Diagnostics.Where(d =>
-                        d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id
-                    );
-                    Assert.Contains(diagnostics, d => d.GetMessage().Contains(expectedMessage));
+                    var model = result.Generator.CompilationModel;
+                    Assert.NotNull(model);
+                    Assert.True(model.ConfiguredViaAttribute);
+                    if (metrics)
+                    {
+                        Assert.True(model.EnableMetrics);
+                        Assert.Equal(expectedName, model.MeterName);
+                    }
+                    else
+                    {
+                        Assert.True(model.EnableTracing);
+                        Assert.Equal(expectedName, model.ActivitySourceName);
+                    }
                 }
             )
-        );
+            .UseParameters(metrics ? "m" : "t");
     }
 
     [Theory]
-    [CombinatorialData]
-    public async Task Test_Telemetry_Tracing_Code_Config_Parses_Into_Model(bool oi)
-    {
-        var telemetryConfig = oi
-            ? """
-                          options.Telemetry = new()
-                          {
-                              EnableTracing = true,
-                              ActivitySourceName = "CodeTracingSource"
-                          };
-                """
-            : """
-                          options.Telemetry.EnableTracing = true;
-                          options.Telemetry.ActivitySourceName = "CodeTracingSource";
-                """;
-
-        var inputCompilation = Fixture.CreateLibrary(
-            $$"""
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-            {{telemetryConfig}}
-                    });
-                }
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                Assert.True(model.EnableTracing);
-                Assert.Equal("CodeTracingSource", model.ActivitySourceName);
-                Assert.False(model.ConfiguredViaAttribute);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Tracing_Attribute_Config_Parses_Into_Model()
-    {
-        var inputCompilation = Fixture.CreateLibrary(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            [assembly: MediatorOptions(TelemetryEnableTracing = true, TelemetryActivitySourceName = "AttributeTracingSource")]
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator();
-                }
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                Assert.True(model.EnableTracing);
-                Assert.Equal("AttributeTracingSource", model.ActivitySourceName);
-                Assert.True(model.ConfiguredViaAttribute);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Tracing_Code_Config_Rejects_NonLiteral_EnableTracing_Assignment()
-    {
-        await AssertTracingCodeConfigRejectsNonLiteralAssignment(
-            optionName: "EnableTracing",
-            valueExpression: "GetTracingEnabled()",
-            helperMethod: "private static bool GetTracingEnabled() => true;",
-            expectedMessage: "Expected boolean literal for 'EnableTracing'"
-        );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Tracing_Code_Config_Rejects_NonLiteral_ActivitySourceName_Assignment()
-    {
-        await AssertTracingCodeConfigRejectsNonLiteralAssignment(
-            optionName: "ActivitySourceName",
-            valueExpression: "GetTracingSourceName()",
-            helperMethod: "private static string GetTracingSourceName() => \"CodeTracingSource\";",
-            expectedMessage: "Expected string literal for 'ActivitySourceName'"
-        );
-    }
-
-    private async Task AssertTracingCodeConfigRejectsNonLiteralAssignment(
+    [InlineData(true, "EnableMetrics", "Expected boolean literal for 'EnableMetrics'")]
+    [InlineData(true, "MeterName", "Expected string literal for 'MeterName'")]
+    [InlineData(true, "HistogramBuckets", "Expected array creation or null for 'HistogramBuckets'")]
+    [InlineData(false, "EnableTracing", "Expected boolean literal for 'EnableTracing'")]
+    [InlineData(false, "ActivitySourceName", "Expected string literal for 'ActivitySourceName'")]
+    public async Task Test_Telemetry_Code_Config_Rejects_NonLiteral_Assignment(
+        bool metrics,
         string optionName,
-        string valueExpression,
-        string helperMethod,
         string expectedMessage
     )
     {
-        var inputCompilation = Fixture.CreateLibrary(
+        var (valueExpression, helperMethod) = (metrics, optionName) switch
+        {
+            (true, "EnableMetrics") => ("GetMetricsEnabled()", "private static bool GetMetricsEnabled() => true;"),
+            (true, "MeterName") => (
+                "GetMetricsMeterName()",
+                "private static string GetMetricsMeterName() => \"CodeMeter\";"
+            ),
+            (true, "HistogramBuckets") => (
+                "GetHistogramBuckets()",
+                "private static double[] GetHistogramBuckets() => new[] { 0.1d, 0.5d, 1.0d };"
+            ),
+            (false, "EnableTracing") => ("GetTracingEnabled()", "private static bool GetTracingEnabled() => true;"),
+            (false, "ActivitySourceName") => (
+                "GetTracingSourceName()",
+                "private static string GetTracingSourceName() => \"CodeTracingSource\";"
+            ),
+            _ => throw new ArgumentOutOfRangeException(nameof(optionName), optionName, null),
+        };
+
+        var inputCompilation = CreateTelemetryLibrary(
             $$"""
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            services.AddMediator(options =>
             {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.{{optionName}} = {{valueExpression}};
-                    });
-                }
-
-                {{helperMethod}}
-            }
-            """
+                options.Telemetry.{{optionName}} = {{valueExpression}};
+            });
+            """,
+            programMembers: helperMethod
         );
 
-        await inputCompilation.AssertAndVerify(
-            (Action<GeneratorResult>)(
-                result =>
-                {
-                    Assertions.AssertCommon(result);
+        var optionParam = optionName switch
+        {
+            "EnableMetrics" => "em",
+            "MeterName" => "mn",
+            "HistogramBuckets" => "hb",
+            "EnableTracing" => "et",
+            "ActivitySourceName" => "asn",
+            _ => optionName,
+        };
 
-                    var diagnostics = result.Diagnostics.Where(d =>
-                        d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id
-                    );
-                    Assert.Contains(diagnostics, d => d.GetMessage().Contains(expectedMessage));
-                }
+        await inputCompilation
+            .AssertAndVerify(
+                (Action<GeneratorResult>)(
+                    result =>
+                    {
+                        Assertions.AssertCommon(result);
+                        var diagnostics = result.Diagnostics.Where(d =>
+                            d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id
+                        );
+                        Assert.Contains(diagnostics, d => d.GetMessage().Contains(expectedMessage));
+                    }
+                )
+            )
+            .UseParameters(metrics ? "m" : "t", optionParam);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Test_Telemetry_Exposes_Name_On_Mediator_When_Enabled(bool metrics)
+    {
+        var configSource = metrics
+            ? """
+                services.AddMediator(options =>
+                {
+                    options.Telemetry.EnableMetrics = true;
+                    options.Telemetry.MeterName = "TestMeter";
+                });
+
+                var meterName = global::Mediator.Mediator.MeterName;
+                if (meterName != "TestMeter")
+                    throw new Exception("Unexpected meter name");
+                """
+            : """
+                services.AddMediator(options =>
+                {
+                    options.Telemetry.EnableTracing = true;
+                    options.Telemetry.ActivitySourceName = "TestActivitySource";
+                });
+
+                var activitySourceName = global::Mediator.Mediator.ActivitySourceName;
+                if (activitySourceName != "TestActivitySource")
+                    throw new Exception("Unexpected activity source name");
+                """;
+
+        var inputCompilation = CreateTelemetryLibrary(configSource);
+        await inputCompilation
+            .AssertAndVerify(Assertions.CompilesWithoutDiagnostics)
+            .UseParameters(metrics ? "m" : "t");
+    }
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    public void Test_Telemetry_Disabled_When_Symbol_Is_Unavailable(bool metrics, bool configuredViaAttribute)
+    {
+        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
+            CreateTelemetrySource(
+                configuredViaAttribute ? "services.AddMediator();"
+                    : metrics
+                        ? """
+                        services.AddMediator(options =>
+                        {
+                            options.Telemetry.EnableMetrics = true;
+                            options.Telemetry.MeterName = "TestMeter";
+                        });
+                        """
+                    : """
+                    services.AddMediator(options =>
+                    {
+                        options.Telemetry.EnableTracing = true;
+                        options.Telemetry.ActivitySourceName = "TestActivitySource";
+                    });
+                    """,
+                configuredViaAttribute
+                    ? metrics
+                        ? """[assembly: MediatorOptions(TelemetryEnableMetrics = true, TelemetryMeterName = "AttrMeter")]"""
+                        : """[assembly: MediatorOptions(TelemetryEnableTracing = true, TelemetryActivitySourceName = "AttrTracingSource")]"""
+                    : null
             )
         );
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Exposes_MeterName_On_Mediator_When_Metrics_Enabled()
-    {
-        var inputCompilation = Fixture.CreateLibrary(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.EnableMetrics = true;
-                        options.Telemetry.MeterName = "TestMeter";
-                    });
-
-                    var meterName = global::Mediator.Mediator.MeterName;
-                    if (meterName != "TestMeter")
-                        throw new Exception("Unexpected meter name");
-                }
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
-    }
-
-    [Fact]
-    public async Task Test_Telemetry_Exposes_ActivitySourceName_On_Mediator_When_Tracing_Enabled()
-    {
-        var inputCompilation = Fixture.CreateLibrary(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.EnableTracing = true;
-                        options.Telemetry.ActivitySourceName = "TestActivitySource";
-                    });
-
-                    var activitySourceName = global::Mediator.Mediator.ActivitySourceName;
-                    if (activitySourceName != "TestActivitySource")
-                        throw new Exception("Unexpected activity source name");
-                }
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(Assertions.CompilesWithoutDiagnostics);
-    }
-
-    [Fact]
-    public void Test_Telemetry_Tracing_Disabled_When_ActivitySource_Symbol_Is_Unavailable()
-    {
-        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.EnableTracing = true;
-                        options.Telemetry.ActivitySourceName = "TestActivitySource";
-                    });
-                }
-            }
-            """
-        );
 
         var result = RunGenerator(inputCompilation);
         Assertions.AssertCommon(result);
-        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(
-            result
-                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-        );
-        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id);
-        Assert.All(
-            result.Diagnostics.Where(d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id),
-            d => Assert.True(d.Location.IsInSource)
-        );
+        AssertNoErrorDiagnostics(result);
+
+        var expectedId = metrics
+            ? Diagnostics.MetricsUnavailableOnTarget.Id
+            : Diagnostics.TracingUnavailableOnTarget.Id;
+        Assert.Contains(result.Diagnostics, d => d.Id == expectedId);
+        Assert.All(result.Diagnostics.Where(d => d.Id == expectedId), d => Assert.True(d.Location.IsInSource));
 
         var model = result.Generator.CompilationModel;
         Assert.NotNull(model);
-        Assert.True(model.EnableTracing);
-        Assert.False(model.EnableTracingOnTarget);
-        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
-    }
-
-    [Fact]
-    public void Test_Telemetry_Tracing_Attribute_Config_Disabled_When_ActivitySource_Symbol_Is_Unavailable()
-    {
-        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            [assembly: MediatorOptions(TelemetryEnableTracing = true, TelemetryActivitySourceName = "AttrTracingSource")]
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator();
-                }
-            }
-            """
-        );
-
-        var result = RunGenerator(inputCompilation);
-        Assertions.AssertCommon(result);
-        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(
-            result
-                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-        );
-        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id);
-        Assert.All(
-            result.Diagnostics.Where(d => d.Id == Diagnostics.TracingUnavailableOnTarget.Id),
-            d => Assert.True(d.Location.IsInSource)
-        );
-
-        var model = result.Generator.CompilationModel;
-        Assert.NotNull(model);
-        Assert.True(model.EnableTracing);
-        Assert.True(model.ConfiguredViaAttribute);
-        Assert.False(model.EnableTracingOnTarget);
-        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
-    }
-
-    [Fact]
-    public void Test_Telemetry_Metrics_Disabled_When_Meter_Symbol_Is_Unavailable()
-    {
-        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.EnableMetrics = true;
-                        options.Telemetry.MeterName = "TestMeter";
-                    });
-                }
-            }
-            """
-        );
-
-        var result = RunGenerator(inputCompilation);
-        Assertions.AssertCommon(result);
-        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(
-            result
-                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-        );
-        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id);
-        Assert.All(
-            result.Diagnostics.Where(d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id),
-            d => Assert.True(d.Location.IsInSource)
-        );
-
-        var model = result.Generator.CompilationModel;
-        Assert.NotNull(model);
-        Assert.True(model.EnableMetrics);
-        Assert.False(model.EnableMetricsOnTarget);
-        Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
-    }
-
-    [Fact]
-    public void Test_Telemetry_Metrics_Attribute_Config_Disabled_When_Meter_Symbol_Is_Unavailable()
-    {
-        var inputCompilation = CreateLibraryWithoutDiagnosticSourceReference(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            [assembly: MediatorOptions(TelemetryEnableMetrics = true, TelemetryMeterName = "AttrMeter")]
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-                    services.AddMediator();
-                }
-            }
-            """
-        );
-
-        var result = RunGenerator(inputCompilation);
-        Assertions.AssertCommon(result);
-        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(
-            result
-                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-        );
-        Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id);
-        Assert.All(
-            result.Diagnostics.Where(d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id),
-            d => Assert.True(d.Location.IsInSource)
-        );
-
-        var model = result.Generator.CompilationModel;
-        Assert.NotNull(model);
-        Assert.True(model.EnableMetrics);
-        Assert.True(model.ConfiguredViaAttribute);
-        Assert.False(model.EnableMetricsOnTarget);
+        Assert.Equal(configuredViaAttribute, model.ConfiguredViaAttribute);
+        if (metrics)
+        {
+            Assert.True(model.EnableMetrics);
+            Assert.False(model.EnableMetricsOnTarget);
+        }
+        else
+        {
+            Assert.True(model.EnableTracing);
+            Assert.False(model.EnableTracingOnTarget);
+        }
         Assert.Equal("global::Mediator.ForeachAwaitPublisher", model.NotificationPublisherResolvedTypeFullName);
     }
 
@@ -1664,50 +1149,22 @@ public sealed class ConfigurationTests
     public void Test_Telemetry_Tracing_Only_On_Target_When_TargetFramework_Symbols_Are_Missing()
     {
         var inputCompilation = CreateLibraryWithoutTargetFrameworkPreprocessorSymbols(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public readonly record struct Request(Guid Id) : IRequest<Response>;
-            public readonly record struct Response(Guid Id);
-
-            public sealed class RequestHandler : IRequestHandler<Request, Response>
-            {
-                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
-                    new(new Response(request.Id));
-            }
-
-            public class Program
-            {
-                public static void Main()
+            CreateTelemetrySource(
+                """
+                services.AddMediator(options =>
                 {
-                    var services = new ServiceCollection();
-                    services.AddMediator(options =>
-                    {
-                        options.Telemetry.EnableMetrics = true;
-                        options.Telemetry.MeterName = "TestMeter";
-                        options.Telemetry.EnableTracing = true;
-                        options.Telemetry.ActivitySourceName = "TestActivitySource";
-                    });
-                }
-            }
-            """
+                    options.Telemetry.EnableMetrics = true;
+                    options.Telemetry.MeterName = "TestMeter";
+                    options.Telemetry.EnableTracing = true;
+                    options.Telemetry.ActivitySourceName = "TestActivitySource";
+                });
+                """
+            )
         );
 
         var result = RunGenerator(inputCompilation);
         Assertions.AssertCommon(result);
-        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Assert.Empty(
-            result
-                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-        );
+        AssertNoErrorDiagnostics(result);
         Assert.Contains(result.Diagnostics, d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id);
         Assert.All(
             result.Diagnostics.Where(d => d.Id == Diagnostics.MetricsUnavailableOnTarget.Id),
@@ -1725,6 +1182,66 @@ public sealed class ConfigurationTests
         Assert.Equal(
             $"global::{model.InternalsNamespace}.MediatorTelemetryNotificationPublisher",
             model.NotificationPublisherResolvedTypeFullName
+        );
+    }
+
+    private static CSharpCompilation CreateTelemetryLibrary(
+        string addMediatorInvocation,
+        string? assemblyAttribute = null,
+        string? programMembers = null
+    )
+    {
+        return Fixture.CreateLibrary(CreateTelemetrySource(addMediatorInvocation, assemblyAttribute, programMembers));
+    }
+
+    private static string CreateTelemetrySource(
+        string addMediatorInvocation,
+        string? assemblyAttribute = null,
+        string? programMembers = null
+    )
+    {
+        var assemblySection = string.IsNullOrWhiteSpace(assemblyAttribute) ? string.Empty : $"{assemblyAttribute}\n";
+        var membersSection = string.IsNullOrWhiteSpace(programMembers) ? string.Empty : $"\n{programMembers}\n";
+
+        return $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            {{assemblySection}}
+            namespace TestCode;
+
+            public readonly record struct Request(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class RequestHandler : IRequestHandler<Request, Response>
+            {
+                public ValueTask<Response> Handle(Request request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    {{addMediatorInvocation}}
+                }
+            {{membersSection}}
+            }
+            """;
+    }
+
+    private static void AssertNoErrorDiagnostics(GeneratorResult result)
+    {
+        Assert.Empty(result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.RunResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(
+            result
+                .OutputCompilation.GetDiagnostics(TestContext.Current.CancellationToken)
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
         );
     }
 
