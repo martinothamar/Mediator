@@ -1,0 +1,9 @@
+services:
+  otel-lgtm:
+    image: docker.io/grafana/otel-lgtm:0.19.1
+    container_name: mediator-samples-otel-lgtm
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped

@@ -12,6 +12,8 @@ public static class ServiceCollectionExtensions
             {
                 options.Assemblies = [typeof(AddTodoItem)];
                 options.ServiceLifetime = ServiceLifetime.Scoped;
+                options.Telemetry.EnableMetrics = true;
+                options.Telemetry.EnableTracing = true;
             }
         );
         return services

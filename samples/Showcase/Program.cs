@@ -7,20 +7,6 @@ using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
-const string activitySourceName = "Mediator";
-using var activityListener = new ActivityListener
-{
-    ShouldListenTo = source => source.Name == activitySourceName,
-    Sample = static (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
-    SampleUsingParentId = static (ref ActivityCreationOptions<string> _) => ActivitySamplingResult.AllDataAndRecorded,
-    ActivityStopped = activity =>
-    {
-        Console.WriteLine(
-            $"Activity: {activity.OperationName}, destination={activity.GetTagItem("messaging.destination.name")}, error={activity.GetTagItem("error.type") ?? "none"}"
-        );
-    },
-};
-ActivitySource.AddActivityListener(activityListener);
 
 services.AddMediator(
     (MediatorOptions options) =>
