@@ -193,6 +193,104 @@ public sealed class TelemetryRuntimeTests
         }
     }
 
+    [Fact]
+    public async Task Test_Telemetry_Emits_ErrorType_For_Stream_Setup_Failures()
+    {
+        using var meterCapture = new MeterCapture(TestConfiguration.MeterName);
+        using var activityCapture = new ActivityCapture(TestConfiguration.ActivitySourceName);
+        using var ctx = CreateServiceProvider();
+        var mediator = ctx.Services.GetRequiredService<IMediator>();
+        var ct = TestContext.Current.CancellationToken;
+        var setupFailureActivity = Activity.Current;
+
+        await FluentActions
+            .Awaiting(async () =>
+            {
+                await foreach (
+                    var _ in mediator.CreateStream(new FailingTelemetryStreamSetupRequest(Guid.NewGuid()), ct)
+                ) { }
+            })
+            .Should()
+            .ThrowAsync<InvalidOperationException>();
+
+        Activity.Current.Should().Be(setupFailureActivity);
+        var enumeratorFailureActivity = Activity.Current;
+
+        await FluentActions
+            .Awaiting(async () =>
+            {
+                await foreach (
+                    var _ in mediator.CreateStream(new FailingTelemetryStreamEnumeratorRequest(Guid.NewGuid()), ct)
+                ) { }
+            })
+            .Should()
+            .ThrowAsync<InvalidOperationException>();
+
+        Activity.Current.Should().Be(enumeratorFailureActivity);
+
+        if (TestConfiguration.EnableMetrics)
+        {
+            var errorType = typeof(InvalidOperationException).FullName;
+            var setupMeasurements = meterCapture
+                .Measurements.Where(x => x.DestinationName == nameof(FailingTelemetryStreamSetupRequest))
+                .ToArray();
+            var enumeratorMeasurements = meterCapture
+                .Measurements.Where(x => x.DestinationName == nameof(FailingTelemetryStreamEnumeratorRequest))
+                .ToArray();
+
+            setupMeasurements.Should().HaveCount(1);
+            setupMeasurements[0].ErrorType.Should().Be(errorType);
+            enumeratorMeasurements.Should().HaveCount(1);
+            enumeratorMeasurements[0].ErrorType.Should().Be(errorType);
+
+            meterCapture
+                .Measurements.Should()
+                .Contain(x =>
+                    x.DestinationName == nameof(FailingTelemetryStreamSetupRequest) && x.ErrorType == errorType
+                );
+            meterCapture
+                .Measurements.Should()
+                .Contain(x =>
+                    x.DestinationName == nameof(FailingTelemetryStreamEnumeratorRequest) && x.ErrorType == errorType
+                );
+        }
+        else
+        {
+            meterCapture.Measurements.Should().BeEmpty();
+        }
+
+        if (TestConfiguration.EnableTracing)
+        {
+            var errorType = typeof(InvalidOperationException).FullName;
+            var setupActivities = activityCapture
+                .Activities.Where(x => x.DestinationName == nameof(FailingTelemetryStreamSetupRequest))
+                .ToArray();
+            var enumeratorActivities = activityCapture
+                .Activities.Where(x => x.DestinationName == nameof(FailingTelemetryStreamEnumeratorRequest))
+                .ToArray();
+
+            setupActivities.Should().HaveCount(1);
+            setupActivities[0].ErrorType.Should().Be(errorType);
+            enumeratorActivities.Should().HaveCount(1);
+            enumeratorActivities[0].ErrorType.Should().Be(errorType);
+
+            activityCapture
+                .Activities.Should()
+                .Contain(x =>
+                    x.DestinationName == nameof(FailingTelemetryStreamSetupRequest) && x.ErrorType == errorType
+                );
+            activityCapture
+                .Activities.Should()
+                .Contain(x =>
+                    x.DestinationName == nameof(FailingTelemetryStreamEnumeratorRequest) && x.ErrorType == errorType
+                );
+        }
+        else
+        {
+            activityCapture.Activities.Should().BeEmpty();
+        }
+    }
+
     private static TestServiceProviderContext CreateServiceProvider()
     {
         var services = new ServiceCollection();
@@ -212,6 +310,10 @@ public sealed class TelemetryRuntimeTests
     public sealed record FailingTelemetryRequest(Guid Id) : IRequest<TelemetryResponse>;
 
     public sealed record FailingTelemetryStreamRequest(Guid Id) : IStreamRequest<TelemetryResponse>;
+
+    public sealed record FailingTelemetryStreamSetupRequest(Guid Id) : IStreamRequest<TelemetryResponse>;
+
+    public sealed record FailingTelemetryStreamEnumeratorRequest(Guid Id) : IStreamRequest<TelemetryResponse>;
 
     public sealed record FailingTelemetryNotification(Guid Id) : INotification;
 
@@ -279,6 +381,35 @@ public sealed class TelemetryRuntimeTests
         public ValueTask Handle(FailingTelemetryNotification notification, CancellationToken cancellationToken)
         {
             throw new InvalidOperationException("notification failed");
+        }
+    }
+
+    public sealed class FailingStreamSetupTelemetryHandler
+        : IStreamRequestHandler<FailingTelemetryStreamSetupRequest, TelemetryResponse>,
+            IStreamRequestHandler<FailingTelemetryStreamEnumeratorRequest, TelemetryResponse>
+    {
+        public IAsyncEnumerable<TelemetryResponse> Handle(
+            FailingTelemetryStreamSetupRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            throw new InvalidOperationException("stream setup failed");
+        }
+
+        public IAsyncEnumerable<TelemetryResponse> Handle(
+            FailingTelemetryStreamEnumeratorRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            return new ThrowingGetAsyncEnumeratorEnumerable();
+        }
+
+        private sealed class ThrowingGetAsyncEnumeratorEnumerable : IAsyncEnumerable<TelemetryResponse>
+        {
+            public IAsyncEnumerator<TelemetryResponse> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+            {
+                throw new InvalidOperationException("get async enumerator failed");
+            }
         }
     }
 

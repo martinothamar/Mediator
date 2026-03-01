@@ -239,10 +239,11 @@ namespace Mediator.Internals
             var startTime = global::System.Diagnostics.Stopwatch.GetTimestamp();
             string? errorType = null;
 
-            global::System.Collections.Generic.IAsyncEnumerable<TResponse> responses;
+            global::System.Collections.Generic.IAsyncEnumerator<TResponse> enumerator;
             try
             {
-                responses = next(message, cancellationToken);
+                var responses = next(message, cancellationToken);
+                enumerator = responses.GetAsyncEnumerator(cancellationToken);
             }
             catch (global::System.Exception ex)
             {
@@ -254,7 +255,7 @@ namespace Mediator.Internals
                 );
                 throw;
             }
-            await using var enumerator = responses.GetAsyncEnumerator(cancellationToken);
+            await using var asyncEnumerator = enumerator;
             try
             {
                 while (true)
@@ -262,9 +263,9 @@ namespace Mediator.Internals
                     TResponse response;
                     try
                     {
-                        if (!await enumerator.MoveNextAsync())
+                        if (!await asyncEnumerator.MoveNextAsync())
                             break;
-                        response = enumerator.Current;
+                        response = asyncEnumerator.Current;
                     }
                     catch (global::System.Exception ex)
                     {

@@ -358,10 +358,11 @@ namespace {{ InternalsNamespace }}
             );
             {{~ end ~}}
 
-            global::System.Collections.Generic.IAsyncEnumerable<TResponse> responses;
+            global::System.Collections.Generic.IAsyncEnumerator<TResponse> enumerator;
             try
             {
-                responses = next(message, cancellationToken);
+                var responses = next(message, cancellationToken);
+                enumerator = responses.GetAsyncEnumerator(cancellationToken);
             }
             catch (global::System.Exception ex)
             {
@@ -383,9 +384,12 @@ namespace {{ InternalsNamespace }}
                     tags
                 );
                 {{~ end ~}}
+                {{~ if EnableTracingOnTarget ~}}
+                activity?.Dispose();
+                {{~ end ~}}
                 throw;
             }
-            await using var enumerator = responses.GetAsyncEnumerator(cancellationToken);
+            await using var asyncEnumerator = enumerator;
             try
             {
                 while (true)
@@ -393,9 +397,9 @@ namespace {{ InternalsNamespace }}
                     TResponse response;
                     try
                     {
-                        if (!await enumerator.MoveNextAsync())
+                        if (!await asyncEnumerator.MoveNextAsync())
                             break;
-                        response = enumerator.Current;
+                        response = asyncEnumerator.Current;
                     }
                     catch (global::System.Exception ex)
                     {

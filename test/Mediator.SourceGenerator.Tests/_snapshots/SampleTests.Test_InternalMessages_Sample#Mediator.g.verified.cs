@@ -262,10 +262,11 @@ namespace Mediator.Internals
                 tags: TelemetryTags
             );
 
-            global::System.Collections.Generic.IAsyncEnumerable<TResponse> responses;
+            global::System.Collections.Generic.IAsyncEnumerator<TResponse> enumerator;
             try
             {
-                responses = next(message, cancellationToken);
+                var responses = next(message, cancellationToken);
+                enumerator = responses.GetAsyncEnumerator(cancellationToken);
             }
             catch (global::System.Exception ex)
             {
@@ -281,9 +282,10 @@ namespace Mediator.Internals
                     global::System.Diagnostics.Stopwatch.GetElapsedTime(startTime).TotalSeconds,
                     tags
                 );
+                activity?.Dispose();
                 throw;
             }
-            await using var enumerator = responses.GetAsyncEnumerator(cancellationToken);
+            await using var asyncEnumerator = enumerator;
             try
             {
                 while (true)
@@ -291,9 +293,9 @@ namespace Mediator.Internals
                     TResponse response;
                     try
                     {
-                        if (!await enumerator.MoveNextAsync())
+                        if (!await asyncEnumerator.MoveNextAsync())
                             break;
-                        response = enumerator.Current;
+                        response = asyncEnumerator.Current;
                     }
                     catch (global::System.Exception ex)
                     {
