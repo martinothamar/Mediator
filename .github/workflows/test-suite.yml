@@ -17,6 +17,12 @@ jobs:
       checkout-ref: ${{ inputs.checkout-ref }}
       dotnet-sdk: '10.0.x'
 
+  benchmark-smoke:
+    uses: ./.github/workflows/_benchmark-smoke.yml
+    with:
+      checkout-ref: ${{ inputs.checkout-ref }}
+      dotnet-sdk: '10.0.x'
+
   tests:
     needs: test-source-generator
     strategy:
@@ -47,8 +53,40 @@ jobs:
       dotnet-sdk: ${{ matrix.dotnet.sdk }}
       dotnet-framework: ${{ matrix.dotnet.framework }}
 
+  telemetry-tests:
+    needs: test-source-generator
+    strategy:
+      max-parallel: 16
+      matrix:
+        lifetime: [Singleton, Scoped, Transient]
+        publisher: [TaskWhenAll]
+        cachingMode: [Eager, Lazy]
+        metrics: [Off, On]
+        tracing: [Off, On]
+        dotnet:
+          - sdk: |
+              8.0.x
+              10.0.x
+            framework: net8.0
+          - sdk: |
+              9.0.x
+              10.0.x
+            framework: net9.0
+          - sdk: '10.0.x'
+            framework: net10.0
+    uses: ./.github/workflows/_test-telemetry.yml
+    with:
+      checkout-ref: ${{ inputs.checkout-ref }}
+      lifetime: ${{ matrix.lifetime }}
+      publisher: ${{ matrix.publisher }}
+      cachingMode: ${{ matrix.cachingMode }}
+      metrics: ${{ matrix.metrics }}
+      tracing: ${{ matrix.tracing }}
+      dotnet-sdk: ${{ matrix.dotnet.sdk }}
+      dotnet-framework: ${{ matrix.dotnet.framework }}
+
   test-memory:
-    needs: tests
+    needs: [tests, telemetry-tests]
     strategy:
       max-parallel: 16
       matrix:

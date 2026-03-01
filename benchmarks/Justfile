@@ -1,11 +1,15 @@
 alias b := bench
 alias bq := bench-quick
+alias bqq := bench-quick-quick
 
 bench:
     dotnet run -f net10.0 -c Release --project Mediator.Benchmarks/
 
 bench-quick:
     dotnet run -f net10.0 -c Release --project Mediator.Benchmarks/ -- --warmupCount 4 --iterationCount 4 --iterationTime 150
+
+bench-quick-quick:
+    dotnet run -f net10.0 -c Release --project Mediator.Benchmarks/ -- --warmupCount 1 --iterationCount 1 --iterationTime 50
 
 _coldstart-build lifetime caching size="" compilation="":
     #!/bin/sh

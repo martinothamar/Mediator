@@ -2,6 +2,11 @@ using AspNetCoreBlazor.Client.Pages;
 using AspNetCoreBlazor.Components;
 using AspNetCoreBlazor.Components.Pages;
 using Mediator;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
+const string serviceName = "AspNetCoreBlazor";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +18,29 @@ builder.Services.AddMediator(
     {
         options.Assemblies = [typeof(GetWeatherForecasts), typeof(IncrementCounter)];
         options.GenerateTypesAsInternal = true;
+        options.Telemetry.EnableMetrics = true;
+        options.Telemetry.EnableTracing = true;
     }
 );
+builder
+    .Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName))
+    .WithMetrics(metrics =>
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddMeter(Mediator.Mediator.MeterName)
+            .AddOtlpExporter(
+                (_, metricReaderOptions) =>
+                    metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10_000
+            )
+    )
+    .WithTracing(tracing =>
+        tracing
+            .SetSampler(new AlwaysOnSampler())
+            .AddAspNetCoreInstrumentation()
+            .AddSource(Mediator.Mediator.ActivitySourceName)
+            .AddOtlpExporter()
+    );
 
 var app = builder.Build();
 

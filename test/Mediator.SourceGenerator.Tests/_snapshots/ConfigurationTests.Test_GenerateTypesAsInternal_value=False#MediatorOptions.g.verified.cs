@@ -27,9 +27,45 @@ namespace Mediator
     }
 
     /// <summary>
+    /// Provides telemetry options for Mediator.
+    /// </summary>
+    [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
+    public sealed class MediatorTelemetryOptions
+    {
+        /// <summary>
+        /// Enable metrics for message processing using <see cref="global::System.Diagnostics.Metrics.Meter" />.
+        /// Requires .NET 8.0 or greater.
+        /// </summary>
+        public bool EnableMetrics { get; set; } = false;
+
+        /// <summary>
+        /// The <see cref="global::System.Diagnostics.Metrics.Meter" /> name used for metrics.
+        /// </summary>
+        public string MeterName { get; set; } = "Mediator";
+
+        /// <summary>
+        /// Enable tracing for message processing using <see cref="global::System.Diagnostics.ActivitySource" />.
+        /// </summary>
+        public bool EnableTracing { get; set; } = false;
+
+        /// <summary>
+        /// The <see cref="global::System.Diagnostics.ActivitySource" /> name used for tracing.
+        /// </summary>
+        public string ActivitySourceName { get; set; } = "Mediator";
+
+        /// <summary>
+        /// Custom histogram bucket boundaries for the messaging.process.duration metric.
+        /// If null, uses default boundaries.
+        /// </summary>
+        public double[] HistogramBuckets { get; set; } = null;
+    }
+
+    /// <summary>
     /// Provide options for the Mediator source generator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     public sealed class MediatorOptions
     {
         /// <summary>
@@ -63,6 +99,15 @@ namespace Mediator
         public global::System.Collections.Generic.IReadOnlyList<global::Mediator.AssemblyReference> Assemblies { get; set; } = new global::Mediator.AssemblyReference[0];
 
         /// <summary>
+        /// The collection of marker interface types to filter which request types are included for generation.
+        /// When specified with one or more types, only request types that implement IRequest AND at least one of the specified marker interfaces will be included.
+        /// When empty or not configured, all discovered request types will be included (no filtering).
+        /// This is useful for modular monolith scenarios where you want to generate code only for requests belonging to specific modules.
+        /// Example: options.IncludeTypesForGeneration = [typeof(IApi1Request)] will only generate code for requests that implement IApi1Request.
+        /// </summary>
+        public global::System.Collections.Generic.IReadOnlyList<global::System.Type> IncludeTypesForGeneration { get; set; } = new global::System.Type[0];
+
+        /// <summary>
         /// The collection of types of pipeline behaviors to register in DI.
         /// When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
         /// </summary>
@@ -80,5 +125,10 @@ namespace Mediator
         /// When set to <see cref="global::Mediator.CachingMode.Lazy" />, initialization is done on demand as messages are processed.
         /// </summary>
         public global::Mediator.CachingMode CachingMode { get; set; } = global::Mediator.CachingMode.Eager;
+
+        /// <summary>
+        /// Telemetry options for Mediator.
+        /// </summary>
+        public global::Mediator.MediatorTelemetryOptions Telemetry { get; set; } = new();
     }
 }

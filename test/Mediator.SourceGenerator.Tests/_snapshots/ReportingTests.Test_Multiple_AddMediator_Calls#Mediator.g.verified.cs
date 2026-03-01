@@ -19,6 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// DI extensions for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public static class MediatorDependencyInjectionExtensions
@@ -110,6 +111,7 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class RequestHandlerWrapper<TRequest, TResponse> : IRequestHandlerBase<TResponse>
@@ -186,6 +188,7 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class StreamRequestHandlerWrapper<TRequest, TResponse> : IStreamRequestHandlerBase<TResponse>
@@ -263,6 +266,7 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class CommandHandlerWrapper<TRequest, TResponse> : ICommandHandlerBase<TResponse>
@@ -339,6 +343,7 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class StreamCommandHandlerWrapper<TRequest, TResponse> : IStreamCommandHandlerBase<TResponse>
@@ -416,6 +421,7 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class QueryHandlerWrapper<TRequest, TResponse> : IQueryHandlerBase<TResponse>
@@ -492,6 +498,7 @@ namespace Mediator.Internals
         );
     }
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class StreamQueryHandlerWrapper<TRequest, TResponse> : IStreamQueryHandlerBase<TResponse>
@@ -561,6 +568,7 @@ namespace Mediator.Internals
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class NotificationHandlerWrapper<TNotification> : INotificationHandlerBase
@@ -615,6 +623,7 @@ namespace Mediator.Internals
     internal sealed class ContainerProbe1 : IContainerProbe { }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     internal sealed class ContainerMetadata
@@ -666,6 +675,7 @@ namespace Mediator
     /// Can be used directly for high performance scenarios.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher

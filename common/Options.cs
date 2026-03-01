@@ -31,4 +31,20 @@ using Microsoft.Extensions.DependencyInjection;
     ,
     CachingMode = CachingMode.Eager
 #endif
+#if Mediator_Telemetry_EnableMetrics
+    ,
+    TelemetryEnableMetrics = true
+#endif
+#if Mediator_Telemetry_MeterName_Tests
+    ,
+    TelemetryMeterName = "Mediator.Telemetry.Tests"
+#endif
+#if Mediator_Telemetry_EnableTracing
+    ,
+    TelemetryEnableTracing = true
+#endif
+#if Mediator_Telemetry_ActivitySourceName_Tests
+    ,
+    TelemetryActivitySourceName = "Mediator.Telemetry.Tests"
+#endif
 )]

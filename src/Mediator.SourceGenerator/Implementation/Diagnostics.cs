@@ -101,6 +101,26 @@ public static class Diagnostics
             isEnabledByDefault: true
         );
 
+        TracingUnavailableOnTarget = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} tracing unavailable on target",
+            $"{nameof(MediatorGenerator)} tracing was enabled, but System.Diagnostics.ActivitySource is unavailable in the target compilation. "
+                + "Tracing code generation is disabled. Add a reference to System.Diagnostics.DiagnosticSource or disable tracing.",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true
+        );
+
+        MetricsUnavailableOnTarget = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} metrics unavailable on target",
+            $"{nameof(MediatorGenerator)} metrics were enabled, but metrics require .NET 8+ and System.Diagnostics.Metrics APIs to be available in the target compilation. "
+                + "Metrics code generation is disabled.",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true
+        );
+
         static string GetNextId()
         {
             var count = _counter++;
@@ -221,6 +241,20 @@ public static class Diagnostics
 
     internal static Diagnostic ReportRequiredSymbolNotFound(this CompilationAnalyzerContext context, string name) =>
         context.Report(RequiredSymbolNotFound, name);
+
+    public static readonly DiagnosticDescriptor TracingUnavailableOnTarget;
+
+    internal static Diagnostic ReportTracingUnavailableOnTarget(
+        this CompilationAnalyzerContext context,
+        Location? location
+    ) => context.Report(TracingUnavailableOnTarget, location);
+
+    public static readonly DiagnosticDescriptor MetricsUnavailableOnTarget;
+
+    internal static Diagnostic ReportMetricsUnavailableOnTarget(
+        this CompilationAnalyzerContext context,
+        Location? location
+    ) => context.Report(MetricsUnavailableOnTarget, location);
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void InjectError()

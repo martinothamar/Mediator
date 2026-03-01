@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <EnablePreviewFeatures>True</EnablePreviewFeatures>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference
+      Include="..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj"
+      OutputItemType="Analyzer"
+    />
+    <ProjectReference Include="..\..\src\Mediator\Mediator.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\common\Options.cs">
+      <Link>Options.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

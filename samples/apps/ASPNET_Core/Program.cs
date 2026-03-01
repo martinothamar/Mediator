@@ -1,5 +1,10 @@
 using ASPNETCore.WeatherForecasts;
 using Mediator;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
+const string serviceName = "ASPNET_Core";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +17,29 @@ builder.Services.AddMediator(
     (MediatorOptions options) =>
     {
         options.Assemblies = [typeof(GetWeatherForecasts).Assembly];
+        options.Telemetry.EnableMetrics = true;
+        options.Telemetry.EnableTracing = true;
     }
 );
+builder
+    .Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName))
+    .WithMetrics(metrics =>
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddMeter(Mediator.Mediator.MeterName)
+            .AddOtlpExporter(
+                (_, metricReaderOptions) =>
+                    metricReaderOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 10_000
+            )
+    )
+    .WithTracing(tracing =>
+        tracing
+            .SetSampler(new AlwaysOnSampler())
+            .AddAspNetCoreInstrumentation()
+            .AddSource(Mediator.Mediator.ActivitySourceName)
+            .AddOtlpExporter()
+    );
 
 var app = builder.Build();
 

@@ -34,6 +34,24 @@ jobs:
       dotnet-sdk: ${{ matrix.dotnet.sdk }}
       dotnet-framework: ${{ matrix.dotnet.framework }}
 
+  telemetry-tests:
+    needs: test-source-generator
+    strategy:
+      max-parallel: 16
+      matrix:
+        metrics: [Off, On]
+        tracing: [Off, On]
+    uses: ./.github/workflows/_test-telemetry.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      lifetime: Singleton
+      publisher: ForeachAwait
+      cachingMode: Eager
+      metrics: ${{ matrix.metrics }}
+      tracing: ${{ matrix.tracing }}
+      dotnet-sdk: '10.0.x'
+      dotnet-framework: net10.0
+
   test-memory:
     strategy:
       max-parallel: 16
@@ -46,6 +64,12 @@ jobs:
       checkout-ref: ${{ github.event.pull_request.head.sha }}
       dotnet-sdk: ${{ matrix.dotnet.sdk }}
       dotnet-framework: ${{ matrix.dotnet.framework }}
+
+  benchmark-smoke:
+    uses: ./.github/workflows/_benchmark-smoke.yml
+    with:
+      checkout-ref: ${{ github.event.pull_request.head.sha }}
+      dotnet-sdk: '10.0.x'
 
   samples-showcase:
     uses: ./.github/workflows/_sample-showcase.yml
@@ -90,7 +114,7 @@ jobs:
   all-tests-pass:
     name: All tests pass
     if: always()
-    needs: [test-source-generator, tests, test-memory, samples-showcase, samples-aot, samples-netfx, formatting]
+    needs: [test-source-generator, tests, telemetry-tests, test-memory, benchmark-smoke, samples-showcase, samples-aot, samples-netfx, formatting]
     runs-on: ubuntu-latest
     steps:
       - name: Check for failures

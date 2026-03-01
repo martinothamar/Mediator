@@ -6,6 +6,8 @@
 #pragma warning disable CS8019 // Unused usings
 #pragma warning disable CS8321 // Unused local function
 
+#nullable enable
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Linq;
@@ -16,6 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// DI extensions for Mediator.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.Diagnostics.DebuggerStepThroughAttribute]
     public static class MediatorDependencyInjectionExtensions
@@ -33,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
-        public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions> options)
+        public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
         {
             services.AddSingleton<Dummy>();
 
@@ -50,8 +53,34 @@ namespace SimpleConsole.Mediator
     /// Can be used directly for high performance scenarios.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Mediator.SourceGenerator", "3.1.0.0")]
+    [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute]
     public sealed partial class Mediator : global::Mediator.IMediator, global::Mediator.ISender, global::Mediator.IPublisher
     {
+        /// <summary>
+        /// The lifetime of Mediator-related service registrations in DI container.
+        /// </summary>
+        public const global::Microsoft.Extensions.DependencyInjection.ServiceLifetime ServiceLifetime = global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton;
+
+        /// <summary>
+        /// The caching mode configuration for Mediator handler resolution.
+        /// </summary>
+        public const global::Mediator.CachingMode CachingMode = global::Mediator.CachingMode.Eager;
+
+        /// <summary>
+        /// The name of the notification publisher service that was configured.
+        /// </summary>
+        public const string NotificationPublisherName = "ForeachAwaitPublisher";
+
+        /// <summary>
+        /// The total number of Mediator messages that were discovered.
+        /// </summary>
+        public const int TotalMessages = 0;
+
+        /// <summary>
+        /// Constructor for DI, should not be used by consumer.
+        /// </summary>
+        public Mediator(global::System.IServiceProvider sp) { }
+
         /// <summary>
         /// Send request.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
@@ -162,7 +191,7 @@ namespace SimpleConsole.Mediator
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Awaitable task</returns>
-        public global::System.Threading.Tasks.ValueTask<object> Send(
+        public global::System.Threading.Tasks.ValueTask<object?> Send(
             object message,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -179,7 +208,7 @@ namespace SimpleConsole.Mediator
         /// <param name="message">Incoming message</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Async enumerable</returns>
-        public global::System.Collections.Generic.IAsyncEnumerable<object> CreateStream(
+        public global::System.Collections.Generic.IAsyncEnumerable<object?> CreateStream(
             object message,
             global::System.Threading.CancellationToken cancellationToken = default
         )
@@ -220,7 +249,7 @@ namespace SimpleConsole.Mediator
         }
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void ThrowInvalidMessage(object msg) =>
+        private static void ThrowInvalidMessage(object? msg) =>
             throw new global::Mediator.MissingMessageHandlerException(msg);
 
         [global::System.Diagnostics.CodeAnalysis.DoesNotReturn]

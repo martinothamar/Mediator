@@ -9,6 +9,8 @@ lifetimes := "Singleton Scoped Transient"
 publishers := "ForeachAwait TaskWhenAll"
 sizes := "Default Large"
 cachingModes := "Eager Lazy"
+telemetryMetrics := "Off On"
+telemetryTracing := "Off On"
 
 # Main recipes
 build:
@@ -65,12 +67,53 @@ test-matrix:
         done; \
     done
 
+# Test matrix combinations for telemetry runtime tests (net10.0 only)
+test-telemetry-matrix:
+    @echo "=== Running Matrix Tests (Mediator.Telemetry.Tests) ==="
+    #!/usr/bin/env sh
+    set -eu
+    for framework in {{frameworks}}; do \
+        for lifetime in {{lifetimes}}; do \
+            for publisher in {{publishers}}; do \
+                for cachingMode in {{cachingModes}}; do \
+                    for metrics in {{telemetryMetrics}}; do \
+                        for tracing in {{telemetryTracing}}; do \
+                            just _test-telemetry-config "$framework" "$lifetime" "$publisher" "$cachingMode" "$metrics" "$tracing"; \
+                        done; \
+                    done; \
+                done; \
+            done; \
+        done; \
+    done
+
+# Run both runtime matrix suites back-to-back
+test-full-matrix:
+    @echo "=== Running Full Matrix (Mediator.Tests + Mediator.Telemetry.Tests) ==="
+    just test-matrix
+    just test-telemetry-matrix
+
 # Helper recipe for individual configuration testing
 _test-config framework lifetime publisher size cachingMode:
     @echo "Testing {{framework}} - {{lifetime}}/{{publisher}}/{{size}}/{{cachingMode}}"
     dotnet clean -v q ./test/Mediator.Tests/
     dotnet build --no-restore -f {{framework}} -p:ExtraDefineConstants=\"Mediator_Lifetime_{{lifetime}}%3BMediator_Publisher_{{publisher}}%3BMediator_{{size}}_Project%3BMediator_CachingMode_{{cachingMode}}\" -v q ./test/Mediator.Tests/
     dotnet test --no-restore --no-build -f {{framework}} ./test/Mediator.Tests/
+
+# Helper recipe for telemetry runtime test configuration
+_test-telemetry-config framework lifetime publisher cachingMode metrics tracing:
+    #!/usr/bin/env sh
+    set -eu
+    echo "Testing {{framework}} - {{lifetime}}/{{publisher}}/{{cachingMode}}/Metrics={{metrics}}/Tracing={{tracing}}"
+    DEFINES="Mediator_Lifetime_{{lifetime}}%3BMediator_Publisher_{{publisher}}%3BMediator_CachingMode_{{cachingMode}}"
+    if [ "{{metrics}}" = "On" ]; then \
+        DEFINES="${DEFINES}%3BMediator_Telemetry_EnableMetrics%3BMediator_Telemetry_MeterName_Tests"; \
+    fi
+    if [ "{{tracing}}" = "On" ]; then \
+        DEFINES="${DEFINES}%3BMediator_Telemetry_EnableTracing%3BMediator_Telemetry_ActivitySourceName_Tests"; \
+    fi
+    dotnet clean -v q ./test/Mediator.Telemetry.Tests/
+    dotnet build --no-restore -f {{framework}} -p:ExtraDefineConstants=\"${DEFINES}\" -v q ./test/Mediator.Telemetry.Tests/
+    dotnet test --no-restore --no-build -f {{framework}} ./test/Mediator.Telemetry.Tests/
 
 # Convenience recipes
 
