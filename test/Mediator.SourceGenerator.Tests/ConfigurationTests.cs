@@ -814,8 +814,41 @@ public sealed class ConfigurationTests
         await inputCompilation.AssertAndVerify();
     }
 
+    public static TheoryData<string, string, string[]> TypesFilteringCases =>
+        new()
+        {
+            { "SingleInterface", "[typeof(IApi1Request)]", new[] { "Request1", "Request3" } },
+            {
+                "MultipleInterfaces",
+                "[typeof(IApi1Request), typeof(IApi2Request)]",
+                new[] { "Request1", "Request2", "Request3" }
+            },
+            { "EmptyCollectionExpr", "[]", new[] { "Request1", "Request2", "Request3", "Request4" } },
+            { "EmptyArray", "new Type[0]", new[] { "Request1", "Request2", "Request3", "Request4" } },
+        };
+
+    [Theory]
+    [MemberData(nameof(TypesFilteringCases))]
+    public async Task Test_Types_Filtering_Basic(string caseName, string typesAssignment, string[] expectedRequestNames)
+    {
+        var inputCompilation = CreateTypesFilteringLibrary(typesAssignment);
+
+        await inputCompilation
+            .AssertAndVerify(
+                Assertions.CompilesWithoutDiagnostics,
+                result =>
+                {
+                    var model = result.Generator.CompilationModel;
+                    Assert.NotNull(model);
+                    var requestNames = model.RequestMessages.Select(x => x.Name).OrderBy(n => n).ToArray();
+                    Assert.Equal(expectedRequestNames, requestNames);
+                }
+            )
+            .UseParameters(caseName);
+    }
+
     [Fact]
-    public async Task Test_IncludeTypesForGeneration_SingleType()
+    public async Task Test_Types_ModularMonolith_TwoApis()
     {
         var inputCompilation = Fixture.CreateLibrary(
             """
@@ -827,7 +860,10 @@ public sealed class ConfigurationTests
 
             namespace TestCode;
 
-            public class Program
+            public interface IApi1Request { }
+            public interface IApi2Request { }
+
+            public class Api1Program
             {
                 public static void Main()
                 {
@@ -835,30 +871,34 @@ public sealed class ConfigurationTests
 
                     services.AddMediator(options =>
                     {
-                        options.IncludeTypesForGeneration =
-                        [
-                            typeof(IApi1Request),
-                        ];
+                        options.Namespace = "Api1";
+                        options.Types = [typeof(IApi1Request)];
                     });
                 }
             }
 
-            public interface IApi1Request { }
-
-            public readonly record struct Request1(Guid Id) : IRequest<Response1>, IApi1Request;
-            public readonly record struct Response1(Guid Id);
-            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+            public readonly record struct SharedRequest(Guid Id) : IRequest<SharedResponse>, IApi1Request, IApi2Request;
+            public readonly record struct SharedResponse(Guid Id);
+            public sealed class SharedRequestHandler : IRequestHandler<SharedRequest, SharedResponse>
             {
-                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
-                    new ValueTask<Response1>(new Response1(request.Id));
+                public ValueTask<SharedResponse> Handle(SharedRequest request, CancellationToken cancellationToken) =>
+                    new ValueTask<SharedResponse>(new SharedResponse(request.Id));
             }
 
-            public readonly record struct Request2(Guid Id) : IRequest<Response2>;
-            public readonly record struct Response2(Guid Id);
-            public sealed class Request2Handler : IRequestHandler<Request2, Response2>
+            public readonly record struct Api1OnlyRequest(Guid Id) : IRequest<Api1Response>, IApi1Request;
+            public readonly record struct Api1Response(Guid Id);
+            public sealed class Api1OnlyRequestHandler : IRequestHandler<Api1OnlyRequest, Api1Response>
             {
-                public ValueTask<Response2> Handle(Request2 request, CancellationToken cancellationToken) =>
-                    new ValueTask<Response2>(new Response2(request.Id));
+                public ValueTask<Api1Response> Handle(Api1OnlyRequest request, CancellationToken cancellationToken) =>
+                    new ValueTask<Api1Response>(new Api1Response(request.Id));
+            }
+
+            public readonly record struct Api2OnlyRequest(Guid Id) : IRequest<Api2Response>, IApi2Request;
+            public readonly record struct Api2Response(Guid Id);
+            public sealed class Api2OnlyRequestHandler : IRequestHandler<Api2OnlyRequest, Api2Response>
+            {
+                public ValueTask<Api2Response> Handle(Api2OnlyRequest request, CancellationToken cancellationToken) =>
+                    new ValueTask<Api2Response>(new Api2Response(request.Id));
             }
             """
         );
@@ -869,15 +909,17 @@ public sealed class ConfigurationTests
             {
                 var model = result.Generator.CompilationModel;
                 Assert.NotNull(model);
-                // Should only have Request1 (implements IApi1Request), not Request2
-                Assert.Single(model.RequestMessages);
-                Assert.Equal("Request1", model.RequestMessages[0].Name);
+                Assert.Equal(2, model.RequestMessages.Count);
+                var requestNames = new[] { model.RequestMessages[0].Name, model.RequestMessages[1].Name }
+                    .OrderBy(n => n)
+                    .ToArray();
+                Assert.Equal(new[] { "Api1OnlyRequest", "SharedRequest" }, requestNames);
             }
         );
     }
 
     [Fact]
-    public async Task Test_IncludeTypesForGeneration_MultipleTypes()
+    public async Task Test_Types_Supports_Concrete_And_Abstract_Base_Types()
     {
         var inputCompilation = Fixture.CreateLibrary(
             """
@@ -889,6 +931,530 @@ public sealed class ConfigurationTests
 
             namespace TestCode;
 
+            public abstract record BaseRequest(Guid Id) : IRequest<Response>;
+
+            public readonly record struct IncludedByConcrete(Guid Id) : IRequest<Response>;
+
+            public sealed record IncludedByBase(Guid Id) : BaseRequest(Id);
+
+            public readonly record struct ExcludedRequest(Guid Id) : IRequest<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(BaseRequest), typeof(IncludedByConcrete)];
+                    });
+                }
+            }
+
+            public sealed class IncludedByConcreteHandler : IRequestHandler<IncludedByConcrete, Response>
+            {
+                public ValueTask<Response> Handle(IncludedByConcrete request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public sealed class IncludedByBaseHandler : IRequestHandler<IncludedByBase, Response>
+            {
+                public ValueTask<Response> Handle(IncludedByBase request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.Equal(2, model.RequestMessages.Count);
+                var requestNames = model.RequestMessages.Select(x => x.Name).OrderBy(n => n).ToArray();
+                Assert.Equal(new[] { "IncludedByBase", "IncludedByConcrete" }, requestNames);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Types_Does_Not_Use_User_Defined_Implicit_Conversions()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public sealed record Marker(Guid Id);
+
+            public readonly record struct ConvertibleRequest(Guid Id) : IRequest<Response>
+            {
+                public static implicit operator Marker(ConvertibleRequest request) => new(request.Id);
+            }
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class ConvertibleRequestHandler : IRequestHandler<ConvertibleRequest, Response>
+            {
+                public ValueTask<Response> Handle(ConvertibleRequest request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(Marker)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.Empty(model.RequestMessages);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Types_AppliesTo_Notifications()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage : INotification { }
+            public interface IExcludedApiMessage : INotification { }
+
+            public sealed record IncludedNotification(Guid Id) : IApiMessage;
+            public sealed record ExcludedNotification(Guid Id) : IExcludedApiMessage;
+
+            public sealed class IncludedNotificationHandler : INotificationHandler<IncludedNotification>
+            {
+                public ValueTask Handle(IncludedNotification notification, CancellationToken cancellationToken) =>
+                    ValueTask.CompletedTask;
+            }
+
+            public sealed class ExcludedNotificationHandler : INotificationHandler<ExcludedNotification>
+            {
+                public ValueTask Handle(ExcludedNotification notification, CancellationToken cancellationToken) =>
+                    ValueTask.CompletedTask;
+            }
+
+            public sealed class GenericNotificationHandler<TNotification> : INotificationHandler<TNotification>
+                where TNotification : INotification
+            {
+                public ValueTask Handle(TNotification notification, CancellationToken cancellationToken) =>
+                    ValueTask.CompletedTask;
+            }
+
+            public sealed class PolymorphicNotificationHandler : INotificationHandler<IApiMessage>
+            {
+                public ValueTask Handle(IApiMessage notification, CancellationToken cancellationToken) =>
+                    ValueTask.CompletedTask;
+            }
+
+            public sealed class ExcludedGenericNotificationHandler<TNotification> : INotificationHandler<TNotification>
+                where TNotification : IExcludedApiMessage
+            {
+                public ValueTask Handle(TNotification notification, CancellationToken cancellationToken) =>
+                    ValueTask.CompletedTask;
+            }
+
+            public sealed class ExcludedPolymorphicNotificationHandler : INotificationHandler<IExcludedApiMessage>
+            {
+                public ValueTask Handle(IExcludedApiMessage notification, CancellationToken cancellationToken) =>
+                    ValueTask.CompletedTask;
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.Empty(model.RequestMessages);
+                Assert.Single(model.NotificationMessages);
+                Assert.Equal("IncludedNotification", model.NotificationMessages[0].Name);
+                var handlerNames = model.NotificationMessageHandlers.Select(h => h.Name).OrderBy(n => n).ToArray();
+                Assert.Equal(
+                    new[]
+                    {
+                        "GenericNotificationHandler",
+                        "IncludedNotificationHandler",
+                        "PolymorphicNotificationHandler",
+                    },
+                    handlerNames
+                );
+                Assert.DoesNotContain("ExcludedGenericNotificationHandler", handlerNames);
+                Assert.DoesNotContain("ExcludedPolymorphicNotificationHandler", handlerNames);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Types_Supports_Nested_MarkerInterfaces()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage { }
+            public interface IApiNestedMessage : IApiMessage { }
+
+            public readonly record struct IncludedRequest(Guid Id) : IRequest<Response>, IApiNestedMessage;
+            public readonly record struct ExcludedRequest(Guid Id) : IRequest<Response>;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class IncludedRequestHandler : IRequestHandler<IncludedRequest, Response>
+            {
+                public ValueTask<Response> Handle(IncludedRequest request, CancellationToken cancellationToken) =>
+                    new(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.Single(model.RequestMessages);
+                Assert.Equal("IncludedRequest", model.RequestMessages[0].Name);
+                Assert.Empty(model.NotificationMessages);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Types_AppliesTo_All_Request_Message_Kinds()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Collections.Generic;
+            using System.Runtime.CompilerServices;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage { }
+
+            public readonly record struct IncludedRequest(Guid Id) : IRequest<Response>, IApiMessage;
+            public readonly record struct ExcludedRequest(Guid Id) : IRequest<Response>;
+
+            public readonly record struct IncludedCommand(Guid Id) : ICommand<Response>, IApiMessage;
+            public readonly record struct ExcludedCommand(Guid Id) : ICommand<Response>;
+
+            public readonly record struct IncludedQuery(Guid Id) : IQuery<Response>, IApiMessage;
+            public readonly record struct ExcludedQuery(Guid Id) : IQuery<Response>;
+
+            public readonly record struct IncludedStreamRequest(Guid Id) : IStreamRequest<Response>, IApiMessage;
+            public readonly record struct ExcludedStreamRequest(Guid Id) : IStreamRequest<Response>;
+
+            public readonly record struct IncludedStreamCommand(Guid Id) : IStreamCommand<Response>, IApiMessage;
+            public readonly record struct ExcludedStreamCommand(Guid Id) : IStreamCommand<Response>;
+
+            public readonly record struct IncludedStreamQuery(Guid Id) : IStreamQuery<Response>, IApiMessage;
+            public readonly record struct ExcludedStreamQuery(Guid Id) : IStreamQuery<Response>;
+
+            public readonly record struct Response(Guid Id);
+
+            public sealed class IncludedRequestHandler : IRequestHandler<IncludedRequest, Response>
+            {
+                public ValueTask<Response> Handle(IncludedRequest request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+
+            public sealed class IncludedCommandHandler : ICommandHandler<IncludedCommand, Response>
+            {
+                public ValueTask<Response> Handle(IncludedCommand request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+
+            public sealed class IncludedQueryHandler : IQueryHandler<IncludedQuery, Response>
+            {
+                public ValueTask<Response> Handle(IncludedQuery request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+
+            public sealed class IncludedStreamRequestHandler : IStreamRequestHandler<IncludedStreamRequest, Response>
+            {
+                public async IAsyncEnumerable<Response> Handle(IncludedStreamRequest request, [EnumeratorCancellation] CancellationToken cancellationToken)
+                {
+                    await Task.Yield();
+                    yield return new(request.Id);
+                }
+            }
+
+            public sealed class IncludedStreamCommandHandler : IStreamCommandHandler<IncludedStreamCommand, Response>
+            {
+                public async IAsyncEnumerable<Response> Handle(IncludedStreamCommand request, [EnumeratorCancellation] CancellationToken cancellationToken)
+                {
+                    await Task.Yield();
+                    yield return new(request.Id);
+                }
+            }
+
+            public sealed class IncludedStreamQueryHandler : IStreamQueryHandler<IncludedStreamQuery, Response>
+            {
+                public async IAsyncEnumerable<Response> Handle(IncludedStreamQuery request, [EnumeratorCancellation] CancellationToken cancellationToken)
+                {
+                    await Task.Yield();
+                    yield return new(request.Id);
+                }
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.Equal(6, model.RequestMessages.Count);
+                var includedNames = model.RequestMessages.Select(x => x.Name).OrderBy(x => x).ToArray();
+                Assert.Equal(
+                    new[]
+                    {
+                        "IncludedCommand",
+                        "IncludedQuery",
+                        "IncludedRequest",
+                        "IncludedStreamCommand",
+                        "IncludedStreamQuery",
+                        "IncludedStreamRequest",
+                    },
+                    includedNames
+                );
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Types_Filtered_Message_Does_Not_Stop_Handler_Discovery_On_Same_Type()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage { }
+
+            public readonly record struct IncludedRequest(Guid Id) : IRequest<Response>, IApiMessage;
+            public readonly record struct Response(Guid Id);
+
+            public sealed class MultiRoleType : IRequest<Response>, IRequestHandler<IncludedRequest, Response>
+            {
+                public ValueTask<Response> Handle(IncludedRequest request, CancellationToken cancellationToken) =>
+                    new ValueTask<Response>(new Response(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                var model = result.Generator.CompilationModel;
+                Assert.NotNull(model);
+                Assert.Single(model.RequestMessages);
+                Assert.Equal("IncludedRequest", model.RequestMessages[0].Name);
+                var handler = model.RequestMessages[0].Handler;
+                Assert.NotNull(handler);
+                Assert.Equal("MultiRoleType", handler.Name);
+            }
+        );
+    }
+
+    [Theory]
+    [InlineData(
+        "SingleNonTypeof",
+        "[typeof(Request1), MarkerType]",
+        "private static readonly Type MarkerType = typeof(Request1);",
+        1
+    )]
+    [InlineData(
+        "DuplicateNonTypeof",
+        "[typeof(Request1), MarkerType, MarkerType]",
+        "private static readonly Type MarkerType = typeof(Request1);",
+        2
+    )]
+    public async Task Test_Types_Config_Rejects_NonTypeof_Expressions(
+        string caseName,
+        string typesAssignment,
+        string helperMember,
+        int expectedDiagnostics
+    )
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public readonly record struct Request1(Guid Id) : IRequest<Response1>;
+            public readonly record struct Response1(Guid Id);
+
+            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+            {
+                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
+                    new(new Response1(request.Id));
+            }
+
+            public class Program
+            {
+                {{helperMember}}
+
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Types = {{typesAssignment}};
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation
+            .AssertAndVerify(
+                (Action<GeneratorResult>)(
+                    result =>
+                    {
+                        Assertions.AssertCommon(result);
+                        var diagnostics = result
+                            .Diagnostics.Where(d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id)
+                            .Where(d =>
+                                d.GetMessage()
+                                    .Contains("Types must be configured as a collection of typeof expressions")
+                            )
+                            .ToArray();
+                        Assert.Equal(expectedDiagnostics, diagnostics.Length);
+                    }
+                )
+            )
+            .UseParameters(caseName);
+    }
+
+    [Fact]
+    public async Task Test_Types_Config_Rejects_Open_Generic_Types()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage<T> { }
+
+            public readonly record struct Request1(Guid Id) : IRequest<Response1>, IApiMessage<Guid>;
+            public readonly record struct Response1(Guid Id);
+
+            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+            {
+                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
+                    new(new Response1(request.Id));
+            }
+
             public class Program
             {
                 public static void Main()
@@ -897,17 +1463,186 @@ public sealed class ConfigurationTests
 
                     services.AddMediator(options =>
                     {
-                        options.IncludeTypesForGeneration =
-                        [
-                            typeof(IApi1Request),
-                            typeof(IApi2Request),
-                        ];
+                        options.Types = [typeof(IApiMessage<>)];
                     });
                 }
             }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(result =>
+        {
+            Assertions.AssertCommon(result);
+            var diagnostics = result.Diagnostics.Where(d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.Contains(diagnostics, d => d.GetMessage().Contains("Types cannot contain open generic types"));
+        });
+    }
+
+    [Fact]
+    public async Task Test_Types_Config_Rejects_Open_Generic_Types_With_Type_Parameters()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage<T> { }
+
+            public readonly record struct Request1(Guid Id) : IRequest<Response1>, IApiMessage<Guid>;
+            public readonly record struct Response1(Guid Id);
+
+            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+            {
+                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
+                    new(new Response1(request.Id));
+            }
+
+            public class Program<T>
+            {
+                public static void Configure()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage<T>)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(result =>
+        {
+            Assertions.AssertCommon(result);
+            var diagnostics = result.Diagnostics.Where(d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.Contains(diagnostics, d => d.GetMessage().Contains("Types cannot contain open generic types"));
+        });
+    }
+
+    [Fact]
+    public async Task Test_Types_Config_Rejects_Duplicate_Configuration()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage { }
+
+            public readonly record struct Request1(Guid Id) : IRequest<Response1>, IApiMessage;
+            public readonly record struct Response1(Guid Id);
+            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+            {
+                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
+                    new(new Response1(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage)];
+                        options.Types = [typeof(Request1)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(result =>
+        {
+            Assertions.AssertCommon(result);
+            var diagnostics = result.Diagnostics.Where(d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.Contains(diagnostics, d => d.GetMessage().Contains("Types can only be configured once"));
+        });
+    }
+
+    [Fact]
+    public async Task Test_Types_Config_Rejects_Duplicate_Type_Entries()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
+
+            public interface IApiMessage { }
+
+            public readonly record struct Request1(Guid Id) : IRequest<Response1>, IApiMessage;
+            public readonly record struct Response1(Guid Id);
+            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
+            {
+                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
+                    new(new Response1(request.Id));
+            }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddMediator(options =>
+                    {
+                        options.Types = [typeof(IApiMessage), typeof(IApiMessage)];
+                    });
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(result =>
+        {
+            Assertions.AssertCommon(result);
+            var diagnostics = result.Diagnostics.Where(d => d.Id == Diagnostics.InvalidCodeBasedConfiguration.Id);
+            Assert.Contains(diagnostics, d => d.GetMessage().Contains("is duplicated in the Types configuration"));
+        });
+    }
+
+    private static CSharpCompilation CreateTypesFilteringLibrary(string typesAssignment)
+    {
+        return Fixture.CreateLibrary(
+            $$"""
+            using System;
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+            using Microsoft.Extensions.DependencyInjection;
+
+            namespace TestCode;
 
             public interface IApi1Request { }
             public interface IApi2Request { }
+
+            public class Program
+            {
+                public static void Main()
+                {
+                    var services = new ServiceCollection();
+
+                    services.AddMediator(options =>
+                    {
+                        options.Types = {{typesAssignment}};
+                    });
+                }
+            }
 
             public readonly record struct Request1(Guid Id) : IRequest<Response1>, IApi1Request;
             public readonly record struct Response1(Guid Id);
@@ -941,157 +1676,6 @@ public sealed class ConfigurationTests
                     new ValueTask<Response4>(new Response4(request.Id));
             }
             """
-        );
-
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                // Should have Request1, Request2, and Request3 (all implement marker interfaces)
-                // Should NOT have Request4 (doesn't implement any marker interface)
-                Assert.Equal(3, model.RequestMessages.Count);
-                var requestNames = new[]
-                {
-                    model.RequestMessages[0].Name,
-                    model.RequestMessages[1].Name,
-                    model.RequestMessages[2].Name,
-                }
-                    .OrderBy(n => n)
-                    .ToArray();
-                Assert.Equal(new[] { "Request1", "Request2", "Request3" }, requestNames);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Test_IncludeTypesForGeneration_EmptyList()
-    {
-        var inputCompilation = Fixture.CreateLibrary(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            public class Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-
-                    services.AddMediator(options =>
-                    {
-                        options.IncludeTypesForGeneration = [];
-                    });
-                }
-            }
-
-            public readonly record struct Request1(Guid Id) : IRequest<Response1>;
-            public readonly record struct Response1(Guid Id);
-            public sealed class Request1Handler : IRequestHandler<Request1, Response1>
-            {
-                public ValueTask<Response1> Handle(Request1 request, CancellationToken cancellationToken) =>
-                    new ValueTask<Response1>(new Response1(request.Id));
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                // Empty filter list means no filtering - all requests should be included
-                Assert.Single(model.RequestMessages);
-                Assert.Equal("Request1", model.RequestMessages[0].Name);
-            }
-        );
-    }
-
-    [Fact]
-    public async Task Test_IncludeTypesForGeneration_ModularMonolith_TwoAPIs()
-    {
-        // This test demonstrates a modular monolith scenario with two APIs
-        // sharing the same codebase but only generating mediator code for their respective requests
-
-        var inputCompilation = Fixture.CreateLibrary(
-            """
-            using System;
-            using System.Threading;
-            using System.Threading.Tasks;
-            using Mediator;
-            using Microsoft.Extensions.DependencyInjection;
-
-            namespace TestCode;
-
-            // Marker interfaces for different APIs/modules
-            public interface IApi1Request { }
-            public interface IApi2Request { }
-
-            public class Api1Program
-            {
-                public static void Main()
-                {
-                    var services = new ServiceCollection();
-
-                    // API1 only generates code for IApi1Request handlers
-                    services.AddMediator(options =>
-                    {
-                        options.Namespace = "Api1";
-                        options.IncludeTypesForGeneration = [typeof(IApi1Request)];
-                    });
-                }
-            }
-
-            // Shared across both APIs
-            public readonly record struct SharedRequest(Guid Id) : IRequest<SharedResponse>, IApi1Request, IApi2Request;
-            public readonly record struct SharedResponse(Guid Id);
-            public sealed class SharedRequestHandler : IRequestHandler<SharedRequest, SharedResponse>
-            {
-                public ValueTask<SharedResponse> Handle(SharedRequest request, CancellationToken cancellationToken) =>
-                    new ValueTask<SharedResponse>(new SharedResponse(request.Id));
-            }
-
-            // API1 only
-            public readonly record struct Api1OnlyRequest(Guid Id) : IRequest<Api1Response>, IApi1Request;
-            public readonly record struct Api1Response(Guid Id);
-            public sealed class Api1OnlyRequestHandler : IRequestHandler<Api1OnlyRequest, Api1Response>
-            {
-                public ValueTask<Api1Response> Handle(Api1OnlyRequest request, CancellationToken cancellationToken) =>
-                    new ValueTask<Api1Response>(new Api1Response(request.Id));
-            }
-
-            // API2 only - should NOT be included in API1's generated code
-            public readonly record struct Api2OnlyRequest(Guid Id) : IRequest<Api2Response>, IApi2Request;
-            public readonly record struct Api2Response(Guid Id);
-            public sealed class Api2OnlyRequestHandler : IRequestHandler<Api2OnlyRequest, Api2Response>
-            {
-                public ValueTask<Api2Response> Handle(Api2OnlyRequest request, CancellationToken cancellationToken) =>
-                    new ValueTask<Api2Response>(new Api2Response(request.Id));
-            }
-            """
-        );
-
-        await inputCompilation.AssertAndVerify(
-            Assertions.CompilesWithoutDiagnostics,
-            result =>
-            {
-                var model = result.Generator.CompilationModel;
-                Assert.NotNull(model);
-                // Should only have SharedRequest and Api1OnlyRequest
-                // Should NOT have Api2OnlyRequest
-                Assert.Equal(2, model.RequestMessages.Count);
-                var requestNames = new[] { model.RequestMessages[0].Name, model.RequestMessages[1].Name }
-                    .OrderBy(n => n)
-                    .ToArray();
-                Assert.Equal(new[] { "Api1OnlyRequest", "SharedRequest" }, requestNames);
-            }
         );
     }
 

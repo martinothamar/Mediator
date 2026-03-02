@@ -59,6 +59,8 @@ namespace Microsoft.Extensions.DependencyInjection
             // Register handlers for request messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request1, global::TestCode.Response1>), typeof(global::TestCode.Request1Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request1, global::TestCode.Response1>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request1, global::TestCode.Response1>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request3, global::TestCode.Response3>), typeof(global::TestCode.Request3Handler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request3, global::TestCode.Response3>), typeof(global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request3, global::TestCode.Response3>), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ForeachAwaitPublisher), typeof(global::Mediator.ForeachAwaitPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -679,6 +681,7 @@ namespace Mediator.Internals
         public readonly global::System.Collections.Frozen.FrozenDictionary<global::System.Type, object> NotificationHandlerWrappers;
 
         public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request1, global::TestCode.Response1> Wrapper_For_TestCode_Request1;
+        public readonly global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request3, global::TestCode.Response3> Wrapper_For_TestCode_Request3;
 
         public readonly global::Mediator.ForeachAwaitPublisher NotificationPublisher;
 
@@ -688,10 +691,11 @@ namespace Mediator.Internals
 
             NotificationPublisher = sp.GetRequiredService<global::Mediator.ForeachAwaitPublisher>();
 
-            var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(1);
+            var requestHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(2);
             var commandHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             var queryHandlerTypes = new global::System.Collections.Generic.Dictionary<global::System.Type, object>(0);
             requestHandlerTypes.Add(typeof(global::TestCode.Request1), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request1, global::TestCode.Response1>>().Init(this, sp));
+            requestHandlerTypes.Add(typeof(global::TestCode.Request3), sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request3, global::TestCode.Response3>>().Init(this, sp));
             RequestHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(requestHandlerTypes);
             CommandHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(commandHandlerTypes);
             QueryHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(queryHandlerTypes);
@@ -707,6 +711,7 @@ namespace Mediator.Internals
             NotificationHandlerWrappers = global::System.Collections.Frozen.FrozenDictionary.ToFrozenDictionary(notificationHandlerTypes);
 
             Wrapper_For_TestCode_Request1 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request1, global::TestCode.Response1>>().Init(this, sp);
+            Wrapper_For_TestCode_Request3 = sp.GetRequiredService<global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request3, global::TestCode.Response3>>().Init(this, sp);
         }
     }
 }
@@ -767,7 +772,7 @@ namespace Mediator
         /// <summary>
         /// The total number of Mediator messages that were discovered.
         /// </summary>
-        public const int TotalMessages = 1;
+        public const int TotalMessages = 2;
 
         /// <summary>
         /// Constructor for DI, should not be used by consumer.
@@ -857,6 +862,20 @@ namespace Mediator
         }
 
         /// <summary>
+        /// Send a request of type global::TestCode.Request3.
+        /// </summary>
+        /// <param name="request">Incoming request</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Awaitable task</returns>
+        public global::System.Threading.Tasks.ValueTask<global::TestCode.Response3> Send(
+            global::TestCode.Request3 request,
+            global::System.Threading.CancellationToken cancellationToken = default
+        )
+        {
+            return _containerMetadata.Value.Wrapper_For_TestCode_Request3.Handle(request, cancellationToken);
+        }
+
+        /// <summary>
         /// Send request.
         /// Throws <see cref="global::System.ArgumentNullException"/> if message is null.
         /// Throws <see cref="global::Mediator.InvalidMessageException"/> if request does not implement <see cref="global::Mediator.IRequest{TResponse}"/>.
@@ -881,6 +900,15 @@ namespace Mediator
                     }
                     return SendAsync(request, cancellationToken);
                 }
+                case global::TestCode.Request3 r:
+                {
+                    if (typeof(TResponse) == typeof(global::TestCode.Response3))
+                    {
+                        var task = Send(r, cancellationToken);
+                        return global::System.Runtime.CompilerServices.Unsafe.As<global::System.Threading.Tasks.ValueTask<global::TestCode.Response3>, global::System.Threading.Tasks.ValueTask<TResponse>>(ref task);
+                    }
+                    return SendAsync(request, cancellationToken);
+                }
                 default:
                 {
                     ThrowInvalidRequest(request, nameof(request));
@@ -900,6 +928,11 @@ namespace Mediator
                 {
                     var response = await Send(r, cancellationToken);
                     return global::System.Runtime.CompilerServices.Unsafe.As<global::TestCode.Response1, TResponse>(ref response);
+                }
+                case global::TestCode.Request3 r:
+                {
+                    var response = await Send(r, cancellationToken);
+                    return global::System.Runtime.CompilerServices.Unsafe.As<global::TestCode.Response3, TResponse>(ref response);
                 }
                 default:
                 {
@@ -1037,6 +1070,7 @@ namespace Mediator
                     switch (request)
                     {
                         case global::TestCode.Request1 r: return await Send(r, cancellationToken);
+                        case global::TestCode.Request3 r: return await Send(r, cancellationToken);
                         default:
                         {
                             ThrowInvalidRequest(request, nameof(request));

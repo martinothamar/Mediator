@@ -28,7 +28,7 @@ internal sealed class CompilationAnalyzer
     private readonly List<PipelineBehaviorType> _pipelineBehaviors;
     private readonly HashSet<string> _preprocessorSymbolNames;
     private Queue<INamespaceOrTypeSymbol>? _configuredAssemblies;
-    private HashSet<INamedTypeSymbol>? _includeTypesForGeneration;
+    private HashSet<ITypeSymbol>? _configuredTypesForGeneration;
 
     public ImmutableArray<RequestMessageHandlerWrapperModel> RequestMessageHandlerWrappers;
 
@@ -639,6 +639,8 @@ internal sealed class CompilationAnalyzer
             }
         }
 
+        _notificationMessageHandlers.RemoveWhere(static handler => handler.Messages.Count == 0);
+
         const int NOT_RELEVANT = 0;
         const int IS_REQUEST_HANDLER = 1;
         const int IS_NOTIFICATION_HANDLER = 2;
@@ -735,6 +737,10 @@ internal sealed class CompilationAnalyzer
 
                             var handler = new RequestMessageHandler(typeSymbol, messageType, this);
                             var requestMessageSymbol = (INamedTypeSymbol)typeInterfaceSymbol.TypeArguments[0];
+
+                            if (!ShouldIncludeTypeForGeneration(requestMessageSymbol))
+                                return true;
+
                             if (mapping.TryGetValue(requestMessageSymbol, out var requestMessageObj))
                             {
                                 if (requestMessageObj is not RequestMessage requestMessage)
@@ -779,6 +785,9 @@ internal sealed class CompilationAnalyzer
                     break;
                 case IS_REQUEST:
                     {
+                        if (!ShouldIncludeTypeForGeneration(typeSymbol))
+                            break;
+
                         ITypeSymbol responseMessageSymbol =
                             typeInterfaceSymbol.TypeArguments.Length > 0
                                 ? typeInterfaceSymbol.TypeArguments[0]
@@ -806,34 +815,6 @@ internal sealed class CompilationAnalyzer
                         }
                         else
                         {
-                            // Filter based on IncludeTypesForGeneration if configured
-                            // Only filter if the collection is not null AND has items
-                            // Empty collection or null means no filtering (include all)
-                            if (_includeTypesForGeneration is not null && _includeTypesForGeneration.Count > 0)
-                            {
-                                var implementsMarkerInterface = false;
-                                foreach (var markerInterface in _includeTypesForGeneration)
-                                {
-                                    // Check if typeSymbol implements the marker interface
-                                    if (
-                                        typeSymbol.AllInterfaces.Any(i =>
-                                            _symbolComparer.Equals(i.OriginalDefinition, markerInterface)
-                                        )
-                                    )
-                                    {
-                                        implementsMarkerInterface = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!implementsMarkerInterface)
-                                {
-                                    // Remove the message if it doesn't implement any marker interface
-                                    _requestMessages.Remove(message);
-                                    return true; // Continue processing, just skip this message
-                                }
-                            }
-
                             if (mapping.TryGetValue(typeSymbol, out var requestMessageHandlerObj))
                             {
                                 mapping[typeSymbol] = null;
@@ -851,6 +832,9 @@ internal sealed class CompilationAnalyzer
                     break;
                 case IS_NOTIFICATION:
                     {
+                        if (!ShouldIncludeTypeForGeneration(typeSymbol))
+                            break;
+
                         if (!_notificationMessages.Add(new NotificationMessage(typeSymbol, this)))
                         {
                             // If this symbol has already been added,
@@ -867,6 +851,25 @@ internal sealed class CompilationAnalyzer
             }
 
             return true;
+        }
+
+        bool ShouldIncludeTypeForGeneration(INamedTypeSymbol messageType)
+        {
+            var configuredTypes = _configuredTypesForGeneration;
+            if (configuredTypes is null || configuredTypes.Count == 0)
+                return true;
+
+            foreach (var configuredType in configuredTypes)
+            {
+                if (_symbolComparer.Equals(configuredType, messageType))
+                    return true;
+
+                var conversion = Compilation.ClassifyConversion(messageType, configuredType);
+                if (conversion is { IsIdentity: true } or { IsImplicit: true, IsReference: true } or { IsBoxing: true })
+                    return true;
+            }
+
+            return false;
         }
 
         int IsInteresting(INamedTypeSymbol interfaceSymbol)
@@ -1892,23 +1895,42 @@ internal sealed class CompilationAnalyzer
                 _configuredAssemblies.Enqueue(assemblySymbol.GlobalNamespace);
             }
         }
-        else if (opt == "IncludeTypesForGeneration")
+        else if (opt == "Types")
         {
-            if (_includeTypesForGeneration is not null)
+            const string invalidTypesConfigurationMessage =
+                "Types must be configured as a collection of typeof expressions";
+
+            if (_configuredTypesForGeneration is not null)
             {
                 ReportDiagnostic(
                     assignment.Left.GetLocation(),
                     (in CompilationAnalyzerContext c, Location l) =>
-                        c.ReportInvalidCodeBasedConfiguration(
-                            l,
-                            "IncludeTypesForGeneration can only be configured once"
-                        )
+                        c.ReportInvalidCodeBasedConfiguration(l, "Types can only be configured once")
                 );
                 return false;
             }
 
-            _includeTypesForGeneration = new(_symbolComparer);
-            var typeOfExpressions = assignment.Right.DescendantNodes().OfType<TypeOfExpressionSyntax>().ToArray();
+            _configuredTypesForGeneration = new(_symbolComparer);
+            if (!TryReadTypeOfExpressions(assignment.Right, out var typeOfExpressions, out var invalidTypeExpressions))
+            {
+                ReportDiagnostic(
+                    assignment.Right.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, invalidTypesConfigurationMessage)
+                );
+                return false;
+            }
+
+            var hasInvalidTypeConfigurationEntries = false;
+            foreach (var invalidTypeExpression in invalidTypeExpressions)
+            {
+                ReportDiagnostic(
+                    invalidTypeExpression.GetLocation(),
+                    (in CompilationAnalyzerContext c, Location l) =>
+                        c.ReportInvalidCodeBasedConfiguration(l, invalidTypesConfigurationMessage)
+                );
+                hasInvalidTypeConfigurationEntries = true;
+            }
 
             foreach (var typeOfExpression in typeOfExpressions)
             {
@@ -1920,11 +1942,37 @@ internal sealed class CompilationAnalyzer
                         (in CompilationAnalyzerContext c, Location l) =>
                             c.ReportInvalidCodeBasedConfiguration(l, $"Could not resolve type: {typeOfExpression.Type}")
                     );
+                    hasInvalidTypeConfigurationEntries = true;
                     continue;
                 }
 
-                _includeTypesForGeneration.Add(typeSymbol.OriginalDefinition);
+                if (typeSymbol.IsUnboundGenericType || ContainsOpenTypeArguments(typeSymbol))
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(l, "Types cannot contain open generic types")
+                    );
+                    hasInvalidTypeConfigurationEntries = true;
+                    continue;
+                }
+
+                if (!_configuredTypesForGeneration.Add(typeSymbol))
+                {
+                    ReportDiagnostic(
+                        typeOfExpression.Type.GetLocation(),
+                        (in CompilationAnalyzerContext c, Location l) =>
+                            c.ReportInvalidCodeBasedConfiguration(
+                                l,
+                                $"The type '{typeOfExpression.Type}' is duplicated in the Types configuration"
+                            )
+                    );
+                    hasInvalidTypeConfigurationEntries = true;
+                }
             }
+
+            if (hasInvalidTypeConfigurationEntries)
+                return false;
         }
         else if (opt == "Telemetry")
         {
@@ -2054,6 +2102,159 @@ internal sealed class CompilationAnalyzer
 
         ConfiguredViaConfiguration = true;
         return true;
+
+        static bool TryReadTypeOfExpressions(
+            ExpressionSyntax expression,
+            [NotNullWhen(true)] out IReadOnlyList<TypeOfExpressionSyntax>? typeOfExpressions,
+            [NotNullWhen(true)] out IReadOnlyList<ExpressionSyntax>? invalidTypeExpressions
+        )
+        {
+            if (expression is TypeOfExpressionSyntax singleTypeOfExpression)
+            {
+                typeOfExpressions = [singleTypeOfExpression];
+                invalidTypeExpressions = Array.Empty<ExpressionSyntax>();
+                return true;
+            }
+
+            if (expression is ArrayCreationExpressionSyntax arrayCreation)
+            {
+                if (arrayCreation.Initializer is not null)
+                    return TryParseExpressionList(
+                        arrayCreation.Initializer.Expressions,
+                        out typeOfExpressions,
+                        out invalidTypeExpressions
+                    );
+
+                if (TryIsZeroLengthArrayCreation(arrayCreation))
+                {
+                    typeOfExpressions = Array.Empty<TypeOfExpressionSyntax>();
+                    invalidTypeExpressions = Array.Empty<ExpressionSyntax>();
+                    return true;
+                }
+
+                typeOfExpressions = null;
+                invalidTypeExpressions = null;
+                return false;
+            }
+
+            if (
+                expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreation
+                && implicitArrayCreation.Initializer is not null
+            )
+            {
+                return TryParseExpressionList(
+                    implicitArrayCreation.Initializer.Expressions,
+                    out typeOfExpressions,
+                    out invalidTypeExpressions
+                );
+            }
+
+            if (
+                expression.GetFirstToken().IsKind(SyntaxKind.OpenBracketToken)
+                && expression.GetLastToken().IsKind(SyntaxKind.CloseBracketToken)
+            )
+            {
+                return TryParseBracketDelimitedExpressionList(
+                    expression,
+                    out typeOfExpressions,
+                    out invalidTypeExpressions
+                );
+            }
+
+            typeOfExpressions = null;
+            invalidTypeExpressions = null;
+            return false;
+        }
+
+        static bool TryParseExpressionList(
+            SeparatedSyntaxList<ExpressionSyntax> expressions,
+            [NotNullWhen(true)] out IReadOnlyList<TypeOfExpressionSyntax>? typeOfExpressions,
+            [NotNullWhen(true)] out IReadOnlyList<ExpressionSyntax>? invalidTypeExpressions
+        )
+        {
+            var builder = new List<TypeOfExpressionSyntax>(expressions.Count);
+            List<ExpressionSyntax>? invalidBuilder = null;
+            foreach (var expression in expressions)
+            {
+                if (expression is TypeOfExpressionSyntax typeOfExpression)
+                {
+                    builder.Add(typeOfExpression);
+                    continue;
+                }
+
+                invalidBuilder ??= new();
+                invalidBuilder.Add(expression);
+            }
+
+            typeOfExpressions = builder;
+            invalidTypeExpressions = invalidBuilder is null ? Array.Empty<ExpressionSyntax>() : invalidBuilder;
+            return true;
+        }
+
+        static bool TryParseBracketDelimitedExpressionList(
+            ExpressionSyntax expression,
+            [NotNullWhen(true)] out IReadOnlyList<TypeOfExpressionSyntax>? typeOfExpressions,
+            [NotNullWhen(true)] out IReadOnlyList<ExpressionSyntax>? invalidTypeExpressions
+        )
+        {
+            var builder = new List<TypeOfExpressionSyntax>();
+            List<ExpressionSyntax>? invalidBuilder = null;
+            foreach (var child in expression.ChildNodes())
+            {
+                var elementExpression =
+                    child as ExpressionSyntax ?? child.ChildNodes().OfType<ExpressionSyntax>().FirstOrDefault();
+                if (elementExpression is null)
+                    continue;
+
+                if (elementExpression is TypeOfExpressionSyntax typeOfExpression)
+                {
+                    builder.Add(typeOfExpression);
+                    continue;
+                }
+
+                invalidBuilder ??= new();
+                invalidBuilder.Add(elementExpression);
+            }
+
+            typeOfExpressions = builder;
+            invalidTypeExpressions = invalidBuilder is null ? Array.Empty<ExpressionSyntax>() : invalidBuilder;
+            return true;
+        }
+
+        static bool TryIsZeroLengthArrayCreation(ArrayCreationExpressionSyntax arrayCreation)
+        {
+            if (arrayCreation.Type.RankSpecifiers.Count != 1)
+                return false;
+
+            var rankSpecifier = arrayCreation.Type.RankSpecifiers[0];
+            if (rankSpecifier.Sizes.Count != 1)
+                return false;
+
+            if (rankSpecifier.Sizes[0] is not LiteralExpressionSyntax literal)
+                return false;
+
+            return literal.IsKind(SyntaxKind.NumericLiteralExpression) && literal.Token.ValueText == "0";
+        }
+
+        static bool ContainsOpenTypeArguments(ITypeSymbol typeSymbol)
+        {
+            if (typeSymbol is ITypeParameterSymbol)
+                return true;
+
+            if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
+                return ContainsOpenTypeArguments(arrayTypeSymbol.ElementType);
+
+            if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+                return false;
+
+            foreach (var typeArgument in namedTypeSymbol.TypeArguments)
+            {
+                if (ContainsOpenTypeArguments(typeArgument))
+                    return true;
+            }
+
+            return false;
+        }
 
         string? TryResolveNamespaceIdentifier(
             IdentifierNameSyntax identifier,

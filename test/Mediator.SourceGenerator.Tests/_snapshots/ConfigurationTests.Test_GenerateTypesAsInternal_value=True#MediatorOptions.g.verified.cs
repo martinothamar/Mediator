@@ -99,13 +99,13 @@ namespace Mediator
         public global::System.Collections.Generic.IReadOnlyList<global::Mediator.AssemblyReference> Assemblies { get; set; } = new global::Mediator.AssemblyReference[0];
 
         /// <summary>
-        /// The collection of marker interface types to filter which request types are included for generation.
-        /// When specified with one or more types, only request types that implement IRequest AND at least one of the specified marker interfaces will be included.
-        /// When empty or not configured, all discovered request types will be included (no filtering).
-        /// This is useful for modular monolith scenarios where you want to generate code only for requests belonging to specific modules.
-        /// Example: options.IncludeTypesForGeneration = [typeof(IApi1Request)] will only generate code for requests that implement IApi1Request.
+        /// The collection of types to include for generation.
+        /// Supports concrete types, interfaces, and abstract base types.
+        /// A message is included when it is assignable to one or more configured types.
+        /// Applies to requests, commands, queries, stream variants, and notifications.
+        /// When empty or not configured, all discovered messages are included (no filtering).
         /// </summary>
-        public global::System.Collections.Generic.IReadOnlyList<global::System.Type> IncludeTypesForGeneration { get; set; } = new global::System.Type[0];
+        public global::System.Collections.Generic.IReadOnlyList<global::System.Type> Types { get; set; } = new global::System.Type[0];
 
         /// <summary>
         /// The collection of types of pipeline behaviors to register in DI.
