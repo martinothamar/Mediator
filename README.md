@@ -40,6 +40,12 @@ In particular, a source generator in this library is used to
 
 NuGet packages:
 
+* `Mediator.SourceGenerator`
+  * Typically installed in edge/outermost executable projects (for example: ASP.NET Core app, worker service, Function app)
+  * Do not install it into every layer/project in the same deployed artifact, that will lead to errors
+* `Mediator.Abstractions`
+  * Install this alongside the SourceGenerator reference and in projects that define messages and handlers
+
 ```pwsh
 dotnet add package Mediator.SourceGenerator --version 3.0.*
 dotnet add package Mediator.Abstractions --version 3.0.*
@@ -432,6 +438,10 @@ illustrating the various ways the Mediator pattern can be used in an application
 See the full runnable sample code in the [Showcase sample](/samples/Showcase/).
 
 ### 4.1. Add packages
+
+Install packages based on project role:
+* Outermost executable projects (for example ASP.NET Core app, worker service): `Mediator.SourceGenerator`
+* Alongside the SourceGenerator reference and in projects that define messages and handlers: `Mediator.Abstractions`
 
 ```pwsh
 dotnet add package Mediator.SourceGenerator --version 3.0.*
