@@ -99,6 +99,15 @@ namespace Mediator
         public global::System.Collections.Generic.IReadOnlyList<global::Mediator.AssemblyReference> Assemblies { get; set; } = new global::Mediator.AssemblyReference[0];
 
         /// <summary>
+        /// The collection of types to include for generation.
+        /// Supports concrete types, interfaces, and abstract base types.
+        /// A message is included when it is assignable to one or more configured types.
+        /// Applies to requests, commands, queries, stream variants, and notifications.
+        /// When empty or not configured, all discovered messages are included (no filtering).
+        /// </summary>
+        public global::System.Collections.Generic.IReadOnlyList<global::System.Type> Types { get; set; } = new global::System.Type[0];
+
+        /// <summary>
         /// The collection of types of pipeline behaviors to register in DI.
         /// When the type is an unconstructed generic type, the source generator will register all the constructed types of the generic type (open generics that is supported during AoT).
         /// </summary>

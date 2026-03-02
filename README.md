@@ -331,6 +331,7 @@ services.AddMediator((MediatorOptions options) =>
     options.GenerateTypesAsInternal = true;
     options.NotificationPublisherType = typeof(Mediator.ForeachAwaitPublisher);
     options.Assemblies = [typeof(...)];
+    options.Types = [typeof(IModuleMarker)];
     options.PipelineBehaviors = [];
     options.StreamPipelineBehaviors = [];
     // Only available from v3.1:
@@ -350,6 +351,10 @@ services.AddMediator((MediatorOptions options) =>
 * `GenerateTypesAsInternal` - makes all generated types `internal` as opposed to `public`, which may be necessary depending on project setup (e.g. for [Blazor sample](/samples/apps/ASPNET_CORE_Blazor))
 * `NotificationPublisherType` - the type used for publishing notifications (`ForeachAwaitPublisher` and `TaskWhenAllPublisher` are built in)
 * `Assemblies` - which assemblies the source generator should scan for messages and handlers. When not used the source generator will scan all references assemblies (same behavior as v2)
+* `Types` - which message types to include for generation (requests/commands/queries/stream variants/notifications)
+  * Supports interfaces, abstract base types, and concrete types
+  * Matching is assignability-based (for example marker interfaces and base classes)
+  * Use inline `typeof(...)` expressions in the `AddMediator` configuration
 * `PipelineBehaviors`/`StreamPipelineBehaviors` - ordered array of types used for the pipeline
   * The source generator adds DI regristrations manually as oppposed to open generics registrations, to support NativeAOT. You can also manually add pipeline behaviors to the DI container if you are not doing AoT compilation.
 * `CachingMode` - controls when Mediator initialization occurs
