@@ -20,6 +20,7 @@
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(DotNetVersion)" />
     <PackageVersion Include="System.Collections.Immutable" Version="$(DotNetVersion)" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(DotNetVersion)" />
+    <PackageVersion Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
     <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.3" />
 
@@ -41,7 +42,7 @@
     <PackageVersion Include="Buildalyzer.Workspaces" Version="8.0.0" />
 
     <!-- Templating -->
-    <PackageVersion Include="Scriban" Version="6.5.0" />
+    <PackageVersion Include="Scriban" Version="7.0.0" />
 
     <!-- Build -->
     <GlobalPackageReference Include="CSharpier.MsBuild" Version="1.2.1">

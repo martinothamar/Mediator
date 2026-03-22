@@ -12,6 +12,8 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
     <PolySharpExcludeGeneratedTypes>System.Runtime.CompilerServices.ModuleInitializerAttribute</PolySharpExcludeGeneratedTypes>
+    <!-- TODO: Scriban 7 includes code that triggers CS8669 (NRT annotations and no explicit #nullable enable) -->
+    <NoWarn>$(NoWarn);CS8669</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Using Include="Microsoft.CodeAnalysis" />
@@ -27,9 +29,31 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <Content
+      Include="$(PkgSystem_Threading_Tasks_Extensions)/lib/netstandard2.0/System.Threading.Tasks.Extensions.dll"
+      CopyToOutputDirectory="PreserveNewest"
+      Link="System.Threading.Tasks.Extensions.dll"
+      Pack="true"
+      PackagePath="analyzers/dotnet/cs"
+      Visible="false"
+    />
+    <Content
+      Include="$(PkgSystem_Runtime_CompilerServices_Unsafe)/lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll"
+      CopyToOutputDirectory="PreserveNewest"
+      Link="System.Runtime.CompilerServices.Unsafe.dll"
+      Pack="true"
+      PackagePath="analyzers/dotnet/cs"
+      Visible="false"
+    />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Scriban" IncludeAssets="Build" />
+    <PackageReference Include="Scriban" IncludeAssets="Build" PrivateAssets="all" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" PrivateAssets="all" GeneratePathProperty="true" />
+    <PackageReference
+      Include="System.Runtime.CompilerServices.Unsafe"
+      PrivateAssets="all"
+      GeneratePathProperty="true"
+    />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" VersionOverride="4.1.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" VersionOverride="4.1.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" VersionOverride="4.1.0" PrivateAssets="all" />

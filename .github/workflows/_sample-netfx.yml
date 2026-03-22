@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  sample-netfx:
-    name: Sample - .NET Framework
+  sample-netfx-nupkg:
+    name: Sample - .NET Framework (nupkg)
     runs-on: windows-latest
     defaults:
       run:
@@ -43,11 +43,55 @@ jobs:
       - name: Setup NuGet
         uses: nuget/setup-nuget@323ab0502cd38fdc493335025a96c8fdb0edc71f # v2.0.1
 
-      - name: Restore Packages
-        run: msbuild Console.sln -t:Restore
+      - name: Pack local NuGet packages
+        id: pack
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        run: |
+          New-Item -ItemType Directory -Force -Path .\artifacts\packages | Out-Null
+          dotnet build .\src\Mediator\Mediator.csproj -c Debug -v q
+          dotnet build .\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj -c Debug -v q
+          dotnet pack .\src\Mediator\Mediator.csproj -c Debug --no-build -o .\artifacts\packages -v q
+          dotnet pack .\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj -c Debug --no-build -o .\artifacts\packages -v q
+          $package = Get-ChildItem .\artifacts\packages\Mediator.SourceGenerator.*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          $version = $package.BaseName.Substring('Mediator.SourceGenerator.'.Length)
+          "version=$version" >> $env:GITHUB_OUTPUT
 
-      - name: Build solution
-        run: msbuild Console.sln -t:Rebuild
+      - name: Create local NuGet config
+        shell: pwsh
+        run: |
+          @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="local" value="${{ github.workspace }}\artifacts\packages" />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+            </packageSources>
+            <packageSourceMapping>
+              <packageSource key="local">
+                <package pattern="Mediator.SourceGenerator" />
+                <package pattern="Mediator.Abstractions" />
+              </packageSource>
+              <packageSource key="nuget.org">
+                <package pattern="*" />
+              </packageSource>
+            </packageSourceMapping>
+          </configuration>
+          "@ | Set-Content -Path .\NuGet.Local.config -Encoding UTF8
+
+      - name: Restore Packages
+        run: |
+          msbuild .\Console\Console.csproj -t:Restore `
+            -p:RestoreConfigFile=NuGet.Local.config `
+            -p:UseLocalMediatorProjects=false `
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+      - name: Build Console
+        run: |
+          msbuild .\Console\Console.csproj -t:Rebuild `
+            -p:UseLocalMediatorProjects=false `
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
 
       - name: Run Console
         run: .\Console\bin\Debug\Console.NetFramework.exe
