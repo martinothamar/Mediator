@@ -3,7 +3,9 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, release/v** ]
+    branches:
+      - main
+      - 'release/v**'
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
@@ -12,7 +14,9 @@ on:
       - 'samples/**'
       - '*.sln'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - 'release/v**'
 
 jobs:
   build:
@@ -84,6 +88,87 @@ jobs:
     - name: Run
       run: dotnet run
 
+  samples-net-nupkg:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./samples/Showcase
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0 # depth is needed for nbgv
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        include-prerelease: false
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-${{ hashFiles('global.json') }}-
+
+    - name: Pack local NuGet packages
+      id: pack
+      working-directory: .
+      run: |
+        mkdir -p ./artifacts/packages
+        dotnet build ./src/Mediator/Mediator.csproj -c Debug -v q
+        dotnet build ./src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj -c Debug -v q
+        dotnet pack ./src/Mediator/Mediator.csproj -c Debug --no-build -o ./artifacts/packages -v q
+        dotnet pack ./src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj -c Debug --no-build -o ./artifacts/packages -v q
+        package_path="$(ls -1t ./artifacts/packages/Mediator.SourceGenerator.*.nupkg | head -n 1)"
+        package_version="${package_path##*/}"
+        package_version="${package_version#Mediator.SourceGenerator.}"
+        package_version="${package_version%.nupkg}"
+        echo "version=$package_version" >> "$GITHUB_OUTPUT"
+
+    - name: Create local NuGet config
+      run: |
+        cat > NuGet.Local.config <<EOF
+        <?xml version="1.0" encoding="utf-8"?>
+        <configuration>
+          <packageSources>
+            <clear />
+            <add key="local" value="${{ github.workspace }}/artifacts/packages" />
+            <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+          </packageSources>
+          <packageSourceMapping>
+            <packageSource key="local">
+              <package pattern="Mediator.SourceGenerator" />
+              <package pattern="Mediator.Abstractions" />
+            </packageSource>
+            <packageSource key="nuget.org">
+              <package pattern="*" />
+            </packageSource>
+          </packageSourceMapping>
+        </configuration>
+        EOF
+
+    - name: Restore
+      run: |
+        dotnet restore Showcase.csproj --configfile NuGet.Local.config \
+          -p:UseLocalMediatorProjects=false \
+          -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+    - name: Build
+      run: |
+        dotnet build Showcase.csproj --no-restore \
+          -p:UseLocalMediatorProjects=false \
+          -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+    - name: Run
+      run: |
+        dotnet run --no-restore --no-build \
+          -p:UseLocalMediatorProjects=false \
+          -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
   samples-aot:
     runs-on: ubuntu-latest
     defaults:
@@ -136,24 +221,74 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nuget-
 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+        include-prerelease: false
+
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
     - name: Setup NuGet
       uses: nuget/setup-nuget@v2
 
+    - name: Pack local NuGet packages
+      id: pack
+      shell: pwsh
+      working-directory: ${{ github.workspace }}
+      run: |
+        New-Item -ItemType Directory -Force -Path .\artifacts\packages | Out-Null
+        dotnet build .\src\Mediator\Mediator.csproj -c Debug -v q
+        dotnet build .\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj -c Debug -v q
+        dotnet pack .\src\Mediator\Mediator.csproj -c Debug --no-build -o .\artifacts\packages -v q
+        dotnet pack .\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj -c Debug --no-build -o .\artifacts\packages -v q
+        $package = Get-ChildItem .\artifacts\packages\Mediator.SourceGenerator.*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+        $version = $package.BaseName.Substring('Mediator.SourceGenerator.'.Length)
+        "version=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Create local NuGet config
+      shell: pwsh
+      run: |
+        @"
+        <?xml version="1.0" encoding="utf-8"?>
+        <configuration>
+          <packageSources>
+            <clear />
+            <add key="local" value="${{ github.workspace }}\artifacts\packages" />
+            <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+          </packageSources>
+          <packageSourceMapping>
+            <packageSource key="local">
+              <package pattern="Mediator.SourceGenerator" />
+              <package pattern="Mediator.Abstractions" />
+            </packageSource>
+            <packageSource key="nuget.org">
+              <package pattern="*" />
+            </packageSource>
+          </packageSourceMapping>
+        </configuration>
+        "@ | Set-Content -Path .\NuGet.Local.config -Encoding UTF8
+
     - name: Restore Packages
-      run: msbuild Console.sln -t:Restore
+      run: |
+        msbuild .\Console\Console.csproj -t:Restore `
+          -p:RestoreConfigFile=NuGet.Local.config `
+          -p:UseLocalMediatorProjects=false `
+          -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
 
     - name: Build solution
-      run: msbuild Console.sln -t:Rebuild
+      run: |
+        msbuild .\Console\Console.csproj -t:Rebuild `
+          -p:UseLocalMediatorProjects=false `
+          -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
 
     - name: Run Console
       run: .\Console\bin\Debug\Console.NetFramework.exe
 
   publish:
     if: ${{ always() }}
-    needs: [build, samples-net, samples-aot, samples-netfx]
+    needs: [build, samples-net, samples-net-nupkg, samples-aot, samples-netfx]
     runs-on: ubuntu-latest
 
     env:

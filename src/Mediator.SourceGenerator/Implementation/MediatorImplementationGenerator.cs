@@ -35,6 +35,7 @@ internal static class MediatorImplementationGenerator
             context.PushGlobal(scriptObject);
             context.LoopLimit = 0;
             context.LoopLimitQueryable = 0;
+            context.LimitToString = 0;
             var output = template.Render(context);
 
             addSource("Mediator.g.cs", SourceText.From(output, Encoding.UTF8));
