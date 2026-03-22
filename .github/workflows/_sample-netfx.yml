@@ -37,17 +37,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-${{ hashFiles('global.json') }}-
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
-
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@323ab0502cd38fdc493335025a96c8fdb0edc71f # v2.0.1
-
       - name: Restore Packages
-        run: msbuild Console.sln -t:Restore
+        run: dotnet msbuild Console.sln -t:Restore
 
       - name: Build solution
-        run: msbuild Console.sln -t:Rebuild
+        # Use the SDK's MSBuild so SDK-style project references resolve with the installed .NET toolchain.
+        run: dotnet msbuild Console.sln -t:Rebuild
 
       - name: Run Console
         run: .\Console\bin\Debug\Console.NetFramework.exe
