@@ -3,7 +3,9 @@ name: Build
 on:
   workflow_dispatch:
   push:
-    branches: [ main, release/v** ]
+    branches:
+      - main
+      - 'release/v**'
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
@@ -12,7 +14,9 @@ on:
       - 'samples/**'
       - '*.sln'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - 'release/v**'
 
 jobs:
   build:
