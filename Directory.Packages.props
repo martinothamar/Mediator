@@ -41,7 +41,7 @@
     <PackageVersion Include="Buildalyzer.Workspaces" Version="8.0.0" />
 
     <!-- Templating -->
-    <PackageVersion Include="Scriban" Version="6.5.0" />
+    <PackageVersion Include="Scriban" Version="7.0.0" />
 
     <!-- Build -->
     <GlobalPackageReference Include="CSharpier.MsBuild" Version="1.2.1">
