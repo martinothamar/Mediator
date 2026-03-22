@@ -51,3 +51,86 @@ jobs:
 
       - name: Run Console
         run: .\Console\bin\Debug\Console.NetFramework.exe
+
+  sample-netfx-nupkg:
+    name: Sample - .NET Framework (nupkg)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: .\samples\basic\NetFramework\
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: 10.0.103
+
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('global.json', '**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ hashFiles('global.json') }}-
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@323ab0502cd38fdc493335025a96c8fdb0edc71f # v2.0.1
+
+      - name: Pack local NuGet packages
+        id: pack
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        run: |
+          New-Item -ItemType Directory -Force -Path .\artifacts\packages | Out-Null
+          dotnet pack .\src\Mediator\Mediator.csproj -c Debug -o .\artifacts\packages -v q
+          dotnet pack .\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj -c Debug -o .\artifacts\packages -v q
+          $package = Get-ChildItem .\artifacts\packages\Mediator.SourceGenerator.*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          $version = $package.BaseName.Substring('Mediator.SourceGenerator.'.Length)
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Create local NuGet config
+        shell: pwsh
+        run: |
+          @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="local" value="${{ github.workspace }}\artifacts\packages" />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+            </packageSources>
+            <packageSourceMapping>
+              <packageSource key="local">
+                <package pattern="Mediator.SourceGenerator" />
+                <package pattern="Mediator.Abstractions" />
+              </packageSource>
+              <packageSource key="nuget.org">
+                <package pattern="*" />
+              </packageSource>
+            </packageSourceMapping>
+          </configuration>
+          "@ | Set-Content -Path .\NuGet.Local.config -Encoding UTF8
+
+      - name: Restore Packages
+        run: |
+          msbuild .\Console\Console.csproj -t:Restore `
+            -p:RestoreConfigFile=NuGet.Local.config `
+            -p:UseLocalMediatorProjects=false `
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+      - name: Build Console
+        run: |
+          msbuild .\Console\Console.csproj -t:Rebuild `
+            -p:UseLocalMediatorProjects=false `
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+      - name: Run Console
+        run: .\Console\bin\Debug\Console.NetFramework.exe

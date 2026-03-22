@@ -45,3 +45,82 @@ jobs:
 
       - name: Run
         run: dotnet run -f ${{ inputs.dotnet-framework }}
+
+  sample-showcase-nupkg:
+    name: Sample - Showcase ${{ inputs.dotnet-framework }} (nupkg)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./samples/Showcase
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: ${{ inputs.checkout-ref }}
+          fetch-depth: 0 # depth is needed for nbgv
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: ${{ inputs.dotnet-sdk }}
+
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-${{ hashFiles('**/*.csproj', '**/Directory.*.props', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-${{ inputs.dotnet-sdk }}-
+
+      - name: Pack local NuGet packages
+        id: pack
+        working-directory: .
+        run: |
+          mkdir -p ./artifacts/packages
+          dotnet pack ./src/Mediator/Mediator.csproj -c Debug -o ./artifacts/packages -v q
+          dotnet pack ./src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj -c Debug -o ./artifacts/packages -v q
+          package_path="$(ls -1t ./artifacts/packages/Mediator.SourceGenerator.*.nupkg | head -n 1)"
+          package_version="${package_path##*/}"
+          package_version="${package_version#Mediator.SourceGenerator.}"
+          package_version="${package_version%.nupkg}"
+          echo "version=$package_version" >> "$GITHUB_OUTPUT"
+
+      - name: Create local NuGet config
+        run: |
+          cat > NuGet.Local.config <<EOF
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="local" value="${{ github.workspace }}/artifacts/packages" />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+            </packageSources>
+            <packageSourceMapping>
+              <packageSource key="local">
+                <package pattern="Mediator.SourceGenerator" />
+                <package pattern="Mediator.Abstractions" />
+              </packageSource>
+              <packageSource key="nuget.org">
+                <package pattern="*" />
+              </packageSource>
+            </packageSourceMapping>
+          </configuration>
+          EOF
+
+      - name: Restore
+        run: |
+          dotnet restore Showcase.csproj --configfile NuGet.Local.config \
+            -p:UseLocalMediatorProjects=false \
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+      - name: Build
+        run: |
+          dotnet build Showcase.csproj --no-restore -f ${{ inputs.dotnet-framework }} \
+            -p:UseLocalMediatorProjects=false \
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
+
+      - name: Run
+        run: |
+          dotnet run --no-restore --no-build -f ${{ inputs.dotnet-framework }} \
+            -p:UseLocalMediatorProjects=false \
+            -p:MediatorPackageVersion=${{ steps.pack.outputs.version }}
