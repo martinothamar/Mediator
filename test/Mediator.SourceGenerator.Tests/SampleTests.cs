@@ -13,9 +13,22 @@ namespace Mediator.SourceGenerator.Tests;
 
 public sealed class SampleTests
 {
+    // Only message available... wtf
+    private static bool IsIgnoredWorkspaceFailure(WorkspaceDiagnostic diagnostic) =>
+        diagnostic.Kind == WorkspaceDiagnosticKind.Failure
+        && diagnostic.Message.Contains("has a known", System.StringComparison.Ordinal)
+        && diagnostic.Message.Contains("vulnerability", System.StringComparison.Ordinal)
+        && diagnostic.Message.Contains("github.com/advisories/", System.StringComparison.Ordinal);
+
     private static async Task Test(string samplesRelativeProjectPath)
     {
-        using var workspace = MSBuildWorkspace.Create();
+        using var workspace = MSBuildWorkspace.Create(
+            new Dictionary<string, string>
+            {
+                // These tests validate source generation behavior, not package audit reporting.
+                ["NuGetAudit"] = "false",
+            }
+        );
 
         var diagnostics = new List<WorkspaceDiagnostic>();
         workspace.WorkspaceFailed += (sender, args) => diagnostics.Add(args.Diagnostic);
@@ -36,7 +49,10 @@ public sealed class SampleTests
         compilation.Should().NotBeNull();
         Assert.NotNull(compilation);
 
-        diagnostics.Where(d => d.Kind == WorkspaceDiagnosticKind.Failure).Should().BeEmpty();
+        diagnostics
+            .Where(d => !IsIgnoredWorkspaceFailure(d) && d.Kind == WorkspaceDiagnosticKind.Failure)
+            .Should()
+            .BeEmpty();
 
         var generator = new IncrementalMediatorGenerator().AsSourceGenerator();
 

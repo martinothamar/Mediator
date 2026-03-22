@@ -41,9 +41,9 @@ test-sourcegen:
 
 # Test memory allocation tests
 test-memory:
-    @echo "=== Running Memory Allocation Tests ==="
     #!/usr/bin/env sh
     set -eu
+    echo "=== Running Memory Allocation Tests ==="
     for framework in {{frameworks}}; do \
         echo "Testing memory allocation on $framework"; \
         dotnet build --no-restore -v q -f "$framework" ./test/Mediator.MemAllocationTests/; \
@@ -52,9 +52,9 @@ test-memory:
 
 # Test all matrix combinations for Mediator.Tests
 test-matrix:
-    @echo "=== Running Matrix Tests (Mediator.Tests) ==="
     #!/usr/bin/env sh
     set -eu
+    echo "=== Running Matrix Tests (Mediator.Tests) ==="
     for framework in {{frameworks}}; do \
         for lifetime in {{lifetimes}}; do \
             for publisher in {{publishers}}; do \
@@ -69,9 +69,9 @@ test-matrix:
 
 # Test matrix combinations for telemetry runtime tests (net10.0 only)
 test-telemetry-matrix:
-    @echo "=== Running Matrix Tests (Mediator.Telemetry.Tests) ==="
     #!/usr/bin/env sh
     set -eu
+    echo "=== Running Matrix Tests (Mediator.Telemetry.Tests) ==="
     for framework in {{frameworks}}; do \
         for lifetime in {{lifetimes}}; do \
             for publisher in {{publishers}}; do \
@@ -119,9 +119,9 @@ _test-telemetry-config framework lifetime publisher cachingMode metrics tracing:
 
 # Test a specific framework with all matrix combinations
 test-framework framework="net10.0":
-    @echo "=== Testing framework {{framework}} with all matrix combinations ==="
     #!/usr/bin/env sh
     set -eu
+    echo "=== Testing framework {{framework}} with all matrix combinations ==="
     for lifetime in {{lifetimes}}; do \
         for publisher in {{publishers}}; do \
             for size in {{sizes}}; do \
@@ -134,9 +134,9 @@ test-framework framework="net10.0":
 
 # Test a specific lifetime across all frameworks
 test-lifetime lifetime="Singleton":
-    @echo "=== Testing lifetime {{lifetime}} across all frameworks ==="
     #!/usr/bin/env sh
     set -eu
+    echo "=== Testing lifetime {{lifetime}} across all frameworks ==="
     for framework in {{frameworks}}; do \
         for publisher in {{publishers}}; do \
             for size in {{sizes}}; do \
@@ -149,9 +149,9 @@ test-lifetime lifetime="Singleton":
 
 # Test a specific publisher across all frameworks
 test-publisher publisher="ForeachAwait":
-    @echo "=== Testing publisher {{publisher}} across all frameworks ==="
     #!/usr/bin/env sh
     set -eu
+    echo "=== Testing publisher {{publisher}} across all frameworks ==="
     for framework in {{frameworks}}; do \
         for lifetime in {{lifetimes}}; do \
             for size in {{sizes}}; do \
