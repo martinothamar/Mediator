@@ -77,8 +77,10 @@ jobs:
         working-directory: .
         run: |
           mkdir -p ./artifacts/packages
-          dotnet pack ./src/Mediator/Mediator.csproj -c Debug -o ./artifacts/packages -v q
-          dotnet pack ./src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj -c Debug -o ./artifacts/packages -v q
+          dotnet build ./src/Mediator/Mediator.csproj -c Debug -v q
+          dotnet build ./src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj -c Debug -v q
+          dotnet pack ./src/Mediator/Mediator.csproj -c Debug --no-build -o ./artifacts/packages -v q
+          dotnet pack ./src/Mediator.SourceGenerator/Mediator.SourceGenerator.csproj -c Debug --no-build -o ./artifacts/packages -v q
           package_path="$(ls -1t ./artifacts/packages/Mediator.SourceGenerator.*.nupkg | head -n 1)"
           package_version="${package_path##*/}"
           package_version="${package_version#Mediator.SourceGenerator.}"
