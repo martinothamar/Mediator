@@ -18,7 +18,8 @@ internal sealed class SyntaxReceiver : ISyntaxReceiver
             is not InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax identifier } invocationSyntax
         )
             return false;
-        if (identifier.Name.Identifier.ValueText != "AddMediator")
+        var methodName = identifier.Name.Identifier.ValueText;
+        if (methodName != "AddMediator" && methodName != "AddMediatorCore" && methodName != "AddMediatorHandlers")
             return false;
 
         invocation = invocationSyntax;

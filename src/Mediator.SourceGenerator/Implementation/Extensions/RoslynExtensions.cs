@@ -35,6 +35,11 @@ public static class RoslynExtensions
         return $"global::{symbol.ToDisplayString()}";
     }
 
+    public static bool IsAccessibleFromGeneratedCode(this ISymbol symbol, Compilation compilation)
+    {
+        return compilation.IsSymbolAccessibleWithin(symbol, compilation.Assembly, throughType: null);
+    }
+
     public static bool SatisfiesConstraints(
         this ISymbol symbol,
         IReadOnlyList<ITypeSymbol> typeArguments,

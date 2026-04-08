@@ -445,7 +445,7 @@ internal sealed class CompilationAnalyzer
                         m.Symbol,
                         m.ResponseSymbol,
                         m.MessageType,
-                        m.Handler?.ToModel(),
+                        m.Handler?.ToModel(m.Symbol, m.ResponseSymbol),
                         m.WrapperType
                     )
                 ),
