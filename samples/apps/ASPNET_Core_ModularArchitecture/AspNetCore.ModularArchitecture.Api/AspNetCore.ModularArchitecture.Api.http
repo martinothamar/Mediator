@@ -1,0 +1,14 @@
+@AspNetCore_ModularArchitecture_HostAddress = http://localhost:5000
+
+GET {{AspNetCore_ModularArchitecture_HostAddress}}/module-a/Alice
+Accept: application/json
+
+###
+
+GET {{AspNetCore_ModularArchitecture_HostAddress}}/module-b/public/Bob
+Accept: application/json
+
+###
+
+GET {{AspNetCore_ModularArchitecture_HostAddress}}/module-b/internal/Charlie
+Accept: application/json

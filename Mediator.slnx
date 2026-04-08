@@ -33,6 +33,12 @@
     <Project Path="samples/apps/ASPNET_Core_Indirect/AspNetCoreIndirect.BaseClasses/AspNetCoreIndirect.BaseClasses.csproj" />
     <Project Path="samples/apps/ASPNET_Core_Indirect/AspNetCoreIndirect.Implementations/AspNetCoreIndirect.Implementations.csproj" />
   </Folder>
+  <Folder Name="/samples/apps/ASPNET_Core_ModularArchitecture/">
+    <File Path="samples/apps/ASPNET_Core_ModularArchitecture/README.md" />
+    <Project Path="samples/apps/ASPNET_Core_ModularArchitecture/AspNetCore.ModularArchitecture.Api/AspNetCore.ModularArchitecture.Api.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_ModularArchitecture/AspNetCore.ModularArchitecture.ModuleA/AspNetCore.ModularArchitecture.ModuleA.csproj" />
+    <Project Path="samples/apps/ASPNET_Core_ModularArchitecture/AspNetCore.ModularArchitecture.ModuleB/AspNetCore.ModularArchitecture.ModuleB.csproj" />
+  </Folder>
   <Folder Name="/samples/apps/InternalMessages/">
     <Project Path="samples/apps/InternalMessages/InternalMessages.Api/InternalMessages.Api.csproj" />
     <Project Path="samples/apps/InternalMessages/InternalMessages.Application/InternalMessages.Application.csproj" />
