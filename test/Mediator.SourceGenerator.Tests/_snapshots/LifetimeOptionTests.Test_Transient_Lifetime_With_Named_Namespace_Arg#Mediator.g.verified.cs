@@ -37,6 +37,25 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
         {
+            AddMediatorCore(services, options);
+            AddMediatorHandlers(services, options);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and generated wrapper infrastructure for your application.
+        /// </summary>
+        public static IServiceCollection AddMediatorCore(this IServiceCollection services)
+        {
+            return AddMediatorCore(services, null);
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and generated wrapper infrastructure for your application, with specified options.
+        /// </summary>
+        public static IServiceCollection AddMediatorCore(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
+        {
             var opts = new global::Mediator.MediatorOptions();
             if (options != null)
                 options(opts);
@@ -46,8 +65,8 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var errMsg = "Invalid configuration detected for Mediator. ";
                 errMsg += "Generated code for 'Transient' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
-                errMsg += "This means that the source generator hasn't seen the 'AddMediator' method call during compilation. ";
-                errMsg += "Make sure that the 'AddMediator' method is called from the project that references the Mediator.SourceGenerator package.";
+                errMsg += "This means that the source generator hasn't seen the Mediator registration method call during compilation. ";
+                errMsg += "Make sure that 'AddMediator', 'AddMediatorCore', or 'AddMediatorHandlers' is called from the project that references the Mediator.SourceGenerator package.";
                 throw new global::System.Exception(errMsg);
             }
 
@@ -64,6 +83,37 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Internals.IContainerProbe), typeof(global::Mediator2.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Internals.IContainerProbe), typeof(global::Mediator2.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator2.Internals.ContainerMetadata), typeof(global::Mediator2.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the generated handler registrations for your application.
+        /// </summary>
+        public static IServiceCollection AddMediatorHandlers(this IServiceCollection services)
+        {
+            return AddMediatorHandlers(services, null);
+        }
+
+        /// <summary>
+        /// Adds the generated handler registrations for your application, with specified options.
+        /// </summary>
+        public static IServiceCollection AddMediatorHandlers(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
+        {
+            var opts = new global::Mediator.MediatorOptions();
+            if (options != null)
+                options(opts);
+
+            var configuredViaAttribute = true;
+            if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient && !configuredViaAttribute)
+            {
+                var errMsg = "Invalid configuration detected for Mediator. ";
+                errMsg += "Generated code for 'Transient' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
+                errMsg += "This means that the source generator hasn't seen the Mediator registration method call during compilation. ";
+                errMsg += "Make sure that 'AddMediator', 'AddMediatorCore', or 'AddMediatorHandlers' is called from the project that references the Mediator.SourceGenerator package.";
+                throw new global::System.Exception(errMsg);
+            }
+
 
             return services;
 

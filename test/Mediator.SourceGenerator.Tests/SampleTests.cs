@@ -85,6 +85,12 @@ public sealed class SampleTests
         await Test("apps/ASPNET_Core_Indirect/AspNetCoreIndirect.Application/AspNetCoreIndirect.Application.csproj");
 
     [Fact]
+    public async Task Test_ASPNET_Core_ModularArchitecture_Sample() =>
+        await Test(
+            "apps/ASPNET_Core_ModularArchitecture/AspNetCore.ModularArchitecture.Api/AspNetCore.ModularArchitecture.Api.csproj"
+        );
+
+    [Fact]
     public async Task Test_Console() => await Test("basic/Console/Console.csproj");
 
     [Fact]
