@@ -29,6 +29,7 @@ Goals for this library
 * Stability
   * Stable API that only changes for good reason - fewer changes means less patching for you
   * Follows [semantic versioning](#7-versioning) strictly
+  * Free and open source, forever
 
 In particular, a source generator in this library is used to
 * Generate code for DI registration
