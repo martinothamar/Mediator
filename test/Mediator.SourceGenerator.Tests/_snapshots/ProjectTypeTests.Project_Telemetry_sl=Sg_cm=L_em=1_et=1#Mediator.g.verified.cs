@@ -37,6 +37,25 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
         {
+            AddMediatorCore(services, options);
+            AddMediatorHandlers(services, options);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and generated wrapper infrastructure for your application.
+        /// </summary>
+        public static IServiceCollection AddMediatorCore(this IServiceCollection services)
+        {
+            return AddMediatorCore(services, null);
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and generated wrapper infrastructure for your application, with specified options.
+        /// </summary>
+        public static IServiceCollection AddMediatorCore(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
+        {
             var opts = new global::Mediator.MediatorOptions();
             if (options != null)
                 options(opts);
@@ -46,8 +65,8 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 var errMsg = "Invalid configuration detected for Mediator. ";
                 errMsg += "Generated code for 'Singleton' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
-                errMsg += "This means that the source generator hasn't seen the 'AddMediator' method call during compilation. ";
-                errMsg += "Make sure that the 'AddMediator' method is called from the project that references the Mediator.SourceGenerator package.";
+                errMsg += "This means that the source generator hasn't seen the Mediator registration method call during compilation. ";
+                errMsg += "Make sure that 'AddMediator', 'AddMediatorCore', or 'AddMediatorHandlers' is called from the project that references the Mediator.SourceGenerator package.";
                 throw new global::System.Exception(errMsg);
             }
 
@@ -56,25 +75,19 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.ISender), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IPublisher), sp => sp.GetRequiredService<global::Mediator.Mediator>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            // Register handlers for request messages
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            // Register wrappers for request messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.Request), sp => {
                 return new global::Mediator.Internals.RequestHandlerWrapper<global::TestCode.Request, global::TestCode.Response>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.StreamRequest), sp => {
                 return new global::Mediator.Internals.StreamRequestHandlerWrapper<global::TestCode.StreamRequest, global::TestCode.Response>().Init(sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
-            // Register handlers and wrappers for notification messages
+            // Register wrappers for notification messages
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotification), sp => {
                 var publisher = sp.GetRequiredService<global::Mediator.Mediator>().NotificationPublisher;
                 return new global::Mediator.Internals.NotificationHandlerWrapper<global::TestCode.PingNotification>().Init(publisher, sp.GetRequiredService<global::Mediator.Internals.ContainerMetadata>(), sp);
             }, global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-
-            // Register notification handlers
-            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotificationHandler), typeof(global::TestCode.PingNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
-            services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.PingNotification>), GetRequiredService<global::TestCode.PingNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             // Register the notification publisher that was configured
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.TaskWhenAllPublisher), typeof(global::Mediator.TaskWhenAllPublisher), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
@@ -84,6 +97,45 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe0), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.IContainerProbe), typeof(global::Mediator.Internals.ContainerProbe1), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
             services.Add(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.Internals.ContainerMetadata), typeof(global::Mediator.Internals.ContainerMetadata), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the generated handler registrations for your application.
+        /// </summary>
+        public static IServiceCollection AddMediatorHandlers(this IServiceCollection services)
+        {
+            return AddMediatorHandlers(services, null);
+        }
+
+        /// <summary>
+        /// Adds the generated handler registrations for your application, with specified options.
+        /// </summary>
+        public static IServiceCollection AddMediatorHandlers(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
+        {
+            var opts = new global::Mediator.MediatorOptions();
+            if (options != null)
+                options(opts);
+
+            var configuredViaAttribute = false;
+            if (opts.ServiceLifetime != global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton && !configuredViaAttribute)
+            {
+                var errMsg = "Invalid configuration detected for Mediator. ";
+                errMsg += "Generated code for 'Singleton' lifetime, but got '" + opts.ServiceLifetime + "' lifetime from options. ";
+                errMsg += "This means that the source generator hasn't seen the Mediator registration method call during compilation. ";
+                errMsg += "Make sure that 'AddMediator', 'AddMediatorCore', or 'AddMediatorHandlers' is called from the project that references the Mediator.SourceGenerator package.";
+                throw new global::System.Exception(errMsg);
+            }
+
+
+            // Register handlers for request messages
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IRequestHandler<global::TestCode.Request, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.IStreamRequestHandler<global::TestCode.StreamRequest, global::TestCode.Response>), typeof(global::TestCode.RequestHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+
+            // Register notification handlers
+            services.TryAdd(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::TestCode.PingNotificationHandler), typeof(global::TestCode.PingNotificationHandler), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
+            services.TryAddEnumerable(new global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor(typeof(global::Mediator.INotificationHandler<global::TestCode.PingNotification>), GetRequiredService<global::TestCode.PingNotificationHandler>(), global::Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton));
 
             return services;
 

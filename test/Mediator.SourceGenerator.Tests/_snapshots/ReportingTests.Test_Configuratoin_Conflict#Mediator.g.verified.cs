@@ -31,17 +31,54 @@ namespace Microsoft.Extensions.DependencyInjection
             return AddMediator(services, null);
         }
 
-        internal sealed class Dummy { }
-
         /// <summary>
         /// Adds the Mediator implementation and handlers of your application, with specified options.
         /// </summary>
         public static IServiceCollection AddMediator(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
         {
+            AddMediatorCore(services, options);
+            AddMediatorHandlers(services, options);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and generated wrapper infrastructure for your application.
+        /// </summary>
+        public static IServiceCollection AddMediatorCore(this IServiceCollection services)
+        {
+            return AddMediatorCore(services, null);
+        }
+
+        /// <summary>
+        /// Adds the Mediator implementation and generated wrapper infrastructure for your application, with specified options.
+        /// </summary>
+        public static IServiceCollection AddMediatorCore(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
+        {
             services.AddSingleton<Dummy>();
 
             return services;
         }
+
+        /// <summary>
+        /// Adds the generated handler registrations for your application.
+        /// </summary>
+        public static IServiceCollection AddMediatorHandlers(this IServiceCollection services)
+        {
+            return AddMediatorHandlers(services, null);
+        }
+
+        /// <summary>
+        /// Adds the generated handler registrations for your application, with specified options.
+        /// </summary>
+        public static IServiceCollection AddMediatorHandlers(this IServiceCollection services, global::System.Action<global::Mediator.MediatorOptions>? options)
+        {
+            services.AddSingleton<Dummy>();
+
+            return services;
+        }
+
+        internal sealed class Dummy { }
     }
 }
 

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference
+      Include="..\..\..\..\src\Mediator.SourceGenerator\Mediator.SourceGenerator.csproj"
+      OutputItemType="Analyzer"
+    />
+    <ProjectReference Include="..\..\..\..\src\Mediator\Mediator.csproj" />
+  </ItemGroup>
+</Project>

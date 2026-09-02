@@ -8,6 +8,9 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
         : base(handler.Symbol)
     {
         ServiceRegistrations = ImmutableEquatableArray<string>.Empty;
+        if (!handler.Symbol.IsAccessibleFromGeneratedCode(analyzer.Compilation))
+            return;
+
         if (handler.Messages.Count > 0)
         {
             var sd = "global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor";
@@ -27,16 +30,18 @@ internal sealed record NotificationMessageHandlerModel : SymbolMetadataModel
             foreach (var message in handler.Messages)
             {
                 var requestType = message.Symbol.GetTypeSymbolFullName();
+                var closedConcreteType = handler.Symbol.IsGenericType
+                    ? $"{concreteSymbol}<{requestType}>"
+                    : concreteSymbol;
                 if (handler.Symbol.IsGenericType)
                 {
                     var concreteRegistration =
-                        $"services.TryAdd(new {sd}(typeof({concreteSymbol}<{requestType}>), typeof({concreteSymbol}<{requestType}>), {analyzer.ServiceLifetime}));";
+                        $"services.TryAdd(new {sd}(typeof({closedConcreteType}), typeof({closedConcreteType}), {analyzer.ServiceLifetime}));";
                     builder.Add(concreteRegistration);
                 }
-                var getExpression =
-                    $"GetRequiredService<{concreteSymbol}{(handler.Symbol.IsGenericType ? $"<{requestType}>" : "")}>()";
+                var getExpression = $"GetRequiredService<{closedConcreteType}>()";
                 var registration =
-                    $"services.Add(new {sd}(typeof({interfaceSymbol}<{requestType}>), {getExpression}, {analyzer.ServiceLifetime}));";
+                    $"services.TryAddEnumerable(new {sd}(typeof({interfaceSymbol}<{requestType}>), {getExpression}, {analyzer.ServiceLifetime}));";
                 builder.Add(registration);
             }
 
