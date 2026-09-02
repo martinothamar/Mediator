@@ -121,6 +121,15 @@ public static class Diagnostics
             isEnabledByDefault: true
         );
 
+        NotificationPassedToSend = new DiagnosticDescriptor(
+            GetNextId(),
+            $"{nameof(MediatorGenerator)} notification passed to Send",
+            $"{nameof(MediatorGenerator)} found a notification passed to Send; use Publish instead.",
+            nameof(MediatorGenerator),
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true
+        );
+
         static string GetNextId()
         {
             var count = _counter++;
@@ -221,6 +230,11 @@ public static class Diagnostics
         this CompilationAnalyzerContext context,
         INamedTypeSymbol messageType
     ) => context.Report(MessageWithoutHandler, messageType);
+
+    public static readonly DiagnosticDescriptor NotificationPassedToSend;
+
+    internal static Diagnostic CreateNotificationPassedToSend(Location location) =>
+        Diagnostic.Create(NotificationPassedToSend, location);
 
     public static readonly DiagnosticDescriptor ConflictingConfiguration;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -414,6 +415,321 @@ namespace MyCode
                     result.Diagnostics,
                     d => d.Id == Diagnostics.MessageWithoutHandler.Id && d.Severity == DiagnosticSeverity.Warning
                 );
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Send_Notification_Reports_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed record UserCreated : INotification;
+
+            public sealed class UserCreatedHandler : INotificationHandler<UserCreated>
+            {
+                public ValueTask Handle(UserCreated notification, CancellationToken cancellationToken) => default;
+            }
+
+            public sealed class NotificationSender
+            {
+                public async Task SendNotification(ISender sender)
+                {
+                    await sender.Send(new UserCreated());
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(result =>
+        {
+            Assert.Empty(result.OutputCompilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+            var warning = Assert.Single(
+                result.Diagnostics,
+                d => d.Id == Diagnostics.NotificationPassedToSend.Id && d.Severity == DiagnosticSeverity.Warning
+            );
+            var message = warning.GetMessage();
+
+            Assert.Contains("Send", message, StringComparison.Ordinal);
+            Assert.Contains("Publish", message, StringComparison.Ordinal);
+        });
+    }
+
+    [Fact]
+    public async Task Test_Send_Statically_Typed_Notification_Reports_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed record UserCreated : INotification;
+
+            public sealed class UserCreatedHandler : INotificationHandler<UserCreated>
+            {
+                public ValueTask Handle(UserCreated notification, CancellationToken cancellationToken) => default;
+            }
+
+            public sealed class NotificationSender
+            {
+                public async Task SendNotification(ISender sender)
+                {
+                    INotification notification = new UserCreated();
+                    await sender.Send(notification);
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutErrorDiagnostics,
+            result =>
+            {
+                Assert.Single(
+                    result.Diagnostics,
+                    d => d.Id == Diagnostics.NotificationPassedToSend.Id && d.Severity == DiagnosticSeverity.Warning
+                );
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Send_Named_Notification_Argument_Reports_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed class NotificationSender
+            {
+                public async Task SendNotification(
+                    ISender sender,
+                    INotification notification,
+                    CancellationToken cancellationToken)
+                {
+                    await sender.Send(
+                        cancellationToken: cancellationToken,
+                        message: notification);
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutErrorDiagnostics,
+            result =>
+            {
+                Assert.Single(
+                    result.Diagnostics,
+                    d => d.Id == Diagnostics.NotificationPassedToSend.Id && d.Severity == DiagnosticSeverity.Warning
+                );
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Send_Generic_Notification_Reports_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed class NotificationSender
+            {
+                public async Task SendNotification<TNotification>(
+                    ISender sender,
+                    TNotification notification)
+                    where TNotification : INotification
+                {
+                    await sender.Send(notification);
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutErrorDiagnostics,
+            result =>
+            {
+                Assert.Single(
+                    result.Diagnostics,
+                    d => d.Id == Diagnostics.NotificationPassedToSend.Id && d.Severity == DiagnosticSeverity.Warning
+                );
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_IMediator_Send_Notification_Reports_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed record UserCreated : INotification;
+
+            public sealed class UserCreatedHandler : INotificationHandler<UserCreated>
+            {
+                public ValueTask Handle(UserCreated notification, CancellationToken cancellationToken) => default;
+            }
+
+            public sealed class NotificationSender
+            {
+                public async Task SendNotification(IMediator mediator)
+                {
+                    await mediator.Send(new UserCreated());
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutErrorDiagnostics,
+            result =>
+            {
+                Assert.Single(
+                    result.Diagnostics,
+                    d => d.Id == Diagnostics.NotificationPassedToSend.Id && d.Severity == DiagnosticSeverity.Warning
+                );
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Send_Request_Does_Not_Report_Notification_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed record GetUser : IRequest<User>;
+            public sealed record User;
+
+            public sealed class GetUserHandler : IRequestHandler<GetUser, User>
+            {
+                public ValueTask<User> Handle(GetUser request, CancellationToken cancellationToken) =>
+                    ValueTask.FromResult(new User());
+            }
+
+            public sealed class RequestSender
+            {
+                public async Task SendRequest(ISender sender)
+                {
+                    await sender.Send(new GetUser());
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                Assert.DoesNotContain(result.Diagnostics, d => d.Id == Diagnostics.NotificationPassedToSend.Id);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Publish_Notification_Does_Not_Report_Send_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed record UserCreated : INotification;
+
+            public sealed class UserCreatedHandler : INotificationHandler<UserCreated>
+            {
+                public ValueTask Handle(UserCreated notification, CancellationToken cancellationToken) => default;
+            }
+
+            public sealed class NotificationPublisher
+            {
+                public async Task PublishNotification(IPublisher publisher)
+                {
+                    await publisher.Publish(new UserCreated());
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                Assert.DoesNotContain(result.Diagnostics, d => d.Id == Diagnostics.NotificationPassedToSend.Id);
+            }
+        );
+    }
+
+    [Fact]
+    public async Task Test_Unrelated_Send_Does_Not_Report_Notification_Diagnostic()
+    {
+        var inputCompilation = Fixture.CreateLibrary(
+            """
+            using System.Threading;
+            using System.Threading.Tasks;
+            using Mediator;
+
+            namespace TestCode;
+
+            public sealed record UserCreated : INotification;
+
+            public sealed class UserCreatedHandler : INotificationHandler<UserCreated>
+            {
+                public ValueTask Handle(UserCreated notification, CancellationToken cancellationToken) => default;
+            }
+
+            public sealed class ApplicationSender
+            {
+                public Task Send(UserCreated notification) => Task.CompletedTask;
+            }
+
+            public sealed class NotificationSender
+            {
+                public async Task SendNotification(ApplicationSender sender)
+                {
+                    await sender.Send(new UserCreated());
+                }
+            }
+            """
+        );
+
+        await inputCompilation.AssertAndVerify(
+            Assertions.CompilesWithoutDiagnostics,
+            result =>
+            {
+                Assert.DoesNotContain(result.Diagnostics, d => d.Id == Diagnostics.NotificationPassedToSend.Id);
             }
         );
     }

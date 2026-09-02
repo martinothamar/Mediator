@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+    {
+        await sender.Send(new UserCreated());
+                          ^^^^^^^^^^^^^^^^^
+    }
+*/
+ : (17,26)-(17,43),
+      Message: MediatorGenerator found a notification passed to Send; use Publish instead.,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: MSG0011,
+        Title: MediatorGenerator notification passed to Send,
+        MessageFormat: MediatorGenerator found a notification passed to Send; use Publish instead.,
+        Category: MediatorGenerator,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
